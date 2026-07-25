@@ -63,13 +63,13 @@ function NetworkGroup() {
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[linePositions, 3]} />
         </bufferGeometry>
-        <lineBasicMaterial color="#5B6EF5" transparent opacity={0.22} />
+        <lineBasicMaterial color="#B08D57" transparent opacity={0.22} />
       </lineSegments>
       <points>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[nodePositions, 3]} />
         </bufferGeometry>
-        <pointsMaterial color="#8B9AFF" size={0.065} sizeAttenuation transparent opacity={0.9} />
+        <pointsMaterial color="#D9C39A" size={0.065} sizeAttenuation transparent opacity={0.9} />
       </points>
     </group>
   );

@@ -17,7 +17,7 @@ export default function Nav() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-8 py-4
-                   bg-[rgba(11,13,18,0.55)] backdrop-blur-xl border-b border-[var(--border)]"
+                   bg-[rgba(11,18,32,0.55)] backdrop-blur-xl border-b border-[var(--border)]"
       >
         <a href="#" className="font-display font-bold text-lg tracking-tight">
           AVERR<span className="text-[var(--accent)]">.</span>
@@ -36,9 +36,9 @@ export default function Nav() {
           ))}
           <a
             href="#contact"
-            className="text-sm font-medium px-4 py-2 rounded-lg bg-[var(--accent)] text-white
-                       shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_12px_rgba(91,110,245,0.25)]
-                       hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(91,110,245,0.4)] transition-all duration-200"
+            className="text-sm font-medium px-4 py-2 rounded-lg bg-[var(--accent)] text-[#1C1508]
+                       shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_12px_rgba(176,141,87,0.25)]
+                       hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(176,141,87,0.4)] transition-all duration-200"
           >
             Start a Project
           </a>
@@ -60,7 +60,7 @@ export default function Nav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[100] bg-[rgba(11,13,18,0.98)] backdrop-blur-2xl
+            className="fixed inset-0 z-[100] bg-[rgba(11,18,32,0.98)] backdrop-blur-2xl
                        flex flex-col items-center justify-center gap-10"
           >
             <button
