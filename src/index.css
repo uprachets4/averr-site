@@ -1,15 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 :root {
-  --primary: #0B1220;
-  --accent: #B08D57;
-  --accent-dim: rgba(176, 141, 87, 0.14);
-  --surface: #0B1220;
-  --surface-alt: #0E1626;
-  --surface-elevated: #131C2E;
-  --text: #F7F8FA;
-  --text-muted: #8792A6;
+  --primary: #08080C;
+  --accent: #7C5CFC;
+  --accent-2: #22D3EE;
+  --accent-dim: rgba(124, 92, 252, 0.16);
+  --surface: #08080C;
+  --surface-alt: #0C0C13;
+  --surface-elevated: #121219;
+  --text: #F5F5F7;
+  --text-muted: #8C8C9C;
   --border: rgba(255, 255, 255, 0.09);
 
   --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
@@ -39,13 +40,20 @@ body {
 }
 
 .font-display {
-  font-family: 'Fraunces', serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   font-optical-sizing: auto;
+}
+
+.gradient-text {
+  background: linear-gradient(100deg, var(--accent) 10%, var(--accent-2) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 ::selection {
   background: var(--accent);
-  color: #1C1508;
+  color: #fff;
 }
 
 a {
