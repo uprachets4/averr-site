@@ -6,7 +6,6 @@ import WaveGrid from './WaveGrid';
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
 const headlineLines = [
-  ['I build the systems'],
   ['your business hasn\u2019t'],
   ['automated yet.', 'accent'],
 ];
@@ -78,7 +77,7 @@ export default function Hero() {
           animation: 'drift 90s linear infinite',
         }}
       />
-      {/* complementary indigo-blue orb, drifting opposite */}
+      {/* complementary cyan orb, drifting opposite */}
       <div
         className="absolute w-[420px] h-[420px] rounded-full -bottom-24 -left-24 blur-[30px] pointer-events-none"
         style={{
@@ -112,12 +111,30 @@ export default function Hero() {
           </motion.div>
 
           <h1 className="font-display font-bold leading-[1.04] tracking-[-0.03em] text-[clamp(38px,5.4vw,76px)] mb-6">
-            {headlineLines.map((line, i) => (
+            <span className="block overflow-hidden">
+              <motion.span
+                initial={{ y: '100%', opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.7, delay: 0.3, ease: EASE }}
+                className="inline-flex items-baseline gap-3"
+              >
+                I build the
+                <span
+                  className="inline-block px-3 rounded-2xl text-white"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--accent-3), var(--accent), var(--accent-2))',
+                  }}
+                >
+                  systems
+                </span>
+              </motion.span>
+            </span>
+            {headlineLines.slice(1).map((line, i) => (
               <span key={i} className="block overflow-hidden">
                 <motion.span
                   initial={{ y: '100%', opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.7, delay: 0.3 + i * 0.12, ease: EASE }}
+                  transition={{ duration: 0.7, delay: 0.42 + i * 0.12, ease: EASE }}
                   className={`inline-block ${line[1] === 'accent' ? 'gradient-text' : ''}`}
                 >
                   {line[0]}
