@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LINKS = [
@@ -9,6 +9,20 @@ const LINKS = [
 
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const ctaRef = useRef<HTMLAnchorElement>(null);
+
+  function handleCtaMove(e: React.MouseEvent<HTMLAnchorElement>) {
+    const el = ctaRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    el.style.transform = `translate(${x * 0.2}px, ${y * 0.3}px)`;
+  }
+
+  function handleCtaLeave() {
+    if (ctaRef.current) ctaRef.current.style.transform = '';
+  }
 
   return (
     <>
@@ -17,7 +31,7 @@ export default function Nav() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-8 py-4
-                   bg-[rgba(11,18,32,0.55)] backdrop-blur-xl border-b border-[var(--border)]"
+                   bg-[rgba(8,8,12,0.55)] backdrop-blur-xl border-b border-[var(--border)]"
       >
         <a href="#" className="font-display font-bold text-lg tracking-tight">
           AVERR<span className="text-[var(--accent)]">.</span>
@@ -35,10 +49,14 @@ export default function Nav() {
             </a>
           ))}
           <a
+            ref={ctaRef}
             href="#contact"
-            className="text-sm font-medium px-4 py-2 rounded-lg bg-[var(--accent)] text-[#1C1508]
-                       shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_12px_rgba(176,141,87,0.25)]
-                       hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(176,141,87,0.4)] transition-all duration-200"
+            onMouseMove={handleCtaMove}
+            onMouseLeave={handleCtaLeave}
+            style={{ transition: 'transform 0.15s ease-out' }}
+            className="text-sm font-medium px-4 py-2 rounded-lg bg-[var(--accent)] text-white
+                       shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_16px_rgba(124,92,252,0.35)]
+                       hover:shadow-[0_4px_20px_rgba(124,92,252,0.5)] transition-shadow duration-200"
           >
             Start a Project
           </a>
@@ -60,7 +78,7 @@ export default function Nav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[100] bg-[rgba(11,18,32,0.98)] backdrop-blur-2xl
+            className="fixed inset-0 z-[100] bg-[rgba(8,8,12,0.98)] backdrop-blur-2xl
                        flex flex-col items-center justify-center gap-10"
           >
             <button
