@@ -5,7 +5,7 @@ const EASE = [0.25, 0.1, 0.25, 1] as const;
 
 export default function HowIWork() {
   return (
-    <section id="how" className="py-24 md:py-32 px-6 md:px-8 bg-[var(--surface-alt)]">
+    <section id="how" className="light-section py-24 md:py-32 px-6 md:px-8">
       <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
         <motion.div
           initial={{ opacity: 0, y: 26 }}
@@ -54,11 +54,11 @@ export default function HowIWork() {
             className="flex gap-8 flex-wrap"
           >
             <div>
-              <div className="font-display text-[34px] font-bold text-[var(--accent)]"><AnimatedNumber value="4" /></div>
+              <div className="font-display text-[34px] font-bold gradient-text-stat"><AnimatedNumber value="4" /></div>
               <div className="text-[13px] text-[var(--text-muted)] mt-1">Products shipped or in build</div>
             </div>
             <div>
-              <div className="font-display text-[34px] font-bold text-[var(--accent)]"><AnimatedNumber value="1" /></div>
+              <div className="font-display text-[34px] font-bold gradient-text-stat"><AnimatedNumber value="1" /></div>
               <div className="text-[13px] text-[var(--text-muted)] mt-1">Operator across all of them</div>
             </div>
           </motion.div>

@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
   --primary: #08080C;
   --accent: #7C5CFC;
   --accent-2: #22D3EE;
+  --accent-3: #FF6B9D;
   --accent-dim: rgba(124, 92, 252, 0.16);
   --surface: #08080C;
   --surface-alt: #0C0C13;
@@ -13,11 +14,29 @@
   --text-muted: #8C8C9C;
   --border: rgba(255, 255, 255, 0.09);
 
+  --light-surface: #F5F5F7;
+  --light-surface-alt: #FFFFFF;
+  --light-surface-elevated: #FFFFFF;
+  --light-text: #1D1D1F;
+  --light-text-muted: #6E6E73;
+  --light-border: rgba(0, 0, 0, 0.08);
+
   --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
   --sp-6: 24px; --sp-8: 32px;  --sp-12: 48px; --sp-16: 64px;
   --sp-24: 96px; --sp-32: 128px;
 
   --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.light-section {
+  --surface: var(--light-surface);
+  --surface-alt: var(--light-surface-alt);
+  --surface-elevated: var(--light-surface-elevated);
+  --text: var(--light-text);
+  --text-muted: var(--light-text-muted);
+  --border: var(--light-border);
+  background: var(--surface-alt);
+  color: var(--text);
 }
 
 * {
@@ -40,8 +59,9 @@ body {
 }
 
 .font-display {
-  font-family: 'Bricolage Grotesque', sans-serif;
-  font-optical-sizing: auto;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
 .gradient-text {
@@ -49,6 +69,17 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.gradient-text-stat {
+  background: linear-gradient(100deg, var(--accent-3) 0%, var(--accent) 55%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pill {
+  border-radius: 999px !important;
 }
 
 ::selection {
@@ -67,6 +98,10 @@ button {
   border: none;
   background: none;
   color: inherit;
+}
+
+input, textarea {
+  color: var(--text);
 }
 
 @media (prefers-reduced-motion: reduce) {

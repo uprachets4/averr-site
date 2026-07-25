@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import HeroScene from './HeroScene';
+import WaveGrid from './WaveGrid';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -67,6 +68,7 @@ export default function Hero() {
       onMouseLeave={() => setGlow((g) => ({ ...g, visible: false }))}
       className="relative min-h-screen flex items-center px-6 md:px-8 pt-32 pb-24 overflow-hidden"
     >
+      <WaveGrid />
       {/* ambient violet orb */}
       <div
         className="absolute w-[680px] h-[680px] rounded-full -top-44 -right-36 blur-[20px] pointer-events-none"
@@ -142,7 +144,7 @@ export default function Hero() {
           >
             <MagneticLink
               href="#work"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-[10px] text-[15px] font-medium
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-[15px] font-medium
                          bg-[var(--accent)] text-white
                          shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_20px_rgba(124,92,252,0.35),0_12px_40px_rgba(124,92,252,0.15)]
                          hover:shadow-[0_4px_24px_rgba(124,92,252,0.5)] transition-shadow duration-200"
@@ -151,7 +153,7 @@ export default function Hero() {
             </MagneticLink>
             <MagneticLink
               href="#contact"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-[10px] text-[15px] font-medium
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-[15px] font-medium
                          border border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-white/[0.03] transition-colors duration-200"
             >
               Start a Project

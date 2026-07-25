@@ -54,7 +54,7 @@ export default function Nav() {
             onMouseMove={handleCtaMove}
             onMouseLeave={handleCtaLeave}
             style={{ transition: 'transform 0.15s ease-out' }}
-            className="text-sm font-medium px-4 py-2 rounded-lg bg-[var(--accent)] text-white
+            className="text-sm font-medium px-4 py-2 rounded-full bg-[var(--accent)] text-white
                        shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_16px_rgba(124,92,252,0.35)]
                        hover:shadow-[0_4px_20px_rgba(124,92,252,0.5)] transition-shadow duration-200"
           >

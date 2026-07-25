@@ -7,7 +7,7 @@ export default function Contact() {
   const [sent, setSent] = useState(false);
 
   return (
-    <section id="contact" className="py-24 md:py-32 px-6 md:px-8 bg-[var(--surface-alt)]">
+    <section id="contact" className="light-section py-24 md:py-32 px-6 md:px-8">
       <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
         <motion.div
           initial={{ opacity: 0, y: 26 }}
@@ -51,7 +51,7 @@ export default function Contact() {
               type="text"
               required
               placeholder="Your name"
-              className="w-full bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[10px] px-3.5 py-3 text-[15px] focus:border-[var(--accent)] outline-none transition-colors"
+              className="w-full bg-[var(--surface-elevated)] border border-[var(--border)] rounded-full px-3.5 py-3 text-[15px] focus:border-[var(--accent)] outline-none transition-colors"
             />
           </div>
           <div>
@@ -60,7 +60,7 @@ export default function Contact() {
               type="email"
               required
               placeholder="you@company.com"
-              className="w-full bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[10px] px-3.5 py-3 text-[15px] focus:border-[var(--accent)] outline-none transition-colors"
+              className="w-full bg-[var(--surface-elevated)] border border-[var(--border)] rounded-full px-3.5 py-3 text-[15px] focus:border-[var(--accent)] outline-none transition-colors"
             />
           </div>
           <div>
@@ -68,12 +68,12 @@ export default function Contact() {
             <textarea
               placeholder="A quick line on the project, and where you're stuck."
               rows={4}
-              className="w-full bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[10px] px-3.5 py-3 text-[15px] focus:border-[var(--accent)] outline-none transition-colors resize-y"
+              className="w-full bg-[var(--surface-elevated)] border border-[var(--border)] rounded-full px-3.5 py-3 text-[15px] focus:border-[var(--accent)] outline-none transition-colors resize-y"
             />
           </div>
           <button
             type="submit"
-            className="mt-2 self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-[10px] text-[15px] font-medium
+            className="mt-2 self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-[15px] font-medium
                        bg-[var(--accent)] text-white
                        shadow-[0_4px_20px_rgba(124,92,252,0.35)] hover:shadow-[0_4px_24px_rgba(124,92,252,0.5)]
                        transition-shadow duration-200"

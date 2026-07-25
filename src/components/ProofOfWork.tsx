@@ -74,7 +74,7 @@ function Showcase({
         <div className="flex gap-8 flex-shrink-0">
           {stats.map((s) => (
             <div key={s.label}>
-              <div className="font-display text-2xl font-bold text-[var(--accent)]"><AnimatedNumber value={s.num} /></div>
+              <div className="font-display text-2xl font-bold gradient-text-stat"><AnimatedNumber value={s.num} /></div>
               <div className="text-xs text-[var(--text-muted)] mt-0.5">{s.label}</div>
             </div>
           ))}
