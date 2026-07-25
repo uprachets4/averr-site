@@ -25,6 +25,12 @@ const cgSlides = [
   { src: '/work/cgwalls/testimonials.jpg', alt: 'CG Walls & Floors client reviews, 4.8 rating', caption: 'Real clients, real names — 4.8 average across Google reviews' },
 ];
 
+const cadenceSlides = [
+  { src: '/work/cadencestack/pipeline.jpg', alt: 'CadenceStack content pipeline board', caption: 'Content pipeline — drafts scored on voice and strength before they ship' },
+  { src: '/work/cadencestack/analytics.jpg', alt: 'CadenceStack performance analytics', caption: 'Performance analytics — impressions, engagement, and DMs tracked live' },
+  { src: '/work/cadencestack/pillars.jpg', alt: 'CadenceStack content pillars strategy', caption: 'Content pillars — real strategy behind every post, not a template' },
+];
+
 function Showcase({
   tag,
   logo,
@@ -32,6 +38,7 @@ function Showcase({
   description,
   stats,
   slides,
+  delay = 0,
 }: {
   tag: string;
   logo: string;
@@ -39,14 +46,15 @@ function Showcase({
   description: string;
   stats: { num: string; label: string }[];
   slides: typeof siftSlides;
+  delay?: number;
 }) {
   return (
     <motion.div
       variants={fadeUp}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.7, ease: EASE }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.7, delay, ease: EASE }}
       className="bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[20px] p-8 md:p-12 mb-12"
     >
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-8">
@@ -82,13 +90,11 @@ function SecondaryCard({
   logo,
   name,
   description,
-  delay,
 }: {
   tag: string;
   logo?: string;
   name: string;
   description: string;
-  delay: number;
 }) {
   return (
     <motion.div
@@ -96,7 +102,7 @@ function SecondaryCard({
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, delay, ease: EASE }}
+      transition={{ duration: 0.6, ease: EASE }}
       className="bg-[var(--surface-elevated)] border border-[var(--border)] rounded-2xl p-8 hover:border-[rgba(124,92,252,0.4)] transition-colors duration-300"
     >
       <span className="inline-block text-[11.5px] tracking-[0.06em] uppercase text-[var(--accent)] bg-[var(--accent-dim)] px-2.5 py-1 rounded-full">
@@ -160,21 +166,28 @@ export default function ProofOfWork() {
             { num: '48h', label: 'Average quote turnaround' },
           ]}
           slides={cgSlides}
+          delay={0.1}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <SecondaryCard
-            tag="In Build"
-            logo="/logos/cadencestack.png"
-            name="CadenceStack"
-            description="A content operating system for LinkedIn growth — plans posts against strategic pillars, scores each draft on voice and strength before it ships, and tracks what actually moves impressions and inbound DMs."
-            delay={0}
-          />
+        <Showcase
+          tag="In Build"
+          logo="/logos/cadencestack.png"
+          name="CadenceStack"
+          description="A content operating system for LinkedIn growth — plans posts against strategic pillars, scores each draft on voice and strength before it ships, and tracks what actually moves impressions and inbound DMs."
+          stats={[
+            { num: '16', label: 'Posts indexed and scored' },
+            { num: '6', label: 'Strategic content pillars' },
+            { num: '8/10', label: 'Best-scoring template quality' },
+          ]}
+          slides={cadenceSlides}
+          delay={0.2}
+        />
+
+        <div className="max-w-[560px]">
           <SecondaryCard
             tag="Founder"
             name="CareerClarity AI"
             description="Turns raw exam data into a clear picture of where a student stands — automated, the moment scores land. Early-stage; more to show soon."
-            delay={0.1}
           />
         </div>
       </div>
