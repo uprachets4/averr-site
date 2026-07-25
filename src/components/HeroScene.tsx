@@ -69,7 +69,7 @@ function NetworkGroup() {
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[nodePositions, 3]} />
         </bufferGeometry>
-        <pointsMaterial color="#22D3EE" size={0.065} sizeAttenuation transparent opacity={0.9} />
+        <pointsMaterial color="#6E8CF0" size={0.065} sizeAttenuation transparent opacity={0.9} />
       </points>
     </group>
   );

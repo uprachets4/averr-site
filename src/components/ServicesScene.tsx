@@ -39,7 +39,7 @@ function Cluster() {
   const shapes = useMemo(
     () => [
       { position: [-1.4, 0.4, 0] as [number, number, number], scale: 1.1, speed: 0.25, color: '#7C5CFC' },
-      { position: [1.3, -0.3, -0.5] as [number, number, number], scale: 0.75, speed: 0.4, color: '#22D3EE' },
+      { position: [1.3, -0.3, -0.5] as [number, number, number], scale: 0.75, speed: 0.4, color: '#6E8CF0' },
       { position: [0.2, 1, -1] as [number, number, number], scale: 0.5, speed: 0.55, color: '#7C5CFC' },
     ],
     []

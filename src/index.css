@@ -2,18 +2,19 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #08080C;
+  --primary: #1A202D;
   --accent: #7C5CFC;
-  --accent-2: #22D3EE;
-  --accent-3: #FF6B9D;
+  --accent-2: #6E8CF0;
+  --accent-3: #FF8F7A;
   --accent-dim: rgba(124, 92, 252, 0.16);
-  --surface: #08080C;
-  --surface-alt: #0C0C13;
-  --surface-elevated: #121219;
+  --surface: #1A202D;
+  --surface-alt: #060909;
+  --surface-elevated: #12161F;
   --text: #F5F5F7;
   --text-muted: #8C8C9C;
   --border: rgba(255, 255, 255, 0.09);
 
+  /* light-section overrides, used by wrapping a section in .light-section */
   --light-surface: #F5F5F7;
   --light-surface-alt: #FFFFFF;
   --light-surface-elevated: #FFFFFF;
