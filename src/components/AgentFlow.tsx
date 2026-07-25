@@ -24,7 +24,7 @@ export default function AgentFlow() {
   }, []);
 
   return (
-    <section className="py-24 md:py-28 px-6 md:px-8 bg-[var(--surface-alt)] overflow-hidden">
+    <section className="light-section py-24 md:py-28 px-6 md:px-8 overflow-hidden">
       <div className="max-w-[1240px] mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 26 }}
@@ -60,7 +60,7 @@ export default function AgentFlow() {
                 id={`flow-path-${i}`}
                 d={d}
                 fill="none"
-                stroke="rgba(124,92,252,0.25)"
+                stroke="rgba(124,92,252,0.35)"
                 strokeWidth="2"
               />
             ))}
@@ -99,7 +99,7 @@ export default function AgentFlow() {
                   fill="var(--text)"
                   fontSize="16"
                   fontWeight="600"
-                  fontFamily="Bricolage Grotesque, sans-serif"
+                  fontFamily="Inter, sans-serif"
                 >
                   {node.label}
                 </text>
@@ -119,7 +119,7 @@ export default function AgentFlow() {
                   textAnchor="middle"
                   fill="var(--text-muted)"
                   fontSize="11"
-                  fontFamily="Bricolage Grotesque, sans-serif"
+                  fontFamily="Inter, sans-serif"
                   letterSpacing="1"
                 >
                   {`//_0${i + 1}`}

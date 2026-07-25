@@ -120,7 +120,7 @@ function SecondaryCard({
 
 export default function ProofOfWork() {
   return (
-    <section id="work" className="py-24 md:py-32 px-6 md:px-8">
+    <section id="work" className="light-section py-24 md:py-32 px-6 md:px-8">
       <div className="max-w-[1240px] mx-auto">
         <motion.div
           variants={fadeUp}
