@@ -67,7 +67,7 @@ export default function AgentFlow() {
 
             {!reduced &&
               PATHS.map((_, i) => (
-                <circle key={`pulse-${i}`} r="5" fill={i % 2 === 0 ? '#7C5CFC' : '#22D3EE'}>
+                <circle key={`pulse-${i}`} r="5" fill={i % 2 === 0 ? '#7C5CFC' : '#6E8CF0'}>
                   <animateMotion
                     dur="2.4s"
                     begin={`${i * 0.5}s`}
@@ -88,10 +88,10 @@ export default function AgentFlow() {
                   cy={130}
                   r={34}
                   fill="var(--surface-elevated)"
-                  stroke={i === 0 || i === 2 ? '#7C5CFC' : '#22D3EE'}
+                  stroke={i === 0 || i === 2 ? '#7C5CFC' : '#6E8CF0'}
                   strokeWidth="1.5"
                 />
-                <circle cx={node.x} cy={130} r={7} fill={i === 0 || i === 2 ? '#7C5CFC' : '#22D3EE'} opacity="0.9" />
+                <circle cx={node.x} cy={130} r={7} fill={i === 0 || i === 2 ? '#7C5CFC' : '#6E8CF0'} opacity="0.9" />
                 <text
                   x={node.x}
                   y={190}

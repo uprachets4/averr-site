@@ -78,12 +78,12 @@ export default function Hero() {
           animation: 'drift 90s linear infinite',
         }}
       />
-      {/* complementary cyan orb, drifting opposite */}
+      {/* complementary indigo-blue orb, drifting opposite */}
       <div
         className="absolute w-[420px] h-[420px] rounded-full -bottom-24 -left-24 blur-[30px] pointer-events-none"
         style={{
           background:
-            'radial-gradient(circle, rgba(34,211,238,0.28) 0%, rgba(34,211,238,0.05) 50%, transparent 70%)',
+            'radial-gradient(circle, rgba(110,140,240,0.28) 0%, rgba(110,140,240,0.05) 50%, transparent 70%)',
           animation: 'driftReverse 70s linear infinite',
         }}
       />
