@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import AnimatedNumber from './AnimatedNumber';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -53,11 +54,11 @@ export default function HowIWork() {
             className="flex gap-8 flex-wrap"
           >
             <div>
-              <div className="font-display text-[34px] font-bold text-[var(--accent)]">4</div>
+              <div className="font-display text-[34px] font-bold text-[var(--accent)]"><AnimatedNumber value="4" /></div>
               <div className="text-[13px] text-[var(--text-muted)] mt-1">Products shipped or in build</div>
             </div>
             <div>
-              <div className="font-display text-[34px] font-bold text-[var(--accent)]">1</div>
+              <div className="font-display text-[34px] font-bold text-[var(--accent)]"><AnimatedNumber value="1" /></div>
               <div className="text-[13px] text-[var(--text-muted)] mt-1">Operator across all of them</div>
             </div>
           </motion.div>

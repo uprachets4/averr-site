@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import Slider from './Slider';
+import AnimatedNumber from './AnimatedNumber';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -73,7 +74,7 @@ function Showcase({
         <div className="flex gap-8 flex-shrink-0">
           {stats.map((s) => (
             <div key={s.label}>
-              <div className="font-display text-2xl font-bold text-[var(--accent)]">{s.num}</div>
+              <div className="font-display text-2xl font-bold text-[var(--accent)]"><AnimatedNumber value={s.num} /></div>
               <div className="text-xs text-[var(--text-muted)] mt-0.5">{s.label}</div>
             </div>
           ))}
