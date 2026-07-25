@@ -10,6 +10,46 @@ const headlineLines = [
   ['automated yet.', 'accent'],
 ];
 
+function MagneticLink({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className: string;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLAnchorElement>(null);
+
+  function handleMove(e: React.MouseEvent<HTMLAnchorElement>) {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    el.style.transform = `translate(${x * 0.25}px, ${y * 0.35}px)`;
+  }
+
+  function handleLeave() {
+    const el = ref.current;
+    if (!el) return;
+    el.style.transform = '';
+  }
+
+  return (
+    <a
+      ref={ref}
+      href={href}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      className={className}
+      style={{ transition: 'transform 0.15s ease-out' }}
+    >
+      {children}
+    </a>
+  );
+}
+
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null);
   const [glow, setGlow] = useState({ x: 0, y: 0, visible: false });
@@ -27,24 +67,33 @@ export default function Hero() {
       onMouseLeave={() => setGlow((g) => ({ ...g, visible: false }))}
       className="relative min-h-screen flex items-center px-6 md:px-8 pt-32 pb-24 overflow-hidden"
     >
-      {/* ambient drifting orb */}
+      {/* ambient violet orb */}
       <div
-        className="absolute w-[640px] h-[640px] rounded-full -top-44 -right-36 blur-[10px] pointer-events-none"
+        className="absolute w-[680px] h-[680px] rounded-full -top-44 -right-36 blur-[20px] pointer-events-none"
         style={{
           background:
-            'radial-gradient(circle, rgba(176,141,87,0.35) 0%, rgba(176,141,87,0.08) 45%, transparent 70%)',
+            'radial-gradient(circle, rgba(124,92,252,0.45) 0%, rgba(124,92,252,0.1) 45%, transparent 70%)',
           animation: 'drift 90s linear infinite',
+        }}
+      />
+      {/* complementary cyan orb, drifting opposite */}
+      <div
+        className="absolute w-[420px] h-[420px] rounded-full -bottom-24 -left-24 blur-[30px] pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(34,211,238,0.28) 0%, rgba(34,211,238,0.05) 50%, transparent 70%)',
+          animation: 'driftReverse 70s linear infinite',
         }}
       />
       {/* cursor-following glow, desktop only */}
       <div
-        className="absolute w-[420px] h-[420px] rounded-full pointer-events-none z-[1] hidden md:block transition-opacity duration-300"
+        className="absolute w-[460px] h-[460px] rounded-full pointer-events-none z-[1] hidden md:block transition-opacity duration-300"
         style={{
           left: glow.x,
           top: glow.y,
           transform: 'translate(-50%, -50%)',
           opacity: glow.visible ? 1 : 0,
-          background: 'radial-gradient(circle, rgba(176,141,87,0.16) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(124,92,252,0.22) 0%, transparent 70%)',
         }}
       />
 
@@ -54,20 +103,20 @@ export default function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
-            className="font-display text-[13px] tracking-[0.08em] uppercase text-[var(--accent)] flex items-center gap-2 mb-6"
+            className="font-display text-[13px] tracking-[0.08em] uppercase text-[var(--accent-2)] flex items-center gap-2 mb-6"
           >
-            <span className="w-4 h-px bg-[var(--accent)]" />
+            <span className="w-4 h-px bg-[var(--accent-2)]" />
             Averr Studio &mdash; Toronto/GTA
           </motion.div>
 
-          <h1 className="font-display font-bold leading-[1.06] tracking-[-0.02em] text-[clamp(38px,5.2vw,72px)] mb-6">
+          <h1 className="font-display font-bold leading-[1.04] tracking-[-0.03em] text-[clamp(38px,5.4vw,76px)] mb-6">
             {headlineLines.map((line, i) => (
               <span key={i} className="block overflow-hidden">
                 <motion.span
                   initial={{ y: '100%', opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.7, delay: 0.3 + i * 0.12, ease: EASE }}
-                  className={`inline-block ${line[1] === 'accent' ? 'text-[var(--accent)]' : ''}`}
+                  className={`inline-block ${line[1] === 'accent' ? 'gradient-text' : ''}`}
                 >
                   {line[0]}
                 </motion.span>
@@ -91,22 +140,22 @@ export default function Hero() {
             transition={{ duration: 0.7, delay: 0.9, ease: EASE }}
             className="flex flex-wrap gap-4"
           >
-            <a
+            <MagneticLink
               href="#work"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-[10px] text-[15px] font-medium
-                         bg-[var(--accent)] text-[#1C1508]
-                         shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_12px_rgba(176,141,87,0.08),0_12px_40px_rgba(176,141,87,0.04)]
-                         hover:shadow-[0_4px_12px_rgba(176,141,87,0.35)] hover:-translate-y-0.5 transition-all duration-200"
+                         bg-[var(--accent)] text-white
+                         shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_20px_rgba(124,92,252,0.35),0_12px_40px_rgba(124,92,252,0.15)]
+                         hover:shadow-[0_4px_24px_rgba(124,92,252,0.5)] transition-shadow duration-200"
             >
               See the Work
-            </a>
-            <a
+            </MagneticLink>
+            <MagneticLink
               href="#contact"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-[10px] text-[15px] font-medium
-                         border border-[var(--border)] hover:border-white/25 hover:bg-white/[0.03] transition-all duration-200"
+                         border border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-white/[0.03] transition-colors duration-200"
             >
               Start a Project
-            </a>
+            </MagneticLink>
           </motion.div>
         </div>
 
@@ -119,7 +168,7 @@ export default function Hero() {
           <div
             className="rounded-2xl border border-[var(--border)] overflow-hidden aspect-square md:aspect-[4/5]
                        bg-[var(--surface-elevated)]
-                       shadow-[0_1px_2px_rgba(0,0,0,0.05),0_8px_24px_rgba(0,0,0,0.3),0_30px_70px_rgba(0,0,0,0.35)]"
+                       shadow-[0_1px_2px_rgba(0,0,0,0.05),0_8px_24px_rgba(0,0,0,0.4),0_30px_80px_rgba(124,92,252,0.08)]"
           >
             <HeroScene />
           </div>
@@ -129,7 +178,12 @@ export default function Hero() {
       <style>{`
         @keyframes drift {
           0% { transform: translate(0,0) scale(1); }
-          50% { transform: translate(-40px,60px) scale(1.08); }
+          50% { transform: translate(-50px,70px) scale(1.1); }
+          100% { transform: translate(0,0) scale(1); }
+        }
+        @keyframes driftReverse {
+          0% { transform: translate(0,0) scale(1); }
+          50% { transform: translate(40px,-50px) scale(1.15); }
           100% { transform: translate(0,0) scale(1); }
         }
       `}</style>
