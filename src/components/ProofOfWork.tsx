@@ -97,7 +97,7 @@ function SecondaryCard({
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.6, delay, ease: EASE }}
-      className="bg-[var(--surface-elevated)] border border-[var(--border)] rounded-2xl p-8 hover:border-[rgba(91,110,245,0.4)] transition-colors duration-300"
+      className="bg-[var(--surface-elevated)] border border-[var(--border)] rounded-2xl p-8 hover:border-[rgba(176,141,87,0.4)] transition-colors duration-300"
     >
       <span className="inline-block text-[11.5px] tracking-[0.06em] uppercase text-[var(--accent)] bg-[var(--accent-dim)] px-2.5 py-1 rounded-full">
         {tag}
