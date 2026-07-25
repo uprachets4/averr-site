@@ -27,14 +27,16 @@ export default function Hero() {
       onMouseLeave={() => setGlow((g) => ({ ...g, visible: false }))}
       className="relative min-h-screen flex items-center px-6 md:px-8 pt-32 pb-24 overflow-hidden"
     >
+      {/* ambient drifting orb */}
       <div
         className="absolute w-[640px] h-[640px] rounded-full -top-44 -right-36 blur-[10px] pointer-events-none"
         style={{
           background:
-            'radial-gradient(circle, rgba(91,110,245,0.35) 0%, rgba(91,110,245,0.08) 45%, transparent 70%)',
+            'radial-gradient(circle, rgba(176,141,87,0.35) 0%, rgba(176,141,87,0.08) 45%, transparent 70%)',
           animation: 'drift 90s linear infinite',
         }}
       />
+      {/* cursor-following glow, desktop only */}
       <div
         className="absolute w-[420px] h-[420px] rounded-full pointer-events-none z-[1] hidden md:block transition-opacity duration-300"
         style={{
@@ -42,7 +44,7 @@ export default function Hero() {
           top: glow.y,
           transform: 'translate(-50%, -50%)',
           opacity: glow.visible ? 1 : 0,
-          background: 'radial-gradient(circle, rgba(91,110,245,0.16) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(176,141,87,0.16) 0%, transparent 70%)',
         }}
       />
 
@@ -92,9 +94,9 @@ export default function Hero() {
             <a
               href="#work"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-[10px] text-[15px] font-medium
-                         bg-[var(--accent)] text-white
-                         shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_12px_rgba(91,110,245,0.08),0_12px_40px_rgba(91,110,245,0.04)]
-                         hover:shadow-[0_4px_12px_rgba(91,110,245,0.35)] hover:-translate-y-0.5 transition-all duration-200"
+                         bg-[var(--accent)] text-[#1C1508]
+                         shadow-[0_1px_2px_rgba(0,0,0,0.05),0_4px_12px_rgba(176,141,87,0.08),0_12px_40px_rgba(176,141,87,0.04)]
+                         hover:shadow-[0_4px_12px_rgba(176,141,87,0.35)] hover:-translate-y-0.5 transition-all duration-200"
             >
               See the Work
             </a>
