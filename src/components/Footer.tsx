@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="border-t border-[var(--border)] py-16 px-6 md:px-8">
+    <footer className="border-t border-[var(--border)] py-16 px-6 md:px-8 bg-[var(--surface-alt)]">
       <div className="max-w-[1240px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr] gap-16">
           <div>

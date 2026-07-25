@@ -47,7 +47,7 @@ function TiltCard({
 
 export default function Services() {
   return (
-    <section id="services" className="py-24 md:py-32 px-6 md:px-8">
+    <section id="services" className="py-24 md:py-32 px-6 md:px-8 bg-[var(--surface-alt)]">
       <div className="max-w-[1240px] mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 26 }}
