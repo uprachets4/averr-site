@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { animate } from 'animejs';
 import HeroScene from './HeroScene';
 import WaveGrid from './WaveGrid';
 import FloatingPaths from './FloatingPaths';
@@ -53,6 +54,7 @@ function MagneticLink({
 
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null);
+  const badgeRef = useRef<HTMLSpanElement>(null);
   const [glow, setGlow] = useState({ x: 0, y: 0, visible: false });
 
   function handleMouseMove(e: React.MouseEvent<HTMLElement>) {
@@ -60,6 +62,18 @@ export default function Hero() {
     if (!rect) return;
     setGlow({ x: e.clientX - rect.left, y: e.clientY - rect.top, visible: true });
   }
+
+  useEffect(() => {
+    if (!badgeRef.current) return;
+    // AnimeJS: continuous shimmering gradient shift on the "systems" badge
+    animate(badgeRef.current, {
+      backgroundPosition: ['0% 50%', '100% 50%'],
+      loop: true,
+      alternate: true,
+      duration: 2800,
+      ease: 'inOutSine',
+    });
+  }, []);
 
   return (
     <header
@@ -104,9 +118,11 @@ export default function Hero() {
               >
                 I build the
                 <span
+                  ref={badgeRef}
                   className="inline-block px-3 rounded-2xl text-white"
                   style={{
                     background: 'linear-gradient(135deg, var(--accent-3), var(--accent), var(--accent-2))',
+                    backgroundSize: '200% 200%',
                   }}
                 >
                   systems

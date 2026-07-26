@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import ServicesScene from './ServicesScene';
-import RingChart from './RingChart';
+import ServiceRing from './ServiceRing';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -101,8 +101,8 @@ export default function Services() {
                 &mdash; lead scanning, outreach drafting, data analysis, follow-ups.
               </p>
               <div className="flex gap-6 mb-5">
-                <RingChart value={85} label="Automation coverage" color="var(--accent)" />
-                <RingChart value={70} label="Hours saved weekly" color="var(--accent-2)" />
+                <ServiceRing value={85} label="Automation coverage" color="var(--accent)" />
+                <ServiceRing value={70} label="Hours saved weekly" color="var(--accent-2)" />
               </div>
               <ul className="flex flex-col gap-2">
                 {[
@@ -130,8 +130,8 @@ export default function Services() {
               like a steal.
             </p>
             <div className="flex gap-6 mb-5">
-              <RingChart value={92} label="Design distinctiveness" color="var(--accent)" />
-              <RingChart value={96} label="Performance score" color="var(--accent-2)" />
+              <ServiceRing value={92} label="Design distinctiveness" color="var(--accent)" />
+              <ServiceRing value={96} label="Performance score" color="var(--accent-2)" />
             </div>
             <ul className="flex flex-col gap-2">
               {[
@@ -158,8 +158,8 @@ export default function Services() {
               users can log into.
             </p>
             <div className="flex gap-6 mb-5">
-              <RingChart value={88} label="Launch readiness" color="var(--accent)" />
-              <RingChart value={90} label="AI-native features" color="var(--accent-2)" />
+              <ServiceRing value={88} label="Launch readiness" color="var(--accent)" />
+              <ServiceRing value={90} label="AI-native features" color="var(--accent-2)" />
             </div>
             <ul className="flex flex-col gap-2">
               {[
