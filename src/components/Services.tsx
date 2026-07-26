@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import ServicesScene from './ServicesScene';
+import ServiceScenePipeline from './ServiceScenePipeline';
+import ServiceSceneLayers from './ServiceSceneLayers';
+import ServiceSceneBlocks from './ServiceSceneBlocks';
 import ServiceMetric from './ServiceMetric';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
@@ -92,7 +94,7 @@ export default function Services() {
               }}
             />
             <div className="absolute -right-10 -top-10 w-56 h-56 opacity-70 pointer-events-none">
-              <ServicesScene />
+              <ServiceScenePipeline />
             </div>
             <div className="relative z-[1]">
               <div className="font-display text-xs text-[var(--accent)] uppercase tracking-[0.08em] mb-2">
@@ -124,56 +126,66 @@ export default function Services() {
 
           <TiltCard
             delay={0.1}
-            className="rounded-2xl p-8 border border-[var(--border)] bg-[var(--surface-elevated)]"
+            className="rounded-2xl p-8 border border-[var(--border)] bg-[var(--surface-elevated)] relative overflow-hidden"
           >
-            <h3 className="font-display font-bold text-2xl mb-3">Web &amp; Brand</h3>
-            <p className="text-[var(--text-muted)] text-[15px] mb-4">
-              Premium, portfolio-grade websites &mdash; the kind that make the price feel
-              like a steal.
-            </p>
-            <div className="flex gap-6 mb-5">
-              <ServiceMetric value={92} label="Design distinctiveness" color="var(--accent)" />
-              <ServiceMetric value={96} label="Performance score" color="var(--accent-2)" />
+            <div className="absolute -right-8 -top-8 w-48 h-48 opacity-60 pointer-events-none">
+              <ServiceSceneLayers />
             </div>
-            <ul className="flex flex-col gap-2">
-              {[
-                'Full design direction, not a template',
-                'Motion & interaction system included',
-                'Built for Framer or your stack of choice',
-              ].map((item) => (
-                <li key={item} className="text-sm text-[var(--text-muted)] pl-4 relative">
-                  <span className="absolute left-0 text-[var(--accent)]">&mdash;</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <div className="relative z-[1]">
+              <h3 className="font-display font-bold text-2xl mb-3">Web &amp; Brand</h3>
+              <p className="text-[var(--text-muted)] text-[15px] mb-4 max-w-[280px]">
+                Premium, portfolio-grade websites &mdash; the kind that make the price feel
+                like a steal.
+              </p>
+              <div className="flex gap-6 mb-5">
+                <ServiceMetric value={92} label="Design distinctiveness" color="var(--accent)" />
+                <ServiceMetric value={96} label="Performance score" color="var(--accent-2)" />
+              </div>
+              <ul className="flex flex-col gap-2">
+                {[
+                  'Full design direction, not a template',
+                  'Motion & interaction system included',
+                  'Built for Framer or your stack of choice',
+                ].map((item) => (
+                  <li key={item} className="text-sm text-[var(--text-muted)] pl-4 relative">
+                    <span className="absolute left-0 text-[var(--accent)]">&mdash;</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </TiltCard>
 
           <TiltCard
             delay={0.2}
-            className="rounded-2xl p-8 border border-[var(--border)] bg-[var(--surface-elevated)]"
+            className="rounded-2xl p-8 border border-[var(--border)] bg-[var(--surface-elevated)] relative overflow-hidden"
           >
-            <h3 className="font-display font-bold text-2xl mb-3">SaaS &amp; Product Build</h3>
-            <p className="text-[var(--text-muted)] text-[15px] mb-4">
-              Full products shipped fast &mdash; from idea to a working platform your
-              users can log into.
-            </p>
-            <div className="flex gap-6 mb-5">
-              <ServiceMetric value={88} label="Launch readiness" color="var(--accent)" />
-              <ServiceMetric value={90} label="AI-native features" color="var(--accent-2)" />
+            <div className="absolute -right-8 -top-8 w-48 h-48 opacity-60 pointer-events-none">
+              <ServiceSceneBlocks />
             </div>
-            <ul className="flex flex-col gap-2">
-              {[
-                'Rapid build via Lovable + modern stack',
-                'AI-native by default, not bolted on',
-                'Built to launch, not just to demo',
-              ].map((item) => (
-                <li key={item} className="text-sm text-[var(--text-muted)] pl-4 relative">
-                  <span className="absolute left-0 text-[var(--accent)]">&mdash;</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <div className="relative z-[1]">
+              <h3 className="font-display font-bold text-2xl mb-3">SaaS &amp; Product Build</h3>
+              <p className="text-[var(--text-muted)] text-[15px] mb-4 max-w-[280px]">
+                Full products shipped fast &mdash; from idea to a working platform your
+                users can log into.
+              </p>
+              <div className="flex gap-6 mb-5">
+                <ServiceMetric value={88} label="Launch readiness" color="var(--accent)" />
+                <ServiceMetric value={90} label="AI-native features" color="var(--accent-2)" />
+              </div>
+              <ul className="flex flex-col gap-2">
+                {[
+                  'Rapid build via Lovable + modern stack',
+                  'AI-native by default, not bolted on',
+                  'Built to launch, not just to demo',
+                ].map((item) => (
+                  <li key={item} className="text-sm text-[var(--text-muted)] pl-4 relative">
+                    <span className="absolute left-0 text-[var(--accent)]">&mdash;</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </TiltCard>
         </div>
       </div>
