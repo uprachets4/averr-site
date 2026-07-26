@@ -33,15 +33,28 @@ const cadenceSlides = [
   { src: '/work/cadencestack/pillars.jpg', alt: 'CadenceStack content pillars strategy', caption: 'Content pillars — real strategy behind every post, not a template' },
 ];
 
+const capitalCommandSlides = [
+  { src: '/work/capitalcommand/01-overview.jpg', alt: 'Capital Command command overview with decision intelligence score', caption: 'Command overview — a decision-intelligence score of 74, with a ranked attention queue across US and India sessions' },
+  { src: '/work/capitalcommand/02-portfolio.jpg', alt: 'Capital Command portfolio intelligence across currencies', caption: 'Portfolio intelligence — one consolidated ledger across CAD, USD, and INR, with FX attribution' },
+  { src: '/work/capitalcommand/03-markets.jpg', alt: 'Capital Command market regimes view', caption: 'Market regimes — US and India equities, gold, rates, and volatility in one focused view' },
+  { src: '/work/capitalcommand/04-ipo-intelligence.jpg', alt: 'Capital Command IPO intelligence pipeline', caption: 'IPO intelligence — 18 filings tracked across both markets, ranked by evidence, not hype' },
+  { src: '/work/capitalcommand/05-signal-desk.jpg', alt: 'Capital Command signal desk with provenance scoring', caption: 'Signal desk — every alert scored by source reputation, cross-source agreement, and freshness' },
+  { src: '/work/capitalcommand/06-research-lab.jpg', alt: 'Capital Command research lab tools', caption: 'Research lab — company deep dives, scenario modeling, and a full decision journal' },
+  { src: '/work/capitalcommand/07-risk-center.jpg', alt: 'Capital Command risk center dashboard', caption: 'Risk center — concentration, drawdown, currency exposure, and data confidence at a glance' },
+  { src: '/work/capitalcommand/08-system-health.jpg', alt: 'Capital Command system health operational view', caption: 'System health — 98.7% provider freshness, zero stalled jobs, trading execution locked by design' },
+];
+
 function ShowcaseHeader({
   tag,
   logo,
+  logoFallback,
   name,
   description,
   stats,
 }: {
   tag: string;
-  logo: string;
+  logo?: string;
+  logoFallback?: { letter: string; bg: string };
   name: string;
   description: string;
   stats: { num: string; label: string }[];
@@ -53,7 +66,16 @@ function ShowcaseHeader({
           {tag}
         </span>
         <div className="flex items-center gap-3 mt-3">
-          <img src={logo} alt={`${name} logo`} className="w-9 h-9 rounded-lg object-cover" />
+          {logo ? (
+            <img src={logo} alt={`${name} logo`} className="w-9 h-9 rounded-lg object-cover" />
+          ) : logoFallback ? (
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-display font-bold text-sm flex-shrink-0"
+              style={{ background: logoFallback.bg }}
+            >
+              {logoFallback.letter}
+            </div>
+          ) : null}
           <h3 className="font-display font-bold text-[clamp(28px,3.4vw,42px)] tracking-[-0.02em]">
             {name}
           </h3>
@@ -75,6 +97,7 @@ function ShowcaseHeader({
 function Showcase({
   tag,
   logo,
+  logoFallback,
   name,
   description,
   stats,
@@ -82,7 +105,8 @@ function Showcase({
   delay = 0,
 }: {
   tag: string;
-  logo: string;
+  logo?: string;
+  logoFallback?: { letter: string; bg: string };
   name: string;
   description: string;
   stats: { num: string; label: string }[];
@@ -98,7 +122,7 @@ function Showcase({
       transition={{ duration: 0.7, delay, ease: EASE }}
       className="bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[20px] p-8 md:p-12 mb-12"
     >
-      <ShowcaseHeader tag={tag} logo={logo} name={name} description={description} stats={stats} />
+      <ShowcaseHeader tag={tag} logo={logo} logoFallback={logoFallback} name={name} description={description} stats={stats} />
       <Slider slides={slides} />
     </motion.div>
   );
@@ -214,6 +238,20 @@ export default function ProofOfWork() {
           ]}
           slides={cadenceSlides}
           delay={0.1}
+        />
+
+        <Showcase
+          tag="Shipped · Research Platform"
+          logoFallback={{ letter: 'C', bg: '#3B82F6' }}
+          name="Capital Command"
+          description="A cross-market intelligence workspace spanning US and India equities — portfolio consolidation across three currencies, evidence-scored IPO tracking, signal provenance, and a full research lab. Built and shipped as an educational simulation, with trading execution deliberately locked."
+          stats={[
+            { num: '18', label: 'IPOs tracked, US & India' },
+            { num: '92', label: 'Highest-confidence signal score' },
+            { num: '98.7%', label: 'Provider data freshness' },
+          ]}
+          slides={capitalCommandSlides}
+          delay={0.2}
         />
 
         <div className="max-w-[560px]">
