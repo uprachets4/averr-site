@@ -92,8 +92,8 @@ export default function Services() {
               <ServicesScene />
             </div>
             <div className="relative z-[1]">
-              <div className="font-display text-xs text-[var(--text-muted)] tracking-[0.08em] mb-2">
-                01 &mdash; Lead Offering
+              <div className="font-display text-xs text-[var(--accent)] uppercase tracking-[0.08em] mb-2">
+                Lead Offering
               </div>
               <h3 className="font-display font-bold text-2xl mb-3">AI Automation &amp; Agents</h3>
               <p className="text-[var(--text-muted)] text-[15px] mb-4 max-w-[280px]">
@@ -123,7 +123,6 @@ export default function Services() {
             delay={0.1}
             className="rounded-2xl p-8 border border-[var(--border)] bg-[var(--surface-elevated)]"
           >
-            <div className="font-display text-xs text-[var(--text-muted)] tracking-[0.08em] mb-2">02</div>
             <h3 className="font-display font-bold text-2xl mb-3">Web &amp; Brand</h3>
             <p className="text-[var(--text-muted)] text-[15px] mb-4">
               Premium, portfolio-grade websites &mdash; the kind that make the price feel
@@ -151,7 +150,6 @@ export default function Services() {
             delay={0.2}
             className="rounded-2xl p-8 border border-[var(--border)] bg-[var(--surface-elevated)]"
           >
-            <div className="font-display text-xs text-[var(--text-muted)] tracking-[0.08em] mb-2">03</div>
             <h3 className="font-display font-bold text-2xl mb-3">SaaS &amp; Product Build</h3>
             <p className="text-[var(--text-muted)] text-[15px] mb-4">
               Full products shipped fast &mdash; from idea to a working platform your

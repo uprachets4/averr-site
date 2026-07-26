@@ -1,8 +1,7 @@
 import Nav from './components/Nav';
 import Hero from './components/Hero';
-import AgentFlow from './components/AgentFlow';
 import ProofOfWork from './components/ProofOfWork';
-import HowIWork from './components/HowIWork';
+import AgentFlow from './components/AgentFlow';
 import Services from './components/Services';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -12,9 +11,8 @@ function App() {
     <div className="min-h-screen">
       <Nav />
       <Hero />
-      <AgentFlow />
       <ProofOfWork />
-      <HowIWork />
+      <AgentFlow />
       <Services />
       <Contact />
       <Footer />

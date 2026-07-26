@@ -121,7 +121,7 @@ export default function Hero() {
                   ref={badgeRef}
                   className="inline-block px-3 rounded-2xl text-white"
                   style={{
-                    background: 'linear-gradient(135deg, var(--accent-3), var(--accent), var(--accent-2))',
+                    background: 'linear-gradient(135deg, var(--accent), var(--accent-2), #A78BFA)',
                     backgroundSize: '200% 200%',
                   }}
                 >

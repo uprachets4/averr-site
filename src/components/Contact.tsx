@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import AnimatedNumber from './AnimatedNumber';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -22,11 +23,23 @@ export default function Contact() {
           <h2 className="font-display font-bold text-[clamp(26px,3vw,34px)] tracking-[-0.01em] mb-4">
             Tell me what needs building.
           </h2>
-          <p className="text-[var(--text-muted)] mb-8 max-w-[440px]">
+          <p className="text-[var(--text-muted)] mb-6 max-w-[440px]">
             Whether it's a site, an agent, or a full product &mdash; I usually reply
             within a day, and can walk through scope on a quick call before anything's
             signed.
           </p>
+
+          <div id="how" className="flex items-center gap-8 mb-8 pb-8 border-b border-[var(--border)]">
+            <div>
+              <div className="font-display text-2xl font-bold gradient-text-stat"><AnimatedNumber value="4" /></div>
+              <div className="text-[12px] text-[var(--text-muted)] mt-0.5 max-w-[140px]">Products shipped or in build</div>
+            </div>
+            <div>
+              <div className="font-display text-2xl font-bold gradient-text-stat"><AnimatedNumber value="9" /></div>
+              <div className="text-[12px] text-[var(--text-muted)] mt-0.5 max-w-[160px]">Years in enterprise ops before this &mdash; one operator, not a vendor</div>
+            </div>
+          </div>
+
           <div className="flex flex-col gap-3 text-sm text-[var(--text-muted)]">
             <div><strong className="text-[var(--text)] font-medium">Response time:</strong> within 24 hours</div>
             <div><strong className="text-[var(--text)] font-medium">Based in:</strong> Greater Toronto Area</div>
