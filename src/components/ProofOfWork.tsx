@@ -18,6 +18,8 @@ const siftSlides = [
   { src: '/work/sift/05-outreach.jpg', alt: 'SIFT outreach inbox', caption: 'Outreach inbox — a real reply from a VP of Engineering at Stripe' },
   { src: '/work/sift/06-funnel.jpg', alt: 'SIFT funnel insights', caption: 'Funnel insights — stage conversion, velocity, hot roles ranked by fit' },
   { src: '/work/sift/07-sources.jpg', alt: 'SIFT source aggregation setup', caption: 'Source setup — LinkedIn, Y Combinator, Wellfound and more, one feed' },
+  { src: '/work/sift/08-settings-search.jpg', alt: 'SIFT job search settings, target roles and skills', caption: 'Search settings — actively looking, target roles, and the skills that drive match scores' },
+  { src: '/work/sift/09-settings-work.jpg', alt: 'SIFT work arrangement and compensation settings', caption: 'Work preferences — hybrid in SF, six years experience, $120–160k target band' },
 ];
 
 const cgSlides = [
