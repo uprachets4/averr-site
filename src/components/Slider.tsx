@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export interface Slide {
@@ -10,14 +10,24 @@ export interface Slide {
 export default function Slider({ slides }: { slides: Slide[] }) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [paused, setPaused] = useState(false);
 
   function go(next: number) {
     setDirection(next > index ? 1 : -1);
     setIndex((next + slides.length) % slides.length);
   }
 
+  useEffect(() => {
+    if (paused) return;
+    const timer = setInterval(() => {
+      setDirection(1);
+      setIndex((i) => (i + 1) % slides.length);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [paused, slides.length]);
+
   return (
-    <div>
+    <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       <div className="relative rounded-2xl border border-[var(--border)] overflow-hidden
                        shadow-[0_1px_2px_rgba(0,0,0,0.05),0_8px_24px_rgba(0,0,0,0.3),0_30px_70px_rgba(0,0,0,0.35)]">
         <div className="relative aspect-[16/9] bg-[var(--surface-alt)]">
@@ -34,6 +44,18 @@ export default function Slider({ slides }: { slides: Slide[] }) {
               className="absolute inset-0 w-full h-full object-cover object-top"
             />
           </AnimatePresence>
+
+          {/* auto-advance progress bar, resets each slide */}
+          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-black/20">
+            <motion.div
+              key={`progress-${index}-${paused}`}
+              className="h-full"
+              style={{ background: 'linear-gradient(90deg, var(--accent-3), var(--accent), var(--accent-2))' }}
+              initial={{ width: '0%' }}
+              animate={{ width: paused ? '0%' : '100%' }}
+              transition={{ duration: paused ? 0 : 3.5, ease: 'linear' }}
+            />
+          </div>
         </div>
 
         <button
