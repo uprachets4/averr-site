@@ -27,6 +27,17 @@
   --sp-24: 96px; --sp-32: 128px;
 
   --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* required by the real Bklit UI ring chart component */
+  --chart-background: transparent;
+  --chart-foreground: var(--text);
+  --chart-foreground-muted: var(--text-muted);
+  --chart-label: var(--text-muted);
+  --chart-1: var(--accent);
+  --chart-2: var(--accent-2);
+  --chart-3: var(--accent-3);
+  --chart-4: #4ADE80;
+  --chart-5: #FBBF24;
 }
 
 .light-section {
