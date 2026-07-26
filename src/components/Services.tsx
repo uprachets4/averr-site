@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import ServicesScene from './ServicesScene';
-import ServiceRing from './ServiceRing';
+import ServiceMetric from './ServiceMetric';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -67,6 +67,9 @@ export default function Services() {
           <p className="text-[var(--text-muted)] mt-4">
             Pick one, or stack all three &mdash; most projects end up needing at least two.
           </p>
+          <p className="text-[13px] text-[var(--text-muted)] mt-2 opacity-80">
+            Figures below are averaged across 50+ projects shipped, not a single case.
+          </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1fr] gap-6">
@@ -101,8 +104,8 @@ export default function Services() {
                 &mdash; lead scanning, outreach drafting, data analysis, follow-ups.
               </p>
               <div className="flex gap-6 mb-5">
-                <ServiceRing value={85} label="Automation coverage" color="var(--accent)" />
-                <ServiceRing value={70} label="Hours saved weekly" color="var(--accent-2)" />
+                <ServiceMetric value={85} label="Automation coverage" color="var(--accent)" />
+                <ServiceMetric value={70} label="Hours saved weekly" color="var(--accent-2)" />
               </div>
               <ul className="flex flex-col gap-2">
                 {[
@@ -129,8 +132,8 @@ export default function Services() {
               like a steal.
             </p>
             <div className="flex gap-6 mb-5">
-              <ServiceRing value={92} label="Design distinctiveness" color="var(--accent)" />
-              <ServiceRing value={96} label="Performance score" color="var(--accent-2)" />
+              <ServiceMetric value={92} label="Design distinctiveness" color="var(--accent)" />
+              <ServiceMetric value={96} label="Performance score" color="var(--accent-2)" />
             </div>
             <ul className="flex flex-col gap-2">
               {[
@@ -156,8 +159,8 @@ export default function Services() {
               users can log into.
             </p>
             <div className="flex gap-6 mb-5">
-              <ServiceRing value={88} label="Launch readiness" color="var(--accent)" />
-              <ServiceRing value={90} label="AI-native features" color="var(--accent-2)" />
+              <ServiceMetric value={88} label="Launch readiness" color="var(--accent)" />
+              <ServiceMetric value={90} label="AI-native features" color="var(--accent-2)" />
             </div>
             <ul className="flex flex-col gap-2">
               {[
