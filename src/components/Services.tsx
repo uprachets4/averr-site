@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import ServicesScene from './ServicesScene';
+import RingChart from './RingChart';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -99,6 +100,10 @@ export default function Services() {
                 Agentic workflows that do the repetitive work your team shouldn't have to
                 &mdash; lead scanning, outreach drafting, data analysis, follow-ups.
               </p>
+              <div className="flex gap-6 mb-5">
+                <RingChart value={85} label="Automation coverage" color="var(--accent)" />
+                <RingChart value={70} label="Hours saved weekly" color="var(--accent-2)" />
+              </div>
               <ul className="flex flex-col gap-2">
                 {[
                   'Custom AI agents for outreach & lead-gen',
@@ -124,6 +129,10 @@ export default function Services() {
               Premium, portfolio-grade websites &mdash; the kind that make the price feel
               like a steal.
             </p>
+            <div className="flex gap-6 mb-5">
+              <RingChart value={92} label="Design distinctiveness" color="var(--accent)" />
+              <RingChart value={96} label="Performance score" color="var(--accent-2)" />
+            </div>
             <ul className="flex flex-col gap-2">
               {[
                 'Full design direction, not a template',
@@ -148,6 +157,10 @@ export default function Services() {
               Full products shipped fast &mdash; from idea to a working platform your
               users can log into.
             </p>
+            <div className="flex gap-6 mb-5">
+              <RingChart value={88} label="Launch readiness" color="var(--accent)" />
+              <RingChart value={90} label="AI-native features" color="var(--accent-2)" />
+            </div>
             <ul className="flex flex-col gap-2">
               {[
                 'Rapid build via Lovable + modern stack',

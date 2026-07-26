@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import HeroScene from './HeroScene';
 import WaveGrid from './WaveGrid';
+import FloatingPaths from './FloatingPaths';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -68,24 +69,7 @@ export default function Hero() {
       className="relative min-h-screen flex items-center px-6 md:px-8 pt-32 pb-24 overflow-hidden"
     >
       <WaveGrid />
-      {/* ambient violet orb */}
-      <div
-        className="absolute w-[680px] h-[680px] rounded-full -top-44 -right-36 blur-[20px] pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(124,92,252,0.45) 0%, rgba(124,92,252,0.1) 45%, transparent 70%)',
-          animation: 'drift 90s linear infinite',
-        }}
-      />
-      {/* complementary cyan orb, drifting opposite */}
-      <div
-        className="absolute w-[420px] h-[420px] rounded-full -bottom-24 -left-24 blur-[30px] pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(110,140,240,0.28) 0%, rgba(110,140,240,0.05) 50%, transparent 70%)',
-          animation: 'driftReverse 70s linear infinite',
-        }}
-      />
+      <FloatingPaths />
       {/* cursor-following glow, desktop only */}
       <div
         className="absolute w-[460px] h-[460px] rounded-full pointer-events-none z-[1] hidden md:block transition-opacity duration-300"
