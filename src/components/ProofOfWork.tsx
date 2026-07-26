@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import Slider from './Slider';
+import SiftScrollStory from './SiftScrollStory';
 import AnimatedNumber from './AnimatedNumber';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
@@ -32,6 +33,45 @@ const cadenceSlides = [
   { src: '/work/cadencestack/pillars.jpg', alt: 'CadenceStack content pillars strategy', caption: 'Content pillars — real strategy behind every post, not a template' },
 ];
 
+function ShowcaseHeader({
+  tag,
+  logo,
+  name,
+  description,
+  stats,
+}: {
+  tag: string;
+  logo: string;
+  name: string;
+  description: string;
+  stats: { num: string; label: string }[];
+}) {
+  return (
+    <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-8">
+      <div className="max-w-[640px]">
+        <span className="inline-block text-[11.5px] tracking-[0.06em] uppercase text-[var(--accent)] bg-[var(--accent-dim)] px-2.5 py-1 rounded-full">
+          {tag}
+        </span>
+        <div className="flex items-center gap-3 mt-3">
+          <img src={logo} alt={`${name} logo`} className="w-9 h-9 rounded-lg object-cover" />
+          <h3 className="font-display font-bold text-[clamp(28px,3.4vw,42px)] tracking-[-0.02em]">
+            {name}
+          </h3>
+        </div>
+        <p className="text-[var(--text-muted)] mt-3">{description}</p>
+      </div>
+      <div className="flex gap-8 flex-shrink-0">
+        {stats.map((s) => (
+          <div key={s.label}>
+            <div className="font-display text-2xl font-bold gradient-text-stat"><AnimatedNumber value={s.num} /></div>
+            <div className="text-xs text-[var(--text-muted)] mt-0.5">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Showcase({
   tag,
   logo,
@@ -58,29 +98,7 @@ function Showcase({
       transition={{ duration: 0.7, delay, ease: EASE }}
       className="bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[20px] p-8 md:p-12 mb-12"
     >
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-8">
-        <div className="max-w-[640px]">
-          <span className="inline-block text-[11.5px] tracking-[0.06em] uppercase text-[var(--accent)] bg-[var(--accent-dim)] px-2.5 py-1 rounded-full">
-            {tag}
-          </span>
-          <div className="flex items-center gap-3 mt-3">
-            <img src={logo} alt={`${name} logo`} className="w-9 h-9 rounded-lg object-cover" />
-            <h3 className="font-display font-bold text-[clamp(28px,3.4vw,42px)] tracking-[-0.02em]">
-              {name}
-            </h3>
-          </div>
-          <p className="text-[var(--text-muted)] mt-3">{description}</p>
-        </div>
-        <div className="flex gap-8 flex-shrink-0">
-          {stats.map((s) => (
-            <div key={s.label}>
-              <div className="font-display text-2xl font-bold gradient-text-stat"><AnimatedNumber value={s.num} /></div>
-              <div className="text-xs text-[var(--text-muted)] mt-0.5">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
+      <ShowcaseHeader tag={tag} logo={logo} name={name} description={description} stats={stats} />
       <Slider slides={slides} />
     </motion.div>
   );
@@ -142,20 +160,35 @@ export default function ProofOfWork() {
             already running in production — for students, not slides.
           </p>
         </motion.div>
+      </div>
 
-        <Showcase
-          tag="In Build"
-          logo="/logos/sift.png"
-          name="SIFT"
-          description="One inbox for every job board — YC, LinkedIn, Google Jobs, Indeed. An agent scores your resume against the role, rewrites it to beat the ATS, finds the right people to message, and tracks the whole pipeline through to an offer."
-          stats={[
-            { num: '1', label: 'Offer received (Mercury)' },
-            { num: '87', label: 'Resume score, tailored' },
-            { num: '42%', label: 'Outreach response rate' },
-          ]}
-          slides={siftSlides}
-        />
+      {/* SIFT: signature scroll-pinned moment — header card, then the full-bleed pinned story */}
+      <div className="max-w-[1240px] mx-auto mb-8">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.7, ease: EASE }}
+          className="bg-[var(--surface-elevated)] border border-[var(--border)] rounded-[20px] p-8 md:p-12"
+        >
+          <ShowcaseHeader
+            tag="In Build"
+            logo="/logos/sift.png"
+            name="SIFT"
+            description="One inbox for every job board — YC, LinkedIn, Google Jobs, Indeed. An agent scores your resume against the role, rewrites it to beat the ATS, finds the right people to message, and tracks the whole pipeline through to an offer."
+            stats={[
+              { num: '1', label: 'Offer received (Mercury)' },
+              { num: '87', label: 'Resume score, tailored' },
+              { num: '42%', label: 'Outreach response rate' },
+            ]}
+          />
+        </motion.div>
+      </div>
 
+      <SiftScrollStory stops={siftSlides} />
+
+      <div className="max-w-[1240px] mx-auto mt-12">
         <Showcase
           tag="Co-Founded · Live Business"
           logo="/logos/cgwalls.png"
@@ -167,7 +200,6 @@ export default function ProofOfWork() {
             { num: '48h', label: 'Average quote turnaround' },
           ]}
           slides={cgSlides}
-          delay={0.1}
         />
 
         <Showcase
@@ -181,7 +213,7 @@ export default function ProofOfWork() {
             { num: '8/10', label: 'Best-scoring template quality' },
           ]}
           slides={cadenceSlides}
-          delay={0.2}
+          delay={0.1}
         />
 
         <div className="max-w-[560px]">

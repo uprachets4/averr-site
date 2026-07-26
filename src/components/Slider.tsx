@@ -50,7 +50,7 @@ export default function Slider({ slides }: { slides: Slide[] }) {
             <motion.div
               key={`progress-${index}-${paused}`}
               className="h-full"
-              style={{ background: 'linear-gradient(90deg, var(--accent-3), var(--accent), var(--accent-2))' }}
+              style={{ background: 'linear-gradient(90deg, var(--accent), var(--accent-2))' }}
               initial={{ width: '0%' }}
               animate={{ width: paused ? '0%' : '100%' }}
               transition={{ duration: paused ? 0 : 3.5, ease: 'linear' }}
