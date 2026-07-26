@@ -1,43 +1,88 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* ============================================================
+   AVERR — DESIGN TOKENS (Phase 1 rewrite, Apple-restraint pass)
+   ============================================================
+   Direction: Apple-style chassis (typography, whitespace, restraint,
+   real materiality) carrying the motion sophistication already built
+   (magnetic buttons, real 3D, real ring charts) — NOT a gradient-
+   forward SaaS-dashboard look. Color is used as emphasis, not decoration.
+   ============================================================ */
+
 :root {
+  /* ---- Color: one confident accent, not a rainbow ---- */
   --primary: #1A202D;
-  --accent: #7C5CFC;
-  --accent-2: #6E8CF0;
-  --accent-3: #FF8F7A;
-  --accent-dim: rgba(124, 92, 252, 0.16);
-  --surface: #1A202D;
-  --surface-alt: #060909;
-  --surface-elevated: #12161F;
+  --accent: #7C5CFC;              /* the one true interactive violet — CTAs, links, focus */
+  --accent-2: #5B4FD6;            /* deeper tonal cousin of accent — same hue family, used for duotone depth only */
+  --accent-3: #C97B63;            /* rare warm counter-note — sparing use only (one signature moment), never a default gradient stop */
+  --accent-dim: rgba(124, 92, 252, 0.14);
+
+  /* ---- Surfaces: two-tone dark system (kept — this is correct, Apple does this too) ---- */
+  --surface: #1A202D;             /* navy-charcoal — Hero */
+  --surface-alt: #0B0B0D;         /* true near-black — Services/Footer, deepened from #060909 */
+  --surface-elevated: #15181F;    /* card backgrounds within dark sections */
+
   --text: #F5F5F7;
   --text-muted: #8C8C9C;
   --border: rgba(255, 255, 255, 0.09);
 
-  /* light-section overrides, used by wrapping a section in .light-section */
-  --light-surface: #F5F5F7;
+  /* ---- Light-section overrides ---- */
+  --light-surface: #FBFBFC;
   --light-surface-alt: #FFFFFF;
   --light-surface-elevated: #FFFFFF;
   --light-text: #1D1D1F;
   --light-text-muted: #6E6E73;
   --light-border: rgba(0, 0, 0, 0.08);
 
+  /* ---- Spacing scale (unchanged — already correct) ---- */
   --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
   --sp-6: 24px; --sp-8: 32px;  --sp-12: 48px; --sp-16: 64px;
   --sp-24: 96px; --sp-32: 128px;
 
-  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* ---- Type scale: Apple-proportioned, deliberate tracking per level ---- */
+  --fs-display: clamp(3rem, 6vw, 6rem);       /* 48–96px */
+  --fs-h1: clamp(2.25rem, 4vw, 3rem);          /* 36–48px */
+  --fs-h2: clamp(1.5rem, 2.4vw, 2rem);         /* 24–32px */
+  --fs-h3: 1.375rem;                            /* 22px */
+  --fs-body-lg: 1.1875rem;                      /* 19px — feature copy */
+  --fs-body: 1.0625rem;                         /* 17px — Apple's actual base size */
+  --fs-caption: 0.8125rem;                      /* 13px */
 
-  /* required by the real Bklit UI ring chart component */
+  --ls-display: -0.03em;
+  --ls-h1: -0.02em;
+  --ls-h2: -0.015em;
+  --ls-body: -0.005em;
+
+  /* ---- Motion: real, verified curves (not invented) ---- */
+  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-overlay-in: cubic-bezier(0.12, 0.23, 0.5, 1);   /* decisive entrance */
+  --ease-overlay-out: cubic-bezier(0.5, 0, 0.88, 0.77);  /* fast, asymmetric exit */
+  --dur-micro: 0.15s;
+  --dur-standard: 0.3s;
+  --dur-overlay: 0.2s;
+  --dur-slow: 0.6s;
+
+  /* ---- Corner geometry: real squircle, progressive enhancement ---- */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+
+  /* ---- required by the real Bklit UI ring chart component ---- */
   --chart-background: transparent;
   --chart-foreground: var(--text);
   --chart-foreground-muted: var(--text-muted);
   --chart-label: var(--text-muted);
   --chart-1: var(--accent);
   --chart-2: var(--accent-2);
-  --chart-3: var(--accent-3);
+  --chart-3: var(--text-muted);
   --chart-4: #4ADE80;
   --chart-5: #FBBF24;
+}
+
+@supports (corner-shape: superellipse(2)) {
+  button, .card, .pill, input, textarea, .squircle {
+    corner-shape: superellipse(2);
+  }
 }
 
 .light-section {
@@ -63,19 +108,21 @@ body {
   margin: 0;
   background: var(--surface);
   color: var(--text);
-  font-family: 'Inter', sans-serif;
-  font-size: 17px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: var(--fs-body);
+  letter-spacing: var(--ls-body);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
 .font-display {
-  font-family: 'Inter', sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: var(--ls-display);
 }
 
+/* Reserved for rare, singular emphasis moments — not a default treatment */
 .gradient-text {
   background: linear-gradient(100deg, var(--accent) 10%, var(--accent-2) 90%);
   -webkit-background-clip: text;
@@ -83,8 +130,10 @@ body {
   color: transparent;
 }
 
+/* Stat numbers: simplified to the same violet duotone family (no coral third stop) —
+   monochromatic-with-tonal-variation reads premium; a rainbow reads like a SaaS dashboard */
 .gradient-text-stat {
-  background: linear-gradient(100deg, var(--accent-3) 0%, var(--accent) 55%, var(--accent-2) 100%);
+  background: linear-gradient(100deg, var(--accent) 0%, var(--accent-2) 70%, #A78BFA 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
