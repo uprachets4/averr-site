@@ -8,10 +8,7 @@ const HeroScene = lazy(() => import('./HeroScene'));
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
-const headlineLines = [
-  ['your business hasn\u2019t'],
-  ['automated yet.', 'accent'],
-];
+const PROOF = ['SIFT', 'CG WALLS & FLOORS', 'CADENCESTACK', 'CAPITAL COMMAND'];
 
 function MagneticLink({
   href,
@@ -103,10 +100,19 @@ export default function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
-            className="font-display text-[13px] tracking-[0.08em] uppercase text-[var(--accent-2)] flex items-center gap-2 mb-6"
+            className="inline-flex items-center gap-2.5 pl-2 pr-4 py-1.5 rounded-full mb-6"
+            style={{ background: 'rgba(124,92,252,0.12)', border: '1px solid rgba(124,92,252,0.25)' }}
           >
-            <span className="w-4 h-px bg-[var(--accent-2)]" />
-            Averr Studio &mdash; Toronto/GTA
+            <span className="relative flex h-2 w-2">
+              <span
+                className="absolute inline-flex h-full w-full rounded-full opacity-60"
+                style={{ background: 'var(--accent)', animation: 'agentPulse 2s cubic-bezier(0,0,0.2,1) infinite' }}
+              />
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: 'var(--accent)' }} />
+            </span>
+            <span className="font-display text-[12.5px] tracking-[0.04em] text-[var(--text)]">
+              Available &mdash; taking on 2 new projects this quarter
+            </span>
           </motion.div>
 
           <h1 className="font-display font-bold leading-[1.04] tracking-[-0.03em] text-[clamp(38px,5.4vw,76px)] mb-6">
@@ -130,18 +136,16 @@ export default function Hero() {
                 </span>
               </motion.span>
             </span>
-            {headlineLines.slice(1).map((line, i) => (
-              <span key={i} className="block overflow-hidden">
-                <motion.span
-                  initial={{ y: '100%', opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.7, delay: 0.42 + i * 0.12, ease: EASE }}
-                  className={`inline-block ${line[1] === 'accent' ? 'gradient-text' : ''}`}
-                >
-                  {line[0]}
-                </motion.span>
-              </span>
-            ))}
+            <span className="block overflow-hidden">
+              <motion.span
+                initial={{ y: '100%', opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.7, delay: 0.42, ease: EASE }}
+                className="inline-block"
+              >
+                your business hasn&rsquo;t automated yet.
+              </motion.span>
+            </span>
           </h1>
 
           <motion.p
@@ -158,7 +162,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.9, ease: EASE }}
-            className="flex flex-wrap gap-4"
+            className="flex flex-wrap gap-4 mb-12"
           >
             <MagneticLink
               href="#work"
@@ -177,6 +181,23 @@ export default function Hero() {
               Start a Project
             </MagneticLink>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.7, delay: 1.05, ease: EASE }}
+          >
+            <div className="text-[11px] tracking-[0.08em] uppercase text-[var(--text-muted)] mb-3">
+              Real products, shipped &mdash; not mockups
+            </div>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              {PROOF.map((name) => (
+                <span key={name} className="font-display text-[13px] tracking-[0.03em] text-[var(--text-muted)] opacity-80">
+                  {name}
+                </span>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
         <motion.div
@@ -194,6 +215,11 @@ export default function Hero() {
               <HeroScene />
             </Suspense>
           </div>
+          <div className="absolute bottom-4 left-4 right-4 text-center">
+            <span className="text-[10.5px] tracking-[0.08em] uppercase text-[var(--text-muted)] opacity-60">
+              4 products &mdash; one operator
+            </span>
+          </div>
         </motion.div>
       </div>
 
@@ -207,6 +233,10 @@ export default function Hero() {
           0% { transform: translate(0,0) scale(1); }
           50% { transform: translate(40px,-50px) scale(1.15); }
           100% { transform: translate(0,0) scale(1); }
+        }
+        @keyframes agentPulse {
+          0%, 100% { transform: scale(1); opacity: 0.6; }
+          50% { transform: scale(1.8); opacity: 0; }
         }
       `}</style>
     </header>
