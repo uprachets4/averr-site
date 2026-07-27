@@ -11,15 +11,15 @@
 
 :root {
   /* ---- Color: one confident accent, not a rainbow ---- */
-  --primary: #1A202D;
+  --primary: #0B0B0D;
   --accent: #7C5CFC;              /* the one true interactive violet — CTAs, links, focus */
   --accent-2: #5B4FD6;            /* deeper tonal cousin of accent — same hue family, used for duotone depth only */
   --accent-3: #C97B63;            /* rare warm counter-note — sparing use only (one signature moment), never a default gradient stop */
   --accent-dim: rgba(124, 92, 252, 0.14);
 
-  /* ---- Surfaces: two-tone dark system (kept — this is correct, Apple does this too) ---- */
-  --surface: #1A202D;             /* navy-charcoal — Hero */
-  --surface-alt: #0B0B0D;         /* true near-black — Services/Footer, deepened from #060909 */
+  /* ---- Surfaces: true black at the two bookends (Hero, Footer) — dark is punctuation, not the default ---- */
+  --surface: #0B0B0D;             /* true near-black — Hero */
+  --surface-alt: #0B0B0D;         /* same true near-black — Footer */
   --surface-elevated: #15181F;    /* card backgrounds within dark sections */
 
   --text: #F5F5F7;

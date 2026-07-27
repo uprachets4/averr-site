@@ -49,7 +49,7 @@ function TiltCard({
 
 export default function Services() {
   return (
-    <section id="services" className="py-24 md:py-32 px-6 md:px-8 bg-[var(--surface-alt)]">
+    <section id="services" className="light-section py-24 md:py-32 px-6 md:px-8">
       <div className="max-w-[1240px] mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 26 }}
@@ -81,7 +81,7 @@ export default function Services() {
             <div
               className="absolute inset-0 -z-0"
               style={{
-                background: 'linear-gradient(160deg, var(--surface-elevated), var(--surface-alt))',
+                background: 'linear-gradient(160deg, var(--surface-elevated), var(--accent-dim))',
                 borderRadius: 16,
               }}
             />

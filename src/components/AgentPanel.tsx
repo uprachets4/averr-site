@@ -23,7 +23,13 @@ export default function AgentPanel() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.7, ease: EASE }}
-      className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] p-6 md:p-8 max-w-[560px] mx-auto md:mx-0"
+      style={{
+        '--surface-elevated': '#15181F',
+        '--border': 'rgba(255,255,255,0.09)',
+        '--text': '#F5F5F7',
+        '--text-muted': '#8C8C9C',
+      } as React.CSSProperties}
+      className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] p-6 md:p-8 max-w-[560px] mx-auto md:mx-0"
     >
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
