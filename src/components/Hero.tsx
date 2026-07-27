@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { animate } from 'animejs';
-import HeroScene from './HeroScene';
 import WaveGrid from './WaveGrid';
 import FloatingPaths from './FloatingPaths';
+
+const HeroScene = lazy(() => import('./HeroScene'));
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -189,7 +190,9 @@ export default function Hero() {
                        bg-[var(--surface-elevated)]
                        shadow-[0_1px_2px_rgba(0,0,0,0.05),0_8px_24px_rgba(0,0,0,0.4),0_30px_80px_rgba(124,92,252,0.08)]"
           >
-            <HeroScene />
+            <Suspense fallback={null}>
+              <HeroScene />
+            </Suspense>
           </div>
         </motion.div>
       </div>

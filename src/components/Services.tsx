@@ -1,8 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import ServiceScenePipeline from './ServiceScenePipeline';
-import ServiceSceneLayers from './ServiceSceneLayers';
-import ServiceSceneBlocks from './ServiceSceneBlocks';
+import LazyOnVisible from './LazyOnVisible';
 import ServiceMetric from './ServiceMetric';
 import ServiceIcon from './ServiceIcon';
 
@@ -95,7 +93,7 @@ export default function Services() {
               }}
             />
             <div className="absolute -right-10 -top-10 w-56 h-56 opacity-70 pointer-events-none">
-              <ServiceScenePipeline />
+              <LazyOnVisible factory={() => import('./ServiceScenePipeline')} />
             </div>
             <div className="relative z-[1]">
               <ServiceIcon variant="agents" />
@@ -131,7 +129,7 @@ export default function Services() {
             className="rounded-2xl p-8 border border-[var(--border)] bg-[var(--surface-elevated)] relative overflow-hidden"
           >
             <div className="absolute -right-8 -top-8 w-48 h-48 opacity-60 pointer-events-none">
-              <ServiceSceneLayers />
+              <LazyOnVisible factory={() => import('./ServiceSceneLayers')} />
             </div>
             <div className="relative z-[1]">
               <ServiceIcon variant="web" />
@@ -164,7 +162,7 @@ export default function Services() {
             className="rounded-2xl p-8 border border-[var(--border)] bg-[var(--surface-elevated)] relative overflow-hidden"
           >
             <div className="absolute -right-8 -top-8 w-48 h-48 opacity-60 pointer-events-none">
-              <ServiceSceneBlocks />
+              <LazyOnVisible factory={() => import('./ServiceSceneBlocks')} />
             </div>
             <div className="relative z-[1]">
               <ServiceIcon variant="saas" />
