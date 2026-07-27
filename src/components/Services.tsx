@@ -4,6 +4,7 @@ import ServiceScenePipeline from './ServiceScenePipeline';
 import ServiceSceneLayers from './ServiceSceneLayers';
 import ServiceSceneBlocks from './ServiceSceneBlocks';
 import ServiceMetric from './ServiceMetric';
+import ServiceIcon from './ServiceIcon';
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -97,7 +98,8 @@ export default function Services() {
               <ServiceScenePipeline />
             </div>
             <div className="relative z-[1]">
-              <div className="font-display text-xs text-[var(--accent)] uppercase tracking-[0.08em] mb-2">
+              <ServiceIcon variant="agents" />
+              <div className="font-display text-xs text-[var(--accent)] uppercase tracking-[0.08em] mt-4 mb-2">
                 Lead Offering
               </div>
               <h3 className="font-display font-bold text-2xl mb-3">AI Automation &amp; Agents</h3>
@@ -132,7 +134,8 @@ export default function Services() {
               <ServiceSceneLayers />
             </div>
             <div className="relative z-[1]">
-              <h3 className="font-display font-bold text-2xl mb-3">Web &amp; Brand</h3>
+              <ServiceIcon variant="web" />
+              <h3 className="font-display font-bold text-2xl mt-4 mb-3">Web &amp; Brand</h3>
               <p className="text-[var(--text-muted)] text-[15px] mb-4 max-w-[280px]">
                 Premium, portfolio-grade websites &mdash; the kind that make the price feel
                 like a steal.
@@ -164,7 +167,8 @@ export default function Services() {
               <ServiceSceneBlocks />
             </div>
             <div className="relative z-[1]">
-              <h3 className="font-display font-bold text-2xl mb-3">SaaS &amp; Product Build</h3>
+              <ServiceIcon variant="saas" />
+              <h3 className="font-display font-bold text-2xl mt-4 mb-3">SaaS &amp; Product Build</h3>
               <p className="text-[var(--text-muted)] text-[15px] mb-4 max-w-[280px]">
                 Full products shipped fast &mdash; from idea to a working platform your
                 users can log into.
