@@ -1,170 +1,167 @@
 @import "tailwindcss";
 
-/* ============================================================
-   AVERR — DESIGN TOKENS (Phase 1 rewrite, Apple-restraint pass)
-   ============================================================
-   Direction: Apple-style chassis (typography, whitespace, restraint,
-   real materiality) carrying the motion sophistication already built
-   (magnetic buttons, real 3D, real ring charts) — NOT a gradient-
-   forward SaaS-dashboard look. Color is used as emphasis, not decoration.
-   ============================================================ */
+/* ═══════════════════════════════════════════════════════════════
+   AVERR STUDIOS — Design Tokens v2 (Nolana-anchored)
+   ═══════════════════════════════════════════════════════════════ */
 
+@theme {
+  /* Colors */
+  --color-bg:         #F4F0E6;
+  --color-bg-alt:     #EDE9E2;
+  --color-bg-warm:    #E8E1D0;
+  --color-dark:       #141412;
+  --color-dark-alt:   #1C1B18;
+  --color-ink:        #141412;
+  --color-ink-soft:   #2A2926;
+  --color-parch:      #EDE9E2;
+  --color-muted:      #6B665C;
+  --color-muted-2:    #8A8377;
+  --color-muted-l:    #7A7770;
+
+  /* Fonts */
+  --font-display: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "Geist Mono", ui-monospace, monospace;
+}
+
+/* Opacity-based hairlines (not @theme, kept as raw vars) */
 :root {
-  /* ---- Color: one confident accent, not a rainbow ---- */
-  --primary: #0B0B0D;
-  --accent: #7C5CFC;              /* the one true interactive violet — CTAs, links, focus */
-  --accent-2: #5B4FD6;            /* deeper tonal cousin of accent — same hue family, used for duotone depth only */
-  --accent-3: #C97B63;            /* rare warm counter-note — sparing use only (one signature moment), never a default gradient stop */
-  --accent-dim: rgba(124, 92, 252, 0.14);
-
-  /* ---- Surfaces: true black at the two bookends (Hero, Footer) — dark is punctuation, not the default ---- */
-  --surface: #0B0B0D;             /* true near-black — Hero */
-  --surface-alt: #0B0B0D;         /* same true near-black — Footer */
-  --surface-elevated: #15181F;    /* card backgrounds within dark sections */
-
-  --text: #F5F5F7;
-  --text-muted: #8C8C9C;
-  --border: rgba(255, 255, 255, 0.09);
-
-  /* ---- Light-section overrides ---- */
-  --light-surface: #FBFBFC;
-  --light-surface-alt: #FFFFFF;
-  --light-surface-elevated: #FFFFFF;
-  --light-text: #1D1D1F;
-  --light-text-muted: #6E6E73;
-  --light-border: rgba(0, 0, 0, 0.08);
-
-  /* ---- Spacing scale (unchanged — already correct) ---- */
-  --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
-  --sp-6: 24px; --sp-8: 32px;  --sp-12: 48px; --sp-16: 64px;
-  --sp-24: 96px; --sp-32: 128px;
-
-  /* ---- Type scale: Apple-proportioned, deliberate tracking per level ---- */
-  --fs-display: clamp(3rem, 6vw, 6rem);       /* 48–96px */
-  --fs-h1: clamp(2.25rem, 4vw, 3rem);          /* 36–48px */
-  --fs-h2: clamp(1.5rem, 2.4vw, 2rem);         /* 24–32px */
-  --fs-h3: 1.375rem;                            /* 22px */
-  --fs-body-lg: 1.1875rem;                      /* 19px — feature copy */
-  --fs-body: 1.0625rem;                         /* 17px — Apple's actual base size */
-  --fs-caption: 0.8125rem;                      /* 13px */
-
-  --ls-display: -0.03em;
-  --ls-h1: -0.02em;
-  --ls-h2: -0.015em;
-  --ls-body: -0.005em;
-
-  /* ---- Motion: real, verified curves (not invented) ---- */
-  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --ease-overlay-in: cubic-bezier(0.12, 0.23, 0.5, 1);   /* decisive entrance */
-  --ease-overlay-out: cubic-bezier(0.5, 0, 0.88, 0.77);  /* fast, asymmetric exit */
-  --dur-micro: 0.15s;
-  --dur-standard: 0.3s;
-  --dur-overlay: 0.2s;
-  --dur-slow: 0.6s;
-
-  /* ---- Corner geometry: real squircle, progressive enhancement ---- */
-  --radius-sm: 12px;
-  --radius-md: 20px;
-  --radius-lg: 28px;
-
-  /* ---- required by the real Bklit UI ring chart component ---- */
-  --chart-background: transparent;
-  --chart-foreground: var(--text);
-  --chart-foreground-muted: var(--text-muted);
-  --chart-label: var(--text-muted);
-  --chart-1: var(--accent);
-  --chart-2: var(--accent-2);
-  --chart-3: var(--text-muted);
-  --chart-4: #4ADE80;
-  --chart-5: #FBBF24;
+  --hair:      rgba(20, 20, 18, 0.10);
+  --hair-hi:   rgba(20, 20, 18, 0.18);
+  --hair-d:    rgba(237, 231, 218, 0.10);
+  --hair-d-hi: rgba(237, 231, 218, 0.18);
 }
 
-@supports (corner-shape: superellipse(2)) {
-  button, .card, .pill, input, textarea, .squircle {
-    corner-shape: superellipse(2);
-  }
-}
-
-.light-section {
-  --surface: var(--light-surface);
-  --surface-alt: var(--light-surface-alt);
-  --surface-elevated: var(--light-surface-elevated);
-  --text: var(--light-text);
-  --text-muted: var(--light-text-muted);
-  --border: var(--light-border);
-  background: var(--surface-alt);
-  color: var(--text);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
+/* Reset */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 body {
-  margin: 0;
-  background: var(--surface);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: var(--fs-body);
-  letter-spacing: var(--ls-body);
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
+img, video { display: block; max-width: 100%; height: auto; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+a { color: inherit; text-decoration: none; }
 
-.font-display {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-weight: 700;
-  letter-spacing: var(--ls-display);
+/* Focus */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--color-dark);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
-/* Reserved for rare, singular emphasis moments — not a default treatment */
-.gradient-text {
-  background: linear-gradient(100deg, var(--accent) 10%, var(--accent-2) 90%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* Stat numbers: simplified to the same violet duotone family (no coral third stop) —
-   monochromatic-with-tonal-variation reads premium; a rainbow reads like a SaaS dashboard */
-.gradient-text-stat {
-  background: linear-gradient(100deg, var(--accent) 0%, var(--accent-2) 70%, #A78BFA 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.pill {
-  border-radius: 999px !important;
-}
-
+/* Selection */
 ::selection {
-  background: var(--accent);
-  color: #fff;
+  background: var(--color-dark);
+  color: var(--color-bg);
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* Grain overlays */
+.grain-light,
+.grain-dark {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.grain-light {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+}
+.grain-dark {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.07;
+  mix-blend-mode: overlay;
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-  color: inherit;
+/* Treatment B — horizontal gradient fade (the signature) */
+.fade-h {
+  background: linear-gradient(90deg,
+    var(--color-ink) 0%,
+    var(--color-ink) 35%,
+    var(--color-muted) 75%,
+    rgba(20,20,18,0.4) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.fade-h-dark {
+  background: linear-gradient(90deg,
+    var(--color-parch) 0%,
+    var(--color-parch) 35%,
+    var(--color-muted-l) 75%,
+    rgba(237,231,218,0.4) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-input, textarea {
-  color: var(--text);
+/* Number gradient — Nolana-style shifting */
+.num-gradient {
+  background: linear-gradient(180deg,
+    #141412 0%, #2A2926 15%, #3D3B36 30%, #4A453D 45%,
+    #6B665C 65%, #8A8377 80%, #A09B8F 92%, rgba(20,20,18,0.12) 100%);
+  background-size: 100% 220%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shift-gradient 8s ease-in-out infinite alternate;
+}
+.num-gradient-dark {
+  background: linear-gradient(180deg,
+    #FFFFFF 0%, #F4F0E6 15%, #EDE9E2 30%, #C8C4BD 50%,
+    #A09B8F 70%, #7A7770 85%, rgba(237,231,218,0.15) 100%);
+  background-size: 100% 220%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shift-gradient 8s ease-in-out infinite alternate;
+}
+@keyframes shift-gradient {
+  0%   { background-position: 0% 15%; }
+  100% { background-position: 0% 85%; }
 }
 
+/* Pill highlight — the Nolana move */
+.pill-hl {
+  display: inline-block;
+  padding: 0.1em 0.55em 0.16em;
+  background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-alt) 100%);
+  border-radius: 0.24em;
+  vertical-align: 0.02em;
+  margin: 0 0.08em;
+  box-shadow:
+    inset 0 -1px 0 rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 2px 8px rgba(20,20,18,0.15);
+}
+.pill-hl > span {
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  background: linear-gradient(90deg,
+    #FFFFFF 0%,
+    #F4F0E6 40%,
+    var(--color-parch) 70%,
+    #C4BDAB 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% 100%;
+  animation: pill-shine 6s ease-in-out infinite alternate;
+}
+@keyframes pill-shine {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 0%; }
+}
+
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
