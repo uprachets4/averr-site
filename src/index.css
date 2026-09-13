@@ -153,6 +153,7 @@ a { color: inherit; text-decoration: none; }
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  -webkit-text-fill-color: transparent;
   background-size: 200% 100%;
   animation: pill-shine 6s ease-in-out infinite alternate;
 }

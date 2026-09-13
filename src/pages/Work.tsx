@@ -7,6 +7,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import FinalCTA from "../components/FinalCTA";
+import PillHl from "../components/PillHl";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 const BOUNCE = [0.34, 1.56, 0.64, 1] as const;
@@ -189,7 +190,7 @@ function WorkHeader() {
             transition={{ duration: reduce ? 0.01 : 0.5, ease: BOUNCE, delay: 0.8 }}
             style={{ display: "inline-block" }}
           >
-            <span className="pill-hl"><span>real projects</span></span>
+            <PillHl>real projects</PillHl>
           </motion.span>.
         </motion.h1>
 
@@ -206,7 +207,7 @@ function WorkHeader() {
           }}
         >
           Every project below is real. Numbers are measured, not marketing. Descriptions
-          are what happened, not what we wish had.
+          are what happened, not what we wish we had.
         </motion.p>
       </div>
     </section>
@@ -214,70 +215,30 @@ function WorkHeader() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Bento grid — 4 real clients
+   Shared card
    ═══════════════════════════════════════════════════════════════ */
 
-type WorkItem = {
+type Card = {
   slug: string;
-  client: string;
-  pillar: "Design" | "Automate" | "Grow";
+  name: string;
+  eyebrow: string;
   kicker: string;
   tags: string[];
-  featured?: boolean;
   live?: boolean;
 };
 
-const ITEMS: WorkItem[] = [
-  {
-    slug: "cg-walls-floors",
-    client: "CG Walls & Floors",
-    pillar: "Design",
-    kicker:
-      "Toronto renovation contractor. Replaced a template contractor site with a brand-led rebuild that reads as the premium option in a copycat market.",
-    tags: ["Framer", "Custom brand", "Marketing site"],
-    featured: true,
-    live: true,
-  },
-  {
-    slug: "careerclarity",
-    client: "CareerClarity AI",
-    pillar: "Automate",
-    kicker:
-      "An AI career-guidance product where the automation is the product. Built the LLM-backed guidance flow that users actually finish.",
-    tags: ["LLM", "Next.js", "Product"],
-    live: true,
-  },
-  {
-    slug: "sift",
-    client: "SIFT",
-    pillar: "Grow",
-    kicker:
-      "Ongoing growth partner. Paid campaigns, landing pages, and reporting built as one engine — not three disconnected services.",
-    tags: ["Paid + Organic", "Landing pages", "Reporting"],
-    live: true,
-  },
-  {
-    slug: "cadencestack",
-    client: "CadenceStack",
-    pillar: "Grow",
-    kicker:
-      "Different market, same principle: measure what a lead costs, then move it down every month.",
-    tags: ["Demand gen", "Attribution", "SaaS"],
-    live: true,
-  },
-];
-
-function WorkCard({ item, index }: { item: WorkItem; index: number }) {
+function ProjectCard({
+  card,
+  size,
+  index,
+}: {
+  card: Card;
+  size: "hero" | "med";
+  index: number;
+}) {
   const reduce = useReducedMotion();
-
-  const gridArea = (() => {
-    if (item.featured) return { gridColumn: "1 / 3", gridRow: "1 / 3" };
-    if (index === 1) return { gridColumn: "3", gridRow: "1" };
-    if (index === 2) return { gridColumn: "3", gridRow: "2" };
-    return { gridColumn: "1 / 4", gridRow: "3" };
-  })();
-
-  const bg = item.featured ? "var(--color-bg-warm)" : "var(--color-bg-alt)";
+  const isHero = size === "hero";
+  const bg = isHero ? "var(--color-bg-warm)" : "var(--color-bg-alt)";
 
   return (
     <motion.div
@@ -289,11 +250,10 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
         ease: EASE,
         delay: reduce ? 0 : 0.1 + index * 0.08,
       }}
-      style={{ ...gridArea, display: "flex" }}
-      className="work-card-wrap"
+      style={{ display: "flex" }}
     >
       <Link
-        to={`/work/${item.slug}`}
+        to={`/work/${card.slug}`}
         className="work-card"
         style={{
           position: "relative",
@@ -302,8 +262,8 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: item.featured ? "48px 44px" : "36px 32px",
-          minHeight: item.featured ? 620 : 300,
+          padding: isHero ? "56px 48px" : "36px 32px",
+          minHeight: isHero ? 480 : 320,
           backgroundColor: bg,
           border: "1px solid rgba(20,20,18,0.08)",
           borderRadius: 4,
@@ -313,7 +273,7 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
             "background-color 0.35s ease, border-color 0.35s ease, transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1)",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = item.featured
+          e.currentTarget.style.backgroundColor = isHero
             ? "rgba(232,225,208,0.85)"
             : "rgba(232,225,208,0.55)";
           e.currentTarget.style.borderColor = "rgba(20,20,18,0.18)";
@@ -331,7 +291,7 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: item.featured ? 40 : 28,
+              marginBottom: isHero ? 40 : 28,
             }}
           >
             <span
@@ -343,9 +303,9 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
                 color: "var(--color-muted)",
               }}
             >
-              {item.pillar}
+              {card.eyebrow}
             </span>
-            {item.live ? (
+            {card.live ? (
               <span
                 style={{
                   fontFamily: "var(--font-mono)",
@@ -373,30 +333,30 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
             ) : null}
           </div>
 
-          <h2
+          <h3
             style={{
               fontFamily: "var(--font-display)",
               fontWeight: 500,
-              fontSize: item.featured ? "clamp(40px, 5vw, 68px)" : "clamp(24px, 2.4vw, 34px)",
-              lineHeight: item.featured ? 1.02 : 1.1,
+              fontSize: isHero ? "clamp(44px, 5.4vw, 72px)" : "clamp(24px, 2.4vw, 34px)",
+              lineHeight: isHero ? 1.02 : 1.1,
               letterSpacing: "-0.028em",
-              marginBottom: item.featured ? 32 : 20,
+              marginBottom: isHero ? 32 : 20,
               color: "var(--color-ink)",
             }}
           >
-            {item.client}
-          </h2>
+            {card.name}
+          </h3>
 
           <p
             style={{
-              fontSize: item.featured ? 17 : 15,
+              fontSize: isHero ? 17 : 15,
               lineHeight: 1.55,
               color: "var(--color-ink-soft)",
-              maxWidth: item.featured ? 520 : 420,
-              marginBottom: item.featured ? 40 : 24,
+              maxWidth: isHero ? 600 : 420,
+              marginBottom: isHero ? 40 : 24,
             }}
           >
-            {item.kicker}
+            {card.kicker}
           </p>
         </div>
 
@@ -412,7 +372,7 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
           }}
         >
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {item.tags.map((t) => (
+            {card.tags.map((t) => (
               <span
                 key={t}
                 style={{
@@ -433,7 +393,7 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
             className="work-arrow"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: item.featured ? 28 : 22,
+              fontSize: isHero ? 28 : 22,
               color: "var(--color-ink)",
               transition: "transform 0.4s ease",
               display: "inline-block",
@@ -448,14 +408,28 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
   );
 }
 
-function WorkGrid() {
+/* ═══════════════════════════════════════════════════════════════
+   //_01 · Portfolio — CG Walls only
+   ═══════════════════════════════════════════════════════════════ */
+
+const PORTFOLIO: Card = {
+  slug: "cg-walls-floors",
+  name: "CG Walls & Floors",
+  eyebrow: "Design",
+  kicker:
+    "Built from scratch for a solo operator in a copycat market. The design does the work of the sales team he doesn't have.",
+  tags: ["React", "Custom brand", "Marketing site"],
+  live: true,
+};
+
+function Portfolio() {
   const reduce = useReducedMotion();
 
   return (
     <section
       style={{
         backgroundColor: "var(--color-bg)",
-        padding: "80px 40px 140px",
+        padding: "80px 40px 100px",
         position: "relative",
       }}
     >
@@ -471,42 +445,136 @@ function WorkGrid() {
             letterSpacing: "0.14em",
             textTransform: "uppercase",
             color: "var(--color-muted)",
-            marginBottom: 40,
+            marginBottom: 32,
           }}
         >
           //_01 · portfolio
         </motion.div>
 
+        <ProjectCard card={PORTFOLIO} size="hero" index={0} />
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   //_02 · In The Lab — our own ventures
+   ═══════════════════════════════════════════════════════════════ */
+
+const LAB: Card[] = [
+  {
+    slug: "sift",
+    name: "SIFT",
+    eyebrow: "Job search",
+    kicker:
+      "Our job-search platform. Aggregates listings from YC, LinkedIn, Google Jobs, and Indeed; ATS-scores your resume against each one and rewrites it to close the gap.",
+    tags: ["Next.js", "Multi-tenant", "AI"],
+    live: true,
+  },
+  {
+    slug: "cadencestack",
+    name: "CadenceStack",
+    eyebrow: "LinkedIn growth",
+    kicker:
+      "Our LinkedIn presence engine. Analyzes your SSI score, generates a growth plan, and tracks whether the posts we recommend actually move the number.",
+    tags: ["LinkedIn", "Growth", "SaaS"],
+    live: true,
+  },
+  {
+    slug: "careerclarity",
+    name: "CareerClarity AI",
+    eyebrow: "Education",
+    kicker:
+      "Our AI product for education. Analyzes student test data to surface where each learner is actually stuck.",
+    tags: ["AI", "EdTech", "Product"],
+    live: true,
+  },
+];
+
+function InTheLab() {
+  const reduce = useReducedMotion();
+
+  return (
+    <section
+      style={{
+        backgroundColor: "var(--color-bg-alt)",
+        padding: "120px 40px",
+        borderTop: "1px solid rgba(20,20,18,0.10)",
+        position: "relative",
+      }}
+    >
+      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+        <motion.div
+          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 11,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "var(--color-muted)",
+            marginBottom: 24,
+          }}
+        >
+          //_02 · in the lab
+        </motion.div>
+
+        <motion.h2
+          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 500,
+            fontSize: "clamp(32px, 4vw, 56px)",
+            lineHeight: 1.06,
+            letterSpacing: "-0.025em",
+            color: "var(--color-ink)",
+            marginBottom: 24,
+            maxWidth: 900,
+          }}
+        >
+          The ventures we're{" "}
+          <span className="fade-h">building for ourselves.</span>
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.2 }}
+          style={{
+            fontSize: 17,
+            lineHeight: 1.65,
+            color: "var(--color-muted)",
+            maxWidth: 640,
+            marginBottom: 56,
+          }}
+        >
+          A proving ground for the same three pillars we sell to clients. If it
+          doesn't work on our own work, we don't ship it to yours.
+        </motion.p>
+
         <div
-          className="work-bento"
+          className="lab-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
-            gridTemplateRows: "300px 300px 280px",
             gap: 16,
           }}
         >
-          {ITEMS.map((item, i) => (
-            <WorkCard key={item.slug} item={item} index={i} />
+          {LAB.map((card, i) => (
+            <ProjectCard key={card.slug} card={card} size="med" index={i} />
           ))}
         </div>
       </div>
 
       <style>{`
-        .work-card:hover .work-arrow { transform: translate(6px, -6px); }
         @media (max-width: 900px) {
-          .work-bento {
-            grid-template-columns: 1fr !important;
-            grid-template-rows: none !important;
-            gap: 16px !important;
-          }
-          .work-card-wrap {
-            grid-column: 1 !important;
-            grid-row: auto !important;
-          }
-          .work-card {
-            min-height: 340px !important;
-          }
+          .lab-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>
@@ -514,16 +582,16 @@ function WorkGrid() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   "More work" — honest note about NDA / off-portfolio work
+   //_03 · Off-portfolio — honest note about NDA / unpublished work
    ═══════════════════════════════════════════════════════════════ */
 
-function MoreWork() {
+function OffPortfolio() {
   const reduce = useReducedMotion();
 
   return (
     <section
       style={{
-        backgroundColor: "var(--color-bg-alt)",
+        backgroundColor: "var(--color-bg)",
         padding: "120px 40px",
         borderTop: "1px solid rgba(20,20,18,0.10)",
       }}
@@ -543,7 +611,7 @@ function MoreWork() {
             marginBottom: 24,
           }}
         >
-          //_02 · off-portfolio
+          //_03 · off-portfolio
         </motion.div>
 
         <motion.h2
@@ -608,9 +676,10 @@ export default function Work() {
   return (
     <>
       <WorkHeader />
-      <WorkGrid />
-      <MoreWork />
-      <FinalCTA />
+      <Portfolio />
+      <InTheLab />
+      <OffPortfolio />
+      <FinalCTA markerNumber="04" />
     </>
   );
 }

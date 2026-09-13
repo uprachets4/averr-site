@@ -6,6 +6,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import FinalCTA from "../components/FinalCTA";
+import PillHl from "../components/PillHl";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 const BOUNCE = [0.34, 1.56, 0.64, 1] as const;
@@ -361,14 +362,13 @@ const PILLARS: Pillar[] = [
       "Custom marketing sites in Next.js or Framer — 5 to 15 pages, CMS-ready, built to load fast on mobile networks.",
       "SaaS product UI. Full user flows, component libraries, and design tokens engineering can hand off from.",
       "Design systems. Tokens, typography, motion primitives, and documentation your team will actually reference.",
-      "Landing page conversion work. Copy revisions and A/B setup so the ads pointing to it earn their spend.",
       "Iterative refinement post-launch. Real users find things static mocks miss.",
     ],
     engagement:
       "Marketing site: 3–6 weeks. Product UI or design system: 6–12 weeks. Fixed scope, fixed price, weekly review call.",
     example: {
       client: "CG Walls & Floors",
-      note: "Replaced a template contractor site with a brand-led rebuild that reads as the premium option in a copycat market.",
+      note: "Built from scratch for a solo operator in a copycat market. The design does the work of the sales team he doesn't have.",
     },
   },
   {
@@ -488,7 +488,7 @@ function ServicesHeader() {
             transition={{ duration: reduce ? 0.01 : 0.5, ease: BOUNCE, delay: 0.8 }}
             style={{ display: "inline-block" }}
           >
-            <span className="pill-hl"><span>One studio</span></span>
+            <PillHl>One studio</PillHl>
           </motion.span>{" "}
           behind them all.
         </motion.h1>
@@ -788,7 +788,7 @@ export default function Services() {
       ))}
       <WhatWeDontDo />
       <HowToStart />
-      <FinalCTA />
+      <FinalCTA markerNumber="06" />
     </>
   );
 }

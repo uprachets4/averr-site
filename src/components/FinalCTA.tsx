@@ -5,6 +5,7 @@ import {
   useSpring,
   useReducedMotion,
 } from "motion/react";
+import PillHl from "./PillHl";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 const BOUNCE = [0.34, 1.56, 0.64, 1] as const;
@@ -108,7 +109,7 @@ function MagneticCTA({
   );
 }
 
-export default function FinalCTA() {
+export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
   const reduce = useReducedMotion();
 
   return (
@@ -150,7 +151,7 @@ export default function FinalCTA() {
             marginBottom: 32,
           }}
         >
-          //_04 · ready when you are
+          {`//_${markerNumber} · ready when you are`}
         </motion.div>
 
         {/* Headline with pill highlight */}
@@ -182,7 +183,7 @@ export default function FinalCTA() {
             }}
             style={{ display: "inline-block" }}
           >
-            <span className="pill-hl"><span>actually</span></span>
+            <PillHl>actually</PillHl>
           </motion.span>{" "}
           looks like you meant it.
         </motion.h2>
