@@ -48,20 +48,21 @@ Global:
 - Cookie banner + Plausible analytics not wired yet (needed before public launch)
 - Privacy policy not written (need Iubenda subscription)
 
-## IMMEDIATE NEXT STEP: Services page
-Per sitemap Tier 1 build order #3. One page (/services) with all three pillars in extended detail.
+## SERVICES PAGE: shipped
+Live on redesign-v2 preview at `/services`. One page, all three pillars in extended detail. Sitemap wins the pricing conflict — no on-page numeric prices anywhere; every pillar block ends in a Book-a-call CTA, and the "Typical engagement" line describes timeline shape only.
 
-Sections (8 total):
-1. Header — "Three services. One studio." + subhead
-2. DESIGN pillar detail — what's included, timeline, starts at price, sample deliverables
-3. AUTOMATE pillar detail — same structure
-4. GROW pillar detail — same structure
-5. What we don't do — no retainer minimums, no white-label, no 12-month contracts
-6. How to start — 3-step visual (Book call → Scope → Kickoff)
-7. Final CTA — Book a call
-8. Footer
+Sections shipped (7 rendered + Footer via App shell):
+1. Header — "Three services. One [studio] behind them all."
+2. DESIGN — intro / What's included (5 bullets) / Typical engagement / Recent work: CG Walls & Floors / CTA
+3. AUTOMATE — same structure / Recent work: CareerClarity AI / on bg-alt for rhythm
+4. GROW — same structure / Recent work: SIFT and CadenceStack
+5. What we don't do — dark inversion, 3 lines, "boutique studio" close
+6. How to start — 3 steps, bg-warm
+7. Final CTA — reuses FinalCTA component
 
-Routing note: No routing library installed yet. Recommend installing react-router-dom before Services build so we can have real /services, /work, /about, /contact routes.
+Routing shipped: react-router-dom installed; `vercel.json` rewrites everything to `/index.html`; Nav uses `<Link>`; unbuilt routes (`/work`, `/about`, `/writing`, etc.) fall through to a lightweight NotFound placeholder pointing back to `/` and `/services`.
+
+Motion dedup: `framer-motion` uninstalled. All components already used `motion/react`. Bundle saves ~34KB.
 
 ## AFTER SERVICES (in order)
 - Work index (bento grid)

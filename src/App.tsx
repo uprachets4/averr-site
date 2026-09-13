@@ -1,21 +1,34 @@
+import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Nav from "./components/Nav";
-import Hero from "./components/Hero";
-import Pillars from "./components/Pillars";
-import Numbers from "./components/Numbers";
-import CaseStudies from "./components/CaseStudies";
-import FinalCTA from "./components/FinalCTA";
 import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import Services from "./pages/Services";
+import NotFound from "./pages/NotFound";
+
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+  useEffect(
+    function scrollOnRouteChange() {
+      if (hash) return;
+      window.scrollTo({ top: 0, behavior: "auto" });
+    },
+    [pathname, hash]
+  );
+  return null;
+}
 
 function App() {
   return (
     <>
+      <ScrollToTop />
       <Nav />
-      <main>
-        <Hero />
-        <Pillars />
-        <Numbers />
-        <CaseStudies />
-        <FinalCTA />
+      <main id="main">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </main>
       <Footer />
     </>

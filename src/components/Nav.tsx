@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const LINKS = [
-  { label: "Work", href: "#work" },
-  { label: "Services", href: "#services" },
-  { label: "About", href: "#about" },
-  { label: "Writing", href: "#writing" },
+  { label: "Work", to: "/work" },
+  { label: "Services", to: "/services" },
+  { label: "About", to: "/about" },
+  { label: "Writing", to: "/writing" },
 ];
 
 export default function Nav() {
@@ -81,12 +82,12 @@ export default function Nav() {
 
   return (
     <nav aria-label="Primary" style={navStyle}>
-      <a href="/" style={brandStyle}>Averr Studios</a>
+      <Link to="/" style={brandStyle}>Averr Studios</Link>
       <ul style={linksWrapStyle}>
         {LINKS.map(function renderLink(link) {
           return (
-            <li key={link.href}>
-              <a href={link.href} style={linkStyle}>{link.label}</a>
+            <li key={link.to}>
+              <Link to={link.to} style={linkStyle}>{link.label}</Link>
             </li>
           );
         })}
