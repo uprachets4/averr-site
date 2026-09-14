@@ -413,7 +413,7 @@ function ProjectCard({
    ═══════════════════════════════════════════════════════════════ */
 
 const PORTFOLIO: Card = {
-  slug: "cg-walls-floors",
+  slug: "cg-walls-and-floors",
   name: "CG Walls & Floors",
   eyebrow: "Design",
   kicker:

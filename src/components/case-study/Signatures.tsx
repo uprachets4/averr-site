@@ -1,0 +1,137 @@
+import { motion, useReducedMotion } from "motion/react";
+
+const EASE = [0.25, 0.1, 0.25, 1] as const;
+
+type Item = { title: string; body: string };
+
+export default function Signatures({ items }: { items: Item[] }) {
+  const reduce = useReducedMotion();
+
+  return (
+    <section
+      style={{
+        backgroundColor: "var(--color-dark)",
+        color: "var(--color-parch)",
+        padding: "140px 40px",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <div className="grain-dark" aria-hidden="true" />
+      <div
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          position: "relative",
+          zIndex: 2,
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 11,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "var(--color-muted-l)",
+            marginBottom: 24,
+          }}
+        >
+          //_04 · signature moments
+        </motion.div>
+
+        <motion.h2
+          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 500,
+            fontSize: "clamp(32px, 4vw, 56px)",
+            lineHeight: 1.08,
+            letterSpacing: "-0.025em",
+            marginBottom: 72,
+            maxWidth: 900,
+          }}
+        >
+          The moves <span className="fade-h-dark">that made it read premium.</span>
+        </motion.h2>
+
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {items.map((item, i) => (
+            <motion.article
+              key={i}
+              initial={{ opacity: 0, y: reduce ? 0 : 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{
+                duration: reduce ? 0.01 : 0.6,
+                ease: EASE,
+                delay: reduce ? 0 : 0.1 + i * 0.1,
+              }}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "60px 1fr",
+                gap: 32,
+                alignItems: "start",
+                padding: "36px 0",
+                borderTop: "1px solid rgba(237,231,218,0.14)",
+              }}
+              className="signature-row"
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 12,
+                  letterSpacing: "0.14em",
+                  color: "var(--color-muted-l)",
+                  paddingTop: 8,
+                }}
+              >
+                0{i + 1}
+              </div>
+              <div>
+                <h3
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 500,
+                    fontSize: "clamp(22px, 2.4vw, 32px)",
+                    letterSpacing: "-0.018em",
+                    lineHeight: 1.2,
+                    color: "var(--color-parch)",
+                    marginBottom: 14,
+                  }}
+                >
+                  {item.title}
+                </h3>
+                <p
+                  style={{
+                    fontSize: 17,
+                    lineHeight: 1.6,
+                    color: "var(--color-muted-l)",
+                    maxWidth: 720,
+                  }}
+                >
+                  {item.body}
+                </p>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+
+      <style>{`
+        @media (max-width: 720px) {
+          .signature-row {
+            grid-template-columns: 40px 1fr !important;
+            gap: 20px !important;
+          }
+        }
+      `}</style>
+    </section>
+  );
+}
