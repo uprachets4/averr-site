@@ -330,9 +330,8 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
           transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.2 }}
         >
           <MagneticCTA
-            href="https://cal.com/prachets/discoverycall"
+            href="/contact"
             variant="ghost"
-            external
           >
             Book a discovery call
           </MagneticCTA>

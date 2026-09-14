@@ -7,7 +7,7 @@ const STUDIO_LINKS = [
 
 const RESOURCE_LINKS = [
   { label: "Writing", href: "/writing" },
-  { label: "Book a call", href: "https://cal.com/prachets/discoverycall" },
+  { label: "Book a call", href: "/contact" },
 ];
 
 const CONTACT_LINKS = [

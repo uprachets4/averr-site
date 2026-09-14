@@ -7,6 +7,7 @@ import Services from "./pages/Services";
 import Work from "./pages/Work";
 import CaseStudy from "./pages/CaseStudy";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 function ScrollToTop() {
@@ -33,6 +34,7 @@ function App() {
           <Route path="/work" element={<Work />} />
           <Route path="/work/:slug" element={<CaseStudy />} />
           <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

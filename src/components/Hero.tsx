@@ -230,7 +230,7 @@ export default function Hero() {
           transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: reduce ? 0 : CTA_DELAY }}
           className="inline-flex flex-wrap justify-center gap-3"
         >
-          <MagneticCTA href="https://cal.com/prachets/discoverycall" variant="primary">
+          <MagneticCTA href="/contact" variant="primary">
             Book a discovery call
           </MagneticCTA>
           <MagneticCTA href="/work" variant="ghost">

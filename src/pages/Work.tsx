@@ -653,9 +653,8 @@ function OffPortfolio() {
         </motion.p>
 
         <MagneticCTA
-          href="https://cal.com/prachets/discoverycall"
+          href="/contact"
           variant="ghost"
-          external
         >
           Book a discovery call
         </MagneticCTA>

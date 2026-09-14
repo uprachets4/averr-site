@@ -202,7 +202,7 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           }}
         >
           <MagneticCTA
-            href="https://cal.com/prachets/discoverycall"
+            href="/contact"
             variant="primary"
           >
             Book a discovery call

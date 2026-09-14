@@ -92,7 +92,7 @@ export default function Nav() {
           );
         })}
       </ul>
-      <a href="https://cal.com/prachets/discoverycall" target="_blank" rel="noopener noreferrer" style={ctaStyle}>Book a call</a>
+      <Link to="/contact" style={ctaStyle}>Book a call</Link>
     </nav>
   );
 }
