@@ -10,6 +10,7 @@ import Outcome from "../components/case-study/Outcome";
 import Next from "../components/case-study/Next";
 import FinalCTA from "../components/FinalCTA";
 import NotFound from "./NotFound";
+import ComingSoon from "./ComingSoon";
 
 export default function CaseStudy() {
   const { slug } = useParams();
@@ -35,8 +36,12 @@ export default function CaseStudy() {
     [slug]
   );
 
-  if (!study || !isPublishable) {
+  if (!study) {
     return <NotFound />;
+  }
+
+  if (study.status === "draft") {
+    return <ComingSoon />;
   }
 
   return (

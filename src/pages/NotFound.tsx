@@ -1,24 +1,41 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
+import PillHl from "../components/PillHl";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
+const BOUNCE = [0.34, 1.56, 0.64, 1] as const;
+
+const EMAIL_ADDR = "prachets@averrstudios.com";
+
+const LINKS = [
+  { label: "//_home", to: "/", text: "Averr Studios — front door" },
+  { label: "//_work", to: "/work", text: "The work we've shipped" },
+  { label: "//_contact", to: "/contact", text: "Book a call or send a note" },
+];
 
 export default function NotFound() {
   const reduce = useReducedMotion();
 
+  useEffect(function updateTitle() {
+    const prev = document.title;
+    document.title = "404 — Averr Studios";
+    return function restore() {
+      document.title = prev;
+    };
+  }, []);
+
   return (
     <section
       style={{
-        minHeight: "100vh",
-        backgroundColor: "var(--color-bg)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "160px 40px 120px",
         position: "relative",
         overflow: "hidden",
-        textAlign: "center",
+        backgroundColor: "var(--color-bg)",
+        minHeight: "100vh",
+        padding: "160px 40px 80px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
       }}
     >
       <div
@@ -27,17 +44,25 @@ export default function NotFound() {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 1000px 600px at 50% 40%, rgba(232,225,208,0.5), transparent 60%)",
+            "radial-gradient(ellipse 1400px 900px at 30% 30%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 70%, rgba(232,225,208,0.35), transparent 60%)",
           pointerEvents: "none",
         }}
       />
       <div className="grain-light" aria-hidden="true" />
 
-      <div style={{ position: "relative", zIndex: 2, maxWidth: 720 }}>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          maxWidth: 1000,
+          margin: "0 auto",
+          width: "100%",
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: 0.1 }}
           style={{
             fontFamily: "var(--font-mono)",
             fontSize: 11,
@@ -47,89 +72,151 @@ export default function NotFound() {
             marginBottom: 32,
           }}
         >
-          //_soon
+          //_404 · wrong door
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.3 }}
           style={{
             fontFamily: "var(--font-display)",
             fontWeight: 500,
-            fontSize: "clamp(40px, 5vw, 64px)",
-            lineHeight: 1.05,
-            letterSpacing: "-0.025em",
-            marginBottom: 24,
+            fontSize: "clamp(42px, 5.6vw, 76px)",
+            lineHeight: 1.04,
+            letterSpacing: "-0.03em",
             color: "var(--color-ink)",
+            marginBottom: 32,
+            maxWidth: 900,
           }}
         >
-          Not yet.
+          You've hit a page that{" "}
+          <motion.span
+            initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: reduce ? 0.01 : 0.5, ease: BOUNCE, delay: 0.9 }}
+            style={{ display: "inline-block" }}
+          >
+            <PillHl>doesn't exist</PillHl>
+          </motion.span>.
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.2 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.2 }}
           style={{
-            fontSize: 17,
+            fontSize: 19,
             lineHeight: 1.6,
             color: "var(--color-muted)",
-            maxWidth: 480,
-            margin: "0 auto 40px",
+            maxWidth: 640,
+            marginBottom: 64,
           }}
         >
-          This page is on the roadmap but isn't live yet. In the meantime,
-          the front door and the services page are.
+          Might be a mistyped URL. Might be a link that went stale. Either way,
+          easiest path back is one of these:
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+          initial={{ opacity: 0, y: reduce ? 0 : 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.3 }}
-          style={{ display: "inline-flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.5 }}
+          className="recovery-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 32,
+            paddingTop: 32,
+            paddingBottom: 40,
+            borderTop: "1px solid rgba(20,20,18,0.10)",
+            borderBottom: "1px solid rgba(20,20,18,0.10)",
+          }}
         >
-          <Link
-            to="/"
-            style={{
-              padding: "14px 24px",
-              borderRadius: 999,
-              backgroundColor: "var(--color-ink)",
-              color: "var(--color-bg)",
-              fontFamily: "var(--font-body)",
-              fontSize: 14,
-              fontWeight: 500,
-              textDecoration: "none",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            Back to home
-            <span>→</span>
-          </Link>
-          <Link
-            to="/services"
-            style={{
-              padding: "14px 24px",
-              borderRadius: 999,
-              backgroundColor: "transparent",
-              color: "var(--color-ink)",
-              border: "1px solid rgba(20,20,18,0.18)",
-              fontFamily: "var(--font-body)",
-              fontSize: 14,
-              fontWeight: 500,
-              textDecoration: "none",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            See services
-            <span>→</span>
-          </Link>
+          {LINKS.map((link) => (
+            <div key={link.to}>
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "var(--color-muted-2)",
+                  marginBottom: 12,
+                }}
+              >
+                {link.label}
+              </div>
+              <Link to={link.to} className="recovery-link" style={recoveryLinkStyle}>
+                {link.text}
+              </Link>
+            </div>
+          ))}
         </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0, y: reduce ? 0 : 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.8 }}
+          style={{
+            marginTop: 32,
+            fontSize: 14,
+            lineHeight: 1.6,
+            color: "var(--color-muted-2)",
+            maxWidth: 720,
+          }}
+        >
+          If a specific page sent you here that shouldn't have — email{" "}
+          <a
+            href={`mailto:${EMAIL_ADDR}`}
+            style={{
+              color: "var(--color-muted)",
+              textDecoration: "underline",
+              textUnderlineOffset: 3,
+            }}
+          >
+            {EMAIL_ADDR}
+          </a>{" "}
+          and I'll fix the link.
+        </motion.p>
       </div>
+
+      <style>{`
+        .recovery-link {
+          position: relative;
+          display: inline-block;
+          font-family: var(--font-display);
+          font-weight: 500;
+          font-size: 18px;
+          letter-spacing: -0.015em;
+          color: var(--color-ink);
+          text-decoration: none;
+          line-height: 1.35;
+        }
+        .recovery-link::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: -4px;
+          height: 1px;
+          background: currentColor;
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .recovery-link:hover::after,
+        .recovery-link:focus-visible::after {
+          transform: scaleX(1);
+        }
+        @media (max-width: 720px) {
+          .recovery-grid {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
+
+const recoveryLinkStyle: React.CSSProperties = {};
