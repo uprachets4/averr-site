@@ -56,7 +56,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       eyebrow: "//_CASE_STUDY",
       thesis:
         "A one-man renovation crew, a zero-budget mandate, and a realtor referral engine that runs itself.",
-      thesisPill: "runs itself",
+      thesisPill: "referral engine",
       kicker:
         "Turning a solo operator into a market presence that punches three brokerages above its weight.",
     },

@@ -26,40 +26,50 @@ export default function Signatures({ items }: { items: Item[] }) {
           zIndex: 2,
         }}
       >
-        <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+        <div
+          className="signatures-header"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            color: "var(--color-muted-l)",
-            marginBottom: 24,
-          }}
-        >
-          //_04 · signature moments
-        </motion.div>
-
-        <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
-          style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(32px, 4vw, 56px)",
-            lineHeight: 1.08,
-            letterSpacing: "-0.025em",
+            display: "grid",
+            gridTemplateColumns: "140px 1fr",
+            gap: 40,
+            alignItems: "start",
             marginBottom: 72,
-            maxWidth: 900,
           }}
         >
-          The moves <span className="fade-h-dark">that made it read premium.</span>
-        </motion.h2>
+          <motion.div
+            initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "var(--color-muted-l)",
+              paddingTop: 12,
+            }}
+          >
+            //_04 · signature moments
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: reduce ? 0 : 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 500,
+              fontSize: "clamp(32px, 4vw, 56px)",
+              lineHeight: 1.08,
+              letterSpacing: "-0.025em",
+              maxWidth: 900,
+            }}
+          >
+            The moves <span className="fade-h-dark">that made it read premium.</span>
+          </motion.h2>
+        </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
           {items.map((item, i) => (
@@ -125,6 +135,12 @@ export default function Signatures({ items }: { items: Item[] }) {
       </div>
 
       <style>{`
+        @media (max-width: 900px) {
+          .signatures-header {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+          }
+        }
         @media (max-width: 720px) {
           .signature-row {
             grid-template-columns: 40px 1fr !important;

@@ -22,8 +22,8 @@ export default function Context({ paragraphs }: { paragraphs: string[] }) {
           position: "relative",
           zIndex: 2,
           display: "grid",
-          gridTemplateColumns: "1fr 2fr",
-          gap: 80,
+          gridTemplateColumns: "140px 1fr",
+          gap: 40,
           alignItems: "start",
         }}
         className="context-grid"

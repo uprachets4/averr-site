@@ -62,7 +62,7 @@ export default function Inventory({
             maxWidth: 900,
           }}
         >
-          The <span className="fade-h">deliverables.</span>
+          What <span className="fade-h">actually shipped.</span>
         </motion.h2>
 
         <ul style={{ listStyle: "none", padding: 0, margin: "0 0 64px" }}>

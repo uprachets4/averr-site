@@ -94,17 +94,37 @@ export default function Approach({ entries }: { entries: Entry[] }) {
             >
               <div
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--color-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
                 }}
               >
-                <span style={{ color: "var(--color-ink)", fontWeight: 500 }}>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 11,
+                    letterSpacing: "0.14em",
+                    color: "var(--color-ink)",
+                    fontWeight: 500,
+                  }}
+                >
                   {String(i + 1).padStart(2, "0")}
-                </span>{" "}
-                · {entry.pillar}
+                </span>
+                <span
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 999,
+                    border: "1px solid rgba(20,20,18,0.18)",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 11,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "var(--color-ink-soft)",
+                    background: "transparent",
+                  }}
+                >
+                  {entry.pillar}
+                </span>
               </div>
               <p
                 style={{
