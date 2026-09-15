@@ -467,7 +467,7 @@ const LAB: Card[] = [
     name: "SIFT",
     eyebrow: "Job search",
     kicker:
-      "Our job-search platform. Aggregates listings from YC, LinkedIn, Google Jobs, and Indeed; ATS-scores your resume against each one and rewrites it to close the gap.",
+      "Our job-search platform. Aggregates listings from YC, LinkedIn, Wellfound, Google Jobs, and every major ATS board; ATS-scores your resume against each one and rewrites it to close the gap.",
     tags: ["Next.js", "Multi-tenant", "AI"],
     live: true,
   },
