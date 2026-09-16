@@ -476,8 +476,8 @@ const LAB: Card[] = [
     name: "CadenceStack",
     eyebrow: "LinkedIn growth",
     kicker:
-      "Our LinkedIn presence engine. Analyzes your SSI score, generates a growth plan, and tracks whether the posts we recommend actually move the number.",
-    tags: ["LinkedIn", "Growth", "SaaS"],
+      "Our LinkedIn presence engine. Turns thought leadership into a managed system — deciding what to say, drafting it in your voice, and remembering what you've already said so the next post doesn't repeat the last one.",
+    tags: ["LinkedIn", "Editorial system", "SaaS"],
     live: true,
   },
   {

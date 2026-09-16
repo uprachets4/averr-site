@@ -184,10 +184,74 @@ export const caseStudies: Record<string, CaseStudy> = {
     ],
     next: "Weeks 4–12 of the 16-week launch plan: closing the AI quality gap on matching, tailoring, and cover letters. Adding visual interactivity and user engagement prompts. Redesigning the Settings/Outreach page. Weeks 13–16: Pro tier launch — quota tracking rebuilt for scale, paid billing infrastructure, and a redesigned paid-source credit model.",
   },
-  cadencestack: draft(
-    "cadencestack",
-    "CadenceStack",
-    ["Design", "Grow"],
-    "SaaS — LinkedIn growth"
-  ),
+  cadencestack: {
+    slug: "cadencestack",
+    client: "CadenceStack",
+    status: "live",
+    pillars: ["Design", "Automate", "Grow"],
+    sector: "SaaS — LinkedIn presence",
+    year: "2025 — ongoing",
+    hero: {
+      eyebrow: "//_CASE_STUDY",
+      thesis:
+        "LinkedIn stops being a blank-page obligation and starts being a managed system — deciding what to say, drafting it in your voice, moving it through review, and learning from what happens after publication.",
+      thesisPill: "managed system",
+      kicker:
+        "Turning founder thought leadership into an editorial pipeline that remembers what it's already said — instead of a text generator with a calendar attached.",
+    },
+    context: [
+      "Most LinkedIn tools treat the problem as content production. Give the model a topic, generate five posts, schedule them, repeat. That solves typing. It does not solve positioning.",
+      "Founders rarely lack ideas. They lack a system for deciding which ideas support their reputation, which angle has already been exhausted, what evidence makes a post credible, and what should come next. Without that memory, automation produces competent-looking repetition: the same hook, the same lesson, the same vague CTA.",
+      "CadenceStack exists because thought leadership is a state-management problem before it is a writing problem. The system has to understand the operator, preserve editorial decisions, rotate ideas deliberately, and connect published work back to future recommendations. Otherwise it's just another text generator with a calendar attached.",
+    ],
+    approach: [
+      {
+        pillar: "Design",
+        body: "CadenceStack required a product system, not a prompt box. The interface makes editorial state visible: what is only an idea, what needs work, what is ready, what has been published, and what the system recommends next. The composer, Structure Guide, review states, Presence Score, personalized roadmap, onboarding, performance views, and founder controls all sit as first-class product surfaces — not settings buried in a sidebar.",
+      },
+      {
+        pillar: "Automate",
+        body: "The drafting path sits behind server-side gates, authentication, quotas, validation, timeouts, telemetry, and fail-closed provider handling. Supabase holds the persistent product state. The productized path is provider-neutral, with a direct OpenAI adapter live in the application and Claude used in the earlier operator-side research workflow. Trigger.dev and ClickUp move operator work through research, drafting, visual production, and completion.",
+      },
+      {
+        pillar: "Grow",
+        body: "CadenceStack encodes an actual LinkedIn operating model — the 7S Methodology, five editorial pillars, hook patterns, content rotation, publishing states, and a performance-learning loop. The objective is not to publish more often at any cost. It is to build a recognizable body of work without repeating the same point until it becomes wallpaper.",
+      },
+    ],
+    inventory: [
+      "The 7S Methodology as system logic — the founder's seven-part sales methodology translated from informal thinking into repeatable editorial rules that shape how an idea is structured, challenged, developed, and prepared for publication",
+      "A five-pillar model: Voice, Strength, Hook, Cadence, and Signal — Voice and Strength inform the post score; score and Cadence shape the recommendation; recommendation and Signal inform the publish decision",
+      "A stateful content pipeline with defined stages: Idea → Drafting → Needs Visual → Ready → Scheduled → Published → Repurpose — each record carrying pillar, hook, body, CTA, first comment, hashtags, audience, proof source, visual concept, schedule, publication link, and performance data",
+      "Rotation and repetition controls: the next recommendation is evaluated against active pillar, recent subjects, hook usage, current pipeline inventory, and previously published material — the system remembers what it has already said instead of generating each post as an isolated request",
+      "A deterministic Structure Guide that runs before AI touches the draft — browser-local rules inspect seven inputs (pillar, title, hook, body, CTA, first comment, hashtags) to identify what is structurally weak without rewriting the post or pretending to predict performance",
+      "A guarded AI drafting core: the server-side generation path handles authentication, generation gates, quota reservation, retries, timeout control, sanitized telemetry, persistence, and strict output validation — malformed, truncated, refused, or unexpected provider output fails closed rather than leaking into the editor",
+      "A persistent product layer in Supabase holding authentication, post records, AI runs, generated outputs, pillars, prompts, visuals, metrics, onboarding state, and recommendation state — service-level credentials stay server-side, user boundaries tested rather than assumed",
+      "A staging product on Vercel with interactive onboarding, deterministic Presence Score, diagnosis, personalized strategy roadmap, first-post handoff, adaptive recommendations, review controls, and controlled-beta foundations",
+    ],
+    signatures: [
+      {
+        title: "Deterministic before generative",
+        body: "The Structure Guide runs before the AI assistant and stays separate from it. That's deliberate. A model can produce fluent copy while missing a weak hook, absent proof, confused CTA, or incomplete first comment. CadenceStack checks the structure first, then decides whether generation is useful.",
+      },
+      {
+        title: "The system remembers the last post",
+        body: "Most content generators behave as if every prompt is the first conversation. CadenceStack keeps the pillar, hook, proof source, workflow state, publishing history, and recommendation state attached to the content. That memory is what makes deliberate rotation and adaptive recommendations possible.",
+      },
+      {
+        title: "Presence before production",
+        body: 'The product doesn\'t begin by asking, "what should the AI write?" It begins with onboarding, user intelligence, a Presence Score, diagnosis, and a roadmap. The bet is simple: a founder should know what reputation they are building before automating the posts meant to build it.',
+      },
+    ],
+    outcome:
+      "CadenceStack is beyond a concept and short of a public SaaS product. The editorial model, product interface, persistent workflow, deterministic guidance, guarded generation architecture, onboarding, scoring, roadmap, and adaptive recommendation work all exist across the main application and staging environment. The internal process can take an idea through structure, drafting, review, visual planning, approval, publication tracking, and repurposing without reducing the work to a single prompt. What has been proven is the operating model and the usefulness of persistent editorial state. What has not been proven is repeatable performance across a broad customer base — CadenceStack is still being run primarily against the founder's own presence, with controlled-beta infrastructure under construction. Production AI activation, unrestricted LinkedIn publishing, multi-tenant usage at scale, and commercial retention are not claims the product can make yet.",
+    stack: [
+      "TanStack Start",
+      "Supabase",
+      "Vercel",
+      "OpenAI adapter",
+      "Trigger.dev",
+      "ClickUp",
+    ],
+    next: "The next three-to-six months turn a founder-operated system into a controlled multi-tenant product. Clearing the remaining protected-boundary checks, isolating staging and production configuration, completing tenant-safe data access, activating provider calls behind quotas and kill switches, finalizing consent and privacy controls, and connecting approved LinkedIn publishing where platform access permits it. A small allowlisted beta comes before open launch — testing onboarding completion, Presence Score usefulness, recommendation quality, review behaviour, publishing reliability, provider cost, and whether performance data actually improves the next decision. If that loop doesn't get smarter with use, the product is still only an organized writing tool.",
+  },
 };
