@@ -52,11 +52,12 @@ export default function CaseStudy() {
         pillars={study.pillars}
         sector={study.sector}
         year={study.year}
+        heroImage={study.heroImage}
       />
       <Context paragraphs={study.context} />
       <Approach entries={study.approach} />
       <Inventory items={study.inventory} stack={study.stack} />
-      <Signatures items={study.signatures} />
+      <Signatures items={study.signatures} imageSrc={study.signatureImage} imageAlt={`${study.client} Signal Desk screen`} />
       <Outcome text={study.outcome} />
       <Next text={study.next} />
       <FinalCTA markerNumber="07" />

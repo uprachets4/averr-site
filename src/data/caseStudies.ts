@@ -13,10 +13,12 @@ export type CaseStudy = {
     thesisPill: string;
     kicker: string;
   };
+  heroImage?: string;
   context: string[];
   approach: { pillar: Pillar; body: string }[];
   inventory: string[];
   signatures: { title: string; body: string }[];
+  signatureImage?: string;
   outcome: string;
   stack: string[];
   next: string;
@@ -110,6 +112,76 @@ export const caseStudies: Record<string, CaseStudy> = {
       "Google Business Profile",
     ],
     next: "Brokerage-specific sequences across RE/MAX, Century 21, and Royal LePage. Landlord and pre-listing-seller flows. NextDoor as a warm-neighbourhood test channel.",
+  },
+  capitalcommand: {
+    slug: "capitalcommand",
+    client: "CapitalCommand",
+    status: "live",
+    pillars: ["Design", "Automate"],
+    sector: "Fintech — portfolio intelligence",
+    year: "2026 — internal alpha",
+    hero: {
+      eyebrow: "//_CASE_STUDY",
+      thesis:
+        "A research-first investment console that brings portfolios, markets, IPOs, signals, risk, and system health into one place — without pretending analysis and execution are the same thing.",
+      thesisPill: "research-first",
+      kicker:
+        "Putting the steps back in order: start with the portfolio, inspect the signal, test the thesis, check the risk, verify the data — then, and only then, consider execution.",
+    },
+    heroImage: "/work/capitalcommand/01-overview.jpg",
+    context: [
+      "Most investing products confuse access to data with investment intelligence. They add charts, news feeds, screeners, alerts, and AI summaries until the interface looks sophisticated, but the investor is still responsible for connecting everything into a decision.",
+      "The second mistake is collapsing research and execution into one loop. A signal appears, confidence gets implied, and the interface pushes the user toward a trade before the thesis, exposure, data freshness, and downside have been examined.",
+      "CapitalCommand exists to put those steps back in order. Start with the portfolio. Establish the market context. Inspect the signal. Test the thesis. Check the risk. Verify the underlying data. Execution comes later, behind explicit controls — not disguised as a convenient button.",
+    ],
+    approach: [
+      {
+        pillar: "Design",
+        body: "CapitalCommand demonstrates product UI and systems design across a dense financial application. The interface covers Overview, Markets, Portfolio, IPO Intelligence, Signal Desk, Research Lab, Risk Center, and System Health without reducing each area to a disconnected dashboard. Information hierarchy, confidence states, source freshness, exposure, and system status are treated as parts of the same decision environment.",
+      },
+      {
+        pillar: "Automate",
+        body: "Scheduled research jobs, IPO refresh and classification workflows, signal processing, portfolio calculations, alerts, notification records, audit logging, and health monitoring. Redis and BullMQ handle durable jobs, retries, leases, dead letters, and replay. A server-side OpenAI adapter exists behind feature flags and strict output validation, but AI and external provider calls remain disabled by default.",
+      },
+    ],
+    inventory: [
+      "TypeScript monorepo managed with pnpm and Turborepo — separate Next.js web application, worker application, and shared packages for the database, audit logging, observability, and common domain logic",
+      "Prisma and PostgreSQL data layer covering users, sessions, workspaces, memberships, portfolios, transactions, holdings, IPO records, options research, signals, alerts, notifications, provider status, scheduled jobs, and audit events",
+      "Database-backed authentication context with server-side sessions, workspace membership and role checks, resource ownership enforcement, protected routes, security headers, and a production guard preventing test auth from being enabled accidentally — production OAuth or password identity provider not yet connected",
+      "Portfolio and command surfaces for the overall account view, portfolios, transactions, holdings, performance, SIP/DCA modelling, and exposure analysis — current workflows run against deterministic seeded data rather than brokerage accounts",
+      "Markets and IPO research covering US and Indian listings — separate IPO routes, refresh and scoring jobs, watch workflows, SEC-document parsing and classification logic, market-regime context, and data-quality states; current provider layer is mock-backed",
+      "Signal Desk and Research Lab for collecting signals, inspecting confidence and provenance, opening a research workspace, testing a thesis, and separating a research observation from an executable action — Discord signal models and ingestion jobs exist, real Discord ingestion still disabled",
+      "Risk Center and System Health covering portfolio exposure, stale-data detection, provider status, readiness, worker health, structured logs, request and correlation IDs, internal metrics, alert rules, degraded-state reporting, and a protected metrics route",
+      "Redis-backed BullMQ worker system with schedules, retries, leases, persistent job metadata, dead-letter handling, replay, graceful shutdown, and jobs for portfolio research, IPO monitoring, options paper workflows, signals, alerts, and notifications — Docker packaging, GitHub Actions validation, backup and restore guardrails, and recovery runbooks in place",
+    ],
+    signatures: [
+      {
+        title: "Research before execution",
+        body: "CapitalCommand treats a signal as the beginning of an investigation, not permission to place an order. The product forces the path through thesis, provenance, portfolio exposure, and risk before brokerage access is even considered.",
+      },
+      {
+        title: "Operational truth is part of the interface",
+        body: "Most investment dashboards display a number without telling you whether the provider is delayed, the worker failed, or the data is stale. CapitalCommand exposes provider status, data quality, job health, readiness, and audit history — because unreliable infrastructure produces unreliable investment decisions.",
+      },
+      {
+        title: "Deterministic before generative",
+        body: "Portfolio calculations, risk rules, job state, ownership checks, and safety controls stay outside the model. AI is restricted to bounded research assistance with schema-validated output, sanitized telemetry, feature flags, and fail-closed behaviour. A fluent answer does not get to override system state.",
+      },
+    ],
+    signatureImage: "/work/capitalcommand/05-signal-desk.jpg",
+    outcome:
+      "CapitalCommand currently works as an internal, research-first engineering build using deterministic seeded and mock-backed data. A user can move through portfolio state, market context, IPO research, signals, thesis work, exposure checks, system status, and audit history. The database, authenticated ownership model, durable worker layer, safety flags, observability, and recovery controls have all been built and tested. It is not a live brokerage product — no licensed live-market provider, no production identity provider, no real notification delivery, no connected brokerage account, no order execution. The architecture has been hardened through local and CI validation, but staging recovery checks and production deployment still need to be completed. What's been proven is the product model and the research loop. What remains unproven is whether that loop becomes valuable enough for external users to return to regularly.",
+    stack: [
+      "Next.js",
+      "TypeScript",
+      "PostgreSQL",
+      "Prisma",
+      "Redis",
+      "BullMQ",
+      "Turborepo",
+      "OpenAI adapter",
+    ],
+    next: "The next three-to-six months turn the internal build into a controlled multi-tenant beta: connecting a licensed market-data provider, replacing deterministic identity with production authentication, completing tenant-isolation and browser-level security testing, activating notification delivery, finishing staging backup-and-restore validation, and instrumenting the full research loop. A small beta will test portfolio import, US and Indian IPO tracking, signals, thesis workflows, and risk monitoring before execution is introduced. Brokerage connectivity belongs behind order previews, human confirmation, stale-quote checks, position and loss limits, reconciliation, and a kill switch. Before offering personalized recommendations or order routing, the product also needs legal review of where research software becomes regulated advice or dealer activity under CIRO and OSC requirements in Canada and SEC/FINRA requirements in the United States.",
   },
   "careerclarity-ai": draft(
     "careerclarity-ai",

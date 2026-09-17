@@ -5,7 +5,10 @@ import type { CaseStudy } from "../../data/caseStudies";
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 const BOUNCE = [0.34, 1.56, 0.64, 1] as const;
 
-type Props = Pick<CaseStudy, "hero" | "client" | "pillars" | "sector" | "year">;
+type Props = Pick<
+  CaseStudy,
+  "hero" | "client" | "pillars" | "sector" | "year" | "heroImage"
+>;
 
 function splitOnPill(thesis: string, pill: string): [string, string, string] {
   const i = thesis.indexOf(pill);
@@ -13,7 +16,14 @@ function splitOnPill(thesis: string, pill: string): [string, string, string] {
   return [thesis.slice(0, i), pill, thesis.slice(i + pill.length)];
 }
 
-export default function CaseHero({ hero, client, pillars, sector, year }: Props) {
+export default function CaseHero({
+  hero,
+  client,
+  pillars,
+  sector,
+  year,
+  heroImage,
+}: Props) {
   const reduce = useReducedMotion();
   const [before, pill, after] = splitOnPill(hero.thesis, hero.thesisPill);
 
@@ -148,6 +158,35 @@ export default function CaseHero({ hero, client, pillars, sector, year }: Props)
           <Meta label="Sector" value={sector} />
           <Meta label="Year" value={year} />
         </motion.div>
+
+        {heroImage ? (
+          <motion.figure
+            initial={{ opacity: 0, y: reduce ? 0 : 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 1.5 }}
+            style={{
+              marginTop: 64,
+              overflow: "hidden",
+              borderRadius: 6,
+              border: "1px solid rgba(20,20,18,0.10)",
+              aspectRatio: "16 / 10",
+              background: "var(--color-bg-alt)",
+            }}
+          >
+            <img
+              src={heroImage}
+              alt={`${client} overview screen`}
+              loading="eager"
+              decoding="async"
+              style={{
+                display: "block",
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          </motion.figure>
+        ) : null}
       </div>
 
       <style>{`

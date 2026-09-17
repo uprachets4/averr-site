@@ -409,18 +409,29 @@ function ProjectCard({
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   //_01 · Portfolio — CG Walls only
+   //_01 · Portfolio — client-tier live case studies
    ═══════════════════════════════════════════════════════════════ */
 
-const PORTFOLIO: Card = {
-  slug: "cg-walls-and-floors",
-  name: "CG Walls & Floors",
-  eyebrow: "Design",
-  kicker:
-    "Built from scratch for a solo operator in a copycat market. The design does the work of the sales team he doesn't have.",
-  tags: ["React", "Custom brand", "Marketing site"],
-  live: true,
-};
+const PORTFOLIO: Card[] = [
+  {
+    slug: "cg-walls-and-floors",
+    name: "CG Walls & Floors",
+    eyebrow: "Design",
+    kicker:
+      "Built from scratch for a solo operator in a copycat market. The design does the work of the sales team he doesn't have.",
+    tags: ["React", "Custom brand", "Marketing site"],
+    live: true,
+  },
+  {
+    slug: "capitalcommand",
+    name: "CapitalCommand",
+    eyebrow: "Design",
+    kicker:
+      "A research-first command console for tracking portfolios, investigating signals, monitoring risk, and following US and Indian IPOs — built to improve the decision before it introduces the trade.",
+    tags: ["Fintech", "Portfolio intelligence", "SaaS"],
+    live: true,
+  },
+];
 
 function Portfolio() {
   const reduce = useReducedMotion();
@@ -451,8 +462,25 @@ function Portfolio() {
           //_01 · portfolio
         </motion.div>
 
-        <ProjectCard card={PORTFOLIO} size="hero" index={0} />
+        <div
+          className="portfolio-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: 16,
+          }}
+        >
+          {PORTFOLIO.map((card, i) => (
+            <ProjectCard key={card.slug} card={card} size="hero" index={i} />
+          ))}
+        </div>
       </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .portfolio-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   );
 }
