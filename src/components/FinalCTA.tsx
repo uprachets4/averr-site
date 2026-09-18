@@ -141,12 +141,9 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
             display: "inline-block",
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 32,
           }}

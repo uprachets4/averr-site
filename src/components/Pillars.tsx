@@ -166,18 +166,15 @@ function PillarCard({
         </span>{" "}
         · {pillar.marker}
       </div>
-      <div
+      <h3
+        className="type-h3"
         style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 500,
-          fontSize: 32,
-          letterSpacing: "-0.02em",
           marginBottom: 16,
           color: "var(--color-ink)",
         }}
       >
         {pillar.title}
-      </div>
+      </h3>
       <div
         style={{
           fontFamily: "var(--font-body)",

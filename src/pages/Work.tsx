@@ -327,12 +327,8 @@ function ProjectCard({
           </div>
 
           <h3
+            className="type-h3"
             style={{
-              fontFamily: "var(--font-display)",
-              fontWeight: 500,
-              fontSize: isHero ? "clamp(44px, 5.4vw, 72px)" : "clamp(24px, 2.4vw, 34px)",
-              lineHeight: isHero ? 1.02 : 1.1,
-              letterSpacing: "-0.028em",
               marginBottom: isHero ? 32 : 20,
               color: "var(--color-ink)",
             }}

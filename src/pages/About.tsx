@@ -484,12 +484,8 @@ function HowIWork() {
                 {String(i + 1).padStart(2, "0")}
               </div>
               <h3
+                className="type-h3"
                 style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 500,
-                  fontSize: "clamp(20px, 2.2vw, 26px)",
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.25,
                   color: "var(--color-ink)",
                 }}
               >

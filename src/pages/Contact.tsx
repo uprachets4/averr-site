@@ -443,11 +443,8 @@ function BookACall() {
                   Booking calendar
                 </div>
                 <h3
+                  className="type-h3"
                   style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: 24,
-                    fontWeight: 500,
-                    letterSpacing: "-0.018em",
                     color: "var(--color-ink)",
                   }}
                 >
@@ -685,12 +682,8 @@ function SendMessage() {
                   //_sent
                 </div>
                 <h3
+                  className="type-h3"
                   style={{
-                    fontFamily: "var(--font-display)",
-                    fontWeight: 500,
-                    fontSize: "clamp(24px, 3vw, 34px)",
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.2,
                     color: "var(--color-ink)",
                   }}
                 >
