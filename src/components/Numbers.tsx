@@ -52,11 +52,8 @@ export default function Numbers() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 20,
           }}
@@ -70,12 +67,8 @@ export default function Numbers() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          className="type-h2"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(32px, 4vw, 56px)",
-            lineHeight: 1.06,
-            letterSpacing: "-0.025em",
             maxWidth: 900,
             marginBottom: 60,
             color: "var(--color-ink)",
@@ -138,11 +131,8 @@ function StatCard({
       }}
     >
       <div
+        className="type-eyebrow"
         style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: 11,
-          letterSpacing: "0.14em",
-          textTransform: "uppercase",
           color: "var(--color-muted)",
           marginBottom: 20,
         }}

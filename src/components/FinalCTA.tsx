@@ -160,12 +160,8 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          className="type-display-xl"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(40px, 5vw, 72px)",
-            lineHeight: 1.05,
-            letterSpacing: "-0.028em",
             maxWidth: 900,
             margin: "0 auto 48px",
             color: "var(--color-ink)",

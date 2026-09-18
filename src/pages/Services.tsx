@@ -149,11 +149,8 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 24,
           }}
@@ -166,12 +163,8 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.05 }}
+          className="type-display-xl"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(48px, 6vw, 88px)",
-            lineHeight: 1.02,
-            letterSpacing: "-0.03em",
             color: "var(--color-ink)",
             marginBottom: 32,
           }}
@@ -208,11 +201,8 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
           {/* What's included */}
           <div>
             <div
+              className="type-eyebrow"
               style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 11,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
                 color: "var(--color-muted-2)",
                 marginBottom: 24,
               }}
@@ -263,11 +253,8 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 48 }}>
             <div>
               <div
+                className="type-eyebrow"
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
                   color: "var(--color-muted-2)",
                   marginBottom: 16,
                 }}
@@ -287,11 +274,8 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
 
             <div>
               <div
+                className="type-eyebrow"
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
                   color: "var(--color-muted-2)",
                   marginBottom: 16,
                 }}
@@ -468,12 +452,8 @@ function ServicesHeader() {
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.3 }}
+          className="type-display-xl"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(44px, 6vw, 80px)",
-            lineHeight: 1.04,
-            letterSpacing: "-0.03em",
             color: "var(--color-ink)",
             marginBottom: 32,
             maxWidth: 900,
@@ -543,11 +523,8 @@ function WhatWeDontDo() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted-l)",
             marginBottom: 24,
           }}
@@ -560,12 +537,8 @@ function WhatWeDontDo() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          className="type-h2"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(32px, 4vw, 56px)",
-            lineHeight: 1.08,
-            letterSpacing: "-0.025em",
             marginBottom: 64,
             maxWidth: 900,
           }}
@@ -661,11 +634,8 @@ function HowToStart() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 24,
           }}
@@ -678,12 +648,8 @@ function HowToStart() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          className="type-h2"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(32px, 4vw, 56px)",
-            lineHeight: 1.06,
-            letterSpacing: "-0.025em",
             color: "var(--color-ink)",
             marginBottom: 72,
             maxWidth: 900,

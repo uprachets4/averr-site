@@ -182,11 +182,8 @@ function StartHere() {
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: 0.2 }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 32,
           }}
@@ -198,12 +195,8 @@ function StartHere() {
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.3 }}
+          className="type-display-xl"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(44px, 5.8vw, 80px)",
-            lineHeight: 1.03,
-            letterSpacing: "-0.03em",
             color: "var(--color-ink)",
             marginBottom: 40,
             maxWidth: 1080,
@@ -313,11 +306,8 @@ function BookACall() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 40,
           }}
@@ -340,12 +330,8 @@ function BookACall() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE }}
+              className="type-h2"
               style={{
-                fontFamily: "var(--font-display)",
-                fontWeight: 500,
-                fontSize: "clamp(28px, 3.4vw, 44px)",
-                lineHeight: 1.1,
-                letterSpacing: "-0.02em",
                 color: "var(--color-ink)",
                 marginBottom: 20,
               }}
@@ -449,11 +435,8 @@ function BookACall() {
                 }}
               >
                 <div
+                  className="type-eyebrow"
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 11,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
                     color: "var(--color-muted-2)",
                   }}
                 >
@@ -601,11 +584,8 @@ function SendMessage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 40,
           }}
@@ -628,12 +608,8 @@ function SendMessage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE }}
+              className="type-h2"
               style={{
-                fontFamily: "var(--font-display)",
-                fontWeight: 500,
-                fontSize: "clamp(28px, 3.4vw, 44px)",
-                lineHeight: 1.1,
-                letterSpacing: "-0.02em",
                 color: "var(--color-ink)",
                 marginBottom: 20,
               }}
@@ -665,11 +641,8 @@ function SendMessage() {
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.2 }}
               href={`mailto:${EMAIL_ADDR}`}
+              className="type-eyebrow"
               style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 12,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
                 color: "var(--color-ink)",
                 textDecoration: "none",
                 borderBottom: "1px solid rgba(20,20,18,0.18)",
@@ -704,11 +677,8 @@ function SendMessage() {
                 }}
               >
                 <div
+                  className="type-eyebrow"
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 11,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
                     color: "var(--color-muted-2)",
                   }}
                 >
@@ -931,11 +901,8 @@ function Faq() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 24,
           }}
@@ -948,12 +915,8 @@ function Faq() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          className="type-h2"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(28px, 3.4vw, 44px)",
-            lineHeight: 1.1,
-            letterSpacing: "-0.02em",
             color: "var(--color-ink)",
             marginBottom: 48,
             maxWidth: 720,
@@ -1083,11 +1046,8 @@ function StillHere() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 32,
           }}
