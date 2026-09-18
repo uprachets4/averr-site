@@ -33,11 +33,8 @@ export default function Next({ text }: { text: string }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
           }}
         >
@@ -49,9 +46,8 @@ export default function Next({ text }: { text: string }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          className="type-body-lg"
           style={{
-            fontSize: 19,
-            lineHeight: 1.6,
             color: "var(--color-ink-soft)",
             maxWidth: 900,
           }}

@@ -31,11 +31,8 @@ export default function Approach({ entries }: { entries: Entry[] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 24,
           }}
@@ -48,12 +45,8 @@ export default function Approach({ entries }: { entries: Entry[] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          className="type-h2"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(32px, 4vw, 56px)",
-            lineHeight: 1.06,
-            letterSpacing: "-0.025em",
             color: "var(--color-ink)",
             marginBottom: 64,
             maxWidth: 900,
@@ -100,25 +93,20 @@ export default function Approach({ entries }: { entries: Entry[] }) {
                 }}
               >
                 <span
+                  className="type-eyebrow"
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 11,
-                    letterSpacing: "0.14em",
                     color: "var(--color-ink)",
-                    fontWeight: 500,
+                    textTransform: "none",
                   }}
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span
+                  className="type-eyebrow"
                   style={{
                     padding: "6px 14px",
                     borderRadius: 999,
                     border: "1px solid rgba(20,20,18,0.18)",
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 11,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
                     color: "var(--color-ink-soft)",
                     background: "transparent",
                   }}
@@ -127,9 +115,8 @@ export default function Approach({ entries }: { entries: Entry[] }) {
                 </span>
               </div>
               <p
+                className="type-body"
                 style={{
-                  fontSize: 16,
-                  lineHeight: 1.6,
                   color: "var(--color-ink-soft)",
                 }}
               >

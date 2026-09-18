@@ -60,14 +60,11 @@ export default function CaseHero({
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: 0.2 }}
+          className="type-eyebrow"
           style={{
             display: "inline-flex",
             alignItems: "center",
             gap: 10,
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 32,
           }}
@@ -81,11 +78,8 @@ export default function CaseHero({
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: 0.3 }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 12,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
             color: "var(--color-muted-2)",
             marginBottom: 24,
           }}
@@ -97,12 +91,8 @@ export default function CaseHero({
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.4 }}
+          className="type-display-l"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(40px, 5.4vw, 72px)",
-            lineHeight: 1.05,
-            letterSpacing: "-0.028em",
             color: "var(--color-ink)",
             marginBottom: 40,
             maxWidth: 1080,
@@ -130,9 +120,8 @@ export default function CaseHero({
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.1 }}
+          className="type-body-lg"
           style={{
-            fontSize: 19,
-            lineHeight: 1.6,
             color: "var(--color-muted)",
             maxWidth: 720,
             marginBottom: 64,
@@ -205,11 +194,8 @@ function Meta({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <div
+        className="type-eyebrow"
         style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: 11,
-          letterSpacing: "0.14em",
-          textTransform: "uppercase",
           color: "var(--color-muted-2)",
           marginBottom: 10,
         }}
@@ -217,11 +203,8 @@ function Meta({ label, value }: { label: string; value: string }) {
         {label}
       </div>
       <div
+        className="type-h3"
         style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 500,
-          fontSize: 17,
-          letterSpacing: "-0.01em",
           color: "var(--color-ink)",
         }}
       >

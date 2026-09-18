@@ -50,11 +50,8 @@ export default function Signatures({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+            className="type-eyebrow"
             style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 11,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
               color: "var(--color-muted-l)",
               paddingTop: 12,
             }}
@@ -67,12 +64,8 @@ export default function Signatures({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+            className="type-h2"
             style={{
-              fontFamily: "var(--font-display)",
-              fontWeight: 500,
-              fontSize: "clamp(32px, 4vw, 56px)",
-              lineHeight: 1.08,
-              letterSpacing: "-0.025em",
               maxWidth: 900,
             }}
           >
@@ -103,24 +96,19 @@ export default function Signatures({
                 className="signature-row"
               >
                 <div
+                  className="type-eyebrow"
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 12,
-                    letterSpacing: "0.14em",
                     color: "var(--color-muted-l)",
                     paddingTop: 8,
+                    textTransform: "none",
                   }}
                 >
                   0{i + 1}
                 </div>
                 <div>
                   <h3
+                    className="type-h3"
                     style={{
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 500,
-                      fontSize: "clamp(22px, 2.4vw, 32px)",
-                      letterSpacing: "-0.018em",
-                      lineHeight: 1.2,
                       color: "var(--color-parch)",
                       marginBottom: 14,
                     }}
@@ -128,9 +116,8 @@ export default function Signatures({
                     {item.title}
                   </h3>
                   <p
+                    className="type-body"
                     style={{
-                      fontSize: 17,
-                      lineHeight: 1.6,
                       color: "var(--color-muted-l)",
                       maxWidth: 720,
                     }}

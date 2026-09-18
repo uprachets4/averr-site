@@ -32,11 +32,8 @@ export default function Outcome({ text }: { text: string }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
           }}
         >
@@ -48,12 +45,8 @@ export default function Outcome({ text }: { text: string }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          className="type-h2"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(24px, 2.6vw, 34px)",
-            lineHeight: 1.35,
-            letterSpacing: "-0.018em",
             color: "var(--color-ink)",
             maxWidth: 900,
           }}

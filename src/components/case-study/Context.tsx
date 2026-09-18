@@ -33,11 +33,8 @@ export default function Context({ paragraphs }: { paragraphs: string[] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
           }}
         >
@@ -56,9 +53,8 @@ export default function Context({ paragraphs }: { paragraphs: string[] }) {
                 ease: EASE,
                 delay: reduce ? 0 : 0.1 + i * 0.1,
               }}
+              className="type-body-lg"
               style={{
-                fontSize: 19,
-                lineHeight: 1.6,
                 color: "var(--color-ink-soft)",
                 maxWidth: 780,
               }}

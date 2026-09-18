@@ -174,11 +174,8 @@ export default function Hero() {
         </motion.div>
 
         <h1
-          className="mx-auto mb-8 max-w-[1000px] font-display font-medium"
+          className="type-display-xl mx-auto mb-8 max-w-[1000px]"
           style={{
-            fontSize: "clamp(40px, 6vw, 80px)",
-            lineHeight: 1.05,
-            letterSpacing: "-0.028em",
             color: "var(--color-ink)",
           }}
         >

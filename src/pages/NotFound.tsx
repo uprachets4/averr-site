@@ -63,11 +63,8 @@ export default function NotFound() {
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: 0.1 }}
+          className="type-eyebrow"
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
             color: "var(--color-muted)",
             marginBottom: 32,
           }}
@@ -79,12 +76,8 @@ export default function NotFound() {
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.3 }}
+          className="type-display-l"
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(42px, 5.6vw, 76px)",
-            lineHeight: 1.04,
-            letterSpacing: "-0.03em",
             color: "var(--color-ink)",
             marginBottom: 32,
             maxWidth: 900,
@@ -135,11 +128,8 @@ export default function NotFound() {
           {LINKS.map((link) => (
             <div key={link.to}>
               <div
+                className="type-eyebrow"
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
                   color: "var(--color-muted-2)",
                   marginBottom: 12,
                 }}
