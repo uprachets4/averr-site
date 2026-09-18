@@ -1,10 +1,9 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
+import { ease } from "../lib/motion";
+import MagneticCTA from "../components/MagneticCTA";
 import PillHl from "../components/PillHl";
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
-const BOUNCE = [0.34, 1.56, 0.64, 1] as const;
 
 const EMAIL_ADDR = "prachets@averrstudios.com";
 
@@ -62,7 +61,7 @@ export default function NotFound() {
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: 0.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: 0.1 }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted)",
@@ -75,7 +74,7 @@ export default function NotFound() {
         <motion.h1
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.3 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.3 }}
           className="type-display-l"
           style={{
             color: "var(--color-ink)",
@@ -87,7 +86,7 @@ export default function NotFound() {
           <motion.span
             initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: BOUNCE, delay: 0.9 }}
+            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.bounce, delay: 0.9 }}
             style={{ display: "inline-block" }}
           >
             <PillHl>doesn't exist</PillHl>
@@ -97,7 +96,7 @@ export default function NotFound() {
         <motion.p
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.2 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.2 }}
           style={{
             fontSize: 19,
             lineHeight: 1.6,
@@ -113,7 +112,7 @@ export default function NotFound() {
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.5 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.5 }}
           className="recovery-grid"
           style={{
             display: "grid",
@@ -136,9 +135,9 @@ export default function NotFound() {
               >
                 {link.label}
               </div>
-              <Link to={link.to} className="recovery-link" style={recoveryLinkStyle}>
+              <MagneticCTA to={link.to} variant="text" size="md" icon={null}>
                 {link.text}
-              </Link>
+              </MagneticCTA>
             </div>
           ))}
         </motion.div>
@@ -146,7 +145,7 @@ export default function NotFound() {
         <motion.p
           initial={{ opacity: 0, y: reduce ? 0 : 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.8 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.8 }}
           style={{
             marginTop: 32,
             fontSize: 14,
@@ -209,4 +208,3 @@ export default function NotFound() {
   );
 }
 
-const recoveryLinkStyle: React.CSSProperties = {};

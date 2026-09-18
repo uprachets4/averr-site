@@ -1,14 +1,8 @@
-import { useRef } from "react";
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useReducedMotion,
-} from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
+import { ease } from "../lib/motion";
+import MagneticCTA from "./MagneticCTA";
 import PillHl from "./PillHl";
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
-const BOUNCE = [0.34, 1.56, 0.64, 1] as const;
 
 const TRUST = ["CG Walls & Floors", "CareerClarity AI", "SIFT", "CadenceStack"];
 const HEADLINE_WORDS = "The studio for businesses that want to look".split(" ");
@@ -20,104 +14,6 @@ const SUBHEAD_DELAY = PILL_DELAY + 0.35;
 const CTA_DELAY = SUBHEAD_DELAY + 0.2;
 const TRUST_DELAY = CTA_DELAY + 0.2;
 
-function MagneticCTA({
-  href,
-  variant,
-  children,
-}: {
-  href: string;
-  variant: "primary" | "ghost";
-  children: React.ReactNode;
-}) {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLAnchorElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 150, damping: 15, mass: 0.3 });
-  const springY = useSpring(y, { stiffness: 150, damping: 15, mass: 0.3 });
-
-  function handleMove(e: React.MouseEvent<HTMLAnchorElement>) {
-    if (reduce || !ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    x.set((e.clientX - (rect.left + rect.width / 2)) * 0.15);
-    y.set((e.clientY - (rect.top + rect.height / 2)) * 0.15);
-  }
-
-  function handleLeave() {
-    x.set(0);
-    y.set(0);
-  }
-
-  const baseStyle: React.CSSProperties = {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    borderRadius: 999,
-    padding: "14px 24px",
-    fontFamily: "var(--font-body)",
-    fontSize: 14,
-    fontWeight: 500,
-    textDecoration: "none",
-    cursor: "pointer",
-    transition: "background-color 0.3s ease, border-color 0.3s ease",
-  };
-
-  const primaryStyle: React.CSSProperties = {
-    ...baseStyle,
-    backgroundColor: "var(--color-ink)",
-    color: "var(--color-bg)",
-    border: "1px solid var(--color-ink)",
-  };
-
-  const ghostStyle: React.CSSProperties = {
-    ...baseStyle,
-    backgroundColor: "transparent",
-    color: "var(--color-ink)",
-    border: "1px solid rgba(20,20,18,0.18)",
-  };
-
-  const finalStyle = variant === "primary" ? primaryStyle : ghostStyle;
-
-  return (
-    <motion.a
-      ref={ref}
-      href={href}
-      style={{ x: springX, y: springY, ...finalStyle }}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      onMouseEnter={(e) => {
-        if (variant === "primary") {
-          e.currentTarget.style.backgroundColor = "var(--color-ink-soft)";
-        } else {
-          e.currentTarget.style.backgroundColor = "rgba(20,20,18,0.04)";
-          e.currentTarget.style.borderColor = "rgba(20,20,18,0.32)";
-        }
-      }}
-      onMouseOut={(e) => {
-        if (variant === "primary") {
-          e.currentTarget.style.backgroundColor = "var(--color-ink)";
-        } else {
-          e.currentTarget.style.backgroundColor = "transparent";
-          e.currentTarget.style.borderColor = "rgba(20,20,18,0.18)";
-        }
-      }}
-      whileHover={{ scale: variant === "primary" ? 1.03 : 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className="group"
-    >
-      {children}
-      <span
-        style={{
-          display: "inline-block",
-          transition: "transform 0.3s ease",
-        }}
-        className="group-hover:translate-x-1"
-      >
-        →
-      </span>
-    </motion.a>
-  );
-}
 
 export default function Hero() {
   const reduce = useReducedMotion();
@@ -129,7 +25,7 @@ export default function Hero() {
       y: 0,
       transition: {
         duration: reduce ? 0.01 : 0.55,
-        ease: EASE,
+        ease: ease.outQuart,
         delay: reduce ? 0 : WORD_START + i * WORD_STAGGER,
       },
     }),
@@ -154,7 +50,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: reduce ? 0 : 0.4 }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: reduce ? 0 : 0.4 }}
           className="mb-10 inline-flex items-center gap-2.5 font-mono uppercase"
           style={{
             fontSize: 11,
@@ -196,7 +92,7 @@ export default function Hero() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{
               duration: reduce ? 0.01 : 0.5,
-              ease: BOUNCE,
+              ease: ease.bounce,
               delay: reduce ? 0 : PILL_DELAY,
             }}
             className="inline-block"
@@ -209,7 +105,7 @@ export default function Hero() {
         <motion.p
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: reduce ? 0 : SUBHEAD_DELAY }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: reduce ? 0 : SUBHEAD_DELAY }}
           className="mx-auto mb-11 max-w-[620px]"
           style={{
             fontSize: 18,
@@ -224,13 +120,13 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: reduce ? 0 : CTA_DELAY }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: reduce ? 0 : CTA_DELAY }}
           className="inline-flex flex-wrap justify-center gap-3"
         >
-          <MagneticCTA href="/contact" variant="primary">
+          <MagneticCTA to="/contact" variant="primary">
             Book a discovery call
           </MagneticCTA>
-          <MagneticCTA href="/work" variant="ghost">
+          <MagneticCTA to="/work" variant="ghost">
             See our work
           </MagneticCTA>
         </motion.div>
@@ -238,7 +134,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: reduce ? 0 : TRUST_DELAY }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: reduce ? 0 : TRUST_DELAY }}
           className="relative z-10 mt-24 flex max-w-[800px] flex-wrap items-center justify-center gap-10 pt-10"
           style={{ borderTop: "1px solid rgba(20,20,18,0.10)" }}
         >

@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { ease } from "../lib/motion";
 import PillHl from "../components/PillHl";
 import FinalCTA from "../components/FinalCTA";
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
-const BOUNCE = [0.34, 1.56, 0.64, 1] as const;
 
 /* ═══════════════════════════════════════════════════════════════
    //_01 · WHO
@@ -38,7 +37,7 @@ function Who() {
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: 0.2 }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: 0.2 }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted)",
@@ -51,7 +50,7 @@ function Who() {
         <motion.h1
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.3 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.3 }}
           className="type-display-xl"
           style={{
             color: "var(--color-ink)",
@@ -63,7 +62,7 @@ function Who() {
           <motion.span
             initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: BOUNCE, delay: 0.8 }}
+            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.bounce, delay: 0.8 }}
             style={{ display: "inline-block" }}
           >
             <PillHl>Three pillars</PillHl>
@@ -73,7 +72,7 @@ function Who() {
         <motion.p
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.1 }}
           style={{
             fontSize: 20,
             lineHeight: 1.55,
@@ -144,7 +143,7 @@ function DayToDay() {
             initial={{ opacity: 0, y: reduce ? 0 : 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
             className="type-eyebrow"
             style={{
               color: "var(--color-muted)",
@@ -158,7 +157,7 @@ function DayToDay() {
             initial={{ opacity: 0, y: reduce ? 0 : 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+            transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
             className="type-h2"
             style={{
               color: "var(--color-ink)",
@@ -178,7 +177,7 @@ function DayToDay() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{
                 duration: reduce ? 0.01 : 0.6,
-                ease: EASE,
+                ease: ease.outQuart,
                 delay: reduce ? 0 : 0.15 + i * 0.1,
               }}
               style={{
@@ -273,7 +272,7 @@ function BeforeThis() {
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted)",
@@ -287,7 +286,7 @@ function BeforeThis() {
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
           className="type-h2"
           style={{
             color: "var(--color-ink)",
@@ -307,7 +306,7 @@ function BeforeThis() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{
                 duration: reduce ? 0.01 : 0.6,
-                ease: EASE,
+                ease: ease.outQuart,
                 delay: reduce ? 0 : 0.1 + i * 0.1,
               }}
               style={{
@@ -418,7 +417,7 @@ function HowIWork() {
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted)",
@@ -432,7 +431,7 @@ function HowIWork() {
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
           className="type-h2"
           style={{
             color: "var(--color-ink)",
@@ -459,7 +458,7 @@ function HowIWork() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{
                 duration: reduce ? 0.01 : 0.6,
-                ease: EASE,
+                ease: ease.outQuart,
                 delay: reduce ? 0 : 0.15 + i * 0.08,
               }}
               style={{
@@ -545,7 +544,7 @@ function WhatIDontDo() {
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted-l)",
@@ -559,7 +558,7 @@ function WhatIDontDo() {
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
           className="type-h2"
           style={{
             marginBottom: 64,
@@ -578,7 +577,7 @@ function WhatIDontDo() {
               viewport={{ once: true, amount: 0.4 }}
               transition={{
                 duration: reduce ? 0.01 : 0.6,
-                ease: EASE,
+                ease: ease.outQuart,
                 delay: reduce ? 0 : 0.1 + i * 0.1,
               }}
               style={{
@@ -605,7 +604,7 @@ function WhatIDontDo() {
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.5 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 0.5 }}
           style={{
             marginTop: 48,
             fontSize: 16,
@@ -655,7 +654,7 @@ function OutsideThis() {
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted)",
@@ -668,7 +667,7 @@ function OutsideThis() {
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
           style={{
             fontFamily: "var(--font-display)",
             fontWeight: 500,

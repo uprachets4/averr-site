@@ -1,9 +1,8 @@
 import { motion, useReducedMotion } from "motion/react";
+import { ease } from "../../lib/motion";
 import PillHl from "../PillHl";
 import type { CaseStudy } from "../../data/caseStudies";
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
-const BOUNCE = [0.34, 1.56, 0.64, 1] as const;
 
 type Props = Pick<
   CaseStudy,
@@ -59,7 +58,7 @@ export default function CaseHero({
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: 0.2 }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: 0.2 }}
           className="type-eyebrow"
           style={{
             display: "inline-flex",
@@ -77,7 +76,7 @@ export default function CaseHero({
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: 0.3 }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: 0.3 }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted-2)",
@@ -90,7 +89,7 @@ export default function CaseHero({
         <motion.h1
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.4 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.4 }}
           className="type-display-l"
           style={{
             color: "var(--color-ink)",
@@ -105,7 +104,7 @@ export default function CaseHero({
               animate={{ opacity: 1, scale: 1 }}
               transition={{
                 duration: reduce ? 0.01 : 0.5,
-                ease: BOUNCE,
+                ease: ease.bounce,
                 delay: reduce ? 0 : 0.9,
               }}
               style={{ display: "inline-block" }}
@@ -119,7 +118,7 @@ export default function CaseHero({
         <motion.p
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.1 }}
           className="type-body-lg"
           style={{
             color: "var(--color-muted)",
@@ -133,7 +132,7 @@ export default function CaseHero({
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.3 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.3 }}
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
@@ -152,7 +151,7 @@ export default function CaseHero({
           <motion.figure
             initial={{ opacity: 0, y: reduce ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 1.5 }}
+            transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 1.5 }}
             style={{
               marginTop: 64,
               overflow: "hidden",

@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
+import { ease } from "../../lib/motion";
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
 
 export default function Outcome({ text }: { text: string }) {
   const reduce = useReducedMotion();
@@ -31,7 +31,7 @@ export default function Outcome({ text }: { text: string }) {
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted)",
@@ -44,7 +44,7 @@ export default function Outcome({ text }: { text: string }) {
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
           className="type-h2"
           style={{
             color: "var(--color-ink)",

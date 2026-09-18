@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
+import { ease } from "../lib/motion";
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
 
 const FEATURED = {
   client: "CG Walls & Floors · 2026",
@@ -66,7 +66,7 @@ export default function CaseStudies() {
             initial={{ opacity: 0, y: reduce ? 0 : 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
             className="type-eyebrow"
             style={{
               color: "var(--color-muted-l)",
@@ -81,7 +81,7 @@ export default function CaseStudies() {
             initial={{ opacity: 0, y: reduce ? 0 : 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+            transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
             className="type-h2"
             style={{
               maxWidth: 900,
@@ -97,7 +97,7 @@ export default function CaseStudies() {
             initial={{ opacity: 0, y: reduce ? 0 : 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.2 }}
+            transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 0.2 }}
             style={{
               fontFamily: "var(--font-body)",
               fontSize: 17,
@@ -164,7 +164,7 @@ function FeaturedCard({ reduce }: { reduce: boolean }) {
       initial={{ opacity: 0, y: reduce ? 0 : 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.3 }}
+      transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.3 }}
       className="featured-grid"
       style={{
         display: "grid",
@@ -386,7 +386,7 @@ function SupportingStat({
       viewport={{ once: true, amount: 0.3 }}
       transition={{
         duration: reduce ? 0.01 : 0.7,
-        ease: EASE,
+        ease: ease.outQuart,
         delay: reduce ? 0 : 0.4 + index * 0.1,
       }}
     >

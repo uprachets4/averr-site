@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import MagneticCTA from "./MagneticCTA";
 
 const LINKS = [
   { label: "Work", to: "/work" },
@@ -68,18 +69,6 @@ export default function Nav() {
     transition: "color 300ms ease",
   };
 
-  const ctaStyle = {
-    padding: "9px 16px",
-    backgroundColor: "var(--color-ink)",
-    color: "var(--color-bg)",
-    borderRadius: "999px",
-    fontFamily: "Inter, system-ui, sans-serif",
-    fontSize: "13px",
-    fontWeight: 500,
-    textDecoration: "none",
-    transition: "background 250ms ease",
-  };
-
   return (
     <nav aria-label="Primary" style={navStyle}>
       <Link to="/" style={brandStyle}>Averr Studios</Link>
@@ -92,7 +81,9 @@ export default function Nav() {
           );
         })}
       </ul>
-      <Link to="/contact" style={ctaStyle}>Book a call</Link>
+      <MagneticCTA to="/contact" variant="primary" size="sm" icon={null}>
+        Book a call
+      </MagneticCTA>
     </nav>
   );
 }

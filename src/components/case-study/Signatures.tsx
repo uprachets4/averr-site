@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { ease } from "../../lib/motion";
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
 
 type Item = { title: string; body: string };
 
@@ -49,7 +49,7 @@ export default function Signatures({
             initial={{ opacity: 0, y: reduce ? 0 : 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
             className="type-eyebrow"
             style={{
               color: "var(--color-muted-l)",
@@ -63,7 +63,7 @@ export default function Signatures({
             initial={{ opacity: 0, y: reduce ? 0 : 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+            transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
             className="type-h2"
             style={{
               maxWidth: 900,
@@ -82,7 +82,7 @@ export default function Signatures({
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{
                   duration: reduce ? 0.01 : 0.6,
-                  ease: EASE,
+                  ease: ease.outQuart,
                   delay: reduce ? 0 : 0.1 + i * 0.1,
                 }}
                 style={{
@@ -131,7 +131,7 @@ export default function Signatures({
                   initial={{ opacity: 0, y: reduce ? 0 : 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE }}
+                  transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart }}
                   style={{
                     margin: "36px 0",
                     maxWidth: 800,

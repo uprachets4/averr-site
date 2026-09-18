@@ -1,119 +1,15 @@
-import { useEffect, useRef } from "react";
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useReducedMotion,
-} from "motion/react";
+import { useEffect } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { ease } from "../lib/motion";
+import MagneticCTA from "../components/MagneticCTA";
 import FinalCTA from "../components/FinalCTA";
 import PillHl from "../components/PillHl";
 
-const EASE = [0.25, 0.1, 0.25, 1] as const;
-const BOUNCE = [0.34, 1.56, 0.64, 1] as const;
 
 /* ═══════════════════════════════════════════════════════════════
    Shared: Magnetic CTA (matches Hero / FinalCTA behaviour)
    ═══════════════════════════════════════════════════════════════ */
 
-function MagneticCTA({
-  href,
-  variant,
-  external,
-  children,
-}: {
-  href: string;
-  variant: "primary" | "ghost";
-  external?: boolean;
-  children: React.ReactNode;
-}) {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLAnchorElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 150, damping: 15, mass: 0.3 });
-  const springY = useSpring(y, { stiffness: 150, damping: 15, mass: 0.3 });
-
-  function handleMove(e: React.MouseEvent<HTMLAnchorElement>) {
-    if (reduce || !ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    x.set((e.clientX - (rect.left + rect.width / 2)) * 0.15);
-    y.set((e.clientY - (rect.top + rect.height / 2)) * 0.15);
-  }
-
-  function handleLeave() {
-    x.set(0);
-    y.set(0);
-  }
-
-  const baseStyle: React.CSSProperties = {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    borderRadius: 999,
-    padding: "14px 24px",
-    fontFamily: "var(--font-body)",
-    fontSize: 14,
-    fontWeight: 500,
-    textDecoration: "none",
-    cursor: "pointer",
-    transition: "background-color 0.3s ease, border-color 0.3s ease",
-  };
-
-  const primaryStyle: React.CSSProperties = {
-    ...baseStyle,
-    backgroundColor: "var(--color-ink)",
-    color: "var(--color-bg)",
-    border: "1px solid var(--color-ink)",
-  };
-
-  const ghostStyle: React.CSSProperties = {
-    ...baseStyle,
-    backgroundColor: "transparent",
-    color: "var(--color-ink)",
-    border: "1px solid rgba(20,20,18,0.18)",
-  };
-
-  const finalStyle = variant === "primary" ? primaryStyle : ghostStyle;
-
-  return (
-    <motion.a
-      ref={ref}
-      href={href}
-      target={external ? "_blank" : undefined}
-      rel={external ? "noopener noreferrer" : undefined}
-      style={{ x: springX, y: springY, ...finalStyle }}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      onMouseEnter={(e) => {
-        if (variant === "primary") {
-          e.currentTarget.style.backgroundColor = "var(--color-ink-soft)";
-        } else {
-          e.currentTarget.style.backgroundColor = "rgba(20,20,18,0.04)";
-          e.currentTarget.style.borderColor = "rgba(20,20,18,0.32)";
-        }
-      }}
-      onMouseOut={(e) => {
-        if (variant === "primary") {
-          e.currentTarget.style.backgroundColor = "var(--color-ink)";
-        } else {
-          e.currentTarget.style.backgroundColor = "transparent";
-          e.currentTarget.style.borderColor = "rgba(20,20,18,0.18)";
-        }
-      }}
-      whileHover={{ scale: variant === "primary" ? 1.03 : 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className="group"
-    >
-      {children}
-      <span
-        style={{ display: "inline-block", transition: "transform 0.3s ease" }}
-        className="group-hover:translate-x-1"
-      >
-        →
-      </span>
-    </motion.a>
-  );
-}
 
 /* ═══════════════════════════════════════════════════════════════
    Pillar block — Design / Automate / Grow
@@ -148,7 +44,7 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted)",
@@ -162,7 +58,7 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.05 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.05 }}
           className="type-display-xl"
           style={{
             color: "var(--color-ink)",
@@ -176,7 +72,7 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.15 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 0.15 }}
           style={{
             fontSize: 20,
             lineHeight: 1.55,
@@ -218,7 +114,7 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{
                     duration: reduce ? 0.01 : 0.5,
-                    ease: EASE,
+                    ease: ease.outQuart,
                     delay: reduce ? 0 : 0.05 * i,
                   }}
                   style={{
@@ -311,10 +207,10 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.2 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 0.2 }}
         >
           <MagneticCTA
-            href="/contact"
+            to="/contact"
             variant="ghost"
           >
             Book a discovery call
@@ -430,7 +326,7 @@ function ServicesHeader() {
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE, delay: 0.2 }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: 0.2 }}
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -451,7 +347,7 @@ function ServicesHeader() {
         <motion.h1
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.3 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.3 }}
           className="type-display-xl"
           style={{
             color: "var(--color-ink)",
@@ -464,7 +360,7 @@ function ServicesHeader() {
           <motion.span
             initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: BOUNCE, delay: 0.8 }}
+            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.bounce, delay: 0.8 }}
             style={{ display: "inline-block" }}
           >
             <PillHl>One studio</PillHl>
@@ -475,7 +371,7 @@ function ServicesHeader() {
         <motion.p
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 1.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.1 }}
           style={{
             fontSize: 19,
             lineHeight: 1.6,
@@ -522,7 +418,7 @@ function WhatWeDontDo() {
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted-l)",
@@ -536,7 +432,7 @@ function WhatWeDontDo() {
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
           className="type-h2"
           style={{
             marginBottom: 64,
@@ -555,7 +451,7 @@ function WhatWeDontDo() {
               viewport={{ once: true, amount: 0.4 }}
               transition={{
                 duration: reduce ? 0.01 : 0.6,
-                ease: EASE,
+                ease: ease.outQuart,
                 delay: reduce ? 0 : 0.1 + i * 0.1,
               }}
               style={{
@@ -578,7 +474,7 @@ function WhatWeDontDo() {
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: EASE, delay: 0.5 }}
+          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 0.5 }}
           style={{
             marginTop: 48,
             fontSize: 16,
@@ -633,7 +529,7 @@ function HowToStart() {
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: EASE }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted)",
@@ -647,7 +543,7 @@ function HowToStart() {
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: EASE, delay: 0.1 }}
+          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
           className="type-h2"
           style={{
             color: "var(--color-ink)",
@@ -675,7 +571,7 @@ function HowToStart() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{
                 duration: reduce ? 0.01 : 0.6,
-                ease: EASE,
+                ease: ease.outQuart,
                 delay: reduce ? 0 : 0.15 + i * 0.1,
               }}
               style={{

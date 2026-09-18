@@ -223,12 +223,13 @@ a { color: inherit; text-decoration: none; }
 /* Pill highlight — the Nolana move */
 .pill-hl {
   display: inline-block;
-  padding: 0.1em 0.55em 0.16em;
-  background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-alt) 100%);
+  padding: 0.1em 0.75em 0.16em;
+  background: linear-gradient(135deg, #1A1815 0%, #211E1A 100%);
   border-radius: 0.24em;
   vertical-align: 0.02em;
   margin: 0 0.08em;
   box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
     inset 0 -1px 0 rgba(0,0,0,0.4),
     inset 0 1px 0 rgba(255,255,255,0.05),
     0 2px 8px rgba(20,20,18,0.15);
@@ -236,21 +237,11 @@ a { color: inherit; text-decoration: none; }
 .pill-hl > span {
   font-weight: 500;
   letter-spacing: -0.015em;
-  background: linear-gradient(90deg,
-    #FFFFFF 0%,
-    #F4F0E6 40%,
-    var(--color-parch) 70%,
-    #C4BDAB 100%);
+  background: linear-gradient(180deg, #F4F0E6 0%, #E8E1D0 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  background-size: 200% 100%;
-  animation: pill-shine 6s ease-in-out infinite alternate;
-}
-@keyframes pill-shine {
-  0%   { background-position: 0% 0%; }
-  100% { background-position: 100% 0%; }
 }
 
 /* Reduced motion */
