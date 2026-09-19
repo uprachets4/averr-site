@@ -6,32 +6,6 @@ import MagneticCTA from "../components/MagneticCTA";
 import FinalCTA from "../components/FinalCTA";
 import PillHl from "../components/PillHl";
 
-function isPillarLabel(s: string): s is "Design" | "Automate" | "Grow" {
-  return s === "Design" || s === "Automate" || s === "Grow";
-}
-
-function pillarChip(pillar: "Design" | "Automate" | "Grow"): React.CSSProperties {
-  const accent =
-    pillar === "Design"
-      ? "var(--accent-design)"
-      : pillar === "Automate"
-      ? "var(--accent-automate)"
-      : "var(--accent-grow)";
-  const rgb =
-    pillar === "Design"
-      ? "139, 92, 246"
-      : pillar === "Automate"
-      ? "59, 130, 246"
-      : "16, 185, 129";
-  return {
-    padding: "5px 12px",
-    borderRadius: 999,
-    border: `1px solid ${accent}`,
-    background: `rgba(${rgb}, 0.08)`,
-    color: accent,
-  };
-}
-
 
 /* ═══════════════════════════════════════════════════════════════
    Shared: Magnetic CTA (matches Hero / FinalCTA behaviour)
@@ -61,7 +35,7 @@ function WorkHeader() {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(245,245,247,0.03), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(245,245,247,0.03), transparent 60%)",
+            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
           pointerEvents: "none",
         }}
       />
@@ -183,7 +157,7 @@ function ProjectCard({
           padding: isHero ? "56px 48px" : "36px 32px",
           minHeight: isHero ? 480 : 320,
           backgroundColor: bg,
-          border: "1px solid rgba(245,245,247,0.08)",
+          border: "1px solid rgba(20,20,18,0.08)",
           borderRadius: 4,
           color: "var(--color-ink)",
           textDecoration: "none",
@@ -192,13 +166,13 @@ function ProjectCard({
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = isHero
-            ? "rgba(245,245,247,0.03)"
-            : "rgba(245,245,247,0.03)";
-          e.currentTarget.style.borderColor = "rgba(245,245,247,0.18)";
+            ? "rgba(232,225,208,0.85)"
+            : "rgba(232,225,208,0.55)";
+          e.currentTarget.style.borderColor = "rgba(20,20,18,0.18)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = bg;
-          e.currentTarget.style.borderColor = "rgba(245,245,247,0.08)";
+          e.currentTarget.style.borderColor = "rgba(20,20,18,0.08)";
         }}
       >
         <div className="grain-light" aria-hidden="true" />
@@ -212,18 +186,14 @@ function ProjectCard({
               marginBottom: isHero ? 40 : 28,
             }}
           >
-            {isPillarLabel(card.eyebrow) ? (
-              <span className="type-eyebrow" style={pillarChip(card.eyebrow)}>
-                {card.eyebrow}
-              </span>
-            ) : (
-              <span
-                className="type-eyebrow"
-                style={{ color: "var(--text-muted)" }}
-              >
-                {card.eyebrow}
-              </span>
-            )}
+            <span
+              className="type-eyebrow"
+              style={{
+                color: "var(--color-muted)",
+              }}
+            >
+              {card.eyebrow}
+            </span>
             {card.live ? (
               <span
                 style={{
@@ -254,8 +224,8 @@ function ProjectCard({
                     width: 6,
                     height: 6,
                     borderRadius: "50%",
-                    background: "var(--accent-grow)",
-                    boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.18)",
+                    background: "#4A7C3F",
+                    boxShadow: "0 0 0 3px rgba(74,124,63,0.18)",
                   }}
                 />
                 Live
@@ -307,7 +277,7 @@ function ProjectCard({
                   fontFamily: "var(--font-body)",
                   fontSize: 12,
                   color: "var(--color-muted)",
-                  border: "1px solid rgba(245,245,247,0.14)",
+                  border: "1px solid rgba(20,20,18,0.14)",
                   background: "transparent",
                 }}
               >
@@ -450,7 +420,7 @@ function InTheLab() {
       style={{
         backgroundColor: "var(--color-bg-alt)",
         padding: "120px 40px",
-        borderTop: "1px solid rgba(245,245,247,0.10)",
+        borderTop: "1px solid rgba(20,20,18,0.10)",
         position: "relative",
       }}
     >
@@ -537,7 +507,7 @@ function OffPortfolio() {
       style={{
         backgroundColor: "var(--color-bg)",
         padding: "120px 40px",
-        borderTop: "1px solid rgba(245,245,247,0.10)",
+        borderTop: "1px solid rgba(20,20,18,0.10)",
       }}
     >
       <div style={{ maxWidth: 1000, margin: "0 auto" }}>

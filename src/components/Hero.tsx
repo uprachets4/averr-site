@@ -41,7 +41,7 @@ export default function Hero() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(245,245,247,0.03), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(245,245,247,0.03), transparent 60%)",
+            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
         }}
       />
       <div className="grain-light" aria-hidden="true" />
@@ -72,9 +72,9 @@ export default function Hero() {
         <h1
           className="type-display-xl mx-auto max-w-[1000px]"
           style={{
+            color: "var(--color-ink)",
             marginBottom: 56,
             lineHeight: 1.0,
-            color: "var(--text-primary)",
           }}
         >
           {HEADLINE_WORDS.map((w, i) => (
@@ -112,7 +112,7 @@ export default function Hero() {
           style={{
             fontSize: 18,
             lineHeight: 1.55,
-            color: "var(--text-muted)",
+            color: "var(--color-muted)",
             marginBottom: 72,
           }}
         >
@@ -140,8 +140,8 @@ export default function Hero() {
           transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: reduce ? 0 : TRUST_DELAY }}
           className="relative z-10 flex max-w-[800px] flex-wrap items-center justify-center gap-10 pt-10"
           style={{
+            borderTop: "1px solid rgba(20,20,18,0.10)",
             marginTop: 96,
-            borderTop: "1px solid var(--border)",
           }}
         >
           <span

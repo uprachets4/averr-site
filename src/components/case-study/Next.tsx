@@ -10,7 +10,7 @@ export default function Next({ text }: { text: string }) {
       style={{
         backgroundColor: "var(--color-bg-alt)",
         padding: "128px 40px",
-        borderTop: "1px solid rgba(245,245,247,0.10)",
+        borderTop: "1px solid rgba(20,20,18,0.10)",
         position: "relative",
       }}
     >

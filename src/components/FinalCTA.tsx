@@ -24,7 +24,7 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 1000px 600px at 50% 50%, rgba(245,245,247,0.03), transparent 60%)",
+            "radial-gradient(ellipse 1000px 600px at 50% 50%, rgba(232,225,208,0.6), transparent 60%)",
           pointerEvents: "none",
         }}
       />

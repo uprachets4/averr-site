@@ -16,7 +16,7 @@ export default function Inventory({
       style={{
         backgroundColor: "var(--color-bg)",
         padding: "128px 40px",
-        borderTop: "1px solid rgba(245,245,247,0.10)",
+        borderTop: "1px solid rgba(20,20,18,0.10)",
         position: "relative",
       }}
     >
@@ -76,7 +76,7 @@ export default function Inventory({
                 gap: 20,
                 alignItems: "start",
                 padding: "22px 0",
-                borderBottom: "1px solid rgba(245,245,247,0.08)",
+                borderBottom: "1px solid rgba(20,20,18,0.08)",
                 fontSize: 17,
                 lineHeight: 1.55,
                 color: "var(--color-ink)",
@@ -129,7 +129,7 @@ export default function Inventory({
                     fontFamily: "var(--font-body)",
                     fontSize: 13,
                     color: "var(--color-ink-soft)",
-                    border: "1px solid rgba(245,245,247,0.14)",
+                    border: "1px solid rgba(20,20,18,0.14)",
                     background: "transparent",
                   }}
                 >

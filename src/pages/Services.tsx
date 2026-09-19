@@ -35,7 +35,7 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
       style={{
         backgroundColor: pillar.altBg ? "var(--color-bg-alt)" : "var(--color-bg)",
         padding: "120px 40px",
-        borderTop: "1px solid rgba(245,245,247,0.10)",
+        borderTop: "1px solid rgba(20,20,18,0.10)",
         position: "relative",
       }}
     >
@@ -122,7 +122,7 @@ function PillarBlock({ pillar }: { pillar: Pillar }) {
                     gridTemplateColumns: "24px 1fr",
                     gap: 12,
                     padding: "18px 0",
-                    borderBottom: "1px solid rgba(245,245,247,0.08)",
+                    borderBottom: "1px solid rgba(20,20,18,0.08)",
                     fontSize: 16,
                     lineHeight: 1.5,
                     color: "var(--color-ink)",
@@ -316,7 +316,7 @@ function ServicesHeader() {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(245,245,247,0.03), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(245,245,247,0.03), transparent 60%)",
+            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
           pointerEvents: "none",
         }}
       />
@@ -576,7 +576,7 @@ function HowToStart() {
               }}
               style={{
                 padding: "40px 32px",
-                borderTop: "1px solid rgba(245,245,247,0.15)",
+                borderTop: "1px solid rgba(20,20,18,0.15)",
                 display: "flex",
                 flexDirection: "column",
                 gap: 20,
