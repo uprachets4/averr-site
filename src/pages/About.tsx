@@ -27,7 +27,7 @@ function Who() {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
+            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(245,245,247,0.03), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(245,245,247,0.03), transparent 60%)",
           pointerEvents: "none",
         }}
       />
@@ -120,7 +120,7 @@ function DayToDay() {
       style={{
         backgroundColor: "var(--color-bg-alt)",
         padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        borderTop: "1px solid rgba(245,245,247,0.10)",
         position: "relative",
       }}
     >
@@ -183,7 +183,7 @@ function DayToDay() {
               style={{
                 padding: "32px 32px",
                 background: "var(--color-bg)",
-                border: "1px solid rgba(20,20,18,0.08)",
+                border: "1px solid rgba(245,245,247,0.08)",
                 borderRadius: 4,
                 display: "flex",
                 flexDirection: "column",
@@ -195,7 +195,7 @@ function DayToDay() {
                   alignSelf: "flex-start",
                   padding: "6px 14px",
                   borderRadius: 999,
-                  border: "1px solid rgba(20,20,18,0.18)",
+                  border: "1px solid rgba(245,245,247,0.18)",
                   fontFamily: "var(--font-mono)",
                   fontSize: 11,
                   letterSpacing: "0.14em",
@@ -238,7 +238,7 @@ function DayToDay() {
 const STOPS = [
   {
     n: "01",
-    role: "AE at Google (via Teleperformance / Extended Workforce). Selling Google Cloud into mid-market.",
+    role: "AE at Google (via Extended Workforce). Selling Google Cloud into mid-market.",
     lesson:
       "Where I learned that most B2B sales problems are actually positioning problems.",
   },
@@ -262,7 +262,7 @@ function BeforeThis() {
       style={{
         backgroundColor: "var(--color-bg)",
         padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        borderTop: "1px solid rgba(245,245,247,0.10)",
         position: "relative",
       }}
     >
@@ -315,10 +315,10 @@ function BeforeThis() {
                 gap: 32,
                 alignItems: "start",
                 padding: "36px 0",
-                borderTop: "1px solid rgba(20,20,18,0.10)",
+                borderTop: "1px solid rgba(245,245,247,0.10)",
                 borderBottom:
                   i === STOPS.length - 1
-                    ? "1px solid rgba(20,20,18,0.10)"
+                    ? "1px solid rgba(245,245,247,0.10)"
                     : "none",
               }}
               className="stop-row"
@@ -407,7 +407,7 @@ function HowIWork() {
       style={{
         backgroundColor: "var(--color-bg-alt)",
         padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        borderTop: "1px solid rgba(245,245,247,0.10)",
         position: "relative",
       }}
     >
@@ -464,7 +464,7 @@ function HowIWork() {
               style={{
                 padding: "40px 36px",
                 background: "var(--color-bg)",
-                border: "1px solid rgba(20,20,18,0.08)",
+                border: "1px solid rgba(245,245,247,0.08)",
                 borderRadius: 4,
                 display: "flex",
                 flexDirection: "column",

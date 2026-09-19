@@ -23,8 +23,8 @@ export interface MagneticCTAProps {
   type?: "button" | "submit";
 }
 
-const MAGNET_RADIUS = 60;
-const MAGNET_STRENGTH = 0.13; // 60 * 0.13 ≈ 8px max displacement
+const MAGNET_RADIUS = 80;
+const MAGNET_STRENGTH = 0.15; // 80 * 0.15 = 12px max displacement
 
 const sizeStyles: Record<Size, React.CSSProperties> = {
   sm: { padding: "8px 16px" },
@@ -104,23 +104,23 @@ export default function MagneticCTA(props: MagneticCTAProps) {
 
   const primary: React.CSSProperties = {
     ...base,
-    backgroundColor: "var(--color-dark)",
-    color: "var(--color-bg)",
-    border: "1px solid var(--color-dark)",
-    boxShadow: "0 0 0 rgba(20,20,18,0)",
+    backgroundColor: "var(--surface-inverted)",
+    color: "var(--text-inverted)",
+    border: "1px solid var(--surface-inverted)",
+    boxShadow: "0 0 0 rgba(245,245,247,0)",
   };
 
   const ghost: React.CSSProperties = {
     ...base,
     backgroundColor: "transparent",
-    color: "var(--color-ink)",
-    border: "1px solid rgba(20,20,18,0.18)",
+    color: "var(--text-primary)",
+    border: "1px solid var(--border)",
   };
 
   const text: React.CSSProperties = {
     ...base,
     background: "transparent",
-    color: "var(--color-ink)",
+    color: "var(--text-primary)",
     border: "1px solid transparent",
     padding:
       size === "sm" ? "4px 8px" : size === "md" ? "6px 10px" : "8px 12px",
@@ -133,13 +133,11 @@ export default function MagneticCTA(props: MagneticCTAProps) {
     setHovered(true);
     const el = e.currentTarget;
     if (variant === "primary") {
-      el.style.backgroundColor = "var(--color-dark-alt)";
-      el.style.boxShadow = "0 8px 24px rgba(20,20,18,0.15)";
+      el.style.boxShadow = "0 8px 32px rgba(245,245,247,0.15)";
     } else if (variant === "ghost") {
-      el.style.backgroundColor = "rgba(20,20,18,0.04)";
-      el.style.borderColor = "rgba(20,20,18,0.32)";
+      el.style.backgroundColor = "rgba(245,245,247,0.04)";
+      el.style.borderColor = "var(--border-hover)";
     } else {
-      // text: reveal underline
       const underline = el.querySelector<HTMLElement>(".mcta-underline");
       if (underline) underline.style.transform = "scaleX(1)";
     }
@@ -149,11 +147,10 @@ export default function MagneticCTA(props: MagneticCTAProps) {
     setHovered(false);
     const el = e.currentTarget;
     if (variant === "primary") {
-      el.style.backgroundColor = "var(--color-dark)";
-      el.style.boxShadow = "0 0 0 rgba(20,20,18,0)";
+      el.style.boxShadow = "0 0 0 rgba(245,245,247,0)";
     } else if (variant === "ghost") {
       el.style.backgroundColor = "transparent";
-      el.style.borderColor = "rgba(20,20,18,0.18)";
+      el.style.borderColor = "var(--border)";
     } else {
       const underline = el.querySelector<HTMLElement>(".mcta-underline");
       if (underline) underline.style.transform = "scaleX(0)";

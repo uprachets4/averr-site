@@ -86,7 +86,7 @@ export default function Pillars() {
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
           gap: 0,
-          borderTop: "1px solid rgba(20,20,18,0.10)",
+          borderTop: "1px solid rgba(245,245,247,0.10)",
         }}
         className="pillars-grid"
       >
@@ -138,15 +138,15 @@ function PillarCard({
       style={{
         display: "block",
         padding: "48px 40px",
-        borderRight: "1px solid rgba(20,20,18,0.10)",
-        borderBottom: "1px solid rgba(20,20,18,0.10)",
+        borderRight: "1px solid rgba(245,245,247,0.10)",
+        borderBottom: "1px solid rgba(245,245,247,0.10)",
         transition: "background-color 0.35s ease",
         cursor: "pointer",
         textDecoration: "none",
         color: "inherit",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = "rgba(232,225,208,0.4)";
+        e.currentTarget.style.backgroundColor = "rgba(245,245,247,0.03)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = "transparent";

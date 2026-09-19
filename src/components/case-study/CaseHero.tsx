@@ -41,7 +41,7 @@ export default function CaseHero({
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
+            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(245,245,247,0.03), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(245,245,247,0.03), transparent 60%)",
           pointerEvents: "none",
         }}
       />
@@ -138,7 +138,7 @@ export default function CaseHero({
             gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
             gap: 40,
             paddingTop: 32,
-            borderTop: "1px solid rgba(20,20,18,0.10)",
+            borderTop: "1px solid rgba(245,245,247,0.10)",
           }}
           className="case-meta-grid"
         >
@@ -156,7 +156,7 @@ export default function CaseHero({
               marginTop: 64,
               overflow: "hidden",
               borderRadius: 6,
-              border: "1px solid rgba(20,20,18,0.10)",
+              border: "1px solid rgba(245,245,247,0.10)",
               aspectRatio: "16 / 10",
               background: "var(--color-bg-alt)",
             }}

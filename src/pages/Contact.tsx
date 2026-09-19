@@ -37,7 +37,7 @@ function StartHere() {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
+            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(245,245,247,0.03), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(245,245,247,0.03), transparent 60%)",
           pointerEvents: "none",
         }}
       />
@@ -134,8 +134,8 @@ function BookACall() {
         cal("ui", {
           theme: "light",
           cssVarsPerTheme: {
-            light: { "cal-brand": "#141412" },
-            dark: { "cal-brand": "#F4F0E6" },
+            light: { "cal-brand": "var(--surface)" },
+            dark: { "cal-brand": "var(--surface)" },
           },
           hideEventTypeDetails: false,
           layout: "month_view",
@@ -154,7 +154,7 @@ function BookACall() {
       style={{
         backgroundColor: "var(--color-bg-alt)",
         padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        borderTop: "1px solid rgba(245,245,247,0.10)",
         position: "relative",
       }}
     >
@@ -241,10 +241,10 @@ function BookACall() {
                     gap: 24,
                     alignItems: "start",
                     padding: "18px 0",
-                    borderTop: "1px solid rgba(20,20,18,0.10)",
+                    borderTop: "1px solid rgba(245,245,247,0.10)",
                     borderBottom:
                       i === CALL_ROWS.length - 1
-                        ? "1px solid rgba(20,20,18,0.10)"
+                        ? "1px solid rgba(245,245,247,0.10)"
                         : "none",
                   }}
                   className="call-row"
@@ -282,7 +282,7 @@ function BookACall() {
             transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.2 }}
             style={{
               background: "var(--color-bg)",
-              border: "1px solid rgba(20,20,18,0.10)",
+              border: "1px solid rgba(245,245,247,0.10)",
               borderRadius: 6,
               overflow: "hidden",
               minHeight: 640,
@@ -429,7 +429,7 @@ function SendMessage() {
       style={{
         backgroundColor: "var(--color-bg)",
         padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        borderTop: "1px solid rgba(245,245,247,0.10)",
         position: "relative",
       }}
     >
@@ -508,7 +508,7 @@ function SendMessage() {
               style={{
                 color: "var(--color-ink)",
                 textDecoration: "none",
-                borderBottom: "1px solid rgba(20,20,18,0.18)",
+                borderBottom: "1px solid rgba(245,245,247,0.18)",
                 paddingBottom: 2,
               }}
             >
@@ -523,7 +523,7 @@ function SendMessage() {
             transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.2 }}
             style={{
               background: "var(--color-bg-alt)",
-              border: "1px solid rgba(20,20,18,0.10)",
+              border: "1px solid rgba(245,245,247,0.10)",
               borderRadius: 6,
               padding: "44px 40px",
               minHeight: 480,
@@ -667,7 +667,7 @@ const inputStyle: React.CSSProperties = {
   lineHeight: 1.5,
   color: "var(--color-ink)",
   background: "var(--color-bg)",
-  border: "1px solid rgba(20,20,18,0.14)",
+  border: "1px solid rgba(245,245,247,0.14)",
   borderRadius: 4,
   outline: "none",
   resize: "vertical",
@@ -749,7 +749,7 @@ function Faq() {
       style={{
         backgroundColor: "var(--color-bg-alt)",
         padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        borderTop: "1px solid rgba(245,245,247,0.10)",
         position: "relative",
       }}
     >
@@ -799,10 +799,10 @@ function Faq() {
                   delay: reduce ? 0 : 0.05 + i * 0.06,
                 }}
                 style={{
-                  borderTop: "1px solid rgba(20,20,18,0.10)",
+                  borderTop: "1px solid rgba(245,245,247,0.10)",
                   borderBottom:
                     i === FAQS.length - 1
-                      ? "1px solid rgba(20,20,18,0.10)"
+                      ? "1px solid rgba(245,245,247,0.10)"
                       : "none",
                 }}
               >
@@ -893,7 +893,7 @@ function StillHere() {
       style={{
         backgroundColor: "var(--color-bg)",
         padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        borderTop: "1px solid rgba(245,245,247,0.10)",
         position: "relative",
         textAlign: "center",
       }}

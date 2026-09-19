@@ -40,7 +40,7 @@ export default function ComingSoon() {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 1400px 900px at 30% 30%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 70%, rgba(232,225,208,0.35), transparent 60%)",
+            "radial-gradient(ellipse 1400px 900px at 30% 30%, rgba(245,245,247,0.03), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 70%, rgba(245,245,247,0.03), transparent 60%)",
           pointerEvents: "none",
         }}
       />

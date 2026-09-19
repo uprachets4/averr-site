@@ -29,7 +29,7 @@ export default function Footer() {
     <footer
       style={{
         padding: "60px 40px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        borderTop: "1px solid rgba(245,245,247,0.10)",
         backgroundColor: "var(--color-bg-alt)",
         fontFamily: "var(--font-body)",
         fontSize: 13,
@@ -88,7 +88,7 @@ export default function Footer() {
           maxWidth: 1200,
           margin: "60px auto 0",
           paddingTop: 24,
-          borderTop: "1px solid rgba(20,20,18,0.10)",
+          borderTop: "1px solid rgba(245,245,247,0.10)",
           display: "flex",
           justifyContent: "space-between",
           flexWrap: "wrap",

@@ -5,6 +5,28 @@ import type { Pillar } from "../../data/caseStudies";
 
 type Entry = { pillar: Pillar; body: string };
 
+function pillarChipStyle(pillar: Pillar): React.CSSProperties {
+  const accent =
+    pillar === "Design"
+      ? "var(--accent-design)"
+      : pillar === "Automate"
+      ? "var(--accent-automate)"
+      : "var(--accent-grow)";
+  const rgb =
+    pillar === "Design"
+      ? "139, 92, 246"
+      : pillar === "Automate"
+      ? "59, 130, 246"
+      : "16, 185, 129";
+  return {
+    padding: "6px 14px",
+    borderRadius: 999,
+    border: `1px solid ${accent}`,
+    background: `rgba(${rgb}, 0.08)`,
+    color: accent,
+  };
+}
+
 export default function Approach({ entries }: { entries: Entry[] }) {
   const reduce = useReducedMotion();
 
@@ -13,7 +35,7 @@ export default function Approach({ entries }: { entries: Entry[] }) {
       style={{
         backgroundColor: "var(--color-bg-alt)",
         padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        borderTop: "1px solid rgba(245,245,247,0.10)",
         position: "relative",
       }}
     >
@@ -76,8 +98,8 @@ export default function Approach({ entries }: { entries: Entry[] }) {
               }}
               style={{
                 padding: "36px 32px",
-                background: "var(--color-bg)",
-                border: "1px solid rgba(20,20,18,0.08)",
+                background: "var(--surface-elevated)",
+                border: "1px solid var(--border)",
                 borderRadius: 4,
                 display: "flex",
                 flexDirection: "column",
@@ -95,7 +117,7 @@ export default function Approach({ entries }: { entries: Entry[] }) {
                 <span
                   className="type-eyebrow"
                   style={{
-                    color: "var(--color-ink)",
+                    color: "var(--text-primary)",
                     textTransform: "none",
                   }}
                 >
@@ -103,13 +125,7 @@ export default function Approach({ entries }: { entries: Entry[] }) {
                 </span>
                 <span
                   className="type-eyebrow"
-                  style={{
-                    padding: "6px 14px",
-                    borderRadius: 999,
-                    border: "1px solid rgba(20,20,18,0.18)",
-                    color: "var(--color-ink-soft)",
-                    background: "transparent",
-                  }}
+                  style={pillarChipStyle(entry.pillar)}
                 >
                   {entry.pillar}
                 </span>

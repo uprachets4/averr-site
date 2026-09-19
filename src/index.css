@@ -25,18 +25,45 @@
    ═══════════════════════════════════════════════════════════════ */
 
 @theme {
-  /* Colors */
-  --color-bg:         #F4F0E6;
-  --color-bg-alt:     #EDE9E2;
-  --color-bg-warm:    #E8E1D0;
-  --color-dark:       #141412;
-  --color-dark-alt:   #1C1B18;
-  --color-ink:        #141412;
-  --color-ink-soft:   #2A2926;
-  --color-parch:      #EDE9E2;
-  --color-muted:      #6B665C;
-  --color-muted-2:    #8A8377;
-  --color-muted-l:    #7A7770;
+  /* Base surfaces — Direction D dark charcoal */
+  --surface:            #0A0A0B;
+  --surface-elevated:   #131315;
+  --surface-raised:     #1C1C1F;
+  --surface-inverted:   #F5F5F7;
+
+  /* Text */
+  --text-primary:  #F5F5F7;
+  --text-muted:    #8E8E93;
+  --text-subtle:   #48484A;
+  --text-inverted: #0A0A0B;
+
+  /* Borders */
+  --border:        #27272A;
+  --border-hover:  #3F3F46;
+  --border-strong: #52525B;
+
+  /* Accents — pillar coding */
+  --accent-design:    #8B5CF6;
+  --accent-automate:  #3B82F6;
+  --accent-grow:      #10B981;
+  --accent-highlight: #F59E0B;
+  --accent-warning:   #EF4444;
+
+  /* Semantic aliases */
+  --color-live: var(--accent-grow);
+
+  /* Legacy aliases — old cream tokens map to dark equivalents so existing refs work */
+  --color-bg:         var(--surface);
+  --color-bg-alt:     var(--surface-elevated);
+  --color-bg-warm:    var(--surface-raised);
+  --color-dark:       var(--surface-raised);
+  --color-dark-alt:   var(--surface-elevated);
+  --color-ink:        var(--text-primary);
+  --color-ink-soft:   var(--text-primary);
+  --color-parch:      var(--text-primary);
+  --color-muted:      var(--text-muted);
+  --color-muted-2:    var(--text-subtle);
+  --color-muted-l:    var(--text-muted);
 
   /* Fonts */
   --font-display: "Geist", ui-sans-serif, system-ui, sans-serif;
@@ -46,10 +73,10 @@
 
 /* Opacity-based hairlines (not @theme, kept as raw vars) */
 :root {
-  --hair:      rgba(20, 20, 18, 0.10);
-  --hair-hi:   rgba(20, 20, 18, 0.18);
-  --hair-d:    rgba(237, 231, 218, 0.10);
-  --hair-d-hi: rgba(237, 231, 218, 0.18);
+  --hair:      rgba(245, 245, 247, 0.08);
+  --hair-hi:   rgba(245, 245, 247, 0.16);
+  --hair-d:    rgba(245, 245, 247, 0.08);
+  --hair-d-hi: rgba(245, 245, 247, 0.16);
 
   /* Type scale — desktop */
   --type-display-xl-size: 96px;
@@ -128,8 +155,8 @@
 html { scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
-  background: var(--color-bg);
-  color: var(--color-ink);
+  background: var(--surface);
+  color: var(--text-primary);
   font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -143,76 +170,53 @@ a { color: inherit; text-decoration: none; }
 /* Focus */
 :focus { outline: none; }
 :focus-visible {
-  outline: 2px solid var(--color-dark);
+  outline: 2px solid var(--accent-highlight);
   outline-offset: 4px;
   border-radius: 4px;
 }
 
 /* Selection */
 ::selection {
-  background: var(--color-dark);
-  color: var(--color-bg);
+  background: var(--accent-highlight);
+  color: var(--text-inverted);
 }
 
-/* Grain overlays */
+/* Grain overlays — both variants render as texture on dark base */
 .grain-light,
 .grain-dark {
   position: absolute; inset: 0;
   pointer-events: none;
   z-index: 1;
-}
-.grain-light {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-  opacity: 0.06;
-  mix-blend-mode: multiply;
-}
-.grain-dark {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-  opacity: 0.07;
+  opacity: 0.05;
   mix-blend-mode: overlay;
 }
 
-/* Treatment B — horizontal gradient fade (the signature) */
-.fade-h {
-  background: linear-gradient(90deg,
-    var(--color-ink) 0%,
-    var(--color-ink) 35%,
-    var(--color-muted) 75%,
-    rgba(20,20,18,0.4) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+/* Treatment B — horizontal gradient fade (the signature) — light-on-dark */
+.fade-h,
 .fade-h-dark {
   background: linear-gradient(90deg,
-    var(--color-parch) 0%,
-    var(--color-parch) 35%,
-    var(--color-muted-l) 75%,
-    rgba(237,231,218,0.4) 100%);
+    var(--text-primary) 0%,
+    var(--text-primary) 35%,
+    var(--text-muted) 75%,
+    rgba(245,245,247,0.35) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Number gradient — Nolana-style shifting */
-.num-gradient {
-  background: linear-gradient(180deg,
-    #141412 0%, #2A2926 15%, #3D3B36 30%, #4A453D 45%,
-    #6B665C 65%, #8A8377 80%, #A09B8F 92%, rgba(20,20,18,0.12) 100%);
-  background-size: 100% 220%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shift-gradient 8s ease-in-out infinite alternate;
-}
+/* Number gradient — shifting on dark base */
+.num-gradient,
 .num-gradient-dark {
   background: linear-gradient(180deg,
-    #FFFFFF 0%, #F4F0E6 15%, #EDE9E2 30%, #C8C4BD 50%,
-    #A09B8F 70%, #7A7770 85%, rgba(237,231,218,0.15) 100%);
+    #FFFFFF 0%, #F5F5F7 15%, #C7C7CC 40%,
+    #8E8E93 65%, #48484A 85%, rgba(245,245,247,0.12) 100%);
   background-size: 100% 220%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  -webkit-text-fill-color: transparent;
   animation: shift-gradient 8s ease-in-out infinite alternate;
 }
 @keyframes shift-gradient {
@@ -220,24 +224,24 @@ a { color: inherit; text-decoration: none; }
   100% { background-position: 0% 85%; }
 }
 
-/* Pill highlight — the Nolana move */
+/* Pill highlight — glassmorphic chip, amber gradient text, violet accents */
 .pill-hl {
   display: inline-block;
   padding: 0.1em 0.75em 0.16em;
-  background: linear-gradient(135deg, #1A1815 0%, #211E1A 100%);
+  background: var(--surface-raised);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 0.24em;
   vertical-align: 0.02em;
   margin: 0 0.08em;
   box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.06),
-    inset 0 -1px 0 rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,255,255,0.05),
-    0 2px 8px rgba(20,20,18,0.15);
+    inset 0 0 0 1px rgba(139, 92, 246, 0.25),
+    0 4px 24px rgba(139, 92, 246, 0.15);
 }
 .pill-hl > span {
   font-weight: 500;
   letter-spacing: -0.015em;
-  background: linear-gradient(180deg, #F4F0E6 0%, #E8E1D0 100%);
+  background: linear-gradient(180deg, #F59E0B 0%, #FBBF24 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
