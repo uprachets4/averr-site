@@ -8,6 +8,7 @@ import {
 import { ease } from "../../lib/motion";
 import PillHl from "../PillHl";
 import type { CaseStudy } from "../../data/caseStudies";
+import ImageFrame from "./ImageFrame";
 
 
 type Props = Pick<
@@ -62,9 +63,13 @@ export default function CaseHero({
         }}
       >
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: 0.2 }}
+          transition={{
+            duration: reduce ? 0 : 0.5,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 0.2,
+          }}
           className="type-eyebrow"
           style={{
             display: "inline-flex",
@@ -80,9 +85,13 @@ export default function CaseHero({
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: 0.3 }}
+          transition={{
+            duration: reduce ? 0 : 0.5,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 0.3,
+          }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted-2)",
@@ -93,23 +102,27 @@ export default function CaseHero({
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.4 }}
+          transition={{
+            duration: reduce ? 0 : 0.7,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 0.4,
+          }}
           className="type-display-l"
           style={{
             color: "var(--color-ink)",
-            marginBottom: 40,
+            marginBottom: 48,
             maxWidth: 1080,
           }}
         >
           {before}
           {pill ? (
             <motion.span
-              initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
+              initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{
-                duration: reduce ? 0.01 : 0.5,
+                duration: reduce ? 0 : 0.5,
                 ease: ease.bounce,
                 delay: reduce ? 0 : 0.9,
               }}
@@ -122,9 +135,13 @@ export default function CaseHero({
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.1 }}
+          transition={{
+            duration: reduce ? 0 : 0.6,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 1.1,
+          }}
           className="type-body-lg"
           style={{
             color: "var(--color-muted)",
@@ -136,9 +153,13 @@ export default function CaseHero({
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.3 }}
+          transition={{
+            duration: reduce ? 0 : 0.6,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 1.3,
+          }}
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
@@ -199,26 +220,17 @@ function HeroImage({
       }}
       style={{
         marginTop: 64,
-        overflow: "hidden",
-        borderRadius: 6,
-        border: "1px solid rgba(20,20,18,0.10)",
-        aspectRatio: "16 / 10",
-        background: "var(--color-bg-alt)",
+        y: reduce ? "0%" : imageY,
       }}
     >
-      <motion.img
-        src={src}
-        alt={`${client} overview screen`}
-        loading="eager"
-        decoding="async"
-        style={{
-          display: "block",
-          width: "100%",
-          height: "120%",
-          objectFit: "cover",
-          y: reduce ? "0%" : imageY,
-        }}
-      />
+      <ImageFrame variant="hero">
+        <img
+          src={src}
+          alt={`${client} overview screen`}
+          loading="eager"
+          decoding="async"
+        />
+      </ImageFrame>
     </motion.figure>
   );
 }

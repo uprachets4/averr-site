@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
+import ImageFrame from "./ImageFrame";
 
 type Item = { src: string; caption: string };
 
@@ -77,25 +78,17 @@ function GalleryItem({
       onHoverEnd={() => setHovered(false)}
       style={{
         position: "relative",
-        overflow: "hidden",
-        aspectRatio: "16 / 10",
-        background: "var(--color-bg-alt)",
-        borderRadius: 6,
-        border: "1px solid rgba(20,20,18,0.08)",
+        margin: 0,
       }}
     >
-      <img
-        src={item.src}
-        alt={`${client} — ${item.caption}`}
-        loading="lazy"
-        decoding="async"
-        style={{
-          display: "block",
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-        }}
-      />
+      <ImageFrame variant="gallery">
+        <img
+          src={item.src}
+          alt={`${client} — ${item.caption}`}
+          loading="lazy"
+          decoding="async"
+        />
+      </ImageFrame>
       <motion.figcaption
         className="type-small"
         animate={{ opacity: hovered && !reduce ? 1 : 0.6 }}

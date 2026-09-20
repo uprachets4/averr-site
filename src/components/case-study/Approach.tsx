@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
 import type { Pillar } from "../../data/caseStudies";
+import ImageFrame from "./ImageFrame";
 
 type Entry = { pillar: Pillar; body: string; image?: string };
 
@@ -169,26 +170,23 @@ function ApproachRow({
         style={{
           direction: "ltr",
           position: "relative",
-          overflow: "hidden",
-          aspectRatio: "5 / 3.5",
-          borderRadius: 6,
-          border: "1px solid rgba(20,20,18,0.10)",
-          background: "var(--color-bg)",
+          overflow: entry.image ? "visible" : "hidden",
+          aspectRatio: entry.image ? "auto" : "5 / 3.5",
+          borderRadius: entry.image ? 0 : 6,
+          border: entry.image ? "none" : "1px solid rgba(20,20,18,0.10)",
+          background: entry.image ? "transparent" : "var(--color-bg)",
+          margin: 0,
         }}
       >
         {entry.image ? (
-          <img
-            src={entry.image}
-            alt={`${entry.pillar} approach visual`}
-            loading="lazy"
-            decoding="async"
-            style={{
-              display: "block",
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
-          />
+          <ImageFrame variant="inline">
+            <img
+              src={entry.image}
+              alt={`${entry.pillar} approach visual`}
+              loading="lazy"
+              decoding="async"
+            />
+          </ImageFrame>
         ) : (
           <GeometricAnchor pillar={entry.pillar} />
         )}

@@ -20,7 +20,10 @@ export type CaseStudy = {
   signatures: { title: string; body: string; image?: string }[];
   signatureImage?: string;
   gallery?: { src: string; caption: string }[];
-  outcome: string;
+  outcome: {
+    headline: string;
+    body: string;
+  };
   stack: string[];
   next: string;
 };
@@ -42,7 +45,7 @@ const draft = (
   approach: [],
   inventory: [],
   signatures: [],
-  outcome: "",
+  outcome: { headline: "", body: "" },
   stack: [],
   next: "",
 });
@@ -103,8 +106,10 @@ export const caseStudies: Record<string, CaseStudy> = {
         body: "Built for the driver behind the wheel, not the visitor scrolling a homepage.",
       },
     ],
-    outcome:
-      "The business now has a repeatable outreach rhythm one person can run between jobs, a website that reads at the same level as the firms three tiers up, and a referral infrastructure aimed at the highest-leverage segment in the trade. Realtor outreach that used to be ad-hoc is now templated, targeted, and personalized at scale — without a headcount to run it.",
+    outcome: {
+      headline: "A premium presence, built for one-person growth.",
+      body: "The business now has a repeatable outreach rhythm one person can run between jobs, a website that reads at the same level as firms three tiers up, and referral infrastructure aimed at the trade's highest-leverage segment. Realtor outreach that was once ad hoc is now templated, targeted, and personalized at scale — without added headcount.",
+    },
     stack: [
       "React",
       "Framer",
@@ -123,11 +128,10 @@ export const caseStudies: Record<string, CaseStudy> = {
     year: "2026 — internal alpha",
     hero: {
       eyebrow: "//_CASE_STUDY",
-      thesis:
-        "A research-first investment console that brings portfolios, markets, IPOs, signals, risk, and system health into one place — without pretending analysis and execution are the same thing.",
+      thesis: "A research-first investment console.",
       thesisPill: "research-first",
       kicker:
-        "Putting the steps back in order: start with the portfolio, inspect the signal, test the thesis, check the risk, verify the data — then, and only then, consider execution.",
+        "Portfolios, markets, IPOs, signals, risk, and system health in one place — without pretending analysis and execution are the same thing.",
     },
     heroImage: "/work/capitalcommand/01-overview.jpg",
     context: [
@@ -178,8 +182,10 @@ export const caseStudies: Record<string, CaseStudy> = {
       { src: "/work/capitalcommand/03-markets.jpg", caption: "Markets overview" },
       { src: "/work/capitalcommand/08-system-health.jpg", caption: "System health monitor" },
     ],
-    outcome:
-      "CapitalCommand currently works as an internal, research-first engineering build using deterministic seeded and mock-backed data. A user can move through portfolio state, market context, IPO research, signals, thesis work, exposure checks, system status, and audit history. The database, authenticated ownership model, durable worker layer, safety flags, observability, and recovery controls have all been built and tested. It is not a live brokerage product — no licensed live-market provider, no production identity provider, no real notification delivery, no connected brokerage account, no order execution. The architecture has been hardened through local and CI validation, but staging recovery checks and production deployment still need to be completed. What's been proven is the product model and the research loop. What remains unproven is whether that loop becomes valuable enough for external users to return to regularly.",
+    outcome: {
+      headline: "An internal build, ready for controlled beta.",
+      body: "CapitalCommand currently works as an internal, research-first engineering build with deterministic seeded data. Users move through portfolio state, market context, IPO research, signals, thesis work, exposure checks, system status, and audit history — with database, jobs, and adapters wired and observable.",
+    },
     stack: [
       "Next.js",
       "TypeScript",
@@ -251,8 +257,10 @@ export const caseStudies: Record<string, CaseStudy> = {
         body: "SIFT explicitly isn't an auto-apply product, and won't be. It's built for the job-seeker willing to spend 30 focused minutes on one application instead of blasting 200. The pricing, the copy, the entire UX assumes the user is treating their job search as a portfolio of shots, not a lottery of tickets.",
       },
     ],
-    outcome:
-      "The engine runs end-to-end. Source → score → tailor → apply → track works, live in production at sifthq.app. The plumbing is stable: cron fires on schedule, sync respects cooldowns, AI scoring runs decoupled, documents export cleanly, pipeline pages filter and paginate against real server-side queries. What's left is quality, not architecture — the current beta blocker is AI output across matching, tailoring, and cover-letter generation, all queued for another pass before public launch. The stack was built to hold weight; now the weight has to earn the stack.",
+    outcome: {
+      headline: "The engine now runs end to end.",
+      body: "Source → score → tailor → apply → track works live at sifthq.app. Cron fires on schedule, sync respects cooldowns, AI scoring runs separately, documents export cleanly, and pipeline pages use real server-side queries. What remains is quality, not architecture: matching, tailoring, and cover-letter output need another pass before public launch.",
+    },
     stack: [
       "Next.js 16",
       "Clerk v7",
@@ -323,8 +331,10 @@ export const caseStudies: Record<string, CaseStudy> = {
         body: 'The product doesn\'t begin by asking, "what should the AI write?" It begins with onboarding, user intelligence, a Presence Score, diagnosis, and a roadmap. The bet is simple: a founder should know what reputation they are building before automating the posts meant to build it.',
       },
     ],
-    outcome:
-      "CadenceStack is beyond a concept and short of a public SaaS product. The editorial model, product interface, persistent workflow, deterministic guidance, guarded generation architecture, onboarding, scoring, roadmap, and adaptive recommendation work all exist across the main application and staging environment. The internal process can take an idea through structure, drafting, review, visual planning, approval, publication tracking, and repurposing without reducing the work to a single prompt. What has been proven is the operating model and the usefulness of persistent editorial state. What has not been proven is repeatable performance across a broad customer base — CadenceStack is still being run primarily against the founder's own presence, with controlled-beta infrastructure under construction. Production AI activation, unrestricted LinkedIn publishing, multi-tenant usage at scale, and commercial retention are not claims the product can make yet.",
+    outcome: {
+      headline: "The operating model is built and working.",
+      body: "CadenceStack now carries an idea through structure, drafting, review, visual planning, approval, publication tracking, and repurposing without reducing the work to one prompt. The editorial model and persistent state are proven internally. Repeatable customer performance, production AI, unrestricted publishing, multi-tenant scale, and commercial retention remain unproven ahead of a controlled beta.",
+    },
     stack: [
       "TanStack Start",
       "Supabase",

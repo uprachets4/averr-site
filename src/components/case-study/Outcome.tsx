@@ -1,7 +1,8 @@
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
+import type { CaseStudy } from "../../data/caseStudies";
 
-export default function Outcome({ text }: { text: string }) {
+export default function Outcome({ text }: { text: CaseStudy["outcome"] }) {
   const reduce = useReducedMotion();
   return (
     <section
@@ -32,7 +33,7 @@ export default function Outcome({ text }: { text: string }) {
           //_05 · outcome
         </motion.div>
 
-        <motion.p
+        <motion.h2
           initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -48,7 +49,26 @@ export default function Outcome({ text }: { text: string }) {
             margin: "0 auto",
           }}
         >
-          {text}
+          {text.headline}
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{
+            duration: reduce ? 0 : 0.9,
+            ease: ease.outExpo,
+            delay: reduce ? 0 : 0.2,
+          }}
+          className="type-body-lg"
+          style={{
+            color: "var(--color-muted)",
+            maxWidth: 800,
+            margin: "40px auto 0",
+          }}
+        >
+          {text.body}
         </motion.p>
       </div>
     </section>

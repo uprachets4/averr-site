@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
+import ImageFrame from "./ImageFrame";
 
 type Item = { title: string; body: string; image?: string };
 
@@ -155,14 +156,7 @@ function SignatureCard({
       }}
     >
       {item.image ? (
-        <div
-          style={{
-            position: "relative",
-            overflow: "hidden",
-            aspectRatio: "16 / 10",
-            background: "rgba(237,231,218,0.04)",
-          }}
-        >
+        <ImageFrame variant="card">
           <motion.img
             src={item.image}
             alt={alt || `${item.title} screen`}
@@ -170,14 +164,8 @@ function SignatureCard({
             decoding="async"
             animate={{ scale: hovered && !reduce ? 1.03 : 1 }}
             transition={{ duration: reduce ? 0 : 0.4, ease: ease.outQuart }}
-            style={{
-              display: "block",
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
           />
-        </div>
+        </ImageFrame>
       ) : null}
       <div style={{ padding: "28px 28px 32px" }}>
         <h3
