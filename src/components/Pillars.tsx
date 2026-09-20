@@ -49,10 +49,10 @@ export default function Pillars() {
       >
         {/* Section marker */}
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
+          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted)",
@@ -64,10 +64,10 @@ export default function Pillars() {
 
         {/* Section title with horizontal gradient fade on second phrase */}
         <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
+          transition={{ duration: reduce ? 0 : 0.7, ease: ease.outQuart, delay: 0.1 }}
           className="type-h2"
           style={{
             maxWidth: 900,
@@ -126,11 +126,11 @@ function PillarCard({
   return (
     <motion.a
       href={pillar.href}
-      initial={{ opacity: 0, y: reduce ? 0 : 24 }}
+      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{
-        duration: reduce ? 0.01 : 0.6,
+        duration: reduce ? 0 : 0.6,
         ease: ease.outQuart,
         delay: reduce ? 0 : 0.2 + index * 0.08,
       }}

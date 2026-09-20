@@ -1,5 +1,11 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useReducedMotion,
+} from "motion/react";
+import { ease } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
 
 const LINKS = [
@@ -10,21 +16,29 @@ const LINKS = [
 ];
 
 export default function Nav() {
-  const [scrolled, setScrolled] = useState(false);
+  const reduce = useReducedMotion();
+  const { scrollY } = useScroll();
 
-  useEffect(function attachScroll() {
-    function onScroll() {
-      setScrolled(window.scrollY >= 12);
-    }
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return function cleanup() {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
+  // At scroll 0 → transparent, at scroll 80 → cream 90%
+  const bg = useTransform(
+    scrollY,
+    [0, 80],
+    ["rgba(244, 240, 230, 0)", "rgba(244, 240, 230, 0.9)"]
+  );
+  const blur = useTransform(
+    scrollY,
+    [0, 80],
+    ["blur(0px) saturate(1)", "blur(12px) saturate(1.4)"]
+  );
+  const borderColor = useTransform(
+    scrollY,
+    [80, 120],
+    ["rgba(20, 20, 18, 0)", "rgba(20, 20, 18, 0.10)"]
+  );
+  const paddingY = useTransform(scrollY, [0, 80], [24, 16]);
 
-  const navStyle = {
-    position: "fixed" as const,
+  const navStyle: React.CSSProperties = {
+    position: "fixed",
     top: 0,
     left: 0,
     right: 0,
@@ -32,16 +46,9 @@ export default function Nav() {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: scrolled ? "12px 40px" : "18px 40px",
-    backdropFilter: "blur(24px) saturate(1.4)",
-    WebkitBackdropFilter: "blur(24px) saturate(1.4)",
-    backgroundColor: scrolled
-      ? "rgba(244, 240, 230, 0.88)"
-      : "rgba(244, 240, 230, 0.68)",
-    borderBottom: scrolled
-      ? "1px solid rgba(20, 20, 18, 0.10)"
-      : "1px solid rgba(20, 20, 18, 0)",
-    transition: "all 300ms ease",
+    paddingLeft: 40,
+    paddingRight: 40,
+    // motion values applied via motion.nav below
   };
 
   const brandStyle = {
@@ -70,7 +77,26 @@ export default function Nav() {
   };
 
   return (
-    <nav aria-label="Primary" style={navStyle}>
+    <motion.nav
+      aria-label="Primary"
+      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: reduce ? 0.01 : 0.4,
+        ease: ease.outQuart,
+        delay: reduce ? 0 : 0.1,
+      }}
+      style={{
+        ...navStyle,
+        paddingTop: reduce ? 16 : paddingY,
+        paddingBottom: reduce ? 16 : paddingY,
+        backgroundColor: reduce ? "rgba(244, 240, 230, 0.88)" : bg,
+        backdropFilter: reduce ? "blur(12px) saturate(1.4)" : blur,
+        WebkitBackdropFilter: reduce ? "blur(12px) saturate(1.4)" : blur,
+        borderBottom: "1px solid",
+        borderBottomColor: reduce ? "rgba(20, 20, 18, 0.10)" : borderColor,
+      }}
+    >
       <Link to="/" style={brandStyle}>Averr Studios</Link>
       <ul style={linksWrapStyle}>
         {LINKS.map(function renderLink(link) {
@@ -84,6 +110,6 @@ export default function Nav() {
       <MagneticCTA to="/contact" variant="primary" size="sm" icon={null}>
         Book a call
       </MagneticCTA>
-    </nav>
+    </motion.nav>
   );
 }

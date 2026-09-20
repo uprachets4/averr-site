@@ -33,10 +33,10 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
       <div style={{ position: "relative", zIndex: 2 }}>
         {/* Section marker */}
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
+          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
             display: "inline-block",
@@ -49,10 +49,10 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
 
         {/* Headline with pill highlight */}
         <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
+          transition={{ duration: reduce ? 0 : 0.7, ease: ease.outQuart, delay: 0.1 }}
           className="type-display-xl"
           style={{
             maxWidth: 900,
@@ -62,11 +62,11 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
         >
           Build something that{" "}
           <motion.span
-            initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
+            initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 0.85 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{
-              duration: reduce ? 0.01 : 0.5,
+              duration: reduce ? 0 : 0.5,
               ease: ease.bounce,
               delay: reduce ? 0 : 0.4,
             }}
@@ -79,10 +79,10 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
 
         {/* CTAs */}
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 0.5 }}
+          transition={{ duration: reduce ? 0 : 0.6, ease: ease.outQuart, delay: 0.5 }}
           style={{
             display: "inline-flex",
             flexWrap: "wrap",

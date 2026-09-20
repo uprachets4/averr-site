@@ -1,23 +1,42 @@
-import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useInView,
+  animate,
+} from "motion/react";
 import { ease } from "../lib/motion";
 
+type Stat = {
+  label: string;
+  target: number;
+  suffix: string;
+  decimals: number;
+  caption: string;
+};
 
-const STATS = [
+const STATS: Stat[] = [
   {
     label: "Sites shipped",
-    value: "40+",
+    target: 40,
+    suffix: "+",
+    decimals: 0,
     caption:
       "Custom-built marketing sites and SaaS product surfaces across the GTA.",
   },
   {
     label: "Automations deployed",
-    value: "15×",
+    target: 15,
+    suffix: "×",
+    decimals: 0,
     caption:
       "AI agents and workflows removing manual work from ops, sales, and support.",
   },
   {
     label: "Average LCP",
-    value: "1.4s",
+    target: 1.4,
+    suffix: "s",
+    decimals: 1,
     caption:
       "Real-user Core Web Vitals across every site we ship. Fast is a feature.",
   },
@@ -46,11 +65,10 @@ export default function Numbers() {
           zIndex: 2,
         }}
       >
-        {/* Section marker */}
         <motion.div
           initial={{ opacity: 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
+          viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
@@ -61,12 +79,15 @@ export default function Numbers() {
           //_02 · the numbers
         </motion.div>
 
-        {/* Section title with horizontal gradient on second phrase */}
         <motion.h2
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{
+            duration: reduce ? 0.01 : 0.6,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 0.1,
+          }}
           className="type-h2"
           style={{
             maxWidth: 900,
@@ -78,7 +99,6 @@ export default function Numbers() {
           <span className="fade-h">Real results.</span>
         </motion.h2>
 
-        {/* Stats grid */}
         <div
           style={{
             display: "grid",
@@ -94,7 +114,6 @@ export default function Numbers() {
         </div>
       </div>
 
-      {/* Responsive collapse */}
       <style>{`
         @media (max-width: 900px) {
           .stats-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
@@ -103,12 +122,6 @@ export default function Numbers() {
     </section>
   );
 }
-
-type Stat = {
-  label: string;
-  value: string;
-  caption: string;
-};
 
 function StatCard({
   stat,
@@ -123,11 +136,11 @@ function StatCard({
     <motion.div
       initial={{ opacity: 0, y: reduce ? 0 : 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
+      viewport={{ once: true, margin: "-100px" }}
       transition={{
         duration: reduce ? 0.01 : 0.7,
         ease: ease.outQuart,
-        delay: reduce ? 0 : 0.2 + index * 0.1,
+        delay: reduce ? 0 : 0.15 + index * 0.12,
       }}
     >
       <div
@@ -148,9 +161,17 @@ function StatCard({
           lineHeight: 0.9,
           letterSpacing: "-0.05em",
           marginBottom: 24,
+          display: "inline-flex",
+          alignItems: "baseline",
         }}
       >
-        {stat.value}
+        <Counter
+          target={stat.target}
+          decimals={stat.decimals}
+          delay={0.35 + index * 0.12}
+          reduce={reduce}
+        />
+        <span>{stat.suffix}</span>
       </div>
       <div
         style={{
@@ -164,5 +185,47 @@ function StatCard({
         {stat.caption}
       </div>
     </motion.div>
+  );
+}
+
+function Counter({
+  target,
+  decimals,
+  delay,
+  reduce,
+}: {
+  target: number;
+  decimals: number;
+  delay: number;
+  reduce: boolean;
+}) {
+  const ref = useRef<HTMLSpanElement | null>(null);
+  const inView = useInView(ref, { once: true, margin: "-100px" });
+  const [value, setValue] = useState(reduce ? target : 0);
+
+  useEffect(
+    function runCount() {
+      if (!inView) return;
+      if (reduce) {
+        setValue(target);
+        return;
+      }
+      const controls = animate(0, target, {
+        duration: 1.5,
+        delay,
+        ease: ease.outQuart,
+        onUpdate: (v) => setValue(v),
+      });
+      return function cleanup() {
+        controls.stop();
+      };
+    },
+    [inView, target, delay, reduce]
+  );
+
+  return (
+    <span ref={ref}>
+      {decimals === 0 ? Math.round(value) : value.toFixed(decimals)}
+    </span>
   );
 }
