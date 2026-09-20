@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
 import PillHl from "./PillHl";
+import HeroSignature from "./HeroSignature";
 
 
 const TRUST = ["CG Walls & Floors", "CareerClarity AI", "SIFT", "CadenceStack"];
@@ -45,6 +46,8 @@ export default function Hero() {
         }}
       />
       <div className="grain-light" aria-hidden="true" />
+
+      <HeroSignature />
 
       <div className="relative z-10 max-w-[1100px]">
         <motion.div
