@@ -9,7 +9,7 @@ import {
 import { ease, spring } from "../lib/motion";
 
 const VIEW_W = 900;
-const VIEW_H = 700;
+const VIEW_H = 800;
 
 type CircleSpec = {
   id: string;
@@ -23,9 +23,9 @@ type CircleSpec = {
 };
 
 const CIRCLES: CircleSpec[] = [
-  { id: "c1", cx: 400, cy: 300, r: 240, drawDelay: 0.4, rotateDuration: 90, clockwise: true, parallaxStrength: 8 },
-  { id: "c2", cx: 500, cy: 340, r: 260, drawDelay: 0.5, rotateDuration: 120, clockwise: false, parallaxStrength: 12 },
-  { id: "c3", cx: 450, cy: 380, r: 220, drawDelay: 0.6, rotateDuration: 100, clockwise: true, parallaxStrength: 6 },
+  { id: "c1", cx: 400, cy: 200, r: 240, drawDelay: 0.4, rotateDuration: 90, clockwise: true, parallaxStrength: 8 },
+  { id: "c2", cx: 500, cy: 400, r: 260, drawDelay: 0.5, rotateDuration: 120, clockwise: false, parallaxStrength: 12 },
+  { id: "c3", cx: 450, cy: 600, r: 220, drawDelay: 0.6, rotateDuration: 100, clockwise: true, parallaxStrength: 6 },
 ];
 
 const DRAW_DURATION = 0.8;
@@ -82,8 +82,8 @@ export default function HeroSignature() {
       aria-hidden
       style={{
         position: "absolute",
-        top: -50,
-        right: -100,
+        top: 80,
+        right: -280,
         width: VIEW_W,
         height: VIEW_H,
         pointerEvents: "none",
