@@ -2,12 +2,58 @@ import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
 import type { Pillar } from "../../data/caseStudies";
 
+type Entry = { pillar: Pillar; body: string; image?: string };
 
-type Entry = { pillar: Pillar; body: string };
+const pillarChipStyle: React.CSSProperties = {
+  display: "inline-block",
+  padding: "6px 14px",
+  borderRadius: 999,
+  border: "1px solid rgba(20,20,18,0.18)",
+  background: "transparent",
+  color: "var(--color-ink-soft)",
+  fontFamily: "var(--font-mono)",
+  fontSize: 11,
+  letterSpacing: "0.14em",
+  textTransform: "uppercase" as const,
+  marginBottom: 20,
+};
+
+function GeometricAnchor({ pillar }: { pillar: Pillar }) {
+  // Muted geometric fallback when no image is provided
+  const rotate = pillar === "Design" ? 0 : pillar === "Automate" ? 30 : -30;
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 400 320"
+      preserveAspectRatio="xMidYMid slice"
+      fill="none"
+      aria-hidden
+      style={{ display: "block" }}
+    >
+      <defs>
+        <linearGradient
+          id={`geom-${pillar}`}
+          x1="0"
+          y1="0"
+          x2="400"
+          y2="320"
+          gradientTransform={`rotate(${rotate} 200 160)`}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0%" stopColor="#C9B896" stopOpacity="0.35" />
+          <stop offset="100%" stopColor="#A8916D" stopOpacity="0.2" />
+        </linearGradient>
+      </defs>
+      <circle cx="200" cy="160" r="140" stroke={`url(#geom-${pillar})`} strokeWidth={1.5} />
+      <circle cx="200" cy="160" r="100" stroke={`url(#geom-${pillar})`} strokeWidth={1.5} />
+      <circle cx="200" cy="160" r="60" stroke={`url(#geom-${pillar})`} strokeWidth={1.5} />
+    </svg>
+  );
+}
 
 export default function Approach({ entries }: { entries: Entry[] }) {
   const reduce = useReducedMotion();
-
   return (
     <section
       style={{
@@ -27,113 +73,136 @@ export default function Approach({ entries }: { entries: Entry[] }) {
         }}
       >
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: 24,
-          }}
+          style={{ color: "var(--color-muted)", marginBottom: 24 }}
         >
           //_02 · approach
         </motion.div>
 
         <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{
+            duration: reduce ? 0 : 0.7,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 0.1,
+          }}
           className="type-h2"
           style={{
             color: "var(--color-ink)",
-            marginBottom: 64,
+            marginBottom: 96,
             maxWidth: 900,
           }}
         >
           Three pillars, <span className="fade-h">one plan.</span>
         </motion.h2>
 
-        <div
-          className="approach-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${Math.max(1, entries.length)}, minmax(0, 1fr))`,
-            gap: 16,
-          }}
-        >
+        <div style={{ display: "flex", flexDirection: "column", gap: 96 }}>
           {entries.map((entry, i) => (
-            <motion.article
+            <ApproachRow
               key={`${entry.pillar}-${i}`}
-              initial={{ opacity: 0, y: reduce ? 0 : 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{
-                duration: reduce ? 0.01 : 0.6,
-                ease: ease.outQuart,
-                delay: reduce ? 0 : 0.15 + i * 0.1,
-              }}
-              style={{
-                padding: "36px 32px",
-                background: "var(--color-bg)",
-                border: "1px solid rgba(20,20,18,0.08)",
-                borderRadius: 4,
-                display: "flex",
-                flexDirection: "column",
-                gap: 24,
-                position: "relative",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 14,
-                }}
-              >
-                <span
-                  className="type-eyebrow"
-                  style={{
-                    color: "var(--color-ink)",
-                    textTransform: "none",
-                  }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span
-                  className="type-eyebrow"
-                  style={{
-                    padding: "6px 14px",
-                    borderRadius: 999,
-                    border: "1px solid rgba(20,20,18,0.18)",
-                    color: "var(--color-ink-soft)",
-                    background: "transparent",
-                  }}
-                >
-                  {entry.pillar}
-                </span>
-              </div>
-              <p
-                className="type-body"
-                style={{
-                  color: "var(--color-ink-soft)",
-                }}
-              >
-                {entry.body}
-              </p>
-            </motion.article>
+              entry={entry}
+              index={i}
+              reduce={!!reduce}
+            />
           ))}
         </div>
       </div>
+    </section>
+  );
+}
+
+function ApproachRow({
+  entry,
+  index,
+  reduce,
+}: {
+  entry: Entry;
+  index: number;
+  reduce: boolean;
+}) {
+  const isReversed = index % 2 === 1;
+  return (
+    <motion.div
+      className="approach-row"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1.4fr",
+        gap: 64,
+        alignItems: "center",
+        direction: isReversed ? "rtl" : "ltr",
+      }}
+    >
+      <motion.div
+        initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{
+          duration: reduce ? 0 : 0.7,
+          ease: ease.outQuart,
+          delay: reduce ? 0 : 0.15,
+        }}
+        style={{ direction: "ltr" }}
+      >
+        <div style={pillarChipStyle}>{entry.pillar}</div>
+        <p
+          className="type-body"
+          style={{ color: "var(--color-ink-soft)", maxWidth: 480 }}
+        >
+          {entry.body}
+        </p>
+      </motion.div>
+
+      <motion.figure
+        initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 0.98 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{
+          duration: reduce ? 0 : 0.9,
+          ease: ease.outExpo,
+        }}
+        style={{
+          direction: "ltr",
+          position: "relative",
+          overflow: "hidden",
+          aspectRatio: "5 / 3.5",
+          borderRadius: 6,
+          border: "1px solid rgba(20,20,18,0.10)",
+          background: "var(--color-bg)",
+        }}
+      >
+        {entry.image ? (
+          <img
+            src={entry.image}
+            alt={`${entry.pillar} approach visual`}
+            loading="lazy"
+            decoding="async"
+            style={{
+              display: "block",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          <GeometricAnchor pillar={entry.pillar} />
+        )}
+      </motion.figure>
 
       <style>{`
         @media (max-width: 900px) {
-          .approach-grid {
+          .approach-row {
             grid-template-columns: 1fr !important;
+            direction: ltr !important;
+            gap: 32px !important;
           }
         }
       `}</style>
-    </section>
+    </motion.div>
   );
 }

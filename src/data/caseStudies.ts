@@ -15,10 +15,11 @@ export type CaseStudy = {
   };
   heroImage?: string;
   context: string[];
-  approach: { pillar: Pillar; body: string }[];
+  approach: { pillar: Pillar; body: string; image?: string }[];
   inventory: string[];
-  signatures: { title: string; body: string }[];
+  signatures: { title: string; body: string; image?: string }[];
   signatureImage?: string;
+  gallery?: { src: string; caption: string }[];
   outcome: string;
   stack: string[];
   next: string;
@@ -138,10 +139,12 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         pillar: "Design",
         body: "CapitalCommand demonstrates product UI and systems design across a dense financial application. The interface covers Overview, Markets, Portfolio, IPO Intelligence, Signal Desk, Research Lab, Risk Center, and System Health without reducing each area to a disconnected dashboard. Information hierarchy, confidence states, source freshness, exposure, and system status are treated as parts of the same decision environment.",
+        image: "/work/capitalcommand/02-portfolio.jpg",
       },
       {
         pillar: "Automate",
         body: "Scheduled research jobs, IPO refresh and classification workflows, signal processing, portfolio calculations, alerts, notification records, audit logging, and health monitoring. Redis and BullMQ handle durable jobs, retries, leases, dead letters, and replay. A server-side OpenAI adapter exists behind feature flags and strict output validation, but AI and external provider calls remain disabled by default.",
+        image: "/work/capitalcommand/04-ipo-intelligence.jpg",
       },
     ],
     inventory: [
@@ -158,17 +161,23 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         title: "Research before execution",
         body: "CapitalCommand treats a signal as the beginning of an investigation, not permission to place an order. The product forces the path through thesis, provenance, portfolio exposure, and risk before brokerage access is even considered.",
+        image: "/work/capitalcommand/05-signal-desk.jpg",
       },
       {
         title: "Operational truth is part of the interface",
         body: "Most investment dashboards display a number without telling you whether the provider is delayed, the worker failed, or the data is stale. CapitalCommand exposes provider status, data quality, job health, readiness, and audit history — because unreliable infrastructure produces unreliable investment decisions.",
+        image: "/work/capitalcommand/06-research-lab.jpg",
       },
       {
         title: "Deterministic before generative",
         body: "Portfolio calculations, risk rules, job state, ownership checks, and safety controls stay outside the model. AI is restricted to bounded research assistance with schema-validated output, sanitized telemetry, feature flags, and fail-closed behaviour. A fluent answer does not get to override system state.",
+        image: "/work/capitalcommand/07-risk-center.jpg",
       },
     ],
-    signatureImage: "/work/capitalcommand/05-signal-desk.jpg",
+    gallery: [
+      { src: "/work/capitalcommand/03-markets.jpg", caption: "Markets overview" },
+      { src: "/work/capitalcommand/08-system-health.jpg", caption: "System health monitor" },
+    ],
     outcome:
       "CapitalCommand currently works as an internal, research-first engineering build using deterministic seeded and mock-backed data. A user can move through portfolio state, market context, IPO research, signals, thesis work, exposure checks, system status, and audit history. The database, authenticated ownership model, durable worker layer, safety flags, observability, and recovery controls have all been built and tested. It is not a live brokerage product — no licensed live-market provider, no production identity provider, no real notification delivery, no connected brokerage account, no order execution. The architecture has been hardened through local and CI validation, but staging recovery checks and production deployment still need to be completed. What's been proven is the product model and the research loop. What remains unproven is whether that loop becomes valuable enough for external users to return to regularly.",
     stack: [

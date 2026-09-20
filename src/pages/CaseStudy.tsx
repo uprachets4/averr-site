@@ -6,8 +6,10 @@ import Context from "../components/case-study/Context";
 import Approach from "../components/case-study/Approach";
 import Inventory from "../components/case-study/Inventory";
 import Signatures from "../components/case-study/Signatures";
+import Gallery from "../components/case-study/Gallery";
 import Outcome from "../components/case-study/Outcome";
 import Next from "../components/case-study/Next";
+import ScrollProgress from "../components/case-study/ScrollProgress";
 import FinalCTA from "../components/FinalCTA";
 import NotFound from "./NotFound";
 import ComingSoon from "./ComingSoon";
@@ -46,6 +48,7 @@ export default function CaseStudy() {
 
   return (
     <>
+      <ScrollProgress />
       <CaseHero
         hero={study.hero}
         client={study.client}
@@ -57,7 +60,14 @@ export default function CaseStudy() {
       <Context paragraphs={study.context} />
       <Approach entries={study.approach} />
       <Inventory items={study.inventory} stack={study.stack} />
-      <Signatures items={study.signatures} imageSrc={study.signatureImage} imageAlt={`${study.client} Signal Desk screen`} />
+      <Signatures
+        items={study.signatures}
+        imageSrc={study.signatureImage}
+        imageAlt={`${study.client} screen`}
+      />
+      {study.gallery && study.gallery.length > 0 ? (
+        <Gallery items={study.gallery} client={study.client} />
+      ) : null}
       <Outcome text={study.outcome} />
       <Next text={study.next} />
       <FinalCTA markerNumber="07" />

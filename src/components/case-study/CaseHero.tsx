@@ -1,4 +1,10 @@
-import { motion, useReducedMotion } from "motion/react";
+import { useRef } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import { ease } from "../../lib/motion";
 import PillHl from "../PillHl";
 import type { CaseStudy } from "../../data/caseStudies";
@@ -148,32 +154,7 @@ export default function CaseHero({
         </motion.div>
 
         {heroImage ? (
-          <motion.figure
-            initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 1.5 }}
-            style={{
-              marginTop: 64,
-              overflow: "hidden",
-              borderRadius: 6,
-              border: "1px solid rgba(20,20,18,0.10)",
-              aspectRatio: "16 / 10",
-              background: "var(--color-bg-alt)",
-            }}
-          >
-            <img
-              src={heroImage}
-              alt={`${client} overview screen`}
-              loading="eager"
-              decoding="async"
-              style={{
-                display: "block",
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-          </motion.figure>
+          <HeroImage src={heroImage} client={client} reduce={!!reduce} />
         ) : null}
       </div>
 
@@ -186,6 +167,59 @@ export default function CaseHero({
         }
       `}</style>
     </section>
+  );
+}
+
+function HeroImage({
+  src,
+  client,
+  reduce,
+}: {
+  src: string;
+  client: string;
+  reduce: boolean;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  // Image shifts up 20% of scroll travel — subtle parallax.
+  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "-20%"]);
+
+  return (
+    <motion.figure
+      ref={ref}
+      initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 1.03 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{
+        duration: reduce ? 0 : 1.2,
+        ease: ease.outExpo,
+      }}
+      style={{
+        marginTop: 64,
+        overflow: "hidden",
+        borderRadius: 6,
+        border: "1px solid rgba(20,20,18,0.10)",
+        aspectRatio: "16 / 10",
+        background: "var(--color-bg-alt)",
+      }}
+    >
+      <motion.img
+        src={src}
+        alt={`${client} overview screen`}
+        loading="eager"
+        decoding="async"
+        style={{
+          display: "block",
+          width: "100%",
+          height: "120%",
+          objectFit: "cover",
+          y: reduce ? "0%" : imageY,
+        }}
+      />
+    </motion.figure>
   );
 }
 

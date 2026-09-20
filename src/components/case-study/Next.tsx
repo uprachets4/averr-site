@@ -1,10 +1,9 @@
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
-
+import MagneticCTA from "../MagneticCTA";
 
 export default function Next({ text }: { text: string }) {
   const reduce = useReducedMotion();
-
   return (
     <section
       style={{
@@ -22,40 +21,63 @@ export default function Next({ text }: { text: string }) {
           position: "relative",
           zIndex: 2,
           display: "grid",
-          gridTemplateColumns: "1fr 2fr",
-          gap: 80,
+          gridTemplateColumns: "140px 1fr",
+          gap: 40,
           alignItems: "start",
         }}
         className="next-grid"
       >
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-          }}
+          style={{ color: "var(--color-muted)" }}
         >
           //_06 · what's next
         </motion.div>
 
-        <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
-          className="type-body-lg"
-          style={{
-            color: "var(--color-ink-soft)",
-            maxWidth: 900,
-          }}
-        >
-          {text}
-        </motion.p>
-      </div>
+        <div>
+          <motion.p
+            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{
+              duration: reduce ? 0 : 0.7,
+              ease: ease.outQuart,
+              delay: reduce ? 0 : 0.1,
+            }}
+            className="type-body-lg"
+            style={{
+              color: "var(--color-ink-soft)",
+              maxWidth: 900,
+              marginBottom: 40,
+            }}
+          >
+            {text}
+          </motion.p>
 
+          <motion.div
+            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{
+              duration: reduce ? 0 : 0.6,
+              ease: ease.outQuart,
+              delay: reduce ? 0 : 0.25,
+            }}
+            style={{ display: "inline-flex", gap: 12, flexWrap: "wrap" }}
+          >
+            <MagneticCTA to="/contact" variant="primary">
+              Book a discovery call
+            </MagneticCTA>
+            <MagneticCTA to="/work" variant="ghost">
+              See related work
+            </MagneticCTA>
+          </motion.div>
+        </div>
+      </div>
       <style>{`
         @media (max-width: 900px) {
           .next-grid {

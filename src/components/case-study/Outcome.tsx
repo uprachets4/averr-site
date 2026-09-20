@@ -1,68 +1,56 @@
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
 
-
 export default function Outcome({ text }: { text: string }) {
   const reduce = useReducedMotion();
-
   return (
     <section
       style={{
         backgroundColor: "var(--color-bg)",
-        padding: "128px 40px",
+        padding: "160px 40px",
         position: "relative",
+        textAlign: "center",
       }}
     >
       <div className="grain-light" aria-hidden="true" />
       <div
         style={{
-          maxWidth: 1200,
+          maxWidth: 1000,
           margin: "0 auto",
           position: "relative",
           zIndex: 2,
-          display: "grid",
-          gridTemplateColumns: "140px 1fr",
-          gap: 40,
-          alignItems: "start",
         }}
-        className="outcome-grid"
       >
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-          }}
+          style={{ color: "var(--color-muted)", marginBottom: 40 }}
         >
           //_05 · outcome
         </motion.div>
 
         <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
-          className="type-h2"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{
+            duration: reduce ? 0 : 0.9,
+            ease: ease.outExpo,
+            delay: reduce ? 0 : 0.1,
+          }}
+          className="type-display-l"
           style={{
             color: "var(--color-ink)",
             maxWidth: 900,
+            margin: "0 auto",
           }}
         >
           {text}
         </motion.p>
       </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .outcome-grid {
-            grid-template-columns: 1fr !important;
-            gap: 24px !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }
