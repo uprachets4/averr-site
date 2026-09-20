@@ -3,6 +3,7 @@ import { ease, spring } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
 import PillHl from "./PillHl";
 import HeroSignature from "./HeroSignature";
+import LineReveal from "./LineReveal";
 
 const TRUST = ["CG Walls & Floors", "CareerClarity AI", "SIFT", "CadenceStack"];
 
@@ -23,32 +24,6 @@ const T = {
 
 const LINE_1 = "The studio for";
 const LINE_2 = "businesses that want";
-
-function LineReveal({
-  delay,
-  children,
-}: {
-  delay: number;
-  children: React.ReactNode;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <span style={{ display: "block", overflow: "hidden" }}>
-      <motion.span
-        style={{ display: "inline-block" }}
-        initial={{ y: reduce ? 0 : "100%", opacity: reduce ? 1 : 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{
-          delay: reduce ? 0 : delay,
-          duration: reduce ? 0.01 : 0.8,
-          ease: ease.outExpo,
-        }}
-      >
-        {children}
-      </motion.span>
-    </span>
-  );
-}
 
 function PillChipEmphasis({
   delay,

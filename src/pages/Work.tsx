@@ -1,10 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
-import { ease } from "../lib/motion";
+import { ease, spring } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import FinalCTA from "../components/FinalCTA";
 import PillHl from "../components/PillHl";
+import LineReveal from "../components/LineReveal";
+
+const T_WORK_HERO = {
+  eyebrow: 0.1,
+  line1: 0.3,
+  line2: 0.5,
+  pillChip: 0.9,
+  kicker: 1.1,
+};
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -43,9 +52,13 @@ function WorkHeader() {
 
       <div style={{ position: "relative", zIndex: 2, maxWidth: 1000, margin: "0 auto" }}>
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: 0.2 }}
+          transition={{
+            duration: reduce ? 0 : 0.5,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : T_WORK_HERO.eyebrow,
+          }}
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -63,10 +76,7 @@ function WorkHeader() {
           <span style={{ height: 1, width: 20, background: "currentColor", opacity: 0.6 }} />
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.3 }}
+        <h1
           className="type-display-xl"
           style={{
             color: "var(--color-ink)",
@@ -75,21 +85,35 @@ function WorkHeader() {
             margin: "0 auto 32px",
           }}
         >
-          A short list of{" "}
-          <motion.span
-            initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.bounce, delay: 0.8 }}
-            style={{ display: "inline-block" }}
-          >
-            <PillHl>real projects</PillHl>
-          </motion.span>.
-        </motion.h1>
+          <LineReveal delay={T_WORK_HERO.line1}>A short list of</LineReveal>
+          <LineReveal delay={T_WORK_HERO.line2}>
+            <motion.span
+              initial={{
+                opacity: reduce ? 1 : 0,
+                scaleX: reduce ? 1 : 0.92,
+              }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={
+                reduce
+                  ? { duration: 0 }
+                  : { delay: T_WORK_HERO.pillChip, ...spring.snappy }
+              }
+              style={{ display: "inline-block", transformOrigin: "center" }}
+            >
+              <PillHl>real projects</PillHl>
+            </motion.span>
+            <span>.</span>
+          </LineReveal>
+        </h1>
 
         <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.1 }}
+          transition={{
+            duration: reduce ? 0 : 0.6,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : T_WORK_HERO.kicker,
+          }}
           style={{
             fontSize: 19,
             lineHeight: 1.6,
@@ -131,175 +155,246 @@ function ProjectCard({
   const reduce = useReducedMotion();
   const isHero = size === "hero";
   const bg = isHero ? "var(--color-bg-warm)" : "var(--color-bg-alt)";
+  const bgHover = isHero
+    ? "rgba(232,225,208,0.9)"
+    : "rgba(232,225,208,0.6)";
+  const [hovered, setHovered] = useState(false);
+
+  // Orchestrated hover — parent variant cascades to children
+  const cardVariants = {
+    rest: {
+      y: 0,
+      boxShadow: "0 0 0 rgba(20,20,18,0)",
+      transition: { duration: reduce ? 0 : 0.3, ease: ease.outQuart },
+    },
+    hover: {
+      y: reduce ? 0 : isHero ? -10 : -6,
+      boxShadow: reduce
+        ? "0 0 0 rgba(20,20,18,0)"
+        : "0 12px 32px rgba(20,20,18,0.08)",
+      transition: { duration: reduce ? 0 : 0.3, ease: ease.outQuart },
+    },
+  };
+
+  const arrowVariants = {
+    rest: { x: 0, transition: { duration: reduce ? 0 : 0.3, ease: ease.outQuart } },
+    hover: {
+      x: reduce ? 0 : isHero ? 6 : 4,
+      transition: { duration: reduce ? 0 : 0.3, ease: ease.outQuart },
+    },
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: reduce ? 0 : 24 }}
+      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 32 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: true, margin: "-100px" }}
       transition={{
-        duration: reduce ? 0.01 : 0.7,
+        duration: reduce ? 0 : 0.7,
         ease: ease.outQuart,
         delay: reduce ? 0 : 0.1 + index * 0.08,
       }}
       style={{ display: "flex" }}
     >
-      <Link
-        to={`/work/${card.slug}`}
-        className="work-card"
+      <motion.div
+        variants={cardVariants}
+        initial="rest"
+        whileHover="hover"
+        onHoverStart={() => setHovered(true)}
+        onHoverEnd={() => setHovered(false)}
         style={{
-          position: "relative",
-          overflow: "hidden",
-          flex: 1,
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: isHero ? "56px 48px" : "36px 32px",
-          minHeight: isHero ? 480 : 320,
-          backgroundColor: bg,
-          border: "1px solid rgba(20,20,18,0.08)",
+          flex: 1,
           borderRadius: 4,
-          color: "var(--color-ink)",
-          textDecoration: "none",
-          transition:
-            "background-color 0.35s ease, border-color 0.35s ease, transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1)",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = isHero
-            ? "rgba(232,225,208,0.85)"
-            : "rgba(232,225,208,0.55)";
-          e.currentTarget.style.borderColor = "rgba(20,20,18,0.18)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = bg;
-          e.currentTarget.style.borderColor = "rgba(20,20,18,0.08)";
         }}
       >
-        <div className="grain-light" aria-hidden="true" />
-
-        <div style={{ position: "relative", zIndex: 2 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: isHero ? 40 : 28,
-            }}
-          >
-            <span
-              className="type-eyebrow"
-              style={{
-                color: "var(--color-muted)",
-              }}
-            >
-              {card.eyebrow}
-            </span>
-            {card.live ? (
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 10,
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  color: "var(--color-muted-2)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <motion.span
-                  aria-hidden
-                  animate={
-                    reduce
-                      ? { scale: 1, opacity: 1 }
-                      : { scale: [1, 1.15, 1], opacity: [1, 0.7, 1] }
-                  }
-                  transition={{
-                    duration: 2.5,
-                    ease: ease.inOut,
-                    repeat: reduce ? 0 : Infinity,
-                  }}
-                  style={{
-                    display: "inline-block",
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: "#4A7C3F",
-                    boxShadow: "0 0 0 3px rgba(74,124,63,0.18)",
-                  }}
-                />
-                Live
-              </span>
-            ) : null}
-          </div>
-
-          <h3
-            className="type-h3"
-            style={{
-              marginBottom: isHero ? 32 : 20,
-              color: "var(--color-ink)",
-            }}
-          >
-            {card.name}
-          </h3>
-
-          <p
-            style={{
-              fontSize: isHero ? 17 : 15,
-              lineHeight: 1.55,
-              color: "var(--color-ink-soft)",
-              maxWidth: isHero ? 600 : 420,
-              marginBottom: isHero ? 40 : 24,
-            }}
-          >
-            {card.kicker}
-          </p>
-        </div>
-
-        <div
+        <Link
+          to={`/work/${card.slug}`}
+          className="work-card"
           style={{
             position: "relative",
-            zIndex: 2,
+            overflow: "hidden",
+            flex: 1,
             display: "flex",
+            flexDirection: "column",
             justifyContent: "space-between",
-            alignItems: "flex-end",
-            gap: 24,
-            flexWrap: "wrap",
+            padding: isHero ? "56px 48px" : "36px 32px",
+            minHeight: isHero ? 480 : 320,
+            backgroundColor: hovered && !reduce ? bgHover : bg,
+            border: `1px solid ${
+              hovered && !reduce
+                ? "rgba(20,20,18,0.18)"
+                : "rgba(20,20,18,0.08)"
+            }`,
+            borderRadius: 4,
+            color: "var(--color-ink)",
+            textDecoration: "none",
+            transition: "background-color 0.3s ease, border-color 0.3s ease",
           }}
         >
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {card.tags.map((t) => (
+          <div className="grain-light" aria-hidden="true" />
+
+          {/* Featured card: shine sweep on hover */}
+          {isHero && !reduce ? (
+            <motion.div
+              aria-hidden
+              initial={{ x: "-100%", opacity: 0 }}
+              animate={hovered ? { x: "200%", opacity: 1 } : { x: "-100%", opacity: 0 }}
+              transition={{ duration: 0.6, ease: ease.outQuart }}
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%)",
+                pointerEvents: "none",
+                zIndex: 1,
+              }}
+            />
+          ) : null}
+
+          <div style={{ position: "relative", zIndex: 2 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: isHero ? 40 : 28,
+              }}
+            >
               <span
-                key={t}
+                className="type-eyebrow"
                 style={{
-                  padding: "5px 12px",
-                  borderRadius: 999,
-                  fontFamily: "var(--font-body)",
-                  fontSize: 12,
-                  color: "var(--color-muted)",
-                  border: "1px solid rgba(20,20,18,0.14)",
-                  background: "transparent",
+                  color:
+                    hovered && !reduce
+                      ? "var(--color-ink-soft)"
+                      : "var(--color-muted)",
+                  fontWeight: hovered && !reduce ? 600 : 500,
+                  transition: `color 300ms cubic-bezier(${ease.outQuart.join(",")}), font-weight 300ms cubic-bezier(${ease.outQuart.join(",")})`,
                 }}
               >
-                {t}
+                {card.eyebrow}
               </span>
-            ))}
+              {card.live ? (
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 10,
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    color: "var(--color-muted-2)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  <motion.span
+                    aria-hidden
+                    animate={
+                      reduce
+                        ? { scale: 1, opacity: 1 }
+                        : hovered
+                        ? { scale: [1, 1.25, 1], opacity: [1, 0.85, 1] }
+                        : { scale: [1, 1.15, 1], opacity: [1, 0.7, 1] }
+                    }
+                    transition={{
+                      duration: hovered ? 1.2 : 2.5,
+                      ease: ease.inOut,
+                      repeat: reduce ? 0 : Infinity,
+                    }}
+                    style={{
+                      display: "inline-block",
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: "#4A7C3F",
+                      boxShadow: "0 0 0 3px rgba(74,124,63,0.18)",
+                    }}
+                  />
+                  Live
+                </span>
+              ) : null}
+            </div>
+
+            <h3
+              className="type-h3"
+              style={{
+                marginBottom: isHero ? 32 : 20,
+                color: "var(--color-ink)",
+                letterSpacing:
+                  hovered && !reduce ? "-0.02em" : "-0.015em",
+                transition: `letter-spacing 300ms cubic-bezier(${ease.outQuart.join(",")}), color 300ms cubic-bezier(${ease.outQuart.join(",")})`,
+              }}
+            >
+              {card.name}
+            </h3>
+
+            <p
+              style={{
+                fontSize: isHero ? 17 : 15,
+                lineHeight: 1.55,
+                color: "var(--color-ink-soft)",
+                maxWidth: isHero ? 600 : 420,
+                marginBottom: isHero ? 40 : 24,
+              }}
+            >
+              {card.kicker}
+            </p>
           </div>
-          <span
-            className="work-arrow"
+
+          <div
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: isHero ? 28 : 22,
-              color: "var(--color-ink)",
-              transition: "transform 0.4s ease",
-              display: "inline-block",
+              position: "relative",
+              zIndex: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              gap: 24,
+              flexWrap: "wrap",
             }}
-            aria-hidden
           >
-            →
-          </span>
-        </div>
-      </Link>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {card.tags.map((t) => (
+                <span
+                  key={t}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: 999,
+                    fontFamily: "var(--font-body)",
+                    fontSize: 12,
+                    color:
+                      hovered && !reduce
+                        ? "var(--color-ink-soft)"
+                        : "var(--color-muted)",
+                    border: `1px solid ${
+                      hovered && !reduce
+                        ? "rgba(20,20,18,0.28)"
+                        : "rgba(20,20,18,0.14)"
+                    }`,
+                    background: "transparent",
+                    fontWeight: hovered && !reduce ? 500 : 400,
+                    transition: `color 300ms cubic-bezier(${ease.outQuart.join(",")}), border-color 300ms cubic-bezier(${ease.outQuart.join(",")}), font-weight 300ms cubic-bezier(${ease.outQuart.join(",")})`,
+                  }}
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+            <motion.span
+              variants={arrowVariants}
+              className="work-arrow"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: isHero ? 28 : 22,
+                color: "var(--color-ink)",
+                display: "inline-block",
+              }}
+              aria-hidden
+            >
+              →
+            </motion.span>
+          </div>
+        </Link>
+      </motion.div>
     </motion.div>
   );
 }
