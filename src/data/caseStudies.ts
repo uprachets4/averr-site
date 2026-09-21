@@ -60,12 +60,12 @@ export const caseStudies: Record<string, CaseStudy> = {
     year: "2025 — ongoing",
     hero: {
       eyebrow: "//_CASE_STUDY",
-      thesis:
-        "A one-man renovation crew, a zero-budget mandate, and a realtor referral engine that runs itself.",
+      thesis: "A realtor referral engine that runs itself.",
       thesisPill: "referral engine",
       kicker:
-        "Turning a solo operator into a market presence that punches three brokerages above its weight.",
+        "One-man renovation crew, zero ad budget, turned into a market presence that punches three brokerages above its weight.",
     },
+    heroImage: "/work/cgwalls/hero.jpg",
     context: [
       "CG Walls & Floors is Max Francis's renovation business — drywall, paint, flooring, framing, trim, and door-and-window install. Ontario-registered, fully insured, one person in the truck.",
       "The mandate was blunt: no ad budget, no headcount, no time to burn. Growth had to come from realtor referrals — the single highest-leverage channel in the trade, where one relationship compounds into ten jobs a year. But realtors get pitched by every contractor in the GTA. The work was to make CG feel like the obvious call.",
@@ -105,6 +105,11 @@ export const caseStudies: Record<string, CaseStudy> = {
           "The map isn't a marketing asset — it's an operations tool",
         body: "Built for the driver behind the wheel, not the visitor scrolling a homepage.",
       },
+    ],
+    gallery: [
+      { src: "/work/cgwalls/gallery.jpg", caption: "Finished work" },
+      { src: "/work/cgwalls/gallery2.jpg", caption: "Interior detail" },
+      { src: "/work/cgwalls/testimonials.jpg", caption: "Client trust bar" },
     ],
     outcome: {
       headline: "A premium presence, built for one-person growth.",
@@ -213,12 +218,12 @@ export const caseStudies: Record<string, CaseStudy> = {
     year: "2025 — ongoing",
     hero: {
       eyebrow: "//_CASE_STUDY",
-      thesis:
-        "Every job board watched, every resume tailored, every application tracked — in one place, built for craft, not volume.",
+      thesis: "A job search built for craft, not volume.",
       thesisPill: "craft, not volume",
       kicker:
-        "Building the tool job-seekers wish existed — the one that treats every application as a portfolio shot, not a lottery ticket.",
+        "Every job board watched, every resume tailored, every application tracked — for the job-seeker who treats every application as a portfolio shot, not a lottery ticket.",
     },
+    heroImage: "/work/sift/04-pipeline.jpg",
     context: [
       "The job-search market is over-served on volume and under-served on precision. Every product built in the last two years is some flavor of auto-apply — mass-blast tools optimizing for applications submitted per hour. But every job-seeker who's been on the market knows the truth: volume doesn't get you interviews, fit does. Two hundred templated applications produce the same interview rate as twenty mediocre ones. The market is loud about the wrong metric.",
       "The other half of the problem is fragmentation. YC's job board lives at ycombinator.com/jobs. LinkedIn's ATS scoring is a paid feature buried three levels deep. Google Jobs surfaces listings but doesn't score them. Wellfound is startup-only. Every serious job-seeker keeps four to six tabs open, tracks applications in a Notion doc, and rewrites their resume per job at 11pm after their day job — badly.",
@@ -228,10 +233,12 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         pillar: "Design",
         body: "Dark-first UI, sodium amber (#F2A93C) as the primary accent, Instrument Serif in the display, Geist for the interface, Geist Mono where numbers or identifiers appear. Deliberate departure from the blue-and-white productivity-SaaS default. shadcn/ui as primitive scaffolding, not as identity — every card, table, and modal styled to SIFT's own system. Dark-first was a call about the actual user: job-seekers work on this at night, on their own time.",
+        image: "/work/sift/02-tailor-resume.jpg",
       },
       {
         pillar: "Automate",
         body: "The entire product is automation. Cron-driven daily sync across every connected job source. AI scoring on each new posting against the user's confirmed resume, running post-response via Vercel's after() API so the UI never waits. AI resume rewriting per job to close the ATS keyword gap. AI cover letter generation. The user's job is to review, not to grind.",
+        image: "/work/sift/07-sources.jpg",
       },
     ],
     inventory: [
@@ -247,14 +254,17 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         title: "Sodium amber on dark",
         body: "#F2A93C on a four-step dark surface ladder. The productivity-SaaS default is either blue-on-white or clinical-white minimalism. Sodium amber is warmer, more editorial — reads as a tool built by someone who cares about how a screen feels at midnight, not just what it does at noon.",
+        image: "/work/sift/05-outreach.jpg",
       },
       {
         title: "The sync engine's concurrency model",
         body: "Paid job sources run sequentially — because a credit race condition, where two concurrent fetches both passed the credit check before either incremented usage, was silently double-charging on first sync. Free sources run parallelized at concurrency 4. The fix came from a bug and became architecture.",
+        image: "/work/sift/06-funnel.jpg",
       },
       {
         title: "Craft over volume as a positioning bet",
         body: "SIFT explicitly isn't an auto-apply product, and won't be. It's built for the job-seeker willing to spend 30 focused minutes on one application instead of blasting 200. The pricing, the copy, the entire UX assumes the user is treating their job search as a portfolio of shots, not a lottery of tickets.",
+        image: "/work/sift/03-cover-letter.jpg",
       },
     ],
     outcome: {
@@ -282,11 +292,10 @@ export const caseStudies: Record<string, CaseStudy> = {
     year: "2025 — ongoing",
     hero: {
       eyebrow: "//_CASE_STUDY",
-      thesis:
-        "LinkedIn stops being a blank-page obligation and starts being a managed system — deciding what to say, drafting it in your voice, moving it through review, and learning from what happens after publication.",
+      thesis: "LinkedIn presence as a managed system.",
       thesisPill: "managed system",
       kicker:
-        "Turning founder thought leadership into an editorial pipeline that remembers what it's already said — instead of a text generator with a calendar attached.",
+        "Founder thought leadership as an editorial pipeline — deciding what to say, drafting in the founder's voice, moving it through review, and learning from what happens after. Not a text generator with a calendar attached.",
     },
     context: [
       "Most LinkedIn tools treat the problem as content production. Give the model a topic, generate five posts, schedule them, repeat. That solves typing. It does not solve positioning.",
@@ -297,14 +306,17 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         pillar: "Design",
         body: "CadenceStack required a product system, not a prompt box. The interface makes editorial state visible: what is only an idea, what needs work, what is ready, what has been published, and what the system recommends next. The composer, Structure Guide, review states, Presence Score, personalized roadmap, onboarding, performance views, and founder controls all sit as first-class product surfaces — not settings buried in a sidebar.",
+        image: "/work/cadencestack/pipeline.jpg",
       },
       {
         pillar: "Automate",
         body: "The drafting path sits behind server-side gates, authentication, quotas, validation, timeouts, telemetry, and fail-closed provider handling. Supabase holds the persistent product state. The productized path is provider-neutral, with a direct OpenAI adapter live in the application and Claude used in the earlier operator-side research workflow. Trigger.dev and ClickUp move operator work through research, drafting, visual production, and completion.",
+        image: "/work/cadencestack/analytics.jpg",
       },
       {
         pillar: "Grow",
         body: "CadenceStack encodes an actual LinkedIn operating model — the 7S Methodology, five editorial pillars, hook patterns, content rotation, publishing states, and a performance-learning loop. The objective is not to publish more often at any cost. It is to build a recognizable body of work without repeating the same point until it becomes wallpaper.",
+        image: "/work/cadencestack/pillars.jpg",
       },
     ],
     inventory: [
