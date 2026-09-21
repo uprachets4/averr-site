@@ -78,7 +78,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         pillar: "Design",
         body: "A single-page site that opens with the work, not the company. Cormorant Garamond display, copper accent — deliberately positioned to read like a boutique interior firm, not a Kijiji handyman.",
-        image: "/work/cgwalls/hero.jpg",
+        image: "/work/cgwalls/testimonials.jpg",
       },
       {
         pillar: "Automate",
