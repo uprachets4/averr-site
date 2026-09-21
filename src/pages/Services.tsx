@@ -15,7 +15,7 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { ease, spring } from "../lib/motion";
+import { duration, ease, spring } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import FinalCTA from "../components/FinalCTA";
 import PillHl from "../components/PillHl";
@@ -26,6 +26,8 @@ import PillHl from "../components/PillHl";
    short-form deliverables per Session 7a spec.
    ═══════════════════════════════════════════════════════════════ */
 
+type ServiceChip = { label: string; tooltip: string };
+
 type Pillar = {
   id: "design" | "automate" | "grow";
   serviceLabel: string; // "SERVICE 01"
@@ -34,6 +36,7 @@ type Pillar = {
   included: string[];
   investment: string;
   timeline: string;
+  chips: ServiceChip[];
 };
 
 const PILLARS: Pillar[] = [
@@ -52,6 +55,21 @@ const PILLARS: Pillar[] = [
     ],
     investment: "$3,500 – $5,000 CAD",
     timeline: "2 – 3 weeks",
+    chips: [
+      { label: "Marketing sites", tooltip: "Framer, Next.js, Astro" },
+      {
+        label: "SaaS product design",
+        tooltip: "Dashboards, admin panels, onboarding flows",
+      },
+      {
+        label: "Dashboards & UI",
+        tooltip: "Data-dense interfaces, real-time views",
+      },
+      {
+        label: "Design systems",
+        tooltip: "Tokens, primitives, component libraries",
+      },
+    ],
   },
   {
     id: "automate",
@@ -68,6 +86,24 @@ const PILLARS: Pillar[] = [
     ],
     investment: "$2,500 – $4,000 CAD",
     timeline: "1 – 2 weeks",
+    chips: [
+      {
+        label: "AI agents",
+        tooltip: "Lead qualification, research, intake, sales enablement",
+      },
+      {
+        label: "Workflow automation",
+        tooltip: "Trigger.dev, n8n, Zapier, Make",
+      },
+      {
+        label: "CRM & email integration",
+        tooltip: "HubSpot, Salesforce, Notion, Attio, Airtable",
+      },
+      {
+        label: "Handoff documentation",
+        tooltip: "Loom + written runbook per system",
+      },
+    ],
   },
   {
     id: "grow",
@@ -83,6 +119,21 @@ const PILLARS: Pillar[] = [
     ],
     investment: "Retainer from $1,500 CAD/month",
     timeline: "Ongoing",
+    chips: [
+      {
+        label: "Social & organic content",
+        tooltip: "LinkedIn, YouTube, X, long-form",
+      },
+      { label: "Paid ads", tooltip: "Google, Meta, LinkedIn, LSA" },
+      {
+        label: "Landing pages",
+        tooltip: "Built for the ad, not repurposed",
+      },
+      {
+        label: "Attribution & reporting",
+        tooltip: "Monthly, source-attributed, honest",
+      },
+    ],
   },
 ];
 
@@ -298,6 +349,7 @@ function PillarSection({
   sticky: boolean;
   registerRef: (el: HTMLDivElement | null) => void;
 }) {
+  const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -419,15 +471,19 @@ function PillarSection({
             {pillar.serviceLabel}
           </div>
           <motion.h2
-            className="type-display-l"
+            className="type-display-xl"
             style={{
               color: "var(--color-ink)",
-              marginBottom: 40,
+              marginBottom: 32,
               y: headlineY,
             }}
           >
             {pillar.name}
           </motion.h2>
+
+          <div style={{ marginBottom: 32 }}>
+            <ServiceChips chips={pillar.chips} reduce={reduce ?? false} />
+          </div>
 
           <div
             style={{
@@ -471,12 +527,12 @@ function PillarSection({
                   return (
                     <li
                       key={item}
-                      className="type-body"
+                      className="type-body-lg"
                       style={{
                         display: "grid",
-                        gridTemplateColumns: "24px 1fr",
-                        gap: 12,
-                        padding: "12px 0",
+                        gridTemplateColumns: "28px 1fr",
+                        gap: 14,
+                        padding: "14px 0",
                         borderTop:
                           i === 0
                             ? "none"
@@ -485,12 +541,10 @@ function PillarSection({
                       }}
                     >
                       <span
+                        className="type-eyebrow"
                         style={{
-                          fontFamily: "var(--font-mono)",
-                          fontSize: 11,
-                          letterSpacing: "0.12em",
-                          color: "var(--color-muted-2)",
-                          paddingTop: 4,
+                          color: "#B18544",
+                          paddingTop: 6,
                         }}
                       >
                         {String(i + 1).padStart(2, "0")}
@@ -533,6 +587,148 @@ function PillarSection({
         </div>
       </div>
     </section>
+  );
+}
+
+/* ── service scope chips (persistent across all stages) ─────── */
+
+function ServiceChips({
+  chips,
+  reduce,
+}: {
+  chips: ServiceChip[];
+  reduce: boolean;
+}) {
+  const [hasFinePointer, setHasFinePointer] = useState(false);
+  useEffect(function detectPointer() {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    setHasFinePointer(mq.matches);
+    function onChange(e: MediaQueryListEvent) {
+      setHasFinePointer(e.matches);
+    }
+    mq.addEventListener("change", onChange);
+    return function cleanup() {
+      mq.removeEventListener("change", onChange);
+    };
+  }, []);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 8,
+      }}
+    >
+      {chips.map(function renderChip(c, i) {
+        return (
+          <ChipButton
+            key={c.label}
+            index={i}
+            chip={c}
+            reduce={reduce}
+            enableTooltip={hasFinePointer}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+function ChipButton({
+  index,
+  chip,
+  reduce,
+  enableTooltip,
+}: {
+  index: number;
+  chip: ServiceChip;
+  reduce: boolean;
+  enableTooltip: boolean;
+}) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-30% 0px" }}
+      transition={{
+        duration: reduce ? 0.001 : 0.4,
+        ease: ease.outQuart,
+        delay: reduce ? 0 : 0.6 + index * 0.08,
+      }}
+      onHoverStart={function h() {
+        setHovered(true);
+      }}
+      onHoverEnd={function h() {
+        setHovered(false);
+      }}
+      className="type-eyebrow"
+      style={{
+        position: "relative",
+        padding: "8px 14px",
+        borderRadius: 100,
+        border: hovered
+          ? "1px solid var(--color-ink)"
+          : "1px solid rgba(20,20,18,0.6)",
+        background: hovered ? "var(--color-ink)" : "transparent",
+        color: hovered ? "var(--color-parch)" : "var(--color-ink)",
+        cursor: enableTooltip ? "help" : "default",
+        transform: hovered && !reduce ? "translateY(-2px)" : "translateY(0)",
+        transitionProperty: "background-color, border-color, color, transform",
+        transitionDuration: `${duration.fast * 1000}ms`,
+        transitionTimingFunction: `cubic-bezier(${ease.outQuart.join(",")})`,
+      }}
+    >
+      {chip.label}
+      {enableTooltip && hovered ? (
+        <ChipTooltip text={chip.tooltip} />
+      ) : null}
+    </motion.div>
+  );
+}
+
+function ChipTooltip({ text }: { text: string }) {
+  return (
+    <motion.div
+      role="tooltip"
+      initial={{ opacity: 0, y: -4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: duration.fast, ease: ease.outQuart }}
+      className="type-small"
+      style={{
+        position: "absolute",
+        top: "calc(100% + 8px)",
+        left: "50%",
+        transform: "translateX(-50%)",
+        background: "var(--color-bg)",
+        color: "var(--color-ink)",
+        border: "1px solid rgba(20,20,18,0.18)",
+        borderRadius: 6,
+        padding: "8px 12px",
+        whiteSpace: "nowrap",
+        boxShadow: "0 8px 24px rgba(20,20,18,0.10)",
+        pointerEvents: "none",
+        zIndex: 10,
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: -5,
+          left: "50%",
+          width: 8,
+          height: 8,
+          background: "var(--color-bg)",
+          borderLeft: "1px solid rgba(20,20,18,0.18)",
+          borderTop: "1px solid rgba(20,20,18,0.18)",
+          transform: "translateX(-50%) rotate(45deg)",
+        }}
+      />
+      {text}
+    </motion.div>
   );
 }
 
@@ -649,7 +845,7 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
             ease: ease.outQuart,
             delay: reduce ? 0 : 0.05,
           }}
-          className="type-display-l"
+          className="type-display-xl"
           style={{ color: "var(--color-ink)", marginBottom: 32 }}
         >
           {pillar.name}
@@ -665,10 +861,14 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
             delay: reduce ? 0 : 0.1,
           }}
           className="type-body-lg"
-          style={{ color: "var(--color-ink)", marginBottom: 48 }}
+          style={{ color: "var(--color-ink)", marginBottom: 32 }}
         >
           {pillar.intro}
         </motion.p>
+
+        <div style={{ marginBottom: 48 }}>
+          <ServiceChips chips={pillar.chips} reduce={reduce ?? false} />
+        </div>
 
         <div style={{ marginBottom: 48 }}>
           <div
@@ -685,12 +885,12 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
               return (
                 <li
                   key={item}
-                  className="type-body"
+                  className="type-body-lg"
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "24px 1fr",
-                    gap: 12,
-                    padding: "14px 0",
+                    gridTemplateColumns: "28px 1fr",
+                    gap: 14,
+                    padding: "16px 0",
                     borderTop:
                       i === 0
                         ? "none"
@@ -699,12 +899,10 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
                   }}
                 >
                   <span
+                    className="type-eyebrow"
                     style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 11,
-                      letterSpacing: "0.12em",
-                      color: "var(--color-muted-2)",
-                      paddingTop: 4,
+                      color: "#B18544",
+                      paddingTop: 6,
                     }}
                   >
                     {String(i + 1).padStart(2, "0")}
@@ -909,6 +1107,10 @@ function useCursorParallax(reduce: boolean, magnitude = 12) {
 
 const MOOD_CARDS = [
   {
+    src: "/work/cgwalls/hero.jpg",
+    label: "CG Walls & Floors",
+  },
+  {
     src: "/work/capitalcommand/01-overview.jpg",
     label: "CapitalCommand",
   },
@@ -929,7 +1131,12 @@ function DesignMoodBoard({
   scrollYProgress: MotionValue<number>;
   reduce: boolean;
 }) {
-  const parallax = useCursorParallax(reduce, 10);
+  const parallax = useCursorParallax(reduce, 16);
+  const scrollHintOpacity = useTransform(
+    scrollYProgress,
+    [0.25, 0.35],
+    [1, 0]
+  );
 
   return (
     <div
@@ -939,20 +1146,20 @@ function DesignMoodBoard({
       style={{
         position: "relative",
         width: "100%",
-        maxWidth: 640,
+        maxWidth: 720,
         aspectRatio: "1 / 1",
         overflow: "hidden",
       }}
     >
-      {/* Warm sand radial wash */}
+      {/* Warm sand radial wash — wider + brighter */}
       <div
         aria-hidden
         style={{
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 80% 70% at 50% 50%, rgba(232,225,208,0.55), transparent 70%)",
-          opacity: 0.6,
+            "radial-gradient(ellipse 110% 90% at 50% 50%, rgba(232,225,208,0.75), transparent 80%)",
+          opacity: 0.85,
           pointerEvents: "none",
         }}
       />
@@ -1014,9 +1221,75 @@ function DesignMoodBoard({
         aria-hidden
         style={{ opacity: 0.04, pointerEvents: "none" }}
       />
+
+      <ScrollHint opacity={scrollHintOpacity} reduce={reduce} />
     </div>
   );
 }
+
+/* ── shared scroll hint (below ambient) ─────────────────────── */
+
+function ScrollHint({
+  opacity,
+  reduce,
+}: {
+  opacity: MotionValue<number>;
+  reduce: boolean;
+}) {
+  return (
+    <motion.div
+      aria-hidden
+      style={{
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 16,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 10,
+        opacity,
+        pointerEvents: "none",
+      }}
+    >
+      <div
+        className="type-eyebrow"
+        style={{ color: "var(--color-ink-soft)" }}
+      >
+        Scroll to explore
+      </div>
+      <motion.div
+        animate={reduce ? undefined : { y: [0, 4, 0] }}
+        transition={{
+          duration: 1.6,
+          repeat: Infinity,
+          ease: ease.inOut,
+        }}
+        style={{
+          width: 1,
+          height: 24,
+          background: "var(--color-ink-soft)",
+        }}
+      />
+    </motion.div>
+  );
+}
+
+const MOOD_START_ROTS = [-7, -5, 5, 7];
+const MOOD_END_ROTS = [-1.5, -0.5, 0.5, 1.5];
+const MOOD_START_OFFSETS: Array<[number, number]> = [
+  [-140, -100],
+  [-60, -40],
+  [60, 40],
+  [140, 100],
+];
+const MOOD_END_OFFSETS: Array<[number, number]> = [
+  [-40, -25],
+  [-15, -10],
+  [15, 10],
+  [40, 25],
+];
+const MOOD_PARALLAX_WEIGHTS = [0.3, 0.6, 0.85, 1.0];
 
 function MoodCard({
   index,
@@ -1035,13 +1308,10 @@ function MoodCard({
   parallaxY: MotionValue<number>;
   reduce: boolean;
 }) {
-  // Start scattered, migrate to aligned grid formation
-  const startRot = [-4, 3, -4][index];
-  const endRot = [-1, 0, 1][index];
-  const startOffsetX = [-90, 0, 90][index];
-  const startOffsetY = [-70, 0, 70][index];
-  const endOffsetX = [-50, 0, 50][index];
-  const endOffsetY = [-40, 0, 40][index];
+  const startRot = MOOD_START_ROTS[index];
+  const endRot = MOOD_END_ROTS[index];
+  const [startOffsetX, startOffsetY] = MOOD_START_OFFSETS[index];
+  const [endOffsetX, endOffsetY] = MOOD_END_OFFSETS[index];
 
   const rot = useTransform(scrollYProgress, [0, 1], [startRot, endRot]);
   const scrollX = useTransform(
@@ -1054,8 +1324,7 @@ function MoodCard({
     [0, 1],
     [startOffsetY, endOffsetY]
   );
-  // Card-index-based parallax weighting (foreground stronger)
-  const parallaxWeight = [0.4, 1, 0.7][index];
+  const parallaxWeight = MOOD_PARALLAX_WEIGHTS[index];
   const totalX = useTransform(
     [scrollX, parallaxX] as MotionValue<number>[],
     function combine([a, b]) {
@@ -1069,7 +1338,8 @@ function MoodCard({
     }
   );
 
-  const zIndex = index === 1 ? 3 : index === 0 ? 2 : 1;
+  // Higher index = more toward foreground
+  const zIndex = index + 1;
 
   return (
     <motion.figure
@@ -1077,15 +1347,15 @@ function MoodCard({
         position: "absolute",
         top: "50%",
         left: "50%",
-        width: 320,
-        height: 220,
+        width: 560,
+        height: 400,
         margin: 0,
-        marginTop: -110,
-        marginLeft: -160,
-        borderRadius: 8,
+        marginTop: -200,
+        marginLeft: -280,
+        borderRadius: 10,
         overflow: "hidden",
         background: "var(--color-bg)",
-        boxShadow: "0 12px 36px rgba(20,20,18,0.14)",
+        boxShadow: "0 18px 48px rgba(20,20,18,0.18)",
         border: "1px solid rgba(20,20,18,0.08)",
         rotate: reduce ? endRot : rot,
         x: totalX,
@@ -1155,12 +1425,17 @@ function AutomateWorkflow({
   scrollYProgress: MotionValue<number>;
   reduce: boolean;
 }) {
-  const parallax = useCursorParallax(reduce, 10);
+  const parallax = useCursorParallax(reduce, 16);
   // Fade in caption at stage 3
   const captionOpacity = useTransform(
     scrollYProgress,
     [0.68, 0.78],
     [0, 1]
+  );
+  const scrollHintOpacity = useTransform(
+    scrollYProgress,
+    [0.25, 0.35],
+    [1, 0]
   );
 
   return (
@@ -1171,7 +1446,7 @@ function AutomateWorkflow({
       style={{
         position: "relative",
         width: "100%",
-        maxWidth: 640,
+        maxWidth: 720,
         aspectRatio: "1 / 1",
         overflow: "hidden",
       }}
@@ -1201,35 +1476,44 @@ function AutomateWorkflow({
         }}
         aria-hidden
       >
-        {/* Edge paths (definitions for pulses) */}
+        {/* Edge paths (definitions for pulses) + node glow filter */}
         <defs>
           {WORKFLOW_EDGES.map(function definePath(e, i) {
             return <path key={i} id={`edge-${i}`} d={e.path} fill="none" />;
           })}
+          <filter id="node-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feFlood floodColor="var(--color-parch)" floodOpacity="0.3" />
+            <feComposite in2="blur" operator="in" result="glow" />
+            <feMerge>
+              <feMergeNode in="glow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
-        {/* Rendered edge strokes */}
+        {/* Rendered edge strokes — thicker + higher opacity */}
         {WORKFLOW_EDGES.map(function drawEdge(e, i) {
           return (
             <path
               key={`s-${i}`}
               d={e.path}
               stroke="var(--color-ink-soft)"
-              strokeOpacity="0.4"
-              strokeWidth="1.5"
+              strokeOpacity="0.55"
+              strokeWidth="2"
               fill="none"
               strokeLinecap="round"
             />
           );
         })}
 
-        {/* Data pulses along edges — one every 3s, staggered */}
+        {/* Data pulses along edges — 6px, staggered */}
         {!reduce
           ? WORKFLOW_EDGES.map(function pulseFor(_e, i) {
               return (
                 <circle
                   key={`p-${i}`}
-                  r="4"
+                  r="6"
                   fill="var(--color-ink)"
                 >
                   <animateMotion
@@ -1244,7 +1528,7 @@ function AutomateWorkflow({
             })
           : null}
 
-        {/* Nodes with scroll-driven activation */}
+        {/* Nodes with scroll-driven activation — larger + glow */}
         {WORKFLOW_NODES.map(function drawNode(n, i) {
           return (
             <WorkflowNode
@@ -1278,7 +1562,7 @@ function AutomateWorkflow({
           position: "absolute",
           left: 0,
           right: 0,
-          bottom: 12,
+          bottom: 60,
           textAlign: "center",
           color: "var(--color-ink-soft)",
           opacity: captionOpacity,
@@ -1287,6 +1571,8 @@ function AutomateWorkflow({
       >
         System average: 12h/week returned
       </motion.div>
+
+      <ScrollHint opacity={scrollHintOpacity} reduce={reduce} />
     </div>
   );
 }
@@ -1304,22 +1590,38 @@ function WorkflowNode({
   const opacity = useTransform(
     scrollYProgress,
     [activateAt - 0.05, activateAt + 0.05],
-    [0.25, 1]
+    [0.3, 1]
   );
   const strokeWidth = useTransform(
     scrollYProgress,
     [activateAt - 0.05, activateAt + 0.05],
-    [1, 2.5]
+    [1.5, 3]
+  );
+  const filterActive = useTransform(
+    scrollYProgress,
+    [activateAt - 0.05, activateAt + 0.05, 0.99, 1],
+    [0, 1, 1, 1]
   );
   return (
-    <motion.circle
-      cx={node.x}
-      cy={node.y}
-      r={8}
-      fill="var(--color-bg)"
-      stroke="var(--color-ink)"
-      style={{ opacity, strokeWidth }}
-    />
+    <>
+      {/* Glow ring (visible once activated) */}
+      <motion.circle
+        cx={node.x}
+        cy={node.y}
+        r={20}
+        fill="var(--color-parch)"
+        style={{ opacity: filterActive, mixBlendMode: "screen" }}
+        filter="url(#node-glow)"
+      />
+      <motion.circle
+        cx={node.x}
+        cy={node.y}
+        r={20}
+        fill="var(--color-bg)"
+        stroke="var(--color-ink)"
+        style={{ opacity, strokeWidth }}
+      />
+    </>
   );
 }
 
@@ -1347,12 +1649,16 @@ function WorkflowLabel({
   const topPct = (node.y / 400) * 100;
   return (
     <motion.div
-      className="type-eyebrow"
       style={{
         position: "absolute",
         left: `${leftPct}%`,
         top: `${topPct}%`,
-        transform: "translate(-50%, 18px)",
+        transform: "translate(-50%, 32px)",
+        fontFamily: "var(--font-mono)",
+        fontSize: 14,
+        fontWeight: 500,
+        letterSpacing: "0.16em",
+        textTransform: "uppercase",
         color: "var(--color-ink)",
         opacity,
         x: parallaxX,
@@ -1407,7 +1713,7 @@ function GrowDashboard({
   scrollYProgress: MotionValue<number>;
   reduce: boolean;
 }) {
-  const parallax = useCursorParallax(reduce, 8);
+  const parallax = useCursorParallax(reduce, 12);
   const captionOpacity = useTransform(
     scrollYProgress,
     [0.68, 0.78],
@@ -1415,6 +1721,11 @@ function GrowDashboard({
   );
   const trendDraw = useTransform(scrollYProgress, [0.2, 0.9], [0, 1]);
   const trendStrokeDashoffset = useTransform(trendDraw, (v) => 1 - v);
+  const scrollHintOpacity = useTransform(
+    scrollYProgress,
+    [0.25, 0.35],
+    [1, 0]
+  );
 
   return (
     <div
@@ -1424,7 +1735,7 @@ function GrowDashboard({
       style={{
         position: "relative",
         width: "100%",
-        maxWidth: 640,
+        maxWidth: 720,
         aspectRatio: "1 / 1",
         overflow: "hidden",
       }}
@@ -1436,7 +1747,7 @@ function GrowDashboard({
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 80% 70% at 50% 40%, rgba(200,175,120,0.18), transparent 70%)",
+            "radial-gradient(ellipse 90% 80% at 50% 40%, rgba(200,175,120,0.24), transparent 75%)",
           pointerEvents: "none",
         }}
       />
@@ -1446,8 +1757,8 @@ function GrowDashboard({
           position: "relative",
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: 12,
-          padding: 24,
+          gap: 18,
+          padding: 32,
           x: parallax.x,
           y: parallax.y,
         }}
@@ -1464,27 +1775,24 @@ function GrowDashboard({
         })}
 
         {/* Trend line under the grid */}
-        <div style={{ gridColumn: "1 / -1", position: "relative", height: 90 }}>
+        <div style={{ gridColumn: "1 / -1", position: "relative", height: 110 }}>
           <svg
-            viewBox="0 0 400 90"
+            viewBox="0 0 400 110"
             preserveAspectRatio="none"
             style={{ width: "100%", height: "100%", display: "block" }}
             aria-hidden
           >
             <defs>
-              <linearGradient id="trend-fill" x1="0" y1="0" x2="0" y2="90">
-                <stop
-                  offset="0%"
-                  stopColor="rgba(200,175,120,0.35)"
-                />
+              <linearGradient id="trend-fill" x1="0" y1="0" x2="0" y2="110">
+                <stop offset="0%" stopColor="rgba(200,175,120,0.55)" />
                 <stop offset="100%" stopColor="rgba(200,175,120,0)" />
               </linearGradient>
             </defs>
             <motion.path
-              d="M 0 60 Q 80 55 140 40 T 260 24 T 400 8"
+              d="M 0 78 Q 80 68 140 48 T 260 26 T 400 8"
               fill="none"
               stroke="var(--color-ink)"
-              strokeWidth="2"
+              strokeWidth="2.5"
               strokeLinecap="round"
               pathLength={1}
               strokeDasharray={1}
@@ -1493,7 +1801,7 @@ function GrowDashboard({
               }}
             />
             <motion.path
-              d="M 0 60 Q 80 55 140 40 T 260 24 T 400 8 L 400 90 L 0 90 Z"
+              d="M 0 78 Q 80 68 140 48 T 260 26 T 400 8 L 400 110 L 0 110 Z"
               fill="url(#trend-fill)"
               style={{ opacity: trendDraw }}
             />
@@ -1508,7 +1816,7 @@ function GrowDashboard({
           position: "absolute",
           left: 0,
           right: 0,
-          bottom: 12,
+          bottom: 60,
           textAlign: "center",
           color: "var(--color-ink-soft)",
           opacity: captionOpacity,
@@ -1517,6 +1825,8 @@ function GrowDashboard({
       >
         3 months in — compounding
       </motion.div>
+
+      <ScrollHint opacity={scrollHintOpacity} reduce={reduce} />
     </div>
   );
 }
@@ -1557,26 +1867,38 @@ function MetricCard({
     [startAt, startAt + 0.08],
     [0.3, 1]
   );
+  // Warm ember active tint as trend line passes underneath — activates while
+  // this card's count is still climbing, then dims once the trend has swept past.
+  const borderTint = useTransform(
+    scrollYProgress,
+    [startAt, startAt + 0.08, endAt, endAt + 0.05],
+    [
+      "1px solid rgba(20,20,18,0.08)",
+      "1px solid rgba(200,175,120,0.7)",
+      "1px solid rgba(200,175,120,0.7)",
+      "1px solid rgba(20,20,18,0.14)",
+    ]
+  );
 
   return (
     <motion.div
       style={{
         background: "var(--color-bg)",
-        border: "1px solid rgba(20,20,18,0.08)",
-        borderRadius: 8,
-        padding: "18px 20px",
+        border: borderTint,
+        borderRadius: 10,
+        padding: "26px 28px",
         opacity,
-        boxShadow: "0 4px 14px rgba(20,20,18,0.04)",
+        boxShadow: "0 6px 18px rgba(20,20,18,0.05)",
       }}
     >
       <div
         className="type-eyebrow"
-        style={{ color: "var(--color-muted)", marginBottom: 10 }}
+        style={{ color: "var(--color-muted)", marginBottom: 14 }}
       >
         {metric.label}
       </div>
       <div
-        className="type-display-l"
+        className="type-display-xl"
         style={{
           color: "var(--color-ink)",
           fontVariantNumeric: "tabular-nums",
@@ -1589,7 +1911,7 @@ function MetricCard({
         className="type-small"
         style={{
           color: "#B18544",
-          marginTop: 8,
+          marginTop: 12,
           fontFamily: "var(--font-mono)",
         }}
       >
