@@ -77,18 +77,18 @@ export const caseStudies: Record<string, CaseStudy> = {
     approach: [
       {
         pillar: "Design",
-        layout: "text-forward",
         body: "A single-page site that opens with the work, not the company. Cormorant Garamond display, copper accent — deliberately positioned to read like a boutique interior firm, not a Kijiji handyman.",
+        image: "/work/cgwalls/hero.jpg",
       },
       {
         pillar: "Automate",
-        layout: "text-forward",
         body: "A realtor activity monitor that surfaces which properties are about to hit market and need pre-listing touch-ups, plus an outreach system that drafts personalized emails per realtor, per listing.",
+        image: "/work/cgwalls/gallery.jpg",
       },
       {
         pillar: "Grow",
-        layout: "text-forward",
         body: 'A Durham Region door-to-door playbook covering 29 neighbourhoods tier-ranked by home era and density, Google Business Profile optimization, and a single repeatable "free estimate" CTA baked into every touchpoint.',
+        image: "/work/cgwalls/gallery2.jpg",
       },
     ],
     inventory: [
@@ -99,11 +99,6 @@ export const caseStudies: Record<string, CaseStudy> = {
       "Zero-budget channel stack: Kijiji monitoring, Facebook Groups, building-permit data, NextDoor",
     ],
     signatures: [],
-    gallery: [
-      { src: "/work/cgwalls/gallery.jpg", caption: "Finished work" },
-      { src: "/work/cgwalls/gallery2.jpg", caption: "Interior detail" },
-      { src: "/work/cgwalls/testimonials.jpg", caption: "Client trust bar" },
-    ],
     outcome: {
       headline: "A premium presence, built for one-person growth.",
       body: "The business now has a repeatable outreach rhythm one person can run between jobs, a website that reads at the same level as firms three tiers up, and referral infrastructure aimed at the trade's highest-leverage segment. Realtor outreach that was once ad hoc is now templated, targeted, and personalized at scale — without added headcount.",

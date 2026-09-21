@@ -16,6 +16,9 @@ type Item = { src: string; caption: string };
 const PEEK_PCT = 12;
 const DRAG_DISTANCE_THRESHOLD = 0.25;
 const DRAG_VELOCITY_THRESHOLD = 500;
+const AUTOPLAY_INTERVAL_MS = 5000;
+const AUTOPLAY_STARTUP_DELAY_MS = 2000;
+const AUTOPLAY_RESUME_DELAY_MS = 4000;
 
 export default function Gallery({
   items,
@@ -26,9 +29,13 @@ export default function Gallery({
 }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
+  const [autoplayEnabled, setAutoplayEnabled] = useState(false);
   const frameRef = useRef<HTMLDivElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const inView = useInView(frameRef, { margin: "-25% 0px -25% 0px" });
+  const startupTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasStartedRef = useRef(false);
 
   const clampedActive = Math.min(active, items.length - 1);
 
@@ -43,30 +50,103 @@ export default function Gallery({
   const prev = useCallback(() => goTo(clampedActive - 1), [clampedActive, goTo]);
   const next = useCallback(() => goTo(clampedActive + 1), [clampedActive, goTo]);
 
+  const pauseAutoplay = useCallback(() => {
+    setAutoplayEnabled(false);
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current);
+      resumeTimeoutRef.current = null;
+    }
+  }, []);
+
+  const scheduleResume = useCallback(() => {
+    if (reduce) return;
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+    resumeTimeoutRef.current = setTimeout(() => {
+      setAutoplayEnabled(true);
+      resumeTimeoutRef.current = null;
+    }, AUTOPLAY_RESUME_DELAY_MS);
+  }, [reduce]);
+
+  const bumpInteraction = useCallback(() => {
+    pauseAutoplay();
+    scheduleResume();
+  }, [pauseAutoplay, scheduleResume]);
+
+  useEffect(
+    function autoplayStartup() {
+      if (reduce || !inView || hasStartedRef.current) return;
+      startupTimeoutRef.current = setTimeout(() => {
+        hasStartedRef.current = true;
+        setAutoplayEnabled(true);
+        startupTimeoutRef.current = null;
+      }, AUTOPLAY_STARTUP_DELAY_MS);
+      return function cleanup() {
+        if (startupTimeoutRef.current) {
+          clearTimeout(startupTimeoutRef.current);
+          startupTimeoutRef.current = null;
+        }
+      };
+    },
+    [reduce, inView]
+  );
+
+  useEffect(
+    function autoplayTick() {
+      if (reduce || !autoplayEnabled || items.length < 2) return;
+      const id = setInterval(() => {
+        setActive((a) => (a + 1) % items.length);
+      }, AUTOPLAY_INTERVAL_MS);
+      return function cleanup() {
+        clearInterval(id);
+      };
+    },
+    [reduce, autoplayEnabled, items.length]
+  );
+
+  useEffect(
+    function unmountCleanup() {
+      return function cleanup() {
+        if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+        if (startupTimeoutRef.current) clearTimeout(startupTimeoutRef.current);
+      };
+    },
+    []
+  );
+
   useEffect(
     function keyboardNav() {
       if (!inView) return;
       function onKey(e: KeyboardEvent) {
-        if (e.key === "ArrowLeft") prev();
-        else if (e.key === "ArrowRight") next();
+        if (e.key === "ArrowLeft") {
+          bumpInteraction();
+          prev();
+        } else if (e.key === "ArrowRight") {
+          bumpInteraction();
+          next();
+        }
       }
       window.addEventListener("keydown", onKey);
       return function cleanup() {
         window.removeEventListener("keydown", onKey);
       };
     },
-    [inView, prev, next]
+    [inView, prev, next, bumpInteraction]
   );
 
   function handleDragEnd(_: unknown, info: PanInfo) {
     const width = viewportRef.current?.offsetWidth ?? 0;
-    if (width === 0) return;
+    if (width === 0) {
+      scheduleResume();
+      return;
+    }
     const distanceRatio = Math.abs(info.offset.x) / width;
     const passesDistance = distanceRatio > DRAG_DISTANCE_THRESHOLD;
     const passesVelocity = Math.abs(info.velocity.x) > DRAG_VELOCITY_THRESHOLD;
-    if (!passesDistance && !passesVelocity) return;
-    if (info.offset.x < 0) next();
-    else prev();
+    if (passesDistance || passesVelocity) {
+      if (info.offset.x < 0) next();
+      else prev();
+    }
+    scheduleResume();
   }
 
   if (!items || items.length === 0) return null;
@@ -89,6 +169,8 @@ export default function Gallery({
       <div
         ref={frameRef}
         className="gallery-frame"
+        onMouseEnter={pauseAutoplay}
+        onMouseLeave={scheduleResume}
         style={{
           position: "relative",
           maxWidth: 1400,
@@ -114,6 +196,7 @@ export default function Gallery({
               drag={reduce ? false : "x"}
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.2}
+              onDragStart={pauseAutoplay}
               onDragEnd={handleDragEnd}
               initial={{
                 opacity: 0,
@@ -154,13 +237,19 @@ export default function Gallery({
 
         <MagneticNavButton
           direction="prev"
-          onClick={prev}
+          onClick={() => {
+            bumpInteraction();
+            prev();
+          }}
           disabled={isFirst}
           reduce={!!reduce}
         />
         <MagneticNavButton
           direction="next"
-          onClick={next}
+          onClick={() => {
+            bumpInteraction();
+            next();
+          }}
           disabled={isLast}
           reduce={!!reduce}
         />
