@@ -1,4 +1,8 @@
 export type Pillar = "Design" | "Automate" | "Grow";
+export type ApproachLayout =
+  | "side-by-side"
+  | "text-forward"
+  | "text-then-image-full";
 
 export type CaseStudy = {
   slug: string;
@@ -15,7 +19,7 @@ export type CaseStudy = {
   };
   heroImage?: string;
   context: string[];
-  approach: { pillar: Pillar; body: string; image?: string }[];
+  approach: { pillar: Pillar; body: string; image?: string; layout?: ApproachLayout }[];
   inventory: string[];
   signatures: { title: string; body: string; image?: string }[];
   signatureImage?: string;
@@ -73,14 +77,17 @@ export const caseStudies: Record<string, CaseStudy> = {
     approach: [
       {
         pillar: "Design",
+        layout: "text-forward",
         body: "A single-page site that opens with the work, not the company. Cormorant Garamond display, copper accent — deliberately positioned to read like a boutique interior firm, not a Kijiji handyman.",
       },
       {
         pillar: "Automate",
+        layout: "text-forward",
         body: "A realtor activity monitor that surfaces which properties are about to hit market and need pre-listing touch-ups, plus an outreach system that drafts personalized emails per realtor, per listing.",
       },
       {
         pillar: "Grow",
+        layout: "text-forward",
         body: 'A Durham Region door-to-door playbook covering 29 neighbourhoods tier-ranked by home era and density, Google Business Profile optimization, and a single repeatable "free estimate" CTA baked into every touchpoint.',
       },
     ],
@@ -91,21 +98,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       "Google Business Profile seeded with an authentic Brampton homeowner review (basement flooring + paint, on-time delivery, transparent pricing)",
       "Zero-budget channel stack: Kijiji monitoring, Facebook Groups, building-permit data, NextDoor",
     ],
-    signatures: [
-      {
-        title: "Copper on cream",
-        body: "A deliberate departure from the trades-industry default of black and hazard yellow. Cost nothing; changed how the business reads at a glance.",
-      },
-      {
-        title: '"Free estimate" as the only CTA',
-        body: "One commitment, everywhere, in the same voice. No secondary asks fighting for attention.",
-      },
-      {
-        title:
-          "The map isn't a marketing asset — it's an operations tool",
-        body: "Built for the driver behind the wheel, not the visitor scrolling a homepage.",
-      },
-    ],
+    signatures: [],
     gallery: [
       { src: "/work/cgwalls/gallery.jpg", caption: "Finished work" },
       { src: "/work/cgwalls/gallery2.jpg", caption: "Interior detail" },
@@ -223,7 +216,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       kicker:
         "Every job board watched, every resume tailored, every application tracked — for the job-seeker who treats every application as a portfolio shot, not a lottery ticket.",
     },
-    heroImage: "/work/sift/04-pipeline.jpg",
+    heroImage: "/work/sift/01-command-overview.jpg",
     context: [
       "The job-search market is over-served on volume and under-served on precision. Every product built in the last two years is some flavor of auto-apply — mass-blast tools optimizing for applications submitted per hour. But every job-seeker who's been on the market knows the truth: volume doesn't get you interviews, fit does. Two hundred templated applications produce the same interview rate as twenty mediocre ones. The market is loud about the wrong metric.",
       "The other half of the problem is fragmentation. YC's job board lives at ycombinator.com/jobs. LinkedIn's ATS scoring is a paid feature buried three levels deep. Google Jobs surfaces listings but doesn't score them. Wellfound is startup-only. Every serious job-seeker keeps four to six tabs open, tracks applications in a Notion doc, and rewrites their resume per job at 11pm after their day job — badly.",
@@ -267,6 +260,10 @@ export const caseStudies: Record<string, CaseStudy> = {
         image: "/work/sift/03-cover-letter.jpg",
       },
     ],
+    gallery: [
+      { src: "/work/sift/08-command-insights.jpg", caption: "Command insights" },
+      { src: "/work/sift/04-pipeline.jpg", caption: "Application pipeline" },
+    ],
     outcome: {
       headline: "The engine now runs end to end.",
       body: "Source → score → tailor → apply → track works live at sifthq.app. Cron fires on schedule, sync respects cooldowns, AI scoring runs separately, documents export cleanly, and pipeline pages use real server-side queries. What remains is quality, not architecture: matching, tailoring, and cover-letter output need another pass before public launch.",
@@ -297,6 +294,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       kicker:
         "Founder thought leadership as an editorial pipeline — deciding what to say, drafting in the founder's voice, moving it through review, and learning from what happens after. Not a text generator with a calendar attached.",
     },
+    heroImage: "/work/cadencestack/01-command-center.jpg",
     context: [
       "Most LinkedIn tools treat the problem as content production. Give the model a topic, generate five posts, schedule them, repeat. That solves typing. It does not solve positioning.",
       "Founders rarely lack ideas. They lack a system for deciding which ideas support their reputation, which angle has already been exhausted, what evidence makes a post credible, and what should come next. Without that memory, automation produces competent-looking repetition: the same hook, the same lesson, the same vague CTA.",
@@ -305,18 +303,21 @@ export const caseStudies: Record<string, CaseStudy> = {
     approach: [
       {
         pillar: "Design",
+        layout: "text-then-image-full",
         body: "CadenceStack required a product system, not a prompt box. The interface makes editorial state visible: what is only an idea, what needs work, what is ready, what has been published, and what the system recommends next. The composer, Structure Guide, review states, Presence Score, personalized roadmap, onboarding, performance views, and founder controls all sit as first-class product surfaces — not settings buried in a sidebar.",
-        image: "/work/cadencestack/pipeline.jpg",
+        image: "/work/cadencestack/02-content-pillars.jpg",
       },
       {
         pillar: "Automate",
+        layout: "text-then-image-full",
         body: "The drafting path sits behind server-side gates, authentication, quotas, validation, timeouts, telemetry, and fail-closed provider handling. Supabase holds the persistent product state. The productized path is provider-neutral, with a direct OpenAI adapter live in the application and Claude used in the earlier operator-side research workflow. Trigger.dev and ClickUp move operator work through research, drafting, visual production, and completion.",
-        image: "/work/cadencestack/analytics.jpg",
+        image: "/work/cadencestack/03-content-pipeline.jpg",
       },
       {
         pillar: "Grow",
+        layout: "text-then-image-full",
         body: "CadenceStack encodes an actual LinkedIn operating model — the 7S Methodology, five editorial pillars, hook patterns, content rotation, publishing states, and a performance-learning loop. The objective is not to publish more often at any cost. It is to build a recognizable body of work without repeating the same point until it becomes wallpaper.",
-        image: "/work/cadencestack/pillars.jpg",
+        image: "/work/cadencestack/04-performance-analytics.jpg",
       },
     ],
     inventory: [
@@ -331,17 +332,24 @@ export const caseStudies: Record<string, CaseStudy> = {
     ],
     signatures: [
       {
-        title: "Deterministic before generative",
-        body: "The Structure Guide runs before the AI assistant and stays separate from it. That's deliberate. A model can produce fluent copy while missing a weak hook, absent proof, confused CTA, or incomplete first comment. CadenceStack checks the structure first, then decides whether generation is useful.",
+        title: "A voice, not a template.",
+        body: "Scored prompts for hooks, rewrites, visuals, and post-mortems — every one tuned to the brand's diagnostic voice and reused across the pipeline. Writing stays consistent even when the writer changes.",
+        image: "/work/cadencestack/05-prompt-library.jpg",
       },
       {
-        title: "The system remembers the last post",
-        body: "Most content generators behave as if every prompt is the first conversation. CadenceStack keeps the pillar, hook, proof source, workflow state, publishing history, and recommendation state attached to the content. That memory is what makes deliberate rotation and adaptive recommendations possible.",
+        title: "Every post has a second life.",
+        body: "Once a post logs real metrics, the engine reads what worked and proposes format extensions — carousel, newsletter, video script — with a Plan Assets action that opens the next artifact in the pipeline. Compounding, not restarting.",
+        image: "/work/cadencestack/06-repurpose-engine.jpg",
       },
       {
-        title: "Presence before production",
-        body: 'The product doesn\'t begin by asking, "what should the AI write?" It begins with onboarding, user intelligence, a Presence Score, diagnosis, and a roadmap. The bet is simple: a founder should know what reputation they are building before automating the posts meant to build it.',
+        title: "The voice is a settings file.",
+        body: "Positioning, brand thesis, voice guide, SLA thresholds, approval escalation — the strategy lives in one place and every downstream surface reads from it. Rewrites and reviewers stay honest to it.",
+        image: "/work/cadencestack/07-brand-voice.jpg",
       },
+    ],
+    gallery: [
+      { src: "/work/cadencestack/08-post-database.jpg", caption: "Post database" },
+      { src: "/work/cadencestack/09-idea-bank.jpg", caption: "Idea bank" },
     ],
     outcome: {
       headline: "The operating model is built and working.",

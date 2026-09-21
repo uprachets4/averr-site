@@ -25,11 +25,13 @@ export default function Gallery({
       }}
     >
       <div
-        className="gallery-grid"
+        className="gallery-stack"
         style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${Math.min(items.length, 3)}, 1fr)`,
-          gap: 4,
+          display: "flex",
+          flexDirection: "column",
+          gap: 96,
+          maxWidth: 1400,
+          margin: "0 auto",
           padding: "0 40px",
         }}
       >
@@ -45,7 +47,7 @@ export default function Gallery({
       </div>
       <style>{`
         @media (max-width: 900px) {
-          .gallery-grid { grid-template-columns: 1fr !important; }
+          .gallery-stack { gap: 64px !important; padding: 0 20px !important; }
         }
       `}</style>
     </section>

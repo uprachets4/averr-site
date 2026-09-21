@@ -60,11 +60,13 @@ export default function CaseStudy() {
       <Context paragraphs={study.context} />
       <Approach entries={study.approach} />
       <Inventory items={study.inventory} stack={study.stack} />
-      <Signatures
-        items={study.signatures}
-        imageSrc={study.signatureImage}
-        imageAlt={`${study.client} screen`}
-      />
+      {study.signatures.length > 0 ? (
+        <Signatures
+          items={study.signatures}
+          imageSrc={study.signatureImage}
+          imageAlt={`${study.client} screen`}
+        />
+      ) : null}
       {study.gallery && study.gallery.length > 0 ? (
         <Gallery items={study.gallery} client={study.client} />
       ) : null}

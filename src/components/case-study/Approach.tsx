@@ -1,9 +1,14 @@
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
-import type { Pillar } from "../../data/caseStudies";
+import type { ApproachLayout, Pillar } from "../../data/caseStudies";
 import ImageFrame from "./ImageFrame";
 
-type Entry = { pillar: Pillar; body: string; image?: string };
+type Entry = {
+  pillar: Pillar;
+  body: string;
+  image?: string;
+  layout?: ApproachLayout;
+};
 
 const pillarChipStyle: React.CSSProperties = {
   display: "inline-block",
@@ -103,17 +108,44 @@ export default function Approach({ entries }: { entries: Entry[] }) {
           Three pillars, <span className="fade-h">one plan.</span>
         </motion.h2>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 96 }}>
-          {entries.map((entry, i) => (
-            <ApproachRow
-              key={`${entry.pillar}-${i}`}
-              entry={entry}
-              index={i}
-              reduce={!!reduce}
-            />
-          ))}
+        <div className="approach-stack" style={{ display: "flex", flexDirection: "column", gap: 96 }}>
+          {entries.map((entry, i) => {
+            if (entry.layout === "text-forward") {
+              return (
+                <TextForwardRow
+                  key={`${entry.pillar}-${i}`}
+                  entry={entry}
+                  index={i}
+                  reduce={!!reduce}
+                />
+              );
+            }
+            if (entry.layout === "text-then-image-full") {
+              return (
+                <TextThenImageFullRow
+                  key={`${entry.pillar}-${i}`}
+                  entry={entry}
+                  index={i}
+                  reduce={!!reduce}
+                />
+              );
+            }
+            return (
+              <ApproachRow
+                key={`${entry.pillar}-${i}`}
+                entry={entry}
+                index={i}
+                reduce={!!reduce}
+              />
+            );
+          })}
         </div>
       </div>
+      <style>{`
+        @media (max-width: 900px) {
+          .approach-stack { gap: 64px !important; }
+        }
+      `}</style>
     </section>
   );
 }
@@ -153,7 +185,7 @@ function ApproachRow({
         <div style={pillarChipStyle}>{entry.pillar}</div>
         <p
           className="type-body"
-          style={{ color: "var(--color-ink-soft)", maxWidth: 480 }}
+          style={{ color: "var(--color-ink)", maxWidth: 480 }}
         >
           {entry.body}
         </p>
@@ -198,6 +230,122 @@ function ApproachRow({
             grid-template-columns: 1fr !important;
             direction: ltr !important;
             gap: 32px !important;
+          }
+        }
+      `}</style>
+    </motion.div>
+  );
+}
+
+function TextForwardRow({
+  entry,
+  index,
+  reduce,
+}: {
+  entry: Entry;
+  index: number;
+  reduce: boolean;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{
+        duration: reduce ? 0 : 0.7,
+        ease: ease.outQuart,
+        delay: reduce ? 0 : 0.15 + index * 0.08,
+      }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+      }}
+    >
+      <div style={{ ...pillarChipStyle, marginBottom: 24 }}>{entry.pillar}</div>
+      <p
+        className="type-body-lg"
+        style={{
+          color: "var(--color-ink)",
+          maxWidth: "72ch",
+          margin: 0,
+        }}
+      >
+        {entry.body}
+      </p>
+    </motion.div>
+  );
+}
+
+function TextThenImageFullRow({
+  entry,
+  index,
+  reduce,
+}: {
+  entry: Entry;
+  index: number;
+  reduce: boolean;
+}) {
+  return (
+    <motion.div
+      className="approach-tif"
+      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{
+        duration: reduce ? 0 : 0.7,
+        ease: ease.outQuart,
+        delay: reduce ? 0 : 0.15 + index * 0.08,
+      }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "stretch",
+      }}
+    >
+      <div className="approach-tif__text">
+        <div style={{ ...pillarChipStyle, marginBottom: 20 }}>{entry.pillar}</div>
+        <p
+          className="type-body-lg"
+          style={{
+            color: "var(--color-ink)",
+            maxWidth: "72ch",
+            margin: 0,
+          }}
+        >
+          {entry.body}
+        </p>
+      </div>
+
+      {entry.image ? (
+        <motion.figure
+          initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: reduce ? 0 : 0.9, ease: ease.outExpo }}
+          style={{ margin: 0, marginTop: 48 }}
+        >
+          <ImageFrame variant="inline">
+            <img
+              src={entry.image}
+              alt={`${entry.pillar} approach visual`}
+              loading="lazy"
+              decoding="async"
+            />
+          </ImageFrame>
+        </motion.figure>
+      ) : null}
+
+      <style>{`
+        .approach-tif__text {
+          max-width: 72ch;
+          margin: 0 auto;
+          text-align: center;
+        }
+        @media (max-width: 720px) {
+          .approach-tif__text {
+            text-align: left;
           }
         }
       `}</style>

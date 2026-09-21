@@ -7,13 +7,15 @@ export default function Outcome({ text }: { text: CaseStudy["outcome"] }) {
   return (
     <section
       style={{
-        backgroundColor: "var(--color-bg)",
+        backgroundColor: "var(--color-dark)",
+        color: "var(--color-parch)",
         padding: "160px 40px",
         position: "relative",
+        overflow: "hidden",
         textAlign: "center",
       }}
     >
-      <div className="grain-light" aria-hidden="true" />
+      <div className="grain-dark" aria-hidden="true" />
       <div
         style={{
           maxWidth: 1000,
@@ -28,7 +30,7 @@ export default function Outcome({ text }: { text: CaseStudy["outcome"] }) {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
-          style={{ color: "var(--color-muted)", marginBottom: 40 }}
+          style={{ color: "var(--color-muted-l)", marginBottom: 40 }}
         >
           //_05 · outcome
         </motion.div>
@@ -44,7 +46,7 @@ export default function Outcome({ text }: { text: CaseStudy["outcome"] }) {
           }}
           className="type-display-l"
           style={{
-            color: "var(--color-ink)",
+            color: "var(--color-parch)",
             maxWidth: 900,
             margin: "0 auto",
           }}
@@ -63,7 +65,7 @@ export default function Outcome({ text }: { text: CaseStudy["outcome"] }) {
           }}
           className="type-body-lg"
           style={{
-            color: "var(--color-muted)",
+            color: "var(--color-muted-l)",
             maxWidth: 800,
             margin: "40px auto 0",
           }}

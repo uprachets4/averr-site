@@ -100,7 +100,7 @@ function ContextRow({
         }}
         className="type-body-lg"
         style={{
-          color: "var(--color-ink-soft)",
+          color: "var(--color-ink)",
           maxWidth: 780,
         }}
       >
