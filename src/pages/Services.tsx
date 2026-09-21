@@ -1,12 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   motion,
+  useMotionValue,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
+  useSpring,
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { ease } from "../lib/motion";
+import { ease, spring } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import FinalCTA from "../components/FinalCTA";
 import PillHl from "../components/PillHl";
@@ -296,16 +305,30 @@ function PillarSection({
   });
 
   // Hooks must run unconditionally — mobile branch renders after all hooks.
-  const stage1Opacity = useTransform(scrollYProgress, [0, 0.28, 0.35], [1, 1, 0]);
+  // Non-overlapping stage windows with hard gap buffers.
+  const stage1Opacity = useTransform(
+    scrollYProgress,
+    [0, 0.28, 0.32, 1],
+    [1, 1, 0, 0]
+  );
   const stage2Opacity = useTransform(
     scrollYProgress,
-    [0.28, 0.35, 0.62, 0.7],
-    [0, 1, 1, 0]
+    [0, 0.35, 0.4, 0.6, 0.65, 1],
+    [0, 0, 1, 1, 0, 0]
   );
-  const stage3Opacity = useTransform(scrollYProgress, [0.62, 0.7, 1], [0, 1, 1]);
-  const stage1Y = useTransform(scrollYProgress, [0, 0.35], [0, -20]);
-  const stage2Y = useTransform(scrollYProgress, [0.28, 0.4, 0.72], [20, 0, -20]);
-  const stage3Y = useTransform(scrollYProgress, [0.65, 0.75], [20, 0]);
+  const stage3Opacity = useTransform(
+    scrollYProgress,
+    [0, 0.68, 0.73, 1],
+    [0, 0, 1, 1]
+  );
+  // Y ranges only advance while the stage is on-screen.
+  const stage1Y = useTransform(scrollYProgress, [0, 0.28, 0.32], [0, 0, -20]);
+  const stage2Y = useTransform(
+    scrollYProgress,
+    [0.35, 0.4, 0.6, 0.65],
+    [20, 0, 0, -20]
+  );
+  const stage3Y = useTransform(scrollYProgress, [0.68, 0.73, 1], [20, 0, 0]);
   const headlineY = useTransform(scrollYProgress, [0, 1], [0, -32]);
 
   useEffect(
@@ -316,6 +339,38 @@ function PillarSection({
       };
     },
     [registerRef]
+  );
+
+  // Reserve left-column stage-stack min-height at the tallest stage.
+  const stageRefs = useRef<Array<HTMLDivElement | null>>([null, null, null]);
+  const [stageMinHeight, setStageMinHeight] = useState(0);
+  useLayoutEffect(
+    function measureStages() {
+      if (!sticky) return;
+      function measure() {
+        let max = 0;
+        stageRefs.current.forEach(function m(el) {
+          if (el) max = Math.max(max, el.offsetHeight);
+        });
+        setStageMinHeight(max);
+      }
+      measure();
+      const ros: ResizeObserver[] = [];
+      stageRefs.current.forEach(function watch(el) {
+        if (!el) return;
+        const ro = new ResizeObserver(measure);
+        ro.observe(el);
+        ros.push(ro);
+      });
+      window.addEventListener("resize", measure);
+      return function cleanup() {
+        ros.forEach(function stop(r) {
+          r.disconnect();
+        });
+        window.removeEventListener("resize", measure);
+      };
+    },
+    [sticky]
   );
 
   if (!sticky) {
@@ -374,10 +429,18 @@ function PillarSection({
             {pillar.name}
           </motion.h2>
 
-          <div style={{ position: "relative", minHeight: 320 }}>
+          <div
+            style={{
+              position: "relative",
+              minHeight: stageMinHeight || 320,
+            }}
+          >
             <StageBody
               opacity={stage1Opacity}
               y={stage1Y}
+              elRef={function s(el) {
+                stageRefs.current[0] = el;
+              }}
             >
               <p
                 className="type-body-lg"
@@ -387,7 +450,13 @@ function PillarSection({
               </p>
             </StageBody>
 
-            <StageBody opacity={stage2Opacity} y={stage2Y}>
+            <StageBody
+              opacity={stage2Opacity}
+              y={stage2Y}
+              elRef={function s(el) {
+                stageRefs.current[1] = el;
+              }}
+            >
               <div
                 className="type-eyebrow"
                 style={{
@@ -433,7 +502,13 @@ function PillarSection({
               </ul>
             </StageBody>
 
-            <StageBody opacity={stage3Opacity} y={stage3Y}>
+            <StageBody
+              opacity={stage3Opacity}
+              y={stage3Y}
+              elRef={function s(el) {
+                stageRefs.current[2] = el;
+              }}
+            >
               <StageThree
                 investment={pillar.investment}
                 timeline={pillar.timeline}
@@ -445,7 +520,7 @@ function PillarSection({
         <div
           style={{
             position: "relative",
-            height: "70vh",
+            height: "80vh",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -453,9 +528,7 @@ function PillarSection({
         >
           <AmbientVisual
             pillar={pillar.id}
-            stage1Opacity={stage1Opacity}
-            stage2Opacity={stage2Opacity}
-            stage3Opacity={stage3Opacity}
+            scrollYProgress={scrollYProgress}
           />
         </div>
       </div>
@@ -466,14 +539,17 @@ function PillarSection({
 function StageBody({
   opacity,
   y,
+  elRef,
   children,
 }: {
   opacity: MotionValue<number>;
   y: MotionValue<number>;
+  elRef: (el: HTMLDivElement | null) => void;
   children: React.ReactNode;
 }) {
   return (
     <motion.div
+      ref={elRef}
       style={{
         position: "absolute",
         top: 0,
@@ -767,279 +843,759 @@ function SequenceProgressIndicator({
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Ambient visuals — one per pillar, three stages each.
-   Palette-only, no images. Motion respects useReducedMotion via
-   parent guard (visuals only render in sticky mode).
+   Ambient visuals — rebuilt to reference tier.
+   Cursor parallax + continuous drift under useReducedMotion guard.
    ═══════════════════════════════════════════════════════════════ */
 
 function AmbientVisual({
   pillar,
-  stage1Opacity,
-  stage2Opacity,
-  stage3Opacity,
+  scrollYProgress,
 }: {
   pillar: Pillar["id"];
-  stage1Opacity: MotionValue<number>;
-  stage2Opacity: MotionValue<number>;
-  stage3Opacity: MotionValue<number>;
+  scrollYProgress: MotionValue<number>;
 }) {
-  const stages = [stage1Opacity, stage2Opacity, stage3Opacity];
+  const reduce = useReducedMotion();
+  if (pillar === "design") {
+    return (
+      <DesignMoodBoard
+        scrollYProgress={scrollYProgress}
+        reduce={!!reduce}
+      />
+    );
+  }
+  if (pillar === "automate") {
+    return (
+      <AutomateWorkflow
+        scrollYProgress={scrollYProgress}
+        reduce={!!reduce}
+      />
+    );
+  }
+  return (
+    <GrowDashboard
+      scrollYProgress={scrollYProgress}
+      reduce={!!reduce}
+    />
+  );
+}
+
+/* ── shared cursor parallax hook ────────────────────────────── */
+
+function useCursorParallax(reduce: boolean, magnitude = 12) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const smoothX = useSpring(rawX, spring.soft);
+  const smoothY = useSpring(rawY, spring.soft);
+
+  function onMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (reduce || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    rawX.set(px * magnitude * 2);
+    rawY.set(py * magnitude * 2);
+  }
+
+  function onLeave() {
+    rawX.set(0);
+    rawY.set(0);
+  }
+
+  return { ref, x: smoothX, y: smoothY, onMove, onLeave };
+}
+
+/* ── design mood board ──────────────────────────────────────── */
+
+const MOOD_CARDS = [
+  {
+    src: "/work/capitalcommand/01-overview.jpg",
+    label: "CapitalCommand",
+  },
+  {
+    src: "/work/cadencestack/01-command-center.jpg",
+    label: "CadenceStack",
+  },
+  {
+    src: "/work/sift/01-command-overview.jpg",
+    label: "SIFT",
+  },
+];
+
+function DesignMoodBoard({
+  scrollYProgress,
+  reduce,
+}: {
+  scrollYProgress: MotionValue<number>;
+  reduce: boolean;
+}) {
+  const parallax = useCursorParallax(reduce, 10);
+
   return (
     <div
+      ref={parallax.ref}
+      onMouseMove={parallax.onMove}
+      onMouseLeave={parallax.onLeave}
       style={{
         position: "relative",
         width: "100%",
         maxWidth: 640,
         aspectRatio: "1 / 1",
+        overflow: "hidden",
       }}
     >
-      {[1, 2, 3].map(function slot(n, i) {
+      {/* Warm sand radial wash */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse 80% 70% at 50% 50%, rgba(232,225,208,0.55), transparent 70%)",
+          opacity: 0.6,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Drifting Aa specimen */}
+      <motion.div
+        aria-hidden
+        animate={
+          reduce
+            ? undefined
+            : {
+                x: [-24, 24, -24],
+                y: [-18, 18, -18],
+              }
+        }
+        transition={{
+          duration: 90,
+          repeat: Infinity,
+          ease: ease.inOut,
+        }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "var(--font-display)",
+          fontSize: 320,
+          fontWeight: 500,
+          letterSpacing: "-0.05em",
+          color: "var(--color-ink)",
+          opacity: 0.08,
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
+      >
+        Aa
+      </motion.div>
+
+      {/* Cards */}
+      {MOOD_CARDS.map(function renderCard(c, i) {
         return (
-          <motion.div
-            key={n}
-            style={{
-              position: "absolute",
-              inset: 0,
-              opacity: stages[i],
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {pillar === "design" ? (
-              <DesignAmbient stage={n as 1 | 2 | 3} />
-            ) : pillar === "automate" ? (
-              <AutomateAmbient stage={n as 1 | 2 | 3} />
-            ) : (
-              <GrowAmbient stage={n as 1 | 2 | 3} />
-            )}
-          </motion.div>
+          <MoodCard
+            key={c.src}
+            index={i}
+            src={c.src}
+            label={c.label}
+            scrollYProgress={scrollYProgress}
+            parallaxX={parallax.x}
+            parallaxY={parallax.y}
+            reduce={reduce}
+          />
         );
       })}
+
+      {/* Grain overlay */}
+      <div
+        className="grain-light"
+        aria-hidden
+        style={{ opacity: 0.04, pointerEvents: "none" }}
+      />
     </div>
   );
 }
 
-function DesignAmbient({ stage }: { stage: 1 | 2 | 3 }) {
-  // Grid overlay + type sample fragment
-  const cols = stage === 1 ? 6 : stage === 2 ? 10 : 14;
-  return (
-    <svg
-      viewBox="0 0 400 400"
-      style={{ width: "100%", height: "100%" }}
-      aria-hidden
-    >
-      <defs>
-        <linearGradient id="d-grad" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#C9B896" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#A8916D" stopOpacity="0.15" />
-        </linearGradient>
-      </defs>
-      {/* Grid */}
-      {Array.from({ length: cols }).map(function line(_, i) {
-        const x = (i / cols) * 400;
-        return (
-          <line
-            key={`v-${i}`}
-            x1={x}
-            y1="0"
-            x2={x}
-            y2="400"
-            stroke="rgba(20,20,18,0.08)"
-            strokeWidth="1"
-          />
-        );
-      })}
-      {Array.from({ length: cols }).map(function line(_, i) {
-        const y = (i / cols) * 400;
-        return (
-          <line
-            key={`h-${i}`}
-            x1="0"
-            y1={y}
-            x2="400"
-            y2={y}
-            stroke="rgba(20,20,18,0.08)"
-            strokeWidth="1"
-          />
-        );
-      })}
-      {/* Type sample fragment — appears from stage 2 */}
-      {stage >= 2 ? (
-        <text
-          x="200"
-          y="220"
-          textAnchor="middle"
-          fontFamily="Geist, sans-serif"
-          fontSize="140"
-          fontWeight="500"
-          fill="url(#d-grad)"
-          letterSpacing="-6"
-        >
-          Aa
-        </text>
-      ) : null}
-      {stage >= 3 ? (
-        <text
-          x="200"
-          y="290"
-          textAnchor="middle"
-          fontFamily="Geist Mono, monospace"
-          fontSize="12"
-          letterSpacing="4"
-          fill="rgba(20,20,18,0.5)"
-        >
-          GRID · SYSTEM · MOTION
-        </text>
-      ) : null}
-    </svg>
-  );
-}
+function MoodCard({
+  index,
+  src,
+  label,
+  scrollYProgress,
+  parallaxX,
+  parallaxY,
+  reduce,
+}: {
+  index: number;
+  src: string;
+  label: string;
+  scrollYProgress: MotionValue<number>;
+  parallaxX: MotionValue<number>;
+  parallaxY: MotionValue<number>;
+  reduce: boolean;
+}) {
+  // Start scattered, migrate to aligned grid formation
+  const startRot = [-4, 3, -4][index];
+  const endRot = [-1, 0, 1][index];
+  const startOffsetX = [-90, 0, 90][index];
+  const startOffsetY = [-70, 0, 70][index];
+  const endOffsetX = [-50, 0, 50][index];
+  const endOffsetY = [-40, 0, 40][index];
 
-function AutomateAmbient({ stage }: { stage: 1 | 2 | 3 }) {
-  // Flow nodes connected by lines. More nodes as stage advances.
-  const nodes =
-    stage === 1
-      ? [
-          { x: 120, y: 200 },
-          { x: 280, y: 200 },
-        ]
-      : stage === 2
-      ? [
-          { x: 100, y: 140 },
-          { x: 200, y: 200 },
-          { x: 300, y: 140 },
-          { x: 200, y: 300 },
-        ]
-      : [
-          { x: 80, y: 120 },
-          { x: 200, y: 80 },
-          { x: 320, y: 140 },
-          { x: 140, y: 220 },
-          { x: 260, y: 250 },
-          { x: 200, y: 340 },
-        ];
-  const edges: Array<[number, number]> =
-    stage === 1
-      ? [[0, 1]]
-      : stage === 2
-      ? [
-          [0, 1],
-          [1, 2],
-          [1, 3],
-        ]
-      : [
-          [0, 1],
-          [1, 2],
-          [0, 3],
-          [3, 4],
-          [4, 5],
-          [2, 4],
-          [1, 3],
-        ];
-  return (
-    <svg
-      viewBox="0 0 400 400"
-      style={{ width: "100%", height: "100%" }}
-      aria-hidden
-    >
-      <defs>
-        <linearGradient id="a-grad" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#C9B896" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#A8916D" stopOpacity="0.35" />
-        </linearGradient>
-      </defs>
-      {edges.map(function edge([a, b], i) {
-        const na = nodes[a];
-        const nb = nodes[b];
-        return (
-          <line
-            key={i}
-            x1={na.x}
-            y1={na.y}
-            x2={nb.x}
-            y2={nb.y}
-            stroke="url(#a-grad)"
-            strokeWidth="1.25"
-          />
-        );
-      })}
-      {nodes.map(function node(n, i) {
-        return (
-          <motion.circle
-            key={i}
-            cx={n.x}
-            cy={n.y}
-            r={6}
-            fill="var(--color-ink)"
-            animate={{ scale: [1, 1.15, 1] }}
-            transition={{
-              duration: 2.4,
-              repeat: Infinity,
-              delay: i * 0.25,
-              ease: ease.inOut,
-            }}
-            style={{ transformOrigin: `${n.x}px ${n.y}px` }}
-          />
-        );
-      })}
-    </svg>
+  const rot = useTransform(scrollYProgress, [0, 1], [startRot, endRot]);
+  const scrollX = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [startOffsetX, endOffsetX]
   );
-}
+  const scrollY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [startOffsetY, endOffsetY]
+  );
+  // Card-index-based parallax weighting (foreground stronger)
+  const parallaxWeight = [0.4, 1, 0.7][index];
+  const totalX = useTransform(
+    [scrollX, parallaxX] as MotionValue<number>[],
+    function combine([a, b]) {
+      return (a as number) + (b as number) * parallaxWeight;
+    }
+  );
+  const totalY = useTransform(
+    [scrollY, parallaxY] as MotionValue<number>[],
+    function combine([a, b]) {
+      return (a as number) + (b as number) * parallaxWeight;
+    }
+  );
 
-function GrowAmbient({ stage }: { stage: 1 | 2 | 3 }) {
-  // Chart-shape gradient sweep — line rises across stages, bars appear at stage 3
-  const path =
-    stage === 1
-      ? "M 40 260 L 360 260"
-      : stage === 2
-      ? "M 40 280 Q 200 240 360 180"
-      : "M 40 300 Q 140 260 220 180 T 360 100";
+  const zIndex = index === 1 ? 3 : index === 0 ? 2 : 1;
+
   return (
-    <svg
-      viewBox="0 0 400 400"
-      style={{ width: "100%", height: "100%" }}
-      aria-hidden
+    <motion.figure
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        width: 320,
+        height: 220,
+        margin: 0,
+        marginTop: -110,
+        marginLeft: -160,
+        borderRadius: 8,
+        overflow: "hidden",
+        background: "var(--color-bg)",
+        boxShadow: "0 12px 36px rgba(20,20,18,0.14)",
+        border: "1px solid rgba(20,20,18,0.08)",
+        rotate: reduce ? endRot : rot,
+        x: totalX,
+        y: totalY,
+        zIndex,
+      }}
     >
-      <defs>
-        <linearGradient id="g-fill" x1="0" y1="0" x2="0" y2="400" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#C9B896" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#C9B896" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="g-line" x1="0" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="var(--color-ink)" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="var(--color-ink)" stopOpacity="1" />
-        </linearGradient>
-      </defs>
-      {/* Baseline axis */}
-      <line x1="40" y1="340" x2="360" y2="340" stroke="rgba(20,20,18,0.15)" strokeWidth="1" />
-      {/* Bars at stage 3 */}
-      {stage === 3
-        ? [80, 140, 200, 260, 320].map(function bar(x, i) {
-            const heights = [40, 80, 130, 90, 160];
-            const h = heights[i];
-            return (
-              <rect
-                key={i}
-                x={x - 12}
-                y={340 - h}
-                width={24}
-                height={h}
-                fill="url(#g-fill)"
-              />
-            );
-          })
-        : null}
-      {/* Trend line */}
-      <path d={path} stroke="url(#g-line)" strokeWidth="2" fill="none" strokeLinecap="round" />
-      {/* End dot */}
-      <circle
-        cx={stage === 1 ? 360 : stage === 2 ? 360 : 360}
-        cy={stage === 1 ? 260 : stage === 2 ? 180 : 100}
-        r="6"
-        fill="var(--color-ink)"
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+        style={{
+          display: "block",
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          pointerEvents: "none",
+        }}
       />
-    </svg>
+      <figcaption
+        className="type-eyebrow"
+        style={{
+          position: "absolute",
+          left: 12,
+          bottom: 10,
+          background: "rgba(244,240,230,0.9)",
+          color: "var(--color-ink)",
+          padding: "4px 10px",
+          borderRadius: 999,
+          backdropFilter: "blur(6px)",
+        }}
+      >
+        {label}
+      </figcaption>
+    </motion.figure>
+  );
+}
+
+/* ── automate workflow diagram ──────────────────────────────── */
+
+const WORKFLOW_NODES: Array<{
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+}> = [
+  { id: "trigger", label: "Trigger", x: 60, y: 90 },
+  { id: "ai", label: "AI process", x: 145, y: 145 },
+  { id: "review", label: "Human review", x: 220, y: 215 },
+  { id: "publish", label: "Publish", x: 300, y: 175 },
+  { id: "measure", label: "Measure", x: 360, y: 290 },
+];
+
+const WORKFLOW_EDGES: Array<{ from: number; to: number; path: string }> = [
+  { from: 0, to: 1, path: "M 60 90 Q 100 60 145 145" },
+  { from: 1, to: 2, path: "M 145 145 Q 200 220 220 215" },
+  { from: 2, to: 3, path: "M 220 215 Q 280 170 300 175" },
+  { from: 3, to: 4, path: "M 300 175 Q 350 240 360 290" },
+];
+
+function AutomateWorkflow({
+  scrollYProgress,
+  reduce,
+}: {
+  scrollYProgress: MotionValue<number>;
+  reduce: boolean;
+}) {
+  const parallax = useCursorParallax(reduce, 10);
+  // Fade in caption at stage 3
+  const captionOpacity = useTransform(
+    scrollYProgress,
+    [0.68, 0.78],
+    [0, 1]
+  );
+
+  return (
+    <div
+      ref={parallax.ref}
+      onMouseMove={parallax.onMove}
+      onMouseLeave={parallax.onLeave}
+      style={{
+        position: "relative",
+        width: "100%",
+        maxWidth: 640,
+        aspectRatio: "1 / 1",
+        overflow: "hidden",
+      }}
+    >
+      {/* Cool radial wash */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle at 50% 50%, rgba(20,20,18,0.10), transparent 70%)",
+          opacity: 0.85,
+          pointerEvents: "none",
+        }}
+      />
+
+      <motion.svg
+        viewBox="0 0 400 400"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          x: parallax.x,
+          y: parallax.y,
+        }}
+        aria-hidden
+      >
+        {/* Edge paths (definitions for pulses) */}
+        <defs>
+          {WORKFLOW_EDGES.map(function definePath(e, i) {
+            return <path key={i} id={`edge-${i}`} d={e.path} fill="none" />;
+          })}
+        </defs>
+
+        {/* Rendered edge strokes */}
+        {WORKFLOW_EDGES.map(function drawEdge(e, i) {
+          return (
+            <path
+              key={`s-${i}`}
+              d={e.path}
+              stroke="var(--color-ink-soft)"
+              strokeOpacity="0.4"
+              strokeWidth="1.5"
+              fill="none"
+              strokeLinecap="round"
+            />
+          );
+        })}
+
+        {/* Data pulses along edges — one every 3s, staggered */}
+        {!reduce
+          ? WORKFLOW_EDGES.map(function pulseFor(_e, i) {
+              return (
+                <circle
+                  key={`p-${i}`}
+                  r="4"
+                  fill="var(--color-ink)"
+                >
+                  <animateMotion
+                    dur="3s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.7}s`}
+                  >
+                    <mpath xlinkHref={`#edge-${i}`} />
+                  </animateMotion>
+                </circle>
+              );
+            })
+          : null}
+
+        {/* Nodes with scroll-driven activation */}
+        {WORKFLOW_NODES.map(function drawNode(n, i) {
+          return (
+            <WorkflowNode
+              key={n.id}
+              index={i}
+              node={n}
+              scrollYProgress={scrollYProgress}
+            />
+          );
+        })}
+      </motion.svg>
+
+      {/* Node labels — HTML overlay for typography control */}
+      {WORKFLOW_NODES.map(function drawLabel(n, i) {
+        return (
+          <WorkflowLabel
+            key={n.id}
+            index={i}
+            node={n}
+            scrollYProgress={scrollYProgress}
+            parallaxX={parallax.x}
+            parallaxY={parallax.y}
+          />
+        );
+      })}
+
+      {/* Stage 3 caption */}
+      <motion.div
+        className="type-small"
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 12,
+          textAlign: "center",
+          color: "var(--color-ink-soft)",
+          opacity: captionOpacity,
+          pointerEvents: "none",
+        }}
+      >
+        System average: 12h/week returned
+      </motion.div>
+    </div>
+  );
+}
+
+function WorkflowNode({
+  index,
+  node,
+  scrollYProgress,
+}: {
+  index: number;
+  node: (typeof WORKFLOW_NODES)[number];
+  scrollYProgress: MotionValue<number>;
+}) {
+  const activateAt = 0.05 + index * 0.18;
+  const opacity = useTransform(
+    scrollYProgress,
+    [activateAt - 0.05, activateAt + 0.05],
+    [0.25, 1]
+  );
+  const strokeWidth = useTransform(
+    scrollYProgress,
+    [activateAt - 0.05, activateAt + 0.05],
+    [1, 2.5]
+  );
+  return (
+    <motion.circle
+      cx={node.x}
+      cy={node.y}
+      r={8}
+      fill="var(--color-bg)"
+      stroke="var(--color-ink)"
+      style={{ opacity, strokeWidth }}
+    />
+  );
+}
+
+function WorkflowLabel({
+  index,
+  node,
+  scrollYProgress,
+  parallaxX,
+  parallaxY,
+}: {
+  index: number;
+  node: (typeof WORKFLOW_NODES)[number];
+  scrollYProgress: MotionValue<number>;
+  parallaxX: MotionValue<number>;
+  parallaxY: MotionValue<number>;
+}) {
+  const activateAt = 0.05 + index * 0.18;
+  const opacity = useTransform(
+    scrollYProgress,
+    [activateAt - 0.05, activateAt + 0.05],
+    [0.4, 1]
+  );
+  // Position in percentage of container (viewBox 0-400)
+  const leftPct = (node.x / 400) * 100;
+  const topPct = (node.y / 400) * 100;
+  return (
+    <motion.div
+      className="type-eyebrow"
+      style={{
+        position: "absolute",
+        left: `${leftPct}%`,
+        top: `${topPct}%`,
+        transform: "translate(-50%, 18px)",
+        color: "var(--color-ink)",
+        opacity,
+        x: parallaxX,
+        y: parallaxY,
+        pointerEvents: "none",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {node.label}
+    </motion.div>
+  );
+}
+
+/* ── grow dashboard ─────────────────────────────────────────── */
+
+const METRICS: Array<{
+  label: string;
+  end: number;
+  format: (n: number) => string;
+  delta: string;
+}> = [
+  {
+    label: "Impressions",
+    end: 48.2,
+    format: (n) => `${n.toFixed(1)}K`,
+    delta: "+42%",
+  },
+  {
+    label: "Engagement",
+    end: 6.8,
+    format: (n) => `${n.toFixed(1)}%`,
+    delta: "+18%",
+  },
+  {
+    label: "CTR",
+    end: 3.4,
+    format: (n) => `${n.toFixed(1)}%`,
+    delta: "+24%",
+  },
+  {
+    label: "Sessions",
+    end: 12.1,
+    format: (n) => `${n.toFixed(1)}K`,
+    delta: "+36%",
+  },
+];
+
+function GrowDashboard({
+  scrollYProgress,
+  reduce,
+}: {
+  scrollYProgress: MotionValue<number>;
+  reduce: boolean;
+}) {
+  const parallax = useCursorParallax(reduce, 8);
+  const captionOpacity = useTransform(
+    scrollYProgress,
+    [0.68, 0.78],
+    [0, 1]
+  );
+  const trendDraw = useTransform(scrollYProgress, [0.2, 0.9], [0, 1]);
+  const trendStrokeDashoffset = useTransform(trendDraw, (v) => 1 - v);
+
+  return (
+    <div
+      ref={parallax.ref}
+      onMouseMove={parallax.onMove}
+      onMouseLeave={parallax.onLeave}
+      style={{
+        position: "relative",
+        width: "100%",
+        maxWidth: 640,
+        aspectRatio: "1 / 1",
+        overflow: "hidden",
+      }}
+    >
+      {/* Warm ember radial wash */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse 80% 70% at 50% 40%, rgba(200,175,120,0.18), transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <motion.div
+        style={{
+          position: "relative",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 12,
+          padding: 24,
+          x: parallax.x,
+          y: parallax.y,
+        }}
+      >
+        {METRICS.map(function drawMetric(m, i) {
+          return (
+            <MetricCard
+              key={m.label}
+              metric={m}
+              index={i}
+              scrollYProgress={scrollYProgress}
+            />
+          );
+        })}
+
+        {/* Trend line under the grid */}
+        <div style={{ gridColumn: "1 / -1", position: "relative", height: 90 }}>
+          <svg
+            viewBox="0 0 400 90"
+            preserveAspectRatio="none"
+            style={{ width: "100%", height: "100%", display: "block" }}
+            aria-hidden
+          >
+            <defs>
+              <linearGradient id="trend-fill" x1="0" y1="0" x2="0" y2="90">
+                <stop
+                  offset="0%"
+                  stopColor="rgba(200,175,120,0.35)"
+                />
+                <stop offset="100%" stopColor="rgba(200,175,120,0)" />
+              </linearGradient>
+            </defs>
+            <motion.path
+              d="M 0 60 Q 80 55 140 40 T 260 24 T 400 8"
+              fill="none"
+              stroke="var(--color-ink)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              pathLength={1}
+              strokeDasharray={1}
+              style={{
+                strokeDashoffset: reduce ? 0 : trendStrokeDashoffset,
+              }}
+            />
+            <motion.path
+              d="M 0 60 Q 80 55 140 40 T 260 24 T 400 8 L 400 90 L 0 90 Z"
+              fill="url(#trend-fill)"
+              style={{ opacity: trendDraw }}
+            />
+          </svg>
+        </div>
+      </motion.div>
+
+      {/* Stage 3 caption */}
+      <motion.div
+        className="type-small"
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 12,
+          textAlign: "center",
+          color: "var(--color-ink-soft)",
+          opacity: captionOpacity,
+          pointerEvents: "none",
+        }}
+      >
+        3 months in — compounding
+      </motion.div>
+    </div>
+  );
+}
+
+function useMotionText<T>(
+  mv: MotionValue<T>,
+  format: (v: T) => string
+): string {
+  const [text, setText] = useState(function initial() {
+    return format(mv.get());
+  });
+  useMotionValueEvent(mv, "change", function onChange(v) {
+    setText(format(v as T));
+  });
+  return text;
+}
+
+function MetricCard({
+  metric,
+  index,
+  scrollYProgress,
+}: {
+  metric: (typeof METRICS)[number];
+  index: number;
+  scrollYProgress: MotionValue<number>;
+}) {
+  const startAt = 0.15 + index * 0.06;
+  const endAt = startAt + 0.4;
+  const count = useTransform(
+    scrollYProgress,
+    [startAt, endAt],
+    [0, metric.end]
+  );
+  const number = useMotionText(count, metric.format);
+
+  const opacity = useTransform(
+    scrollYProgress,
+    [startAt, startAt + 0.08],
+    [0.3, 1]
+  );
+
+  return (
+    <motion.div
+      style={{
+        background: "var(--color-bg)",
+        border: "1px solid rgba(20,20,18,0.08)",
+        borderRadius: 8,
+        padding: "18px 20px",
+        opacity,
+        boxShadow: "0 4px 14px rgba(20,20,18,0.04)",
+      }}
+    >
+      <div
+        className="type-eyebrow"
+        style={{ color: "var(--color-muted)", marginBottom: 10 }}
+      >
+        {metric.label}
+      </div>
+      <div
+        className="type-display-l"
+        style={{
+          color: "var(--color-ink)",
+          fontVariantNumeric: "tabular-nums",
+          lineHeight: 1,
+        }}
+      >
+        {number}
+      </div>
+      <div
+        className="type-small"
+        style={{
+          color: "#B18544",
+          marginTop: 8,
+          fontFamily: "var(--font-mono)",
+        }}
+      >
+        {metric.delta}
+      </div>
+    </motion.div>
   );
 }
 
