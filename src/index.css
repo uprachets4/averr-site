@@ -38,9 +38,6 @@
   --color-muted-2:    #8A8377;
   --color-muted-l:    #7A7770;
 
-  /* Personal brand accent — use only on /about founder identity. */
-  --color-brand-navy: #131046;
-
   /* Fonts */
   --font-display: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-body:    "Inter", ui-sans-serif, system-ui, sans-serif;

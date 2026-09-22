@@ -197,7 +197,8 @@ function MonogramHero() {
         style={{ opacity: 0.05 }}
       />
 
-      {/* Ambient brand fragments */}
+      {/* Ambient brand fragments — 5 total, varied primitives */}
+      {/* 1. Circle outline, top-left */}
       <motion.div
         aria-hidden
         style={{
@@ -207,8 +208,8 @@ function MonogramHero() {
           width: 32,
           height: 32,
           borderRadius: "50%",
-          border: "1px solid var(--color-brand-navy)",
-          opacity: 0.3,
+          border: "1px solid var(--color-ink)",
+          opacity: 0.25,
           pointerEvents: "none",
         }}
         animate={
@@ -218,6 +219,7 @@ function MonogramHero() {
         }
         transition={{ duration: 40, repeat: Infinity, ease: ease.inOut }}
       />
+      {/* 2. Square outline, bottom-right */}
       <motion.div
         aria-hidden
         style={{
@@ -236,6 +238,72 @@ function MonogramHero() {
             : { x: [0, -22, 0, 18, 0], y: [0, 16, -12, 0, 0] }
         }
         transition={{ duration: 55, repeat: Infinity, ease: ease.inOut }}
+      />
+      {/* 3. Plus sign, top-right */}
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "14%",
+          right: "10%",
+          width: 20,
+          height: 20,
+          opacity: 0.2,
+          pointerEvents: "none",
+          color: "var(--color-ink)",
+        }}
+        animate={
+          reduce
+            ? undefined
+            : { x: [0, 14, 0, -14, 0], y: [0, 10, -10, 0, 0] }
+        }
+        transition={{ duration: 50, repeat: Infinity, ease: ease.inOut }}
+      >
+        <svg viewBox="0 0 20 20" fill="none" style={{ display: "block", width: "100%", height: "100%" }}>
+          <line x1="10" y1="2" x2="10" y2="18" stroke="currentColor" strokeWidth="1.5" />
+          <line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+      </motion.div>
+      {/* 4. Small horizontal line, middle-left */}
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "6%",
+          width: 40,
+          height: 2,
+          background: "var(--color-parch)",
+          opacity: 0.5,
+          pointerEvents: "none",
+        }}
+        animate={
+          reduce
+            ? undefined
+            : { x: [0, 18, 0, -12, 0], y: [0, -8, 8, 0, 0] }
+        }
+        transition={{ duration: 65, repeat: Infinity, ease: ease.inOut }}
+      />
+      {/* 5. Small filled dot, middle-right */}
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "48%",
+          right: "6%",
+          width: 8,
+          height: 8,
+          borderRadius: "50%",
+          background: "var(--color-ink)",
+          opacity: 0.3,
+          pointerEvents: "none",
+        }}
+        animate={
+          reduce
+            ? undefined
+            : { x: [0, -12, 0, 12, 0], y: [0, 10, -10, 0, 0] }
+        }
+        transition={{ duration: 45, repeat: Infinity, ease: ease.inOut }}
       />
 
       <div
@@ -285,7 +353,7 @@ function MonogramHero() {
           <div
             className="type-h3"
             style={{
-              color: "var(--color-brand-navy)",
+              color: "var(--color-ink)",
               letterSpacing: "0.15em",
               textTransform: "uppercase",
             }}
