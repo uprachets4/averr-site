@@ -1,15 +1,116 @@
-import { useEffect } from "react";
-import { motion, useReducedMotion } from "motion/react";
-import { ease } from "../lib/motion";
-import PillHl from "../components/PillHl";
-import FinalCTA from "../components/FinalCTA";
-
+import { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from "motion/react";
+import { duration, ease } from "../lib/motion";
+import MagneticCTA from "../components/MagneticCTA";
+import MonogramMark from "../components/MonogramMark";
+import ProcessTimeline from "../components/ProcessTimeline";
 
 /* ═══════════════════════════════════════════════════════════════
-   //_01 · WHO
+   Character-by-character reveal helper
    ═══════════════════════════════════════════════════════════════ */
 
-function Who() {
+function CharReveal({
+  text,
+  delay = 0,
+  stagger = 0.03,
+  perCharDuration = 0.4,
+  className,
+  style,
+  as = "span",
+}: {
+  text: string;
+  delay?: number;
+  stagger?: number;
+  perCharDuration?: number;
+  className?: string;
+  style?: React.CSSProperties;
+  as?: "span" | "h1" | "h2" | "p";
+}) {
+  const reduce = useReducedMotion();
+  const chars = Array.from(text);
+  const Tag: React.ElementType = motion[as as keyof typeof motion] as React.ElementType;
+  return (
+    <Tag
+      className={className}
+      style={style}
+      initial={reduce ? { opacity: 1 } : undefined}
+      animate={reduce ? { opacity: 1 } : undefined}
+    >
+      {chars.map(function drawChar(ch, i) {
+        return (
+          <motion.span
+            key={i}
+            initial={{
+              opacity: reduce ? 1 : 0,
+              y: reduce ? 0 : 20,
+            }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: reduce ? 0 : perCharDuration,
+              ease: ease.outQuart,
+              delay: reduce ? 0 : delay + i * stagger,
+            }}
+            style={{ display: "inline-block", whiteSpace: "pre" }}
+          >
+            {ch}
+          </motion.span>
+        );
+      })}
+    </Tag>
+  );
+}
+
+function CharRevealInView({
+  text,
+  stagger = 0.03,
+  className,
+  style,
+}: {
+  text: string;
+  stagger?: number;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const reduce = useReducedMotion();
+  const chars = Array.from(text);
+  return (
+    <span className={className} style={style}>
+      {chars.map(function drawChar(ch, i) {
+        return (
+          <motion.span
+            key={i}
+            initial={{
+              opacity: reduce ? 1 : 0,
+              y: reduce ? 0 : 20,
+            }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-15% 0px" }}
+            transition={{
+              duration: reduce ? 0 : 0.4,
+              ease: ease.outQuart,
+              delay: reduce ? 0 : i * stagger,
+            }}
+            style={{ display: "inline-block", whiteSpace: "pre" }}
+          >
+            {ch}
+          </motion.span>
+        );
+      })}
+    </span>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Band 1 — The Monogram Moment
+   ═══════════════════════════════════════════════════════════════ */
+
+function MonogramHero() {
   const reduce = useReducedMotion();
 
   return (
@@ -18,680 +119,1037 @@ function Who() {
         position: "relative",
         overflow: "hidden",
         backgroundColor: "var(--color-bg)",
-        padding: "180px 40px 100px",
+        minHeight: "100vh",
+        padding: "120px 40px 80px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
+      className="about-hero"
     >
-      <div
+      {/* Warm gradient wash — slow rotation */}
+      <motion.div
         aria-hidden
         style={{
           position: "absolute",
-          inset: 0,
+          top: "50%",
+          left: "50%",
+          width: "90vmin",
+          height: "90vmin",
+          marginTop: "-45vmin",
+          marginLeft: "-45vmin",
           background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
+            "radial-gradient(circle at 50% 50%, rgba(237,233,226,0.6), transparent 60%)",
+          opacity: 0.85,
           pointerEvents: "none",
         }}
+        animate={reduce ? undefined : { rotate: 360 }}
+        transition={{
+          duration: 90,
+          repeat: Infinity,
+          ease: "linear",
+        }}
       />
+
       <div className="grain-light" aria-hidden="true" />
 
-      <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto" }}>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          maxWidth: 1000,
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          gap: 32,
+        }}
+      >
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: 0.2 }}
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: 32,
+          transition={{
+            duration: reduce ? 0 : 0.5,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 0.15,
           }}
+          className="type-eyebrow"
+          style={{ color: "var(--color-ink-soft)" }}
         >
-          //_01 · who
+          The Studio · Founder-led
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.3 }}
-          className="type-display-xl"
+        <MonogramMark variant="hero" />
+
+        <motion.div
+          initial={{ opacity: reduce ? 1 : 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            duration: reduce ? 0 : 0.5,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 2.05,
+          }}
+          className="type-eyebrow"
+          style={{ color: "var(--color-ink-soft)" }}
+        >
+          Prachets Upadhyay · Founder, Averr Studios
+        </motion.div>
+
+        <CharReveal
+          text="The studio for founders who care how they show up."
+          delay={2.2}
+          stagger={0.03}
+          perCharDuration={0.4}
+          className="type-display-l"
           style={{
             color: "var(--color-ink)",
-            marginBottom: 48,
-            maxWidth: 1080,
+            maxWidth: "22ch",
+            margin: 0,
           }}
-        >
-          One operator.{" "}
-          <motion.span
-            initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.bounce, delay: 0.8 }}
-            style={{ display: "inline-block" }}
-          >
-            <PillHl>Three pillars</PillHl>
-          </motion.span>. Ten years of shipping.
-        </motion.h1>
+          as="span"
+        />
 
-        <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+        <motion.div
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.1 }}
+          transition={{
+            duration: reduce ? 0 : 0.6,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 3.4,
+          }}
           style={{
-            fontSize: 20,
-            lineHeight: 1.55,
-            color: "var(--color-muted)",
-            maxWidth: 760,
+            display: "flex",
+            gap: 16,
+            flexWrap: "wrap",
+            justifyContent: "center",
+            marginTop: 16,
           }}
         >
-          I'm Prachets. I run Averr Studios out of Toronto — a boutique studio
-          for businesses that refuse to look templated. Design, Automate, Grow.
-          Same person on every project. No account manager between you and the
-          work.
-        </motion.p>
+          <MagneticCTA to="/work" variant="primary">
+            See the work
+          </MagneticCTA>
+          <MagneticCTA to="/contact" variant="ghost">
+            Book a call
+          </MagneticCTA>
+        </motion.div>
       </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .about-hero { min-height: 90vh; }
+        }
+      `}</style>
     </section>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   //_02 · WHAT I ACTUALLY DO ALL DAY
+   Band 2 — Four principles
    ═══════════════════════════════════════════════════════════════ */
 
-const DAY_TO_DAY = [
+type Principle = {
+  n: string;
+  title: string;
+  body: string;
+  variant: "stroke-fill" | "scale-up" | "skew-straighten" | "slow-rotate";
+  numeralPosition: "top-right" | "top-left" | "center";
+  bg: "cream" | "alt" | "dark";
+};
+
+const PRINCIPLES: Principle[] = [
   {
-    pillar: "Design",
-    body:
-      "Custom marketing sites and product UI. React, Framer, Next.js, Tailwind, Framer Motion. If it renders in a browser, I can build it.",
+    n: "01",
+    title: "Craft over checklists.",
+    body: "We don't ship template sections because “websites have this section.” Every element earns its place. Every animation serves comprehension or delight. If a section could sit on a ThemeForest template unchanged, it gets rebuilt.",
+    variant: "stroke-fill",
+    numeralPosition: "top-right",
+    bg: "cream",
   },
   {
-    pillar: "Automate",
-    body:
-      "AI systems and workflow automation. Claude API, Python, n8n. The boring parts of your business, running without you in the loop.",
+    n: "02",
+    title: "Direction first, build second.",
+    body: "Before any code is written, you get a design direction — palette, typography, signature moves, interaction plan. One checkpoint. One decision. Then the studio builds independently. No approval-by-committee.",
+    variant: "scale-up",
+    numeralPosition: "top-left",
+    bg: "alt",
   },
   {
-    pillar: "Grow",
-    body:
-      "Paid campaigns and organic distribution. Google Ads, Meta Ads, LinkedIn, long-form content. Numbers-driven, not vibes-driven.",
+    n: "03",
+    title: "Motion as language.",
+    body: "Every scroll frame, every hover, every page load is choreographed. Motion tells the visitor how to read the site. When it doesn’t serve that, it doesn’t ship.",
+    variant: "skew-straighten",
+    numeralPosition: "top-right",
+    bg: "cream",
+  },
+  {
+    n: "04",
+    title: "A site that ages well.",
+    body: "Trend-driven design ages in 18 months. The studio designs for typography, spacing, and interaction fundamentals that hold up in three years. Every project is built to be portfolio-worthy for the studio and for the client.",
+    variant: "slow-rotate",
+    numeralPosition: "center",
+    bg: "dark",
   },
 ];
 
-function DayToDay() {
+function PrinciplesBand() {
+  return (
+    <>
+      {PRINCIPLES.map(function drawPrinciple(p) {
+        return <PrincipleSection key={p.n} principle={p} />;
+      })}
+    </>
+  );
+}
+
+function PrincipleSection({ principle }: { principle: Principle }) {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  const bg =
+    principle.bg === "dark"
+      ? "var(--color-dark)"
+      : principle.bg === "alt"
+        ? "var(--color-bg-alt)"
+        : "var(--color-bg)";
+
+  const inkColor =
+    principle.bg === "dark" ? "var(--color-parch)" : "var(--color-ink)";
+  const softColor =
+    principle.bg === "dark"
+      ? "var(--color-muted-l)"
+      : "var(--color-ink-soft)";
+  const ruleColor =
+    principle.bg === "dark"
+      ? "var(--color-parch)"
+      : "#B18544";
 
   return (
     <section
+      ref={ref}
       style={{
-        backgroundColor: "var(--color-bg-alt)",
-        padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
         position: "relative",
+        overflow: "hidden",
+        backgroundColor: bg,
+        minHeight: "100vh",
+        padding: "120px 40px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      className="principle-section"
+    >
+      {principle.bg === "dark" ? (
+        <div className="grain-dark" aria-hidden="true" />
+      ) : (
+        <div className="grain-light" aria-hidden="true" />
+      )}
+
+      <NumeralBackdrop
+        principle={principle}
+        scrollYProgress={scrollYProgress}
+        reduce={!!reduce}
+      />
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          maxWidth: "60ch",
+          margin: "0 auto",
+          textAlign: "center",
+        }}
+      >
+        <motion.div
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-20% 0px" }}
+          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
+          className="type-eyebrow"
+          style={{
+            color: softColor,
+            marginBottom: 32,
+          }}
+        >
+          Principle {principle.n}
+        </motion.div>
+
+        <div
+          className="type-display-l"
+          style={{ color: inkColor, marginBottom: 40 }}
+        >
+          <CharRevealInView
+            text={principle.title}
+            stagger={0.03}
+            style={{ color: inkColor }}
+          />
+        </div>
+
+        <motion.p
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-15% 0px" }}
+          transition={{
+            duration: reduce ? 0 : 0.6,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 1.2,
+          }}
+          className="type-body-lg"
+          style={{
+            color: principle.bg === "dark" ? "var(--color-muted-l)" : "var(--color-ink)",
+            marginBottom: 40,
+          }}
+        >
+          {principle.body}
+        </motion.p>
+
+        <motion.hr
+          aria-hidden
+          initial={{ scaleX: reduce ? 1 : 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true, margin: "-15% 0px" }}
+          transition={{
+            duration: reduce ? 0 : 0.6,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 1.6,
+          }}
+          style={{
+            width: 40,
+            height: 2,
+            background: ruleColor,
+            border: "none",
+            margin: "0 auto",
+            transformOrigin: "left",
+            opacity: principle.bg === "dark" ? 0.9 : 1,
+          }}
+        />
+      </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .principle-section { min-height: 90vh; padding: 96px 24px; }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+function NumeralBackdrop({
+  principle,
+  scrollYProgress,
+  reduce,
+}: {
+  principle: Principle;
+  scrollYProgress: MotionValue<number>;
+  reduce: boolean;
+}) {
+  const numeralColor =
+    principle.bg === "dark" ? "var(--color-parch)" : "var(--color-ink)";
+
+  // 01 — stroke-then-fill grow across scroll progress
+  const strokeFillOpacity = useTransform(
+    scrollYProgress,
+    [0.4, 0.7],
+    [0, 0.12]
+  );
+  const strokeOnlyOpacity = useTransform(
+    scrollYProgress,
+    [0.2, 0.4, 0.7],
+    [0, 0.35, 0]
+  );
+
+  // 02 — scale-up 0.6 → 1.0
+  const scale = useTransform(scrollYProgress, [0.15, 0.55], [0.6, 1]);
+
+  // 03 — skew Y 12° → 0° over 0.2–0.8
+  const skewDeg = useTransform(scrollYProgress, [0.2, 0.8], [12, 0]);
+  const skewTransform = useTransform(skewDeg, (v) => `skewY(${v}deg)`);
+
+  // 04 — continuous rotation handled by motion animate loop
+
+  // Positioning
+  const positionStyle: React.CSSProperties =
+    principle.numeralPosition === "top-right"
+      ? { position: "absolute", top: "clamp(24px, 6vh, 96px)", right: 40 }
+      : principle.numeralPosition === "top-left"
+        ? { position: "absolute", top: "clamp(24px, 6vh, 96px)", left: 40 }
+        : {
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          };
+
+  const base: React.CSSProperties = {
+    ...positionStyle,
+    fontFamily: "var(--font-display), Georgia, serif",
+    fontSize: "clamp(160px, 28vw, 320px)",
+    fontWeight: 700,
+    lineHeight: 1,
+    color: numeralColor,
+    pointerEvents: "none",
+    zIndex: 0,
+    userSelect: "none",
+  };
+
+  switch (principle.variant) {
+    case "stroke-fill":
+      return (
+        <div style={{ ...base, opacity: 1, position: base.position }}>
+          <svg
+            viewBox="0 0 300 220"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "1em",
+              height: "0.75em",
+              overflow: "visible",
+            }}
+            aria-hidden
+          >
+            <motion.text
+              x="150"
+              y="180"
+              textAnchor="middle"
+              fontFamily="var(--font-display), Georgia, serif"
+              fontSize={260}
+              fontWeight={700}
+              fill={numeralColor}
+              style={{ opacity: reduce ? 0.12 : strokeFillOpacity }}
+            >
+              {principle.n}
+            </motion.text>
+            <motion.text
+              x="150"
+              y="180"
+              textAnchor="middle"
+              fontFamily="var(--font-display), Georgia, serif"
+              fontSize={260}
+              fontWeight={700}
+              fill="transparent"
+              stroke={numeralColor}
+              strokeWidth={2}
+              style={{ opacity: reduce ? 0 : strokeOnlyOpacity }}
+            >
+              {principle.n}
+            </motion.text>
+          </svg>
+        </div>
+      );
+    case "scale-up":
+      return (
+        <motion.div
+          aria-hidden
+          style={{
+            ...base,
+            opacity: 0.12,
+            scale: reduce ? 1 : scale,
+            transformOrigin: "top left",
+          }}
+        >
+          {principle.n}
+        </motion.div>
+      );
+    case "skew-straighten":
+      return (
+        <motion.div
+          aria-hidden
+          animate={
+            reduce
+              ? undefined
+              : {
+                  rotate: [0, -0.5, 0.5, 0],
+                }
+          }
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: ease.inOut,
+          }}
+          style={{
+            ...base,
+            opacity: 0.12,
+            transform: reduce ? "none" : (skewTransform as unknown as string),
+          }}
+        >
+          {principle.n}
+        </motion.div>
+      );
+    case "slow-rotate":
+      return (
+        <motion.div
+          aria-hidden
+          animate={reduce ? undefined : { rotate: 360 }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          style={{
+            ...base,
+            opacity: 0.14,
+          }}
+        >
+          {principle.n}
+        </motion.div>
+      );
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Band 3 — How we work
+   ═══════════════════════════════════════════════════════════════ */
+
+function HowWeWorkBand() {
+  const reduce = useReducedMotion();
+  return (
+    <section
+      style={{
+        position: "relative",
+        backgroundColor: "var(--color-bg-alt)",
+        padding: "160px 40px",
       }}
     >
       <div className="grain-light" aria-hidden="true" />
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          position: "relative",
-          zIndex: 2,
-          display: "grid",
-          gridTemplateColumns: "1fr 1.4fr",
-          gap: 80,
-          alignItems: "start",
-        }}
-        className="day-grid"
-      >
-        <div>
+      <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 2 }}>
+        <div style={{ textAlign: "center", marginBottom: 72 }}>
           <motion.div
-            initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
+            viewport={{ once: true, margin: "-20% 0px" }}
+            transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
             className="type-eyebrow"
             style={{
               color: "var(--color-muted)",
               marginBottom: 24,
             }}
           >
-            //_02 · what I actually do all day
+            How we work
           </motion.div>
-
           <motion.h2
-            initial={{ opacity: 0, y: reduce ? 0 : 20 }}
+            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
-            className="type-h2"
+            viewport={{ once: true, margin: "-15% 0px" }}
+            transition={{
+              duration: reduce ? 0 : 0.7,
+              ease: ease.outQuart,
+              delay: reduce ? 0 : 0.1,
+            }}
+            className="type-display-l"
             style={{
               color: "var(--color-ink)",
-              maxWidth: 480,
+              margin: 0,
+              maxWidth: 900,
+              marginInline: "auto",
             }}
           >
-            The <span className="fade-h">day-to-day.</span>
+            Direction. Design. Build. Refine. Ship.
           </motion.h2>
+          <motion.p
+            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-15% 0px" }}
+            transition={{
+              duration: reduce ? 0 : 0.6,
+              ease: ease.outQuart,
+              delay: reduce ? 0 : 0.25,
+            }}
+            className="type-body"
+            style={{
+              color: "var(--color-ink-soft)",
+              marginTop: 24,
+              maxWidth: 640,
+              marginInline: "auto",
+            }}
+          >
+            Every project runs through the same five stages. No surprises.
+          </motion.p>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {DAY_TO_DAY.map((entry, i) => (
-            <motion.article
-              key={entry.pillar}
-              initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{
-                duration: reduce ? 0.01 : 0.6,
-                ease: ease.outQuart,
-                delay: reduce ? 0 : 0.15 + i * 0.1,
-              }}
+        <ProcessTimeline />
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Band 4 — The founder card
+   ═══════════════════════════════════════════════════════════════ */
+
+type Chip = { label: string; tooltip: string };
+
+const FOUNDER_CHIPS: Chip[] = [
+  {
+    label: "Design",
+    tooltip: "Marketing sites, SaaS product design, dashboards",
+  },
+  {
+    label: "Automate",
+    tooltip: "AI agents, workflow automation, CRM integration",
+  },
+  {
+    label: "Grow",
+    tooltip: "Social + organic content, paid ads, attribution",
+  },
+];
+
+function FounderBand() {
+  const reduce = useReducedMotion();
+
+  return (
+    <section
+      style={{
+        position: "relative",
+        backgroundColor: "var(--color-bg)",
+        padding: "160px 40px 96px",
+      }}
+    >
+      <div className="grain-light" aria-hidden="true" />
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          maxWidth: 900,
+          margin: "0 auto",
+          textAlign: "center",
+        }}
+      >
+        <motion.div
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-20% 0px" }}
+          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
+          className="type-eyebrow"
+          style={{
+            color: "var(--color-ink-soft)",
+            marginBottom: 40,
+          }}
+        >
+          Who's behind this
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-15% 0px" }}
+          transition={{
+            duration: reduce ? 0 : 0.7,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 0.1,
+          }}
+          style={{
+            maxWidth: 720,
+            margin: "0 auto",
+            padding: 40,
+            border: "1px solid rgba(20,20,18,0.08)",
+            borderRadius: 12,
+            background: "var(--color-bg)",
+            boxShadow: "0 12px 40px rgba(20,20,18,0.06)",
+          }}
+        >
+          <div
+            className="founder-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+              gap: 48,
+              alignItems: "start",
+              textAlign: "left",
+            }}
+          >
+            <div
               style={{
-                padding: "32px 32px",
-                background: "var(--color-bg)",
-                border: "1px solid rgba(20,20,18,0.08)",
-                borderRadius: 4,
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <FounderMark />
+            </div>
+            <div
+              style={{
                 display: "flex",
                 flexDirection: "column",
                 gap: 20,
               }}
             >
-              <span
-                style={{
-                  alignSelf: "flex-start",
-                  padding: "6px 14px",
-                  borderRadius: 999,
-                  border: "1px solid rgba(20,20,18,0.18)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--color-ink-soft)",
-                }}
-              >
-                {entry.pillar}
-              </span>
-              <p
-                style={{
-                  fontSize: 17,
-                  lineHeight: 1.55,
-                  color: "var(--color-ink-soft)",
-                }}
-              >
-                {entry.body}
-              </p>
-            </motion.article>
-          ))}
-        </div>
-      </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .day-grid {
-            grid-template-columns: 1fr !important;
-            gap: 40px !important;
-          }
-        }
-      `}</style>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   //_03 · BEFORE THIS — timeline
-   ═══════════════════════════════════════════════════════════════ */
-
-const STOPS = [
-  {
-    n: "01",
-    role: "AE at Google (via Extended Workforce). Selling Google Cloud into mid-market.",
-    lesson:
-      "Where I learned that most B2B sales problems are actually positioning problems.",
-  },
-  {
-    n: "02",
-    role: "Co-founder at KlaasX Edutech. Scaled to a 15-person team, sold into 150+ institutions.",
-    lesson: "Where I learned that shipping fast beats shipping perfect.",
-  },
-  {
-    n: "03",
-    role: "Freelance web design and venture building at Gratifa.",
-    lesson: "Where I learned the shape of the studio I actually wanted to build.",
-  },
-];
-
-function BeforeThis() {
-  const reduce = useReducedMotion();
-
-  return (
-    <section
-      style={{
-        backgroundColor: "var(--color-bg)",
-        padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
-        position: "relative",
-      }}
-    >
-      <div className="grain-light" aria-hidden="true" />
-      <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 2 }}>
-        <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: 24,
-          }}
-        >
-          //_03 · before this
-        </motion.div>
-
-        <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
-          className="type-h2"
-          style={{
-            color: "var(--color-ink)",
-            marginBottom: 64,
-            maxWidth: 900,
-          }}
-        >
-          How I <span className="fade-h">got here.</span>
-        </motion.h2>
-
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {STOPS.map((stop, i) => (
-            <motion.li
-              key={stop.n}
-              initial={{ opacity: 0, y: reduce ? 0 : 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{
-                duration: reduce ? 0.01 : 0.6,
-                ease: ease.outQuart,
-                delay: reduce ? 0 : 0.1 + i * 0.1,
-              }}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "60px 1fr",
-                gap: 32,
-                alignItems: "start",
-                padding: "36px 0",
-                borderTop: "1px solid rgba(20,20,18,0.10)",
-                borderBottom:
-                  i === STOPS.length - 1
-                    ? "1px solid rgba(20,20,18,0.10)"
-                    : "none",
-              }}
-              className="stop-row"
-            >
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 12,
-                  letterSpacing: "0.14em",
-                  color: "var(--color-muted)",
-                  paddingTop: 6,
-                }}
-              >
-                {stop.n}
-              </div>
-              <div>
-                <p
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontWeight: 500,
-                    fontSize: "clamp(20px, 2.2vw, 28px)",
-                    letterSpacing: "-0.018em",
-                    lineHeight: 1.25,
-                    color: "var(--color-ink)",
-                    marginBottom: 14,
-                  }}
-                >
-                  {stop.role}
-                </p>
-                <p
-                  style={{
-                    fontSize: 16,
-                    lineHeight: 1.6,
-                    color: "var(--color-muted)",
-                    maxWidth: 720,
-                  }}
-                >
-                  {stop.lesson}
-                </p>
-              </div>
-            </motion.li>
-          ))}
-        </ul>
-      </div>
-
-      <style>{`
-        @media (max-width: 720px) {
-          .stop-row {
-            grid-template-columns: 40px 1fr !important;
-            gap: 20px !important;
-          }
-        }
-      `}</style>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   //_04 · HOW I WORK — 4 principles
-   ═══════════════════════════════════════════════════════════════ */
-
-const PRINCIPLES = [
-  {
-    head: "Fixed scope, fixed price, fixed timeline.",
-    body: "Weekly review call. Preview URLs from day one.",
-  },
-  {
-    head: "One person on your project — me.",
-    body: "No agency layers, no handoffs to junior staff you didn't hire.",
-  },
-  {
-    head: "If I can't do it well, I tell you and refer you to someone who can.",
-    body: "I'd rather lose a project than ship something I can't stand behind.",
-  },
-  {
-    head: "Everything I build, I could rebuild from scratch tomorrow.",
-    body: 'No black-box tools, no "you\'d need me to maintain it" lock-in.',
-  },
-];
-
-function HowIWork() {
-  const reduce = useReducedMotion();
-
-  return (
-    <section
-      style={{
-        backgroundColor: "var(--color-bg-alt)",
-        padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
-        position: "relative",
-      }}
-    >
-      <div className="grain-light" aria-hidden="true" />
-      <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 2 }}>
-        <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: 24,
-          }}
-        >
-          //_04 · how I work
-        </motion.div>
-
-        <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
-          className="type-h2"
-          style={{
-            color: "var(--color-ink)",
-            marginBottom: 64,
-            maxWidth: 900,
-          }}
-        >
-          Four principles <span className="fade-h">I don't break.</span>
-        </motion.h2>
-
-        <div
-          className="principles-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 16,
-          }}
-        >
-          {PRINCIPLES.map((p, i) => (
-            <motion.article
-              key={p.head}
-              initial={{ opacity: 0, y: reduce ? 0 : 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{
-                duration: reduce ? 0.01 : 0.6,
-                ease: ease.outQuart,
-                delay: reduce ? 0 : 0.15 + i * 0.08,
-              }}
-              style={{
-                padding: "40px 36px",
-                background: "var(--color-bg)",
-                border: "1px solid rgba(20,20,18,0.08)",
-                borderRadius: 4,
-                display: "flex",
-                flexDirection: "column",
-                gap: 16,
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  letterSpacing: "0.14em",
-                  color: "var(--color-muted-2)",
-                  marginBottom: 4,
-                }}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </div>
-              <h3
-                className="type-h3"
+              <h2
+                className="type-h2"
                 style={{
                   color: "var(--color-ink)",
+                  margin: 0,
                 }}
               >
-                {p.head}
-              </h3>
+                Prachets Upadhyay
+              </h2>
+              <div
+                className="type-eyebrow"
+                style={{ color: "var(--color-ink-soft)" }}
+              >
+                Founder + Design Engineer
+              </div>
               <p
+                className="type-body"
                 style={{
-                  fontSize: 15,
-                  lineHeight: 1.6,
-                  color: "var(--color-muted)",
+                  color: "var(--color-ink)",
+                  maxWidth: "60ch",
+                  margin: 0,
                 }}
               >
-                {p.body}
+                Toronto-based design engineer with a background spanning B2B
+                SaaS sales at Google, frontend development, and AI workflow
+                automation. Previously co-founded KlaasX Edutech (15-person
+                team, 150+ institutions). Started Averr Studios to build the
+                kind of client websites that actually earn their portfolio
+                slot.
               </p>
-            </motion.article>
-          ))}
-        </div>
-      </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .principles-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   //_05 · WHAT I DON'T DO — dark inversion
-   ═══════════════════════════════════════════════════════════════ */
-
-const NOT_DOING = [
-  "I don't do retainers with 12-month minimums.",
-  "I don't white-label for agencies.",
-  "I don't take projects I can't ship in 90 days.",
-];
-
-function WhatIDontDo() {
-  const reduce = useReducedMotion();
-
-  return (
-    <section
-      style={{
-        backgroundColor: "var(--color-dark)",
-        color: "var(--color-parch)",
-        padding: "140px 40px",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <div className="grain-dark" aria-hidden="true" />
-      <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 2 }}>
-        <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-muted-l)",
-            marginBottom: 24,
-          }}
-        >
-          //_05 · what I don't do
+              <FounderChips reduce={!!reduce} />
+              <FounderLinks />
+            </div>
+          </div>
         </motion.div>
 
-        <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
-          className="type-h2"
-          style={{
-            marginBottom: 64,
-            maxWidth: 900,
-          }}
-        >
-          The things I <span className="fade-h-dark">say no to.</span>
-        </motion.h2>
-
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {NOT_DOING.map((line, i) => (
-            <motion.li
-              key={line}
-              initial={{ opacity: 0, y: reduce ? 0 : 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{
-                duration: reduce ? 0.01 : 0.6,
-                ease: ease.outQuart,
-                delay: reduce ? 0 : 0.1 + i * 0.1,
-              }}
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(24px, 2.6vw, 36px)",
-                fontWeight: 500,
-                letterSpacing: "-0.018em",
-                lineHeight: 1.25,
-                padding: "28px 0",
-                borderTop: "1px solid rgba(237,231,218,0.14)",
-                borderBottom:
-                  i === NOT_DOING.length - 1
-                    ? "1px solid rgba(237,231,218,0.14)"
-                    : "none",
-                color: "var(--color-parch)",
-              }}
-            >
-              {line}
-            </motion.li>
-          ))}
-        </ul>
-
         <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 0.5 }}
+          initial={{ opacity: reduce ? 1 : 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-15% 0px" }}
+          transition={{
+            duration: reduce ? 0 : 0.6,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 0.4,
+          }}
+          className="type-small"
           style={{
-            marginTop: 48,
-            fontSize: 16,
-            lineHeight: 1.6,
-            color: "var(--color-muted-l)",
-            maxWidth: 560,
+            color: "var(--color-ink-soft)",
+            fontStyle: "italic",
+            marginTop: 28,
           }}
         >
-          Averr is a boutique studio. I take a small number of projects each
-          quarter and finish them.
+          Grid absorbs future collaborators without a rewrite.
         </motion.p>
       </div>
     </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   //_06 · OUTSIDE THIS — one paragraph
-   ═══════════════════════════════════════════════════════════════ */
-
-function OutsideThis() {
-  const reduce = useReducedMotion();
-
+function FounderMark() {
   return (
-    <section
+    <div
       style={{
-        backgroundColor: "var(--color-bg-warm)",
-        padding: "128px 40px",
         position: "relative",
+        width: 240,
+        height: 240,
+        background: "var(--color-dark)",
+        borderRadius: 12,
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <div className="grain-light" aria-hidden="true" />
+      <div className="grain-dark" aria-hidden />
       <div
         style={{
-          maxWidth: 1200,
-          margin: "0 auto",
           position: "relative",
           zIndex: 2,
-          display: "grid",
-          gridTemplateColumns: "140px 1fr",
-          gap: 40,
-          alignItems: "start",
+          transform: "scale(0.85)",
+          filter:
+            "invert(1) brightness(1.35) contrast(0.95)",
         }}
-        className="outside-grid"
+      >
+        <MonogramMark variant="mini" />
+      </div>
+    </div>
+  );
+}
+
+function FounderChips({ reduce }: { reduce: boolean }) {
+  const [hasFinePointer, setHasFinePointer] = useState(false);
+  useEffect(function detect() {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    setHasFinePointer(mq.matches);
+    function onChange(e: MediaQueryListEvent) {
+      setHasFinePointer(e.matches);
+    }
+    mq.addEventListener("change", onChange);
+    return function cleanup() {
+      mq.removeEventListener("change", onChange);
+    };
+  }, []);
+
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      {FOUNDER_CHIPS.map(function drawChip(c, i) {
+        return (
+          <FounderChip
+            key={c.label}
+            chip={c}
+            index={i}
+            reduce={reduce}
+            enableTooltip={hasFinePointer}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+function FounderChip({
+  chip,
+  index,
+  reduce,
+  enableTooltip,
+}: {
+  chip: Chip;
+  index: number;
+  reduce: boolean;
+  enableTooltip: boolean;
+}) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-30% 0px" }}
+      transition={{
+        duration: reduce ? 0.001 : 0.4,
+        ease: ease.outQuart,
+        delay: reduce ? 0 : 0.6 + index * 0.08,
+      }}
+      onHoverStart={function h() {
+        setHovered(true);
+      }}
+      onHoverEnd={function h() {
+        setHovered(false);
+      }}
+      className="type-eyebrow"
+      style={{
+        position: "relative",
+        padding: "8px 14px",
+        borderRadius: 100,
+        border: hovered
+          ? "1px solid var(--color-ink)"
+          : "1px solid rgba(20,20,18,0.6)",
+        background: hovered ? "var(--color-ink)" : "transparent",
+        color: hovered ? "var(--color-parch)" : "var(--color-ink)",
+        cursor: enableTooltip ? "help" : "default",
+        transform: hovered && !reduce ? "translateY(-2px)" : "translateY(0)",
+        transitionProperty: "background-color, border-color, color, transform",
+        transitionDuration: `${duration.fast * 1000}ms`,
+        transitionTimingFunction: `cubic-bezier(${ease.outQuart.join(",")})`,
+      }}
+    >
+      {chip.label}
+      {enableTooltip && hovered ? (
+        <motion.div
+          role="tooltip"
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: duration.fast, ease: ease.outQuart }}
+          className="type-small"
+          style={{
+            position: "absolute",
+            top: "calc(100% + 8px)",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "var(--color-bg)",
+            color: "var(--color-ink)",
+            border: "1px solid rgba(20,20,18,0.18)",
+            borderRadius: 6,
+            padding: "8px 12px",
+            whiteSpace: "nowrap",
+            boxShadow: "0 8px 24px rgba(20,20,18,0.10)",
+            pointerEvents: "none",
+            zIndex: 10,
+          }}
+        >
+          {chip.tooltip}
+        </motion.div>
+      ) : null}
+    </motion.div>
+  );
+}
+
+function FounderLinks() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 24,
+        flexWrap: "wrap",
+        marginTop: 8,
+      }}
+    >
+      <UnderlineLink
+        href="https://www.linkedin.com/in/prachetsupadhyay"
+        label="LinkedIn"
+      />
+      <UnderlineLink
+        href="https://prachetsupadhyay.com"
+        label="Portfolio"
+      />
+    </div>
+  );
+}
+
+function UnderlineLink({ href, label }: { href: string; label: string }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={function h() {
+        setHovered(true);
+      }}
+      onMouseLeave={function h() {
+        setHovered(false);
+      }}
+      className="type-small"
+      style={{
+        position: "relative",
+        color: "var(--color-ink)",
+        textDecoration: "none",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+      }}
+    >
+      {label}
+      <span aria-hidden>↗</span>
+      <span
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: -3,
+          height: 1,
+          background: "currentColor",
+          transform: `scaleX(${hovered ? 1 : 0})`,
+          transformOrigin: "left",
+          transition: `transform ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
+        }}
+      />
+    </a>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Band 5 — Closing CTA
+   ═══════════════════════════════════════════════════════════════ */
+
+function ClosingCTA() {
+  const reduce = useReducedMotion();
+  return (
+    <section
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        backgroundColor: "var(--color-dark)",
+        color: "var(--color-parch)",
+        minHeight: "85vh",
+        padding: "160px 40px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div className="grain-dark" aria-hidden="true" style={{ opacity: 0.5 }} />
+
+      {/* Warm accent glow */}
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          width: "80vmin",
+          height: "80vmin",
+          marginTop: "-40vmin",
+          marginLeft: "-40vmin",
+          background:
+            "radial-gradient(circle at 50% 50%, rgba(237,233,226,0.15), transparent 60%)",
+          pointerEvents: "none",
+        }}
+        animate={
+          reduce
+            ? undefined
+            : {
+                x: [-30, 30, -30],
+                y: [-20, 20, -20],
+              }
+        }
+        transition={{
+          duration: 60,
+          repeat: Infinity,
+          ease: ease.inOut,
+        }}
+      />
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          maxWidth: 900,
+          margin: "0 auto",
+          textAlign: "center",
+        }}
       >
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
+          viewport={{ once: true, margin: "-20% 0px" }}
+          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
-            color: "var(--color-muted)",
+            color: "var(--color-parch)",
+            opacity: 0.6,
+            marginBottom: 32,
           }}
         >
-          //_06 · outside this
+          Start here
         </motion.div>
 
-        <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+        <div
+          className="type-display-l"
+          style={{ color: "var(--color-parch)", marginBottom: 48 }}
+        >
+          <CharRevealInView
+            text="Ready to build a site that earns its place?"
+            stagger={0.03}
+            style={{ color: "var(--color-parch)" }}
+          />
+        </div>
+
+        <motion.div
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
+          viewport={{ once: true, margin: "-15% 0px" }}
+          transition={{
+            duration: reduce ? 0 : 0.6,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 1.6,
+          }}
           style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(22px, 2.4vw, 30px)",
-            lineHeight: 1.4,
-            letterSpacing: "-0.018em",
-            color: "var(--color-ink)",
-            maxWidth: 820,
+            display: "flex",
+            gap: 16,
+            flexWrap: "wrap",
+            justifyContent: "center",
           }}
         >
-          When I'm not shipping: reading (mostly non-fiction, currently working
-          through the intersection of AI and enterprise sales), lifting, and
-          helping my friend Max grow CG Walls & Floors on weekends.
-        </motion.p>
+          <MagneticCTA to="/contact" variant="primary">
+            Book a call
+          </MagneticCTA>
+          <MagneticCTA to="/work" variant="ghost">
+            See the work
+          </MagneticCTA>
+        </motion.div>
       </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .outside-grid {
-            grid-template-columns: 1fr !important;
-            gap: 24px !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }
@@ -701,7 +1159,8 @@ function OutsideThis() {
    ═══════════════════════════════════════════════════════════════ */
 
 export default function About() {
-  useEffect(function updateTitle() {
+  useEffect(function scrollTopAndTitle() {
+    window.scrollTo(0, 0);
     const prev = document.title;
     document.title = "About — Averr Studios";
     return function restore() {
@@ -709,19 +1168,13 @@ export default function About() {
     };
   }, []);
 
-  useEffect(function scrollTop() {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <>
-      <Who />
-      <DayToDay />
-      <BeforeThis />
-      <HowIWork />
-      <WhatIDontDo />
-      <OutsideThis />
-      <FinalCTA markerNumber="07" />
+      <MonogramHero />
+      <PrinciplesBand />
+      <HowWeWorkBand />
+      <FounderBand />
+      <ClosingCTA />
     </>
   );
 }
