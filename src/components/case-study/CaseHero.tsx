@@ -319,7 +319,8 @@ function HeroCluster({
   // Mobile falls back to single centered middle-card image.
   if (!isDesktop) {
     return (
-      <div style={{ marginTop: 64 }}>
+      <div style={{ position: "relative", marginTop: 64 }}>
+        <AmbientMarks reduce={reduce} />
         <MobileCluster images={images} client={client} reduce={reduce} />
         {caption ? <ClusterCaption caption={caption} reduce={reduce} /> : null}
       </div>
