@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   motion,
   useReducedMotion,
@@ -53,37 +53,38 @@ function CharReveal({
     <Tag className={className} style={style}>
       {words.map(function drawWord(chars, wi) {
         return (
-          <span
-            key={wi}
-            style={{
-              display: "inline-block",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {chars.map(function drawChar(ch, ci) {
-              globalIdx++;
-              const gi = globalIdx;
-              return (
-                <motion.span
-                  key={ci}
-                  initial={{
-                    opacity: reduce ? 1 : 0,
-                    y: reduce ? 0 : 20,
-                  }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
-                    ease: ease.outQuart,
-                    delay: reduce ? 0 : delay + gi * REVEAL_STAGGER,
-                  }}
-                  style={{ display: "inline-block" }}
-                >
-                  {ch}
-                </motion.span>
-              );
-            })}
-            {wi < words.length - 1 ? " " : ""}
-          </span>
+          <Fragment key={wi}>
+            <span
+              style={{
+                display: "inline-block",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {chars.map(function drawChar(ch, ci) {
+                globalIdx++;
+                const gi = globalIdx;
+                return (
+                  <motion.span
+                    key={ci}
+                    initial={{
+                      opacity: reduce ? 1 : 0,
+                      y: reduce ? 0 : 20,
+                    }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
+                      ease: ease.outQuart,
+                      delay: reduce ? 0 : delay + gi * REVEAL_STAGGER,
+                    }}
+                    style={{ display: "inline-block" }}
+                  >
+                    {ch}
+                  </motion.span>
+                );
+              })}
+            </span>
+            {wi < words.length - 1 ? " " : null}
+          </Fragment>
         );
       })}
     </Tag>
@@ -106,38 +107,39 @@ function CharRevealInView({
     <span className={className} style={style}>
       {words.map(function drawWord(chars, wi) {
         return (
-          <span
-            key={wi}
-            style={{
-              display: "inline-block",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {chars.map(function drawChar(ch, ci) {
-              globalIdx++;
-              const gi = globalIdx;
-              return (
-                <motion.span
-                  key={ci}
-                  initial={{
-                    opacity: reduce ? 1 : 0,
-                    y: reduce ? 0 : 20,
-                  }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-15% 0px" }}
-                  transition={{
-                    duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
-                    ease: ease.outQuart,
-                    delay: reduce ? 0 : gi * REVEAL_STAGGER,
-                  }}
-                  style={{ display: "inline-block" }}
-                >
-                  {ch}
-                </motion.span>
-              );
-            })}
-            {wi < words.length - 1 ? " " : ""}
-          </span>
+          <Fragment key={wi}>
+            <span
+              style={{
+                display: "inline-block",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {chars.map(function drawChar(ch, ci) {
+                globalIdx++;
+                const gi = globalIdx;
+                return (
+                  <motion.span
+                    key={ci}
+                    initial={{
+                      opacity: reduce ? 1 : 0,
+                      y: reduce ? 0 : 20,
+                    }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-15% 0px" }}
+                    transition={{
+                      duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
+                      ease: ease.outQuart,
+                      delay: reduce ? 0 : gi * REVEAL_STAGGER,
+                    }}
+                    style={{ display: "inline-block" }}
+                  >
+                    {ch}
+                  </motion.span>
+                );
+              })}
+            </span>
+            {wi < words.length - 1 ? " " : null}
+          </Fragment>
         );
       })}
     </span>
