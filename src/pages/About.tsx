@@ -15,51 +15,75 @@ import ProcessTimeline from "../components/ProcessTimeline";
    Character-by-character reveal helper
    ═══════════════════════════════════════════════════════════════ */
 
+/* Word-preserving character reveal — outer span per word has
+ * whiteSpace:nowrap so the browser wraps at word boundaries only.
+ * Each character inside a word is a motion.span with a globally
+ * staggered entrance. Regular text-node spaces between words let
+ * the browser handle line breaks naturally.
+ */
+function splitTextForReveal(text: string): string[][] {
+  return text.split(" ").map(function toChars(word) {
+    return Array.from(word);
+  });
+}
+
+const REVEAL_STAGGER = 0.02;
+const REVEAL_PER_CHAR_DURATION = 0.35;
+
 function CharReveal({
   text,
   delay = 0,
-  stagger = 0.03,
-  perCharDuration = 0.4,
   className,
   style,
   as = "span",
 }: {
   text: string;
   delay?: number;
-  stagger?: number;
-  perCharDuration?: number;
   className?: string;
   style?: React.CSSProperties;
   as?: "span" | "h1" | "h2" | "p";
 }) {
   const reduce = useReducedMotion();
-  const chars = Array.from(text);
-  const Tag: React.ElementType = motion[as as keyof typeof motion] as React.ElementType;
+  const words = splitTextForReveal(text);
+  const Tag: React.ElementType = motion[
+    as as keyof typeof motion
+  ] as React.ElementType;
+  let globalIdx = -1;
   return (
-    <Tag
-      className={className}
-      style={style}
-      initial={reduce ? { opacity: 1 } : undefined}
-      animate={reduce ? { opacity: 1 } : undefined}
-    >
-      {chars.map(function drawChar(ch, i) {
+    <Tag className={className} style={style}>
+      {words.map(function drawWord(chars, wi) {
         return (
-          <motion.span
-            key={i}
-            initial={{
-              opacity: reduce ? 1 : 0,
-              y: reduce ? 0 : 20,
+          <span
+            key={wi}
+            style={{
+              display: "inline-block",
+              whiteSpace: "nowrap",
             }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: reduce ? 0 : perCharDuration,
-              ease: ease.outQuart,
-              delay: reduce ? 0 : delay + i * stagger,
-            }}
-            style={{ display: "inline-block", whiteSpace: "pre" }}
           >
-            {ch}
-          </motion.span>
+            {chars.map(function drawChar(ch, ci) {
+              globalIdx++;
+              const gi = globalIdx;
+              return (
+                <motion.span
+                  key={ci}
+                  initial={{
+                    opacity: reduce ? 1 : 0,
+                    y: reduce ? 0 : 20,
+                  }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
+                    ease: ease.outQuart,
+                    delay: reduce ? 0 : delay + gi * REVEAL_STAGGER,
+                  }}
+                  style={{ display: "inline-block" }}
+                >
+                  {ch}
+                </motion.span>
+              );
+            })}
+            {wi < words.length - 1 ? " " : ""}
+          </span>
         );
       })}
     </Tag>
@@ -68,38 +92,52 @@ function CharReveal({
 
 function CharRevealInView({
   text,
-  stagger = 0.03,
   className,
   style,
 }: {
   text: string;
-  stagger?: number;
   className?: string;
   style?: React.CSSProperties;
 }) {
   const reduce = useReducedMotion();
-  const chars = Array.from(text);
+  const words = splitTextForReveal(text);
+  let globalIdx = -1;
   return (
     <span className={className} style={style}>
-      {chars.map(function drawChar(ch, i) {
+      {words.map(function drawWord(chars, wi) {
         return (
-          <motion.span
-            key={i}
-            initial={{
-              opacity: reduce ? 1 : 0,
-              y: reduce ? 0 : 20,
+          <span
+            key={wi}
+            style={{
+              display: "inline-block",
+              whiteSpace: "nowrap",
             }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-15% 0px" }}
-            transition={{
-              duration: reduce ? 0 : 0.4,
-              ease: ease.outQuart,
-              delay: reduce ? 0 : i * stagger,
-            }}
-            style={{ display: "inline-block", whiteSpace: "pre" }}
           >
-            {ch}
-          </motion.span>
+            {chars.map(function drawChar(ch, ci) {
+              globalIdx++;
+              const gi = globalIdx;
+              return (
+                <motion.span
+                  key={ci}
+                  initial={{
+                    opacity: reduce ? 1 : 0,
+                    y: reduce ? 0 : 20,
+                  }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-15% 0px" }}
+                  transition={{
+                    duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
+                    ease: ease.outQuart,
+                    delay: reduce ? 0 : gi * REVEAL_STAGGER,
+                  }}
+                  style={{ display: "inline-block" }}
+                >
+                  {ch}
+                </motion.span>
+              );
+            })}
+            {wi < words.length - 1 ? " " : ""}
+          </span>
         );
       })}
     </span>
@@ -151,7 +189,52 @@ function MonogramHero() {
         }}
       />
 
-      <div className="grain-light" aria-hidden="true" />
+      <div
+        className="grain-light"
+        aria-hidden="true"
+        style={{ opacity: 0.05 }}
+      />
+
+      {/* Ambient brand fragments */}
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "12%",
+          left: "8%",
+          width: 32,
+          height: 32,
+          borderRadius: "50%",
+          border: "1px solid var(--color-brand-navy)",
+          opacity: 0.3,
+          pointerEvents: "none",
+        }}
+        animate={
+          reduce
+            ? undefined
+            : { x: [0, 20, 0, -18, 0], y: [0, -14, 12, 0, 0] }
+        }
+        transition={{ duration: 40, repeat: Infinity, ease: ease.inOut }}
+      />
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          bottom: "10%",
+          right: "8%",
+          width: 24,
+          height: 24,
+          border: "1px solid var(--color-parch)",
+          opacity: 0.4,
+          pointerEvents: "none",
+        }}
+        animate={
+          reduce
+            ? undefined
+            : { x: [0, -22, 0, 18, 0], y: [0, 16, -12, 0, 0] }
+        }
+        transition={{ duration: 55, repeat: Infinity, ease: ease.inOut }}
+      />
 
       <div
         style={{
@@ -183,24 +266,41 @@ function MonogramHero() {
         <MonogramMark variant="hero" />
 
         <motion.div
-          initial={{ opacity: reduce ? 1 : 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 6 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{
             duration: reduce ? 0 : 0.5,
             ease: ease.outQuart,
             delay: reduce ? 0 : 2.05,
           }}
-          className="type-eyebrow"
-          style={{ color: "var(--color-ink-soft)" }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 8,
+          }}
         >
-          Prachets Upadhyay · Founder, Averr Studios
+          <div
+            className="type-h3"
+            style={{
+              color: "var(--color-brand-navy)",
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+            }}
+          >
+            Prachets Upadhyay
+          </div>
+          <div
+            className="type-eyebrow"
+            style={{ color: "var(--color-ink-soft)" }}
+          >
+            Founder, Averr Studios · Envisioning Future
+          </div>
         </motion.div>
 
         <CharReveal
           text="The studio for founders who care how they show up."
           delay={2.2}
-          stagger={0.03}
-          perCharDuration={0.4}
           className="type-display-l"
           style={{
             color: "var(--color-ink)",
@@ -384,7 +484,6 @@ function PrincipleSection({ principle }: { principle: Principle }) {
         >
           <CharRevealInView
             text={principle.title}
-            stagger={0.03}
             style={{ color: inkColor }}
           />
         </div>
@@ -451,10 +550,11 @@ function NumeralBackdrop({
     principle.bg === "dark" ? "var(--color-parch)" : "var(--color-ink)";
 
   // 01 — stroke-then-fill grow across scroll progress
+  const filledPeak = principle.bg === "dark" ? 0.22 : 0.18;
   const strokeFillOpacity = useTransform(
     scrollYProgress,
     [0.4, 0.7],
-    [0, 0.12]
+    [0, filledPeak]
   );
   const strokeOnlyOpacity = useTransform(
     scrollYProgress,
@@ -519,7 +619,13 @@ function NumeralBackdrop({
               fontSize={260}
               fontWeight={700}
               fill={numeralColor}
-              style={{ opacity: reduce ? 0.12 : strokeFillOpacity }}
+              style={{
+                opacity: reduce
+                  ? principle.bg === "dark"
+                    ? 0.22
+                    : 0.18
+                  : strokeFillOpacity,
+              }}
             >
               {principle.n}
             </motion.text>
@@ -546,7 +652,7 @@ function NumeralBackdrop({
           aria-hidden
           style={{
             ...base,
-            opacity: 0.12,
+            opacity: principle.bg === "dark" ? 0.22 : 0.18,
             scale: reduce ? 1 : scale,
             transformOrigin: "top left",
           }}
@@ -572,7 +678,7 @@ function NumeralBackdrop({
           }}
           style={{
             ...base,
-            opacity: 0.12,
+            opacity: principle.bg === "dark" ? 0.22 : 0.18,
             transform: reduce ? "none" : (skewTransform as unknown as string),
           }}
         >
@@ -591,7 +697,7 @@ function NumeralBackdrop({
           }}
           style={{
             ...base,
-            opacity: 0.14,
+            opacity: principle.bg === "dark" ? 0.22 : 0.18,
           }}
         >
           {principle.n}
@@ -843,26 +949,17 @@ function FounderMark() {
         position: "relative",
         width: 240,
         height: 240,
-        background: "var(--color-dark)",
-        borderRadius: 12,
+        background: "var(--color-bg)",
+        border: "1px solid rgba(20,20,18,0.10)",
+        borderRadius: 24,
         overflow: "hidden",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        padding: 24,
       }}
     >
-      <div className="grain-dark" aria-hidden />
-      <div
-        style={{
-          position: "relative",
-          zIndex: 2,
-          transform: "scale(0.85)",
-          filter:
-            "invert(1) brightness(1.35) contrast(0.95)",
-        }}
-      >
-        <MonogramMark variant="mini" />
-      </div>
+      <MonogramMark variant="mini" />
     </div>
   );
 }
@@ -1121,7 +1218,6 @@ function ClosingCTA() {
         >
           <CharRevealInView
             text="Ready to build a site that earns its place?"
-            stagger={0.03}
             style={{ color: "var(--color-parch)" }}
           />
         </div>

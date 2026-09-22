@@ -4,10 +4,8 @@ import {
   useMotionValue,
   useReducedMotion,
   useSpring,
-  useTransform,
-  type MotionValue,
 } from "motion/react";
-import { duration, ease, spring } from "../lib/motion";
+import { ease, spring } from "../lib/motion";
 
 type Variant = "hero" | "mini";
 
@@ -17,17 +15,17 @@ type Props = {
 };
 
 /**
- * PU monogram.
- * "hero" runs the stroke-then-fill entrance + breathing + per-letter cursor
- * parallax. "mini" renders the settled filled state at small size for reuse
- * inside cards.
- * Every animated bit is gated by useReducedMotion.
+ * PU monogram — renders the deep-navy raster at /brand/pu-mark.png.
+ * "hero" runs a clip-path draw-from-top + scale-fade entrance,
+ * then a subtle breathing loop with cursor parallax on the whole mark.
+ * "mini" renders the settled state at card scale — no ambient.
+ * All motion gated by useReducedMotion.
  */
 export default function MonogramMark({ variant = "hero", className }: Props) {
   const reduce = useReducedMotion();
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Cursor parallax — hero variant only.
+  // Cursor parallax — hero only.
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
   const sX = useSpring(rawX, spring.soft);
@@ -46,37 +44,34 @@ export default function MonogramMark({ variant = "hero", className }: Props) {
     rawY.set(0);
   }
 
-  // Entrance phase tracker — 0: stroke drawing, 1: fill filling, 2: settled.
-  const [phase, setPhase] = useState<0 | 1 | 2>(reduce ? 2 : 0);
-
+  // After the clip-path draw-in completes, kick off the breathing loop.
+  const [entered, setEntered] = useState(reduce ? true : false);
   useEffect(
-    function orchestrate() {
+    function scheduleBreathing() {
       if (reduce) {
-        setPhase(2);
+        setEntered(true);
         return;
       }
-      const t1 = window.setTimeout(function toFill() {
-        setPhase(1);
-      }, 1400);
-      const t2 = window.setTimeout(function settle() {
-        setPhase(2);
-      }, 2000);
+      const t = window.setTimeout(function done() {
+        setEntered(true);
+      }, 1500);
       return function cleanup() {
-        window.clearTimeout(t1);
-        window.clearTimeout(t2);
+        window.clearTimeout(t);
       };
     },
     [reduce]
   );
 
-  // Sizing per variant.
-  const sizeStyle =
+  const sizeStyle: React.CSSProperties =
     variant === "hero"
       ? {
-          width: "clamp(280px, 40vw, 480px)",
-          height: "clamp(240px, 34vw, 400px)",
+          width: "clamp(320px, 45vw, 560px)",
+          height: "auto",
         }
-      : { width: 160, height: 140 };
+      : { width: 160, height: "auto" };
+
+  const applyParallax = !reduce && variant === "hero";
+  const applyBreathing = !reduce && variant === "hero" && entered;
 
   return (
     <div
@@ -86,25 +81,20 @@ export default function MonogramMark({ variant = "hero", className }: Props) {
       onMouseLeave={onLeave}
       style={{
         position: "relative",
+        display: "inline-block",
         ...sizeStyle,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
       }}
     >
-      <motion.svg
-        viewBox="0 0 400 320"
+      <motion.div
         style={{
+          x: applyParallax ? sX : 0,
+          y: applyParallax ? sY : 0,
           width: "100%",
-          height: "100%",
-          overflow: "visible",
         }}
-        aria-label="Prachets Upadhyay monogram"
-        role="img"
         animate={
-          reduce || variant !== "hero"
-            ? undefined
-            : { scale: [1, 1.008, 1] }
+          applyBreathing
+            ? { scale: [1, 1.008, 1] }
+            : undefined
         }
         transition={{
           duration: 6,
@@ -112,126 +102,34 @@ export default function MonogramMark({ variant = "hero", className }: Props) {
           ease: ease.inOut,
         }}
       >
-        {/* P */}
-        <Letter
-          character="P"
-          x={120}
-          phase={phase}
-          reduce={!!reduce}
-          parallaxWeight={0.7}
-          parallaxX={sX}
-          parallaxY={sY}
-          variant={variant}
+        <motion.img
+          src="/brand/pu-mark.png"
+          alt="Prachets Upadhyay monogram"
+          draggable={false}
+          initial={{
+            opacity: reduce ? 1 : 0,
+            scale: reduce ? 1 : 0.92,
+            clipPath: reduce ? "inset(0%)" : "inset(100% 0 0 0)",
+          }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+            clipPath: "inset(0%)",
+          }}
+          transition={{
+            duration: reduce ? 0 : 1.4,
+            ease: ease.outQuart,
+          }}
+          style={{
+            display: "block",
+            width: "100%",
+            height: "auto",
+            objectFit: "contain",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
         />
-        {/* U */}
-        <Letter
-          character="U"
-          x={280}
-          phase={phase}
-          reduce={!!reduce}
-          parallaxWeight={1.0}
-          parallaxX={sX}
-          parallaxY={sY}
-          variant={variant}
-        />
-      </motion.svg>
+      </motion.div>
     </div>
   );
 }
-
-function Letter({
-  character,
-  x,
-  phase,
-  reduce,
-  parallaxWeight,
-  parallaxX,
-  parallaxY,
-  variant,
-}: {
-  character: string;
-  x: number;
-  phase: 0 | 1 | 2;
-  reduce: boolean;
-  parallaxWeight: number;
-  parallaxX: MotionValue<number>;
-  parallaxY: MotionValue<number>;
-  variant: Variant;
-}) {
-  // Per-letter weighted parallax so P (0.7) drifts less than U (1.0).
-  const weightedX = useTransform(parallaxX, (v) => v * parallaxWeight);
-  const weightedY = useTransform(parallaxY, (v) => v * parallaxWeight);
-
-  // Base font sizing to fill the viewBox height.
-  const fontSize = variant === "hero" ? 320 : 260;
-
-  const strokeOpacity =
-    phase === 0 ? 1 : phase === 1 ? 0.6 : 0;
-  const fillOpacity = phase === 0 ? 0 : 1;
-  const strokeOffset =
-    phase === 0
-      ? 2400 // start fully hidden
-      : 0; // settled/settling revealed
-
-  const shared = {
-    x,
-    y: 260,
-    textAnchor: "middle" as const,
-    fontFamily: "var(--font-display), Georgia, serif",
-    fontWeight: 700,
-    fontSize,
-    letterSpacing: "-0.06em",
-  };
-
-  const applyParallax = !reduce && variant === "hero";
-
-  return (
-    <motion.g
-      style={{
-        x: applyParallax ? weightedX : 0,
-        y: applyParallax ? weightedY : 0,
-      }}
-    >
-      {/* Stroke layer — draws in via strokeDashoffset. */}
-      <motion.text
-        {...shared}
-        fill="transparent"
-        stroke="var(--color-ink)"
-        strokeWidth={2}
-        strokeLinejoin="round"
-        style={{
-          strokeDasharray: 2400,
-        }}
-        initial={{ strokeDashoffset: reduce ? 0 : 2400, opacity: reduce ? 0 : 1 }}
-        animate={{ strokeDashoffset: strokeOffset, opacity: strokeOpacity }}
-        transition={{
-          duration: reduce ? 0 : phase === 0 ? 1.4 : duration.slow,
-          ease: ease.outQuart,
-        }}
-      >
-        {character}
-      </motion.text>
-      {/* Fill layer — fades in after stroke completes. */}
-      <motion.text
-        {...shared}
-        fill="var(--color-ink)"
-        initial={{ opacity: reduce ? 1 : 0 }}
-        animate={{ opacity: fillOpacity }}
-        transition={{
-          duration: reduce ? 0 : duration.slow,
-          ease: ease.outQuart,
-        }}
-      >
-        {character}
-      </motion.text>
-    </motion.g>
-  );
-}
-
-/**
- * Uses per-letter weighted parallax to build depth. Consumers of the mini
- * variant get static rendering — the mini isn't the signature moment.
- */
-
-// Reduce noise: intentionally casts spring motion values via unknown to number
-// for x/y style channels; motion accepts MotionValues on transform channels.
