@@ -18,6 +18,8 @@ export type CaseStudy = {
     kicker: string;
   };
   heroImage?: string;
+  heroImages?: string[];
+  heroCaption?: { eyebrow: string; labels: string[] };
   context: string[];
   approach: { pillar: Pillar; body: string; image?: string; layout?: ApproachLayout }[];
   inventory: string[];
@@ -70,6 +72,15 @@ export const caseStudies: Record<string, CaseStudy> = {
         "One-man renovation crew, zero ad budget, turned into a market presence that punches three brokerages above its weight.",
     },
     heroImage: "/work/cgwalls/hero.jpg",
+    heroImages: [
+      "/work/cgwalls/hero.jpg",
+      "/work/cgwalls/gallery.jpg",
+      "/work/cgwalls/gallery2.jpg",
+    ],
+    heroCaption: {
+      eyebrow: "Site + project shots",
+      labels: ["Live site", "Renovation in progress", "Finished space"],
+    },
     context: [
       "CG Walls & Floors is Max Francis's renovation business — drywall, paint, flooring, framing, trim, and door-and-window install. Ontario-registered, fully insured, one person in the truck.",
       "The mandate was blunt: no ad budget, no headcount, no time to burn. Growth had to come from realtor referrals — the single highest-leverage channel in the trade, where one relationship compounds into ten jobs a year. But realtors get pitched by every contractor in the GTA. The work was to make CG feel like the obvious call.",
@@ -127,6 +138,15 @@ export const caseStudies: Record<string, CaseStudy> = {
         "Portfolios, markets, IPOs, signals, risk, and system health in one place — without pretending analysis and execution are the same thing.",
     },
     heroImage: "/work/capitalcommand/01-overview.jpg",
+    heroImages: [
+      "/work/capitalcommand/01-overview.jpg",
+      "/work/capitalcommand/04-ipo-intelligence.jpg",
+      "/work/capitalcommand/05-signal-desk.jpg",
+    ],
+    heroCaption: {
+      eyebrow: "Featured screens",
+      labels: ["Overview", "IPO Intelligence", "Signal Desk"],
+    },
     context: [
       "Most investing products confuse access to data with investment intelligence. They add charts, news feeds, screeners, alerts, and AI summaries until the interface looks sophisticated, but the investor is still responsible for connecting everything into a decision.",
       "The second mistake is collapsing research and execution into one loop. A signal appears, confidence gets implied, and the interface pushes the user toward a trade before the thesis, exposure, data freshness, and downside have been examined.",
@@ -212,6 +232,15 @@ export const caseStudies: Record<string, CaseStudy> = {
         "Every job board watched, every resume tailored, every application tracked — for the job-seeker who treats every application as a portfolio shot, not a lottery ticket.",
     },
     heroImage: "/work/sift/01-command-overview.jpg",
+    heroImages: [
+      "/work/sift/01-command-overview.jpg",
+      "/work/sift/08-command-insights.jpg",
+      "/work/sift/04-pipeline.jpg",
+    ],
+    heroCaption: {
+      eyebrow: "Featured screens",
+      labels: ["Command Overview", "Pipeline Insights", "Sample Pipeline"],
+    },
     context: [
       "The job-search market is over-served on volume and under-served on precision. Every product built in the last two years is some flavor of auto-apply — mass-blast tools optimizing for applications submitted per hour. But every job-seeker who's been on the market knows the truth: volume doesn't get you interviews, fit does. Two hundred templated applications produce the same interview rate as twenty mediocre ones. The market is loud about the wrong metric.",
       "The other half of the problem is fragmentation. YC's job board lives at ycombinator.com/jobs. LinkedIn's ATS scoring is a paid feature buried three levels deep. Google Jobs surfaces listings but doesn't score them. Wellfound is startup-only. Every serious job-seeker keeps four to six tabs open, tracks applications in a Notion doc, and rewrites their resume per job at 11pm after their day job — badly.",
@@ -290,6 +319,15 @@ export const caseStudies: Record<string, CaseStudy> = {
         "Founder thought leadership as an editorial pipeline — deciding what to say, drafting in the founder's voice, moving it through review, and learning from what happens after. Not a text generator with a calendar attached.",
     },
     heroImage: "/work/cadencestack/01-command-center.jpg",
+    heroImages: [
+      "/work/cadencestack/01-command-center.jpg",
+      "/work/cadencestack/02-content-pillars.jpg",
+      "/work/cadencestack/03-content-pipeline.jpg",
+    ],
+    heroCaption: {
+      eyebrow: "Featured screens",
+      labels: ["Command Center", "Content Pillars", "Content Pipeline"],
+    },
     context: [
       "Most LinkedIn tools treat the problem as content production. Give the model a topic, generate five posts, schedule them, repeat. That solves typing. It does not solve positioning.",
       "Founders rarely lack ideas. They lack a system for deciding which ideas support their reputation, which angle has already been exhausted, what evidence makes a post credible, and what should come next. Without that memory, automation produces competent-looking repetition: the same hook, the same lesson, the same vague CTA.",

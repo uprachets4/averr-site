@@ -56,6 +56,8 @@ export default function CaseStudy() {
         sector={study.sector}
         year={study.year}
         heroImage={study.heroImage}
+        heroImages={study.heroImages}
+        heroCaption={study.heroCaption}
       />
       <Context paragraphs={study.context} />
       <Approach entries={study.approach} />
