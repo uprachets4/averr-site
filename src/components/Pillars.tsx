@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../lib/motion";
+import { CharRevealInView } from "./CharReveal";
 
 
 const PILLARS = [
@@ -62,12 +63,8 @@ export default function Pillars() {
           //_01 · what we do
         </motion.div>
 
-        {/* Section title with horizontal gradient fade on second phrase */}
-        <motion.h2
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0 : 0.7, ease: ease.outQuart, delay: 0.1 }}
+        {/* Section title with word-preserved char reveal */}
+        <h2
           className="type-h2"
           style={{
             maxWidth: 900,
@@ -75,9 +72,11 @@ export default function Pillars() {
             color: "var(--color-ink)",
           }}
         >
-          Three services.{" "}
-          <span className="fade-h">One studio behind them all.</span>
-        </motion.h2>
+          <CharRevealInView
+            text="Three services. One studio behind them all."
+            style={{ color: "var(--color-ink)" }}
+          />
+        </h2>
       </div>
 
       {/* Pillars grid */}

@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../lib/motion";
+import { CharRevealInView } from "./CharReveal";
 
 
 const FEATURED = {
@@ -77,11 +78,7 @@ export default function CaseStudies() {
           </motion.div>
 
           {/* Section title */}
-          <motion.h2
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: reduce ? 0 : 0.7, ease: ease.outQuart, delay: 0.1 }}
+          <h2
             className="type-h2"
             style={{
               maxWidth: 900,
@@ -89,9 +86,11 @@ export default function CaseStudies() {
               color: "var(--color-parch)",
             }}
           >
-            Recent projects.{" "}
-            <span className="fade-h-dark">The rest live in the vault.</span>
-          </motion.h2>
+            <CharRevealInView
+              text="Recent projects. The rest live in the vault."
+              style={{ color: "var(--color-parch)" }}
+            />
+          </h2>
 
           <motion.p
             initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}

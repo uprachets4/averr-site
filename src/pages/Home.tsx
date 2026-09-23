@@ -1,4 +1,5 @@
 import Hero from "../components/Hero";
+import StorySoFar from "../components/StorySoFar";
 import Pillars from "../components/Pillars";
 import Numbers from "../components/Numbers";
 import CaseStudies from "../components/CaseStudies";
@@ -9,11 +10,12 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <StorySoFar />
       <Pillars />
       <Numbers />
       <CaseStudies />
       <Manifesto />
-      <FinalCTA markerNumber="05" />
+      <FinalCTA markerNumber="06" />
     </>
   );
 }

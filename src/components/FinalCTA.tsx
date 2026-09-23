@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
 import PillHl from "./PillHl";
+import { CharRevealInView } from "./CharReveal";
 
 
 
@@ -80,12 +81,8 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           {`//_${markerNumber} · ready when you are`}
         </motion.div>
 
-        {/* Headline with pill highlight */}
-        <motion.h2
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0 : 0.7, ease: ease.outQuart, delay: 0.1 }}
+        {/* Headline: char reveal on the flat portions, PillHl still self-animates */}
+        <h2
           className="type-display-xl"
           style={{
             maxWidth: 900,
@@ -93,7 +90,10 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
             color: "var(--color-ink)",
           }}
         >
-          Build something that{" "}
+          <CharRevealInView
+            text="Build something that"
+            style={{ color: "var(--color-ink)" }}
+          />{" "}
           <motion.span
             initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 0.85 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -107,8 +107,11 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           >
             <PillHl>actually</PillHl>
           </motion.span>{" "}
-          looks like you meant it.
-        </motion.h2>
+          <CharRevealInView
+            text="looks like you meant it."
+            style={{ color: "var(--color-ink)" }}
+          />
+        </h2>
 
         {/* CTAs */}
         <motion.div
@@ -132,6 +135,37 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           <MagneticCTA to="/work" variant="ghost">
             See our work
           </MagneticCTA>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: reduce ? 1 : 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: reduce ? 0 : 0.5, delay: reduce ? 0 : 0.9 }}
+          style={{ marginTop: 72 }}
+        >
+          <button
+            type="button"
+            onClick={function toTop() {
+              window.scrollTo({
+                top: 0,
+                behavior: reduce ? "auto" : "smooth",
+              });
+            }}
+            className="type-eyebrow"
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: "var(--color-ink-soft)",
+              padding: "8px 12px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            ↑ Back to top
+          </button>
         </motion.div>
       </div>
     </section>

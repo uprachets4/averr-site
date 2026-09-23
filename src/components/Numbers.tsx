@@ -6,6 +6,7 @@ import {
   animate,
 } from "motion/react";
 import { ease } from "../lib/motion";
+import { CharRevealInView } from "./CharReveal";
 
 type Stat = {
   label: string;
@@ -48,7 +49,7 @@ export default function Numbers() {
   return (
     <section
       style={{
-        backgroundColor: "var(--color-bg)",
+        backgroundColor: "var(--color-bg-alt)",
         color: "var(--color-ink)",
         padding: "120px 40px",
         position: "relative",
@@ -56,6 +57,39 @@ export default function Numbers() {
       }}
     >
       <div className="grain-light" aria-hidden="true" />
+
+      {/* Ambient marks — chapter break rhythm */}
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "15%",
+          left: "6%",
+          width: 26,
+          height: 26,
+          borderRadius: "50%",
+          border: "1px solid var(--color-ink)",
+          opacity: 0.22,
+          pointerEvents: "none",
+        }}
+        animate={reduce ? undefined : { x: [0, 14, 0, -12, 0], y: [0, -10, 8, 0, 0] }}
+        transition={{ duration: 42, repeat: Infinity, ease: ease.inOut }}
+      />
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          bottom: "12%",
+          right: "6%",
+          width: 20,
+          height: 20,
+          border: "1px solid var(--color-parch)",
+          opacity: 0.4,
+          pointerEvents: "none",
+        }}
+        animate={reduce ? undefined : { x: [0, -14, 0, 10, 0], y: [0, 12, -8, 0, 0] }}
+        transition={{ duration: 52, repeat: Infinity, ease: ease.inOut }}
+      />
 
       <div
         style={{
@@ -79,15 +113,7 @@ export default function Numbers() {
           //_02 · the numbers
         </motion.div>
 
-        <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{
-            duration: reduce ? 0.01 : 0.6,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 0.1,
-          }}
+        <h2
           className="type-h2"
           style={{
             maxWidth: 900,
@@ -95,9 +121,11 @@ export default function Numbers() {
             color: "var(--color-ink)",
           }}
         >
-          Small studio.{" "}
-          <span className="fade-h">Real results.</span>
-        </motion.h2>
+          <CharRevealInView
+            text="Small studio. Real results."
+            style={{ color: "var(--color-ink)" }}
+          />
+        </h2>
 
         <div
           style={{
