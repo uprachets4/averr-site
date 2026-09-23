@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
+import AmbientEnvironment from "./components/AmbientEnvironment";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
 import Work from "./pages/Work";
@@ -26,8 +27,9 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      <AmbientEnvironment />
       <Nav />
-      <main id="main">
+      <main id="main" style={{ position: "relative", zIndex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />

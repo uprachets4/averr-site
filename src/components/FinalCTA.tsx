@@ -28,7 +28,40 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           pointerEvents: "none",
         }}
       />
-      <div className="grain-light" aria-hidden="true" />
+      <div className="grain-light" aria-hidden="true" style={{ opacity: 0.05 }} />
+
+      {/* Ambient marks — echo /about closing rhythm */}
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "18%",
+          left: "10%",
+          width: 28,
+          height: 28,
+          borderRadius: "50%",
+          border: "1px solid var(--color-ink)",
+          opacity: 0.22,
+          pointerEvents: "none",
+        }}
+        animate={reduce ? undefined : { x: [0, 18, 0, -14, 0], y: [0, -12, 10, 0, 0] }}
+        transition={{ duration: 42, repeat: Infinity, ease: ease.inOut }}
+      />
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          bottom: "16%",
+          right: "10%",
+          width: 22,
+          height: 22,
+          border: "1px solid var(--color-parch)",
+          opacity: 0.35,
+          pointerEvents: "none",
+        }}
+        animate={reduce ? undefined : { x: [0, -18, 0, 14, 0], y: [0, 14, -10, 0, 0] }}
+        transition={{ duration: 55, repeat: Infinity, ease: ease.inOut }}
+      />
 
       <div style={{ position: "relative", zIndex: 2 }}>
         {/* Section marker */}
