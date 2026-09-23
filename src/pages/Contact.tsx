@@ -8,10 +8,17 @@ import {
   type MotionValue,
 } from "motion/react";
 import Cal, { getCalApi } from "@calcom/embed-react";
+import {
+  Check,
+  Envelope,
+  InstagramLogo,
+  LinkedinLogo,
+} from "@phosphor-icons/react";
 import { ease } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import MonogramMark from "../components/MonogramMark";
 import ContactForm from "../components/ContactForm";
+import Icon from "../components/icons/Icon";
 
 const EMAIL_ADDR = "prachets@averrstudios.com";
 const CAL_LINK = "prachets/discoverycall";
@@ -866,24 +873,7 @@ function FormBand() {
 }
 
 function CheckGlyph() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden
-      style={{ flexShrink: 0 }}
-    >
-      <path
-        d="M3 8.5 L6.5 12 L13 4.5"
-        stroke="var(--color-ink)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+  return <Icon glyph={Check} size="sm" weight="regular" />;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1096,41 +1086,13 @@ function DirectCardTile({
 }
 
 function DirectGlyph({ type }: { type: DirectCard["glyph"] }) {
-  const common = {
-    width: 32,
-    height: 32,
-    viewBox: "0 0 32 32",
-    fill: "none",
-    stroke: "var(--color-ink)",
-    strokeWidth: 1.5,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
   if (type === "email") {
-    return (
-      <svg {...common}>
-        <rect x="4" y="7" width="24" height="18" rx="2" />
-        <path d="M4 9 L16 18 L28 9" />
-      </svg>
-    );
+    return <Icon glyph={Envelope} size="xl" weight="regular" />;
   }
   if (type === "linkedin") {
-    return (
-      <svg {...common}>
-        <rect x="4" y="4" width="24" height="24" rx="4" />
-        <circle cx="10.5" cy="11" r="1.5" fill="var(--color-ink)" stroke="none" />
-        <line x1="10.5" y1="14" x2="10.5" y2="23" />
-        <path d="M15.5 14 L15.5 23 M15.5 17 C15.5 15 17.5 14 19 14 C21 14 22 15.5 22 18 L22 23" />
-      </svg>
-    );
+    return <Icon glyph={LinkedinLogo} size="xl" weight="regular" />;
   }
-  return (
-    <svg {...common}>
-      <rect x="6" y="4" width="20" height="24" rx="4" />
-      <circle cx="16" cy="17" r="5" />
-      <circle cx="22" cy="10" r="1" fill="var(--color-ink)" stroke="none" />
-    </svg>
-  );
+  return <Icon glyph={InstagramLogo} size="xl" weight="regular" />;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1384,7 +1346,7 @@ function ClosingBand() {
           zIndex: 3,
         }}
       >
-        <MonogramMark variant="mini" />
+        <MonogramMark variant="signature" />
       </motion.div>
 
       <style>{`

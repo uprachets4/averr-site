@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { CaretDown } from "@phosphor-icons/react";
 import { duration, ease } from "../lib/motion";
+import Icon from "./icons/Icon";
 
 type Option = { value: string; label: string };
 
@@ -158,26 +160,17 @@ export default function CustomSelect({
         <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {selectedLabel || placeholder}
         </span>
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
+        <span
           aria-hidden
           style={{
             flexShrink: 0,
+            display: "inline-flex",
             transform: open ? "rotate(180deg)" : "rotate(0)",
             transition: `transform ${duration.fast * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
           }}
         >
-          <path
-            d="M3 5.5 L8 10.5 L13 5.5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+          <Icon glyph={CaretDown} size="sm" weight="regular" />
+        </span>
       </button>
 
       {open ? (

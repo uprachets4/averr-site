@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { CheckCircle } from "@phosphor-icons/react";
 import { ease } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
 import CustomSelect from "./CustomSelect";
+import Icon from "./icons/Icon";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_MSG = 20;
@@ -129,29 +131,8 @@ export default function ContactForm() {
           alignItems: "flex-start",
         }}
       >
-        <svg
-          width="40"
-          height="40"
-          viewBox="0 0 40 40"
-          fill="none"
-          aria-hidden
-        >
-          <circle
-            cx="20"
-            cy="20"
-            r="18"
-            stroke="var(--color-ink)"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M12 20.5 L18 26.5 L28 14"
-            stroke="var(--color-ink)"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-        </svg>
+        <Icon glyph={CheckCircle} size={40} weight="regular" label="Success" />
+
         <h2 className="type-h2" style={{ color: "var(--color-ink)", margin: 0 }}>
           Message received.
         </h2>

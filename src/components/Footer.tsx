@@ -1,3 +1,5 @@
+import AverrMark from "./AverrMark";
+
 const STUDIO_LINKS = [
   { label: "Work", href: "/work" },
   { label: "Services", href: "/services" },
@@ -48,17 +50,8 @@ export default function Footer() {
       >
         {/* Brand column */}
         <div>
-          <div
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: 18,
-              fontWeight: 500,
-              color: "var(--color-ink)",
-              marginBottom: 12,
-              letterSpacing: "-0.015em",
-            }}
-          >
-            Averr Studios
+          <div style={{ color: "var(--color-ink)", marginBottom: 20 }}>
+            <AverrMark variant="footer" />
           </div>
           <div
             style={{

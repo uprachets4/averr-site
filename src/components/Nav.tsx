@@ -7,6 +7,7 @@ import {
 } from "motion/react";
 import { ease } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
+import AverrMark from "./AverrMark";
 
 const LINKS = [
   { label: "Work", to: "/work" },
@@ -97,7 +98,9 @@ export default function Nav() {
         borderBottomColor: reduce ? "rgba(20, 20, 18, 0.10)" : borderColor,
       }}
     >
-      <Link to="/" style={brandStyle}>Averr Studios</Link>
+      <Link to="/" style={brandStyle} aria-label="Averr Studios — home">
+        <AverrMark variant="nav" />
+      </Link>
       <ul style={linksWrapStyle}>
         {LINKS.map(function renderLink(link) {
           return (
