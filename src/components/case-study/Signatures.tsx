@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
 import ImageFrame from "./ImageFrame";
+import { CharRevealInView } from "../CharReveal";
 
 type Item = { title: string; body: string; image?: string };
 
@@ -62,20 +63,15 @@ export default function Signatures({
             //_04 · signature moments
           </motion.div>
 
-          <motion.h2
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{
-              duration: reduce ? 0 : 0.7,
-              ease: ease.outQuart,
-              delay: reduce ? 0 : 0.1,
-            }}
+          <h2
             className="type-h2"
-            style={{ maxWidth: 900 }}
+            style={{ maxWidth: 900, color: "var(--color-parch)" }}
           >
-            The moves <span className="fade-h-dark">that made it read premium.</span>
-          </motion.h2>
+            <CharRevealInView
+              text="The moves that made it read premium."
+              style={{ color: "var(--color-parch)" }}
+            />
+          </h2>
         </div>
 
         <div

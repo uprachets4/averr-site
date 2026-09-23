@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
 import type { ApproachLayout, Pillar } from "../../data/caseStudies";
 import ImageFrame from "./ImageFrame";
+import { CharRevealInView } from "../CharReveal";
 
 type Entry = {
   pillar: Pillar;
@@ -89,15 +90,7 @@ export default function Approach({ entries }: { entries: Entry[] }) {
           //_02 · approach
         </motion.div>
 
-        <motion.h2
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{
-            duration: reduce ? 0 : 0.7,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 0.1,
-          }}
+        <h2
           className="type-h2"
           style={{
             color: "var(--color-ink)",
@@ -105,8 +98,11 @@ export default function Approach({ entries }: { entries: Entry[] }) {
             maxWidth: 900,
           }}
         >
-          Three pillars, <span className="fade-h">one plan.</span>
-        </motion.h2>
+          <CharRevealInView
+            text="Three pillars, one plan."
+            style={{ color: "var(--color-ink)" }}
+          />
+        </h2>
 
         <div className="approach-stack" style={{ display: "flex", flexDirection: "column", gap: 96 }}>
           {entries.map((entry, i) => {
