@@ -8,7 +8,6 @@ const STUDIO_LINKS = [
 ];
 
 const RESOURCE_LINKS = [
-  { label: "Writing", href: "/writing" },
   { label: "Book a call", href: "/contact" },
 ];
 

@@ -36,7 +36,8 @@
   --color-parch:      #EDE9E2;
   --color-muted:      #6B665C;
   --color-muted-2:    #8A8377;
-  --color-muted-l:    #7A7770;
+  /* On-dark secondary text. AA against --color-dark (#141412) at 5.45:1. */
+  --color-muted-l:    #918B80;
 
   /* Icon sizes — Phosphor lockstep. */
   --icon-sm: 16px;

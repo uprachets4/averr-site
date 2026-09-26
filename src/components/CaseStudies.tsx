@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { ease } from "../lib/motion";
+import { duration, ease } from "../lib/motion";
 import { CharRevealInView } from "./CharReveal";
 
 
@@ -32,16 +33,6 @@ export default function CaseStudies() {
 
   return (
     <>
-      {/* Transition cream → dark */}
-      <div
-        style={{
-          height: 120,
-          background:
-            "linear-gradient(180deg, var(--color-bg) 0%, var(--color-dark) 100%)",
-        }}
-        aria-hidden="true"
-      />
-
       <section
         id="work"
         style={{
@@ -136,16 +127,6 @@ export default function CaseStudies() {
         </div>
       </section>
 
-      {/* Transition dark → cream */}
-      <div
-        style={{
-          height: 120,
-          background:
-            "linear-gradient(180deg, var(--color-dark) 0%, var(--color-bg) 100%)",
-        }}
-        aria-hidden="true"
-      />
-
       <style>{`
         @media (max-width: 900px) {
           .featured-grid { grid-template-columns: 1fr !important; }
@@ -157,6 +138,7 @@ export default function CaseStudies() {
 }
 
 function FeaturedCard({ reduce }: { reduce: boolean }) {
+  const [hovered, setHovered] = useState(false);
   return (
     <motion.a
       href={FEATURED.href}
@@ -179,47 +161,42 @@ function FeaturedCard({ reduce }: { reduce: boolean }) {
         color: "inherit",
       }}
       onMouseEnter={(e) => {
+        setHovered(true);
+        if (reduce) return;
         e.currentTarget.style.transform = "translateY(-4px)";
         e.currentTarget.style.borderColor = "rgba(237,231,218,0.18)";
       }}
       onMouseLeave={(e) => {
+        setHovered(false);
         e.currentTarget.style.transform = "translateY(0)";
         e.currentTarget.style.borderColor = "rgba(237,231,218,0.10)";
       }}
     >
-      {/* Visual placeholder */}
+      {/* Project visual */}
       <div
         style={{
-          background: "linear-gradient(135deg, #2A2926 0%, #1C1B18 100%)",
           position: "relative",
           overflow: "hidden",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          background: "var(--color-dark-alt)",
         }}
       >
-        <div
-          aria-hidden
+        <motion.img
+          src="/work/cgwalls/gallery.jpg"
+          alt="CG Walls & Floors renovation in progress — drywall and trim work mid-project"
+          width={1400}
+          height={775}
+          loading="lazy"
+          decoding="async"
+          animate={{ scale: hovered && !reduce ? 1.04 : 1 }}
+          transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart }}
           style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse 500px 400px at 30% 40%, rgba(237,231,218,0.06), transparent 70%)",
+            display: "block",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            aspectRatio: "1400 / 775",
           }}
         />
-        <div
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-muted-l)",
-            padding: "12px 20px",
-            border: "1px dashed rgba(237,231,218,0.18)",
-            borderRadius: 8,
-            position: "relative",
-            zIndex: 2,
-          }}
-        >
-          Case study visual · Phase 2
-        </div>
       </div>
 
       {/* Meta */}

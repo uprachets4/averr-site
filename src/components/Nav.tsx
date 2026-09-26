@@ -13,7 +13,6 @@ const LINKS = [
   { label: "Work", to: "/work" },
   { label: "Services", to: "/services" },
   { label: "About", to: "/about" },
-  { label: "Writing", to: "/writing" },
 ];
 
 export default function Nav() {
