@@ -119,7 +119,7 @@ export default function Hero() {
 
         {/* Display headline — three lines, mask-reveal each */}
         <h1
-          className="type-display-xl mx-auto max-w-[1000px]"
+          className="type-display-l mx-auto max-w-[1000px]"
           style={{
             color: "var(--color-ink)",
             marginBottom: 56,

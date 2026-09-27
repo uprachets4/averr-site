@@ -25,16 +25,8 @@
   font-display: swap;
 }
 
-/* Cormorant Garamond — the accent voice. Italic only, 500 + 600.
+/* Cormorant Garamond — the accent voice. Italic 600 only.
    Never used as a roman face; the display roman is Geist. */
-@font-face {
-  font-family: 'Cormorant Garamond';
-  src: url('/fonts/cormorant-garamond-latin-500-italic.woff2') format('woff2');
-  font-weight: 500;
-  font-style: italic;
-  font-display: swap;
-}
-
 @font-face {
   font-family: 'Cormorant Garamond';
   src: url('/fonts/cormorant-garamond-latin-600-italic.woff2') format('woff2');
@@ -423,5 +415,23 @@ a { color: inherit; text-decoration: none; }
   .tnum {
     font-feature-settings: "tnum" 1;
     font-variant-numeric: tabular-nums;
+  }
+
+  /* MagneticCTA inverted for dark surfaces. All three of its variants are
+     built for light grounds — `primary` paints --color-dark on --color-dark
+     and disappears. MagneticCTA writes its colors inline (including on
+     hover), so this has to win with !important rather than by specificity.
+     Wrap the CTA, don't touch the component.
+
+     Direct child only: for an internal link MagneticCTA's pill is an outer
+     <span> wrapping a `all: unset` <a>, so painting the <a> would put a
+     parch box behind just the label. */
+  .cta-on-dark > a,
+  .cta-on-dark > button,
+  .cta-on-dark > span {
+    background-color: var(--color-parch) !important;
+    border-color: var(--color-parch) !important;
+    color: var(--color-dark) !important;
+    box-shadow: none !important;
   }
 }
