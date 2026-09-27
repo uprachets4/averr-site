@@ -12,6 +12,7 @@ import { ease, spring } from "../lib/motion";
 import { CharRevealInView, type Segment } from "./CharReveal";
 import ImageFrame from "./case-study/ImageFrame";
 import MagneticCTA from "./MagneticCTA";
+import { useScrollStyle } from "../lib/useScrollStyle";
 
 const STAGES: Array<{
   eyebrow: string;
@@ -256,15 +257,20 @@ function StageBlock({
   opacity: MotionValue<number>;
   cta?: React.ReactNode;
 }) {
+  // Plain div + useScrollStyle: this block is inside the pinned frame, where a
+  // MotionValue bound to style.opacity gets hijacked by motion's ViewTimeline
+  // acceleration. See src/lib/useScrollStyle.ts.
+  const ref = useScrollStyle<HTMLDivElement>(opacity);
+
   return (
-    <motion.div
+    <div
+      ref={ref}
       style={{
         position: "absolute",
         top: "50%",
         left: 0,
         right: 0,
         transform: "translateY(-50%)",
-        opacity,
       }}
     >
       <div
@@ -286,7 +292,7 @@ function StageBlock({
         {stage.body}
       </p>
       {cta ? <div style={{ marginTop: 28 }}>{cta}</div> : null}
-    </motion.div>
+    </div>
   );
 }
 

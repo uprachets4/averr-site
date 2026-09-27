@@ -20,6 +20,7 @@ import MagneticCTA from "../components/MagneticCTA";
 import FinalCTA from "../components/FinalCTA";
 import PillHl from "../components/PillHl";
 import Chapter from "../components/Chapter";
+import { useScrollStyle } from "../lib/useScrollStyle";
 
 /* ═══════════════════════════════════════════════════════════════
    Pillar data — names + descriptions preserved verbatim.
@@ -749,15 +750,21 @@ function StageBody({
   elRef: (el: HTMLDivElement | null) => void;
   children: React.ReactNode;
 }) {
+  // opacity via useScrollStyle (pinned frame — see src/lib/useScrollStyle.ts);
+  // y stays on motion, transforms are not affected by the acceleration bug.
+  const opacityRef = useScrollStyle<HTMLDivElement>(opacity);
+
   return (
     <motion.div
-      ref={elRef}
+      ref={function setRefs(node: HTMLDivElement | null) {
+        opacityRef.current = node;
+        elRef(node);
+      }}
       style={{
         position: "absolute",
         top: 0,
         left: 0,
         right: 0,
-        opacity,
         y,
       }}
     >
@@ -1236,6 +1243,26 @@ function DesignMoodBoard({
 
 /* ── shared scroll hint (below ambient) ─────────────────────── */
 
+/** Opacity-only caption inside a pinned frame — see src/lib/useScrollStyle.ts. */
+function CaptionLine({
+  opacity,
+  className,
+  style,
+  children,
+}: {
+  opacity: MotionValue<number>;
+  className?: string;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
+}) {
+  const ref = useScrollStyle<HTMLDivElement>(opacity);
+  return (
+    <div ref={ref} className={className} style={style}>
+      {children}
+    </div>
+  );
+}
+
 function ScrollHint({
   opacity,
   reduce,
@@ -1243,8 +1270,11 @@ function ScrollHint({
   opacity: MotionValue<number>;
   reduce: boolean;
 }) {
+  const ref = useScrollStyle<HTMLDivElement>(opacity);
+
   return (
-    <motion.div
+    <div
+      ref={ref}
       aria-hidden
       style={{
         position: "absolute",
@@ -1255,7 +1285,6 @@ function ScrollHint({
         flexDirection: "column",
         alignItems: "center",
         gap: 10,
-        opacity,
         pointerEvents: "none",
       }}
     >
@@ -1278,7 +1307,7 @@ function ScrollHint({
           background: "var(--color-ink-soft)",
         }}
       />
-    </motion.div>
+    </div>
   );
 }
 
@@ -1563,7 +1592,7 @@ function AutomateWorkflow({
       })}
 
       {/* Stage 3 caption */}
-      <motion.div
+      <CaptionLine opacity={captionOpacity}
         className="type-small"
         style={{
           position: "absolute",
@@ -1572,12 +1601,12 @@ function AutomateWorkflow({
           bottom: 60,
           textAlign: "center",
           color: "var(--color-ink-soft)",
-          opacity: captionOpacity,
+          
           pointerEvents: "none",
         }}
       >
         System average: 12h/week returned
-      </motion.div>
+      </CaptionLine>
 
       <ScrollHint opacity={scrollHintOpacity} reduce={reduce} />
     </div>
@@ -1654,8 +1683,10 @@ function WorkflowLabel({
   // Position in percentage of container (viewBox 0-400)
   const leftPct = (node.x / 400) * 100;
   const topPct = (node.y / 400) * 100;
+  const opacityRef = useScrollStyle<HTMLDivElement>(opacity);
   return (
     <motion.div
+      ref={opacityRef}
       style={{
         position: "absolute",
         left: `${leftPct}%`,
@@ -1667,7 +1698,6 @@ function WorkflowLabel({
         letterSpacing: "0.16em",
         textTransform: "uppercase",
         color: "var(--color-ink)",
-        opacity,
         x: parallaxX,
         y: parallaxY,
         pointerEvents: "none",
@@ -1817,7 +1847,7 @@ function GrowDashboard({
       </motion.div>
 
       {/* Stage 3 caption */}
-      <motion.div
+      <CaptionLine opacity={captionOpacity}
         className="type-small"
         style={{
           position: "absolute",
@@ -1826,12 +1856,12 @@ function GrowDashboard({
           bottom: 60,
           textAlign: "center",
           color: "var(--color-ink-soft)",
-          opacity: captionOpacity,
+          
           pointerEvents: "none",
         }}
       >
         3 months in — compounding
-      </motion.div>
+      </CaptionLine>
 
       <ScrollHint opacity={scrollHintOpacity} reduce={reduce} />
     </div>
@@ -1887,14 +1917,16 @@ function MetricCard({
     ]
   );
 
+  const opacityRef = useScrollStyle<HTMLDivElement>(opacity);
+
   return (
     <motion.div
+      ref={opacityRef}
       style={{
         background: "var(--color-bg)",
         border: borderTint,
         borderRadius: 10,
         padding: "26px 28px",
-        opacity,
         boxShadow: "0 6px 18px rgba(20,20,18,0.05)",
       }}
     >
