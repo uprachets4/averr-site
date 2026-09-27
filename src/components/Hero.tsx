@@ -15,6 +15,7 @@ import LineReveal from "./LineReveal";
 import TorontoClock from "./TorontoClock";
 import Chapter from "./Chapter";
 import { useSetNavDarkOverride } from "../lib/navTone";
+import { useScrollStyle } from "../lib/useScrollStyle";
 import HeroReelStatic, {
   ReelCardTile,
   ReelCTA,
@@ -488,55 +489,17 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
   );
 }
 
-/**
- * Scroll-linked opacity, written straight to the node.
- *
- * Why not `style={{ opacity: someMotionValue }}`:
- * motion 12.43.0 hardware-accelerates scroll-linked `opacity` by compiling it
- * into a native Web Animations API animation — and attaches that animation to a
- * **ViewTimeline**, i.e. the element's own progress through its scrollport,
- * rather than the useScroll() progress it was derived from. Every element here
- * lives inside the `position: sticky` frame, so it never moves through the
- * scrollport and that timeline is meaningless.
- *
- * Confirmed via el.getAnimations(): one running Animation, timeline
- * "ViewTimeline", keyframes exactly [0.45 → 0, 0.6 → 1] — our values on the
- * wrong clock. Once WAAPI owns the property framer stops writing inline style,
- * and a WAAPI animation outranks inline style in the cascade, so the element
- * ignored the MotionValue entirely. `transform` was unaffected because it was
- * not accelerated and stayed on the JS path.
- *
- * Subscribing and assigning style.opacity keeps the property off the
- * accelerated path, so it tracks the real scroll progress. The animated
- * property set is still transform/opacity/clip-path only.
- */
+/** Thin wrapper over the shared hook: builds the opacity MotionValue from a
+ *  progress range. See src/lib/useScrollStyle.ts for why opacity cannot ride
+ *  on style={{ opacity }} inside a sticky frame. */
 function useScrollOpacity(
   progress: MotionValue<number>,
   from: number,
   to: number,
   fadeOut = false
 ) {
-  const ref = useRef<HTMLElement | null>(null);
-
-  const apply = useCallback(
-    function applyOpacity(p: number) {
-      const t = (p - from) / (to - from);
-      const k = t < 0 ? 0 : t > 1 ? 1 : t;
-      const v = fadeOut ? 1 - k : k;
-      if (ref.current) ref.current.style.opacity = String(v);
-    },
-    [from, to, fadeOut]
-  );
-
-  useMotionValueEvent(progress, "change", apply);
-  useLayoutEffect(
-    function setInitial() {
-      apply(progress.get());
-    },
-    [apply, progress]
-  );
-
-  return ref;
+  const opacity = useTransform(progress, [from, to], fadeOut ? [1, 0] : [0, 1]);
+  return useScrollStyle<HTMLElement>(opacity);
 }
 
 function mergeRefs<T>(...refs: Array<React.MutableRefObject<T | null> | React.Ref<T> | null>) {
