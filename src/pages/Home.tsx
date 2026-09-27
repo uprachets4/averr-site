@@ -11,7 +11,13 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <StorySoFar />
+
+      {/* The hero ends dark in every mode — pinned takeover on desktop, the
+          static reel block otherwise — so the handoff back to cream uses the
+          site's own transition signature. */}
+      <Chapter tone="cream" from="dark">
+        <StorySoFar />
+      </Chapter>
       <Pillars />
       <Numbers />
 

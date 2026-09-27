@@ -98,7 +98,9 @@
      block is gone; the scale interpolates continuously instead of
      stepping at one breakpoint. ── */
 
-  --type-display-2xl-size: clamp(56px, 13vw, 208px);
+  /* 11vw, not 13: the hero offsets this line 38% into the measure, and
+     "serious." (≈4.99em wide incl. pill padding) overflows above ~11.4vw. */
+  --type-display-2xl-size: clamp(56px, 11vw, 208px);
   --type-display-2xl-weight: 500;
   --type-display-2xl-tracking: -0.055em;
   --type-display-2xl-leading: 0.88;
@@ -276,7 +278,49 @@ a { color: inherit; text-decoration: none; }
     inset 0 1px 0 rgba(255,255,255,0.05),
     0 2px 8px rgba(20,20,18,0.15);
 }
-.pill-hl > span {
+/* The hero's pill line is offset into the measure on desktop. Below 768 the
+   display-2xl floor (56px) makes "serious." wider than the remaining 62%, so
+   the offset is dropped rather than clipping the word. */
+.hero-pill-line { padding-left: 38%; }
+@media (max-width: 767px) {
+  .hero-pill-line { padding-left: 0; }
+}
+
+/* Slab variant — same box as .pill-hl, but the surface is its own layer so
+   it can grow scaleX from the left, and the word sits above it. */
+.pill-hl--bare {
+  background: none;
+  box-shadow: none;
+}
+.pill-hl__slab {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transform-origin: left center;
+  background: linear-gradient(135deg, #1A1815 0%, #211E1A 100%);
+  border-radius: 0.24em;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    inset 0 -1px 0 rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 2px 8px rgba(20,20,18,0.15);
+}
+.pill-hl__word {
+  position: relative;
+  z-index: 1;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  background: linear-gradient(180deg, #F4F0E6 0%, #E8E1D0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Scoped so it cannot reach the slab variant's own children — it is
+   specificity (0,1,1) and would otherwise beat .pill-hl__slab (0,1,0) and
+   paint the slab with the parch TEXT gradient. */
+.pill-hl:not(.pill-hl--bare) > span {
   font-weight: 500;
   letter-spacing: -0.015em;
   background: linear-gradient(180deg, #F4F0E6 0%, #E8E1D0 100%);
