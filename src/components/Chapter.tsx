@@ -43,10 +43,12 @@ type Props = {
   settle?: "viewport" | "end";
 };
 
-/** cubic-bezier(ease.outQuart) evaluated at t — fast off the mark, soft
- *  settle, so the surface arrives rather than slides to a stop. */
-function outQuart(t: number) {
-  const [x1, y1, x2, y2] = ease.outQuart;
+/** cubic-bezier(ease.inOut) evaluated at t — holds the inset wide on approach,
+ *  spends the expansion mid-viewport, then settles. outQuart put ~90% of the
+ *  travel in the first 15% of the range, which finished the reveal before the
+ *  reader reached it. */
+function easeInOut(t: number) {
+  const [x1, y1, x2, y2] = ease.inOut;
   // Solve x(s) = t for s by bisection, then return y(s). 18 passes is well
   // inside sub-pixel for the inset range we map onto.
   let lo = 0;
@@ -157,7 +159,7 @@ function AnimatedChapter({ tone, from, children, id, as, settle }: Props) {
 
   const clipPath = useTransform(scrollYProgress, function toClip(t) {
     const raw = t < 0 ? 0 : t > 1 ? 1 : t;
-    const p = outQuart(raw);
+    const p = easeInOut(raw);
     const x = geometry.x * (1 - p);
     const r = geometry.r * (1 - p);
     return `inset(0px ${x}px 0px ${x}px round ${r}px ${r}px 0px 0px)`;
