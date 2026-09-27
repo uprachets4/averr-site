@@ -48,6 +48,74 @@ function useIsMobile() {
   return isMobile;
 }
 
+/** Case-study routes (/work/:slug) mark Work as current. */
+function isCurrent(pathname: string, to: string) {
+  if (to === "/") return pathname === "/";
+  return pathname === to || pathname.startsWith(to + "/");
+}
+
+function DesktopLink({
+  to,
+  label,
+  current,
+  reduce,
+}: {
+  to: string;
+  label: string;
+  current: boolean;
+  reduce: boolean;
+}) {
+  const [active, setActive] = useState(false);
+  const lit = current || active;
+
+  return (
+    <Link
+      to={to}
+      aria-current={current ? "page" : undefined}
+      onMouseEnter={function enter() {
+        setActive(true);
+      }}
+      onMouseLeave={function leave() {
+        setActive(false);
+      }}
+      onFocus={function focus(e) {
+        if (e.currentTarget.matches(":focus-visible")) setActive(true);
+      }}
+      onBlur={function blur() {
+        setActive(false);
+      }}
+      style={{
+        position: "relative",
+        display: "inline-block",
+        fontFamily: "Inter, system-ui, sans-serif",
+        fontSize: "13px",
+        color: lit ? "var(--color-ink)" : "var(--color-muted)",
+        textDecoration: "none",
+        transition: `color ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
+      }}
+    >
+      {label}
+      <span
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: -4,
+          height: 1,
+          background: "currentColor",
+          transform: lit ? "scaleX(1)" : "scaleX(0)",
+          transformOrigin: "left",
+          transition: reduce
+            ? "none"
+            : `transform ${(lit ? duration.base : duration.fast) * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
+          pointerEvents: "none",
+        }}
+      />
+    </Link>
+  );
+}
+
 export default function Nav() {
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
@@ -217,14 +285,6 @@ export default function Nav() {
     padding: 0,
   };
 
-  const linkStyle: React.CSSProperties = {
-    fontFamily: "Inter, system-ui, sans-serif",
-    fontSize: "13px",
-    color: "var(--color-muted)",
-    textDecoration: "none",
-    transition: "color 300ms ease",
-  };
-
   // While open the bar itself must read as part of the dark overlay.
   const barSurface = open
     ? {
@@ -336,9 +396,12 @@ export default function Nav() {
               {LINKS.map(function renderLink(link) {
                 return (
                   <li key={link.to}>
-                    <Link to={link.to} style={linkStyle}>
-                      {link.label}
-                    </Link>
+                    <DesktopLink
+                      to={link.to}
+                      label={link.label}
+                      current={isCurrent(pathname, link.to)}
+                      reduce={!!reduce}
+                    />
                   </li>
                 );
               })}
@@ -428,11 +491,9 @@ export default function Nav() {
               }
               style={{ marginTop: "auto", paddingTop: 48 }}
             >
-              <div className="cta-on-dark" style={{ display: "flex" }}>
-                <MagneticCTA to="/contact" variant="primary">
-                  Book a call
-                </MagneticCTA>
-              </div>
+              <MagneticCTA to="/contact" variant="primary" tone="dark">
+                Book a call
+              </MagneticCTA>
               <a
                 href={`mailto:${EMAIL}`}
                 className="type-small"

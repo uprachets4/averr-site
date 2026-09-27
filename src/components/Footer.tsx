@@ -1,4 +1,6 @@
 import AverrMark from "./AverrMark";
+import Chapter from "./Chapter";
+import { usePageEndTone } from "../lib/pageTone";
 
 const STUDIO_LINKS = [
   { label: "Work", href: "/work" },
@@ -26,12 +28,19 @@ const LEGAL_LINKS = [
 const YEAR = new Date().getFullYear();
 
 export default function Footer() {
+  // Only a dark closing band is a boundary worth revealing. Every other route
+  // ends on a cream surface, and cream→cream-alt is not a tone change — so we
+  // collapse it to the footer's own tone and Chapter renders flat, with no
+  // scroll listener at all.
+  const endTone = usePageEndTone();
+  const from = endTone === "dark" ? "dark" : "cream-alt";
+
   return (
-    <footer
+    <Chapter as="footer" tone="cream-alt" from={from} settle="end">
+    <div
       style={{
         padding: "60px 40px 40px",
         borderTop: "1px solid rgba(20,20,18,0.10)",
-        backgroundColor: "var(--color-bg-alt)",
         fontFamily: "var(--font-body)",
         fontSize: 13,
         color: "var(--color-muted)",
@@ -120,7 +129,8 @@ export default function Footer() {
           }
         }
       `}</style>
-    </footer>
+    </div>
+    </Chapter>
   );
 }
 

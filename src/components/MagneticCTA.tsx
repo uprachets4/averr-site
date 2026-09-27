@@ -10,12 +10,16 @@ import { duration, ease, spring } from "../lib/motion";
 
 type Variant = "primary" | "ghost" | "text";
 type Size = "sm" | "md" | "lg";
+type Tone = "light" | "dark";
 
 export interface MagneticCTAProps {
   to?: string;
   onClick?: (e?: React.MouseEvent | React.FormEvent) => void;
   variant?: Variant;
   size?: Size;
+  /** Ground the CTA sits on. "light" (default) is the original behaviour,
+   *  byte-identical. "dark" inverts every variant for --color-dark surfaces. */
+  tone?: Tone;
   icon?: React.ReactNode | null;
   children: React.ReactNode;
   className?: string;
@@ -49,6 +53,7 @@ export default function MagneticCTA(props: MagneticCTAProps) {
     onClick,
     variant = "primary",
     size = "md",
+    tone = "light",
     icon,
     children,
     className,
@@ -102,25 +107,27 @@ export default function MagneticCTA(props: MagneticCTAProps) {
     ...sizeStyles[size],
   };
 
+  const onDark = tone === "dark";
+
   const primary: React.CSSProperties = {
     ...base,
-    backgroundColor: "var(--color-dark)",
-    color: "var(--color-bg)",
-    border: "1px solid var(--color-dark)",
-    boxShadow: "0 0 0 rgba(20,20,18,0)",
+    backgroundColor: onDark ? "var(--color-parch)" : "var(--color-dark)",
+    color: onDark ? "var(--color-dark)" : "var(--color-bg)",
+    border: `1px solid ${onDark ? "var(--color-parch)" : "var(--color-dark)"}`,
+    boxShadow: onDark ? "0 0 0 rgba(237,233,226,0)" : "0 0 0 rgba(20,20,18,0)",
   };
 
   const ghost: React.CSSProperties = {
     ...base,
     backgroundColor: "transparent",
-    color: "var(--color-ink)",
-    border: "1px solid rgba(20,20,18,0.18)",
+    color: onDark ? "var(--color-parch)" : "var(--color-ink)",
+    border: `1px solid ${onDark ? "var(--color-parch)" : "rgba(20,20,18,0.18)"}`,
   };
 
   const text: React.CSSProperties = {
     ...base,
     background: "transparent",
-    color: "var(--color-ink)",
+    color: onDark ? "var(--color-parch)" : "var(--color-ink)",
     border: "1px solid transparent",
     padding:
       size === "sm" ? "4px 8px" : size === "md" ? "6px 10px" : "8px 12px",
@@ -133,11 +140,19 @@ export default function MagneticCTA(props: MagneticCTAProps) {
     setHovered(true);
     const el = e.currentTarget;
     if (variant === "primary") {
-      el.style.backgroundColor = "var(--color-dark-alt)";
-      el.style.boxShadow = "0 8px 24px rgba(20,20,18,0.15)";
+      el.style.backgroundColor = onDark
+        ? "var(--color-bg)"
+        : "var(--color-dark-alt)";
+      el.style.boxShadow = onDark
+        ? "0 8px 24px rgba(0,0,0,0.35)"
+        : "0 8px 24px rgba(20,20,18,0.15)";
     } else if (variant === "ghost") {
-      el.style.backgroundColor = "rgba(20,20,18,0.04)";
-      el.style.borderColor = "rgba(20,20,18,0.32)";
+      el.style.backgroundColor = onDark
+        ? "rgba(237,233,226,0.08)"
+        : "rgba(20,20,18,0.04)";
+      el.style.borderColor = onDark
+        ? "var(--color-parch)"
+        : "rgba(20,20,18,0.32)";
     } else {
       // text: reveal underline
       const underline = el.querySelector<HTMLElement>(".mcta-underline");
@@ -149,11 +164,17 @@ export default function MagneticCTA(props: MagneticCTAProps) {
     setHovered(false);
     const el = e.currentTarget;
     if (variant === "primary") {
-      el.style.backgroundColor = "var(--color-dark)";
-      el.style.boxShadow = "0 0 0 rgba(20,20,18,0)";
+      el.style.backgroundColor = onDark
+        ? "var(--color-parch)"
+        : "var(--color-dark)";
+      el.style.boxShadow = onDark
+        ? "0 0 0 rgba(237,233,226,0)"
+        : "0 0 0 rgba(20,20,18,0)";
     } else if (variant === "ghost") {
       el.style.backgroundColor = "transparent";
-      el.style.borderColor = "rgba(20,20,18,0.18)";
+      el.style.borderColor = onDark
+        ? "var(--color-parch)"
+        : "rgba(20,20,18,0.18)";
     } else {
       const underline = el.querySelector<HTMLElement>(".mcta-underline");
       if (underline) underline.style.transform = "scaleX(0)";
@@ -259,6 +280,10 @@ export default function MagneticCTA(props: MagneticCTAProps) {
       onMouseLeave={onLeaveStyles}
       style={motionStyle}
       className={className}
+      // framer-motion auto-adds tabIndex={0} to non-interactive elements that
+      // carry whileHover/whileTap, which made every internal-link CTA two tab
+      // stops. The real <a> below is the only focusable element.
+      tabIndex={-1}
       {...scaleProps}
     >
       <Link

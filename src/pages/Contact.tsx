@@ -20,6 +20,8 @@ import MonogramMark from "../components/MonogramMark";
 import ContactForm from "../components/ContactForm";
 import Icon from "../components/icons/Icon";
 import { CharReveal, CharRevealInView } from "../components/CharReveal";
+import Chapter from "../components/Chapter";
+import { useDeclarePageEndTone } from "../lib/pageTone";
 
 const EMAIL_ADDR = "prachets@averrstudios.com";
 const CAL_LINK = "prachets/discoverycall";
@@ -1253,6 +1255,9 @@ function ClosingBand() {
    ═══════════════════════════════════════════════════════════════ */
 
 export default function Contact() {
+  // The closing band is dark, so the footer reveals over dark on this route.
+  useDeclarePageEndTone("dark");
+
   useEffect(function scrollTopAndTitle() {
     window.scrollTo(0, 0);
     const prev = document.title;
@@ -1265,12 +1270,18 @@ export default function Contact() {
   return (
     <>
       <EditorialHero />
-      <PromiseBand />
-      <HelpersBand />
+      <Chapter tone="dark" from="cream">
+        <PromiseBand />
+      </Chapter>
+      <Chapter tone="cream-alt" from="dark">
+        <HelpersBand />
+      </Chapter>
       <FormBand />
       <DirectBand />
       <BookingBand />
-      <ClosingBand />
+      <Chapter tone="dark" from="cream-alt">
+        <ClosingBand />
+      </Chapter>
     </>
   );
 }

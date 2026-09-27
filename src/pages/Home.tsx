@@ -5,6 +5,7 @@ import Numbers from "../components/Numbers";
 import CaseStudies from "../components/CaseStudies";
 import Manifesto from "../components/Manifesto";
 import FinalCTA from "../components/FinalCTA";
+import Chapter from "../components/Chapter";
 
 export default function Home() {
   return (
@@ -13,9 +14,17 @@ export default function Home() {
       <StorySoFar />
       <Pillars />
       <Numbers />
-      <CaseStudies />
-      <Manifesto />
-      <FinalCTA markerNumber="06" />
+
+      {/* CaseStudies and Manifesto are one continuous dark stretch — one
+          reveal in, one out, rather than a boundary between them. */}
+      <Chapter tone="dark" from="cream-alt">
+        <CaseStudies />
+        <Manifesto />
+      </Chapter>
+
+      <Chapter tone="cream" from="dark">
+        <FinalCTA markerNumber="06" />
+      </Chapter>
     </>
   );
 }

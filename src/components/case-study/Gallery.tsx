@@ -12,6 +12,7 @@ import { duration, ease, spring } from "../../lib/motion";
 import ImageFrame from "./ImageFrame";
 
 type Item = { src: string; caption: string };
+type Tone = "light" | "dark";
 
 const PEEK_PCT = 12;
 const DRAG_DISTANCE_THRESHOLD = 0.25;
@@ -23,10 +24,16 @@ const AUTOPLAY_RESUME_DELAY_MS = 4000;
 export default function Gallery({
   items,
   client,
+  tone = "light",
 }: {
   items: Item[];
   client: string;
+  /** Ground the gallery sits on. "light" (default) is the original band.
+   *  "dark" drops the band's own paint so it can live inside a dark Chapter,
+   *  and lifts every affordance to parch. */
+  tone?: Tone;
 }) {
+  const onDark = tone === "dark";
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
   const [autoplayEnabled, setAutoplayEnabled] = useState(false);
@@ -159,11 +166,11 @@ export default function Gallery({
   return (
     <section
       style={{
-        backgroundColor: "var(--color-bg)",
+        backgroundColor: onDark ? "transparent" : "var(--color-bg)",
         padding: "64px 0 112px",
         position: "relative",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
-        borderBottom: "1px solid rgba(20,20,18,0.10)",
+        borderTop: `1px solid ${onDark ? "rgba(237,233,226,0.10)" : "rgba(20,20,18,0.10)"}`,
+        borderBottom: `1px solid ${onDark ? "rgba(237,233,226,0.10)" : "rgba(20,20,18,0.10)"}`,
       }}
     >
       <div
@@ -243,6 +250,7 @@ export default function Gallery({
           }}
           disabled={isFirst}
           reduce={!!reduce}
+          onDark={onDark}
         />
         <MagneticNavButton
           direction="next"
@@ -252,6 +260,7 @@ export default function Gallery({
           }}
           disabled={isLast}
           reduce={!!reduce}
+          onDark={onDark}
         />
 
         <div
@@ -262,11 +271,11 @@ export default function Gallery({
             bottom: -32,
             display: "inline-flex",
             gap: 6,
-            color: "var(--color-ink)",
+            color: onDark ? "var(--color-parch)" : "var(--color-ink)",
           }}
         >
           <span>{String(clampedActive + 1).padStart(2, "0")}</span>
-          <span style={{ color: "var(--color-ink-soft)" }}>/</span>
+          <span style={{ color: onDark ? "var(--color-muted-l)" : "var(--color-ink-soft)" }}>/</span>
           <span>{String(items.length).padStart(2, "0")}</span>
         </div>
       </div>
@@ -361,11 +370,13 @@ function MagneticNavButton({
   onClick,
   disabled,
   reduce,
+  onDark = false,
 }: {
   direction: "prev" | "next";
   onClick: () => void;
   disabled: boolean;
   reduce: boolean;
+  onDark?: boolean;
 }) {
   const ref = useRef<HTMLButtonElement | null>(null);
   const x = useMotionValue(0);
@@ -415,13 +426,13 @@ function MagneticNavButton({
         width: 44,
         height: 44,
         borderRadius: 999,
-        border: "1px solid rgba(20,20,18,0.18)",
-        background: "rgba(244,240,230,0.85)",
+        border: `1px solid ${onDark ? "rgba(237,233,226,0.28)" : "rgba(20,20,18,0.18)"}`,
+        background: onDark ? "rgba(20,20,18,0.72)" : "rgba(244,240,230,0.85)",
         backdropFilter: "blur(6px)",
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        color: "var(--color-ink)",
+        color: onDark ? "var(--color-parch)" : "var(--color-ink)",
         cursor: disabled ? "default" : "pointer",
         opacity: disabled ? 0.3 : 1,
         pointerEvents: disabled ? "none" : "auto",

@@ -19,6 +19,7 @@ import { duration, ease, spring } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import FinalCTA from "../components/FinalCTA";
 import PillHl from "../components/PillHl";
+import Chapter from "../components/Chapter";
 
 /* ═══════════════════════════════════════════════════════════════
    Pillar data — names + descriptions preserved verbatim.
@@ -2172,8 +2173,12 @@ export default function Services() {
     <>
       <ServicesHeader />
       <PillarSequence />
-      <WhatWeDontDo />
-      <HowToStart />
+      <Chapter tone="dark" from="cream">
+        <WhatWeDontDo />
+      </Chapter>
+      <Chapter tone="cream-warm" from="dark">
+        <HowToStart />
+      </Chapter>
       <FinalCTA markerNumber="06" />
     </>
   );

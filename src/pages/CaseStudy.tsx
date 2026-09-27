@@ -10,6 +10,7 @@ import Gallery from "../components/case-study/Gallery";
 import Outcome from "../components/case-study/Outcome";
 import Next from "../components/case-study/Next";
 import ScrollProgress from "../components/case-study/ScrollProgress";
+import Chapter from "../components/Chapter";
 import FinalCTA from "../components/FinalCTA";
 import NotFound from "./NotFound";
 import ComingSoon from "./ComingSoon";
@@ -62,18 +63,28 @@ export default function CaseStudy() {
       <Context paragraphs={study.context} />
       <Approach entries={study.approach} />
       <Inventory items={study.inventory} stack={study.stack} />
-      {study.signatures.length > 0 ? (
-        <Signatures
-          items={study.signatures}
-          imageSrc={study.signatureImage}
-          imageAlt={`${study.client} screen`}
-        />
-      ) : null}
-      {study.gallery && study.gallery.length > 0 ? (
-        <Gallery items={study.gallery} client={study.client} />
-      ) : null}
-      <Outcome text={study.outcome} />
-      <Next text={study.next} />
+
+      {/* Signatures → Gallery → Outcome is one dark stretch: the Gallery goes
+          dark so the run reveals once on entry instead of flickering between
+          three separate boundaries. Studies without Signatures/Gallery (CG
+          Walls) get the Chapter around Outcome alone. */}
+      <Chapter tone="dark" from="cream">
+        {study.signatures.length > 0 ? (
+          <Signatures
+            items={study.signatures}
+            imageSrc={study.signatureImage}
+            imageAlt={`${study.client} screen`}
+          />
+        ) : null}
+        {study.gallery && study.gallery.length > 0 ? (
+          <Gallery items={study.gallery} client={study.client} tone="dark" />
+        ) : null}
+        <Outcome text={study.outcome} />
+      </Chapter>
+
+      <Chapter tone="cream-alt" from="dark">
+        <Next text={study.next} />
+      </Chapter>
       <FinalCTA markerNumber="07" />
     </>
   );

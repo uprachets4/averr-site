@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   motion,
   useReducedMotion,
@@ -11,6 +11,8 @@ import MagneticCTA from "../components/MagneticCTA";
 import MonogramMark from "../components/MonogramMark";
 import ProcessTimeline from "../components/ProcessTimeline";
 import { CharReveal, CharRevealInView } from "../components/CharReveal";
+import Chapter, { type Tone } from "../components/Chapter";
+import { useDeclarePageEndTone } from "../lib/pageTone";
 
 /* ═══════════════════════════════════════════════════════════════
    Band 1 — The Monogram Moment
@@ -327,11 +329,30 @@ const PRINCIPLES: Principle[] = [
   },
 ];
 
+/** Principle bgs map onto Chapter tones. */
+function principleTone(bg: Principle["bg"] | undefined): Tone {
+  if (bg === "dark") return "dark";
+  if (bg === "alt") return "cream-alt";
+  return "cream";
+}
+
 function PrinciplesBand() {
   return (
     <>
-      {PRINCIPLES.map(function drawPrinciple(p) {
-        return <PrincipleSection key={p.n} principle={p} />;
+      {PRINCIPLES.map(function drawPrinciple(p, i) {
+        const tone = principleTone(p.bg);
+        // The first principle follows the cream monogram hero.
+        const from = principleTone(PRINCIPLES[i - 1]?.bg);
+        const node = <PrincipleSection principle={p} />;
+        // Only cream↔dark flips are chapter boundaries; the cream/cream-alt
+        // alternation between principles is not a tone change worth revealing.
+        const isToneBoundary = (tone === "dark") !== (from === "dark");
+        if (!isToneBoundary) return <Fragment key={p.n}>{node}</Fragment>;
+        return (
+          <Chapter key={p.n} tone={tone} from={from}>
+            {node}
+          </Chapter>
+        );
       })}
     </>
   );
@@ -1175,10 +1196,10 @@ function ClosingCTA() {
             justifyContent: "center",
           }}
         >
-          <MagneticCTA to="/contact" variant="primary">
+          <MagneticCTA to="/contact" variant="primary" tone="dark">
             Book a call
           </MagneticCTA>
-          <MagneticCTA to="/work" variant="ghost">
+          <MagneticCTA to="/work" variant="ghost" tone="dark">
             See the work
           </MagneticCTA>
         </motion.div>
@@ -1192,6 +1213,9 @@ function ClosingCTA() {
    ═══════════════════════════════════════════════════════════════ */
 
 export default function About() {
+  // The closing CTA is dark, so the footer reveals over dark on this route.
+  useDeclarePageEndTone("dark");
+
   useEffect(function scrollTopAndTitle() {
     window.scrollTo(0, 0);
     const prev = document.title;
@@ -1205,9 +1229,13 @@ export default function About() {
     <>
       <MonogramHero />
       <PrinciplesBand />
-      <HowWeWorkBand />
+      <Chapter tone="cream-alt" from="dark">
+        <HowWeWorkBand />
+      </Chapter>
       <FounderBand />
-      <ClosingCTA />
+      <Chapter tone="dark" from="cream">
+        <ClosingCTA />
+      </Chapter>
     </>
   );
 }

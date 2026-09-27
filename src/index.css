@@ -417,21 +417,4 @@ a { color: inherit; text-decoration: none; }
     font-variant-numeric: tabular-nums;
   }
 
-  /* MagneticCTA inverted for dark surfaces. All three of its variants are
-     built for light grounds — `primary` paints --color-dark on --color-dark
-     and disappears. MagneticCTA writes its colors inline (including on
-     hover), so this has to win with !important rather than by specificity.
-     Wrap the CTA, don't touch the component.
-
-     Direct child only: for an internal link MagneticCTA's pill is an outer
-     <span> wrapping a `all: unset` <a>, so painting the <a> would put a
-     parch box behind just the label. */
-  .cta-on-dark > a,
-  .cta-on-dark > button,
-  .cta-on-dark > span {
-    background-color: var(--color-parch) !important;
-    border-color: var(--color-parch) !important;
-    color: var(--color-dark) !important;
-    box-shadow: none !important;
-  }
 }
