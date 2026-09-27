@@ -7,6 +7,10 @@ type Variant = "nav" | "footer";
 type Props = {
   variant?: Variant;
   className?: string;
+  /** Ground the mark sits on. "light" (default) is byte-identical; "dark"
+   *  swaps the inner dot so it reads as a hole in a parch disc. The outer
+   *  disc already follows currentColor. */
+  tone?: "light" | "dark";
 };
 
 /**
@@ -16,7 +20,7 @@ type Props = {
  * mounts and briefly pulses on nav hover — the single delight moment on
  * the mark.
  */
-export default function AverrMark({ variant = "nav", className }: Props) {
+export default function AverrMark({ variant = "nav", className, tone = "light" }: Props) {
   const reduce = useReducedMotion();
   const [hovered, setHovered] = useState(false);
 
@@ -46,7 +50,7 @@ export default function AverrMark({ variant = "nav", className }: Props) {
           gap: 10,
         }}
       >
-        <AverrGlyph reduce={!!reduce} hovered={hovered} />
+        <AverrGlyph reduce={!!reduce} hovered={hovered} tone={tone} />
         <span
           style={{
             fontFamily: "var(--font-display), Georgia, serif",
@@ -79,9 +83,11 @@ export default function AverrMark({ variant = "nav", className }: Props) {
 function AverrGlyph({
   reduce,
   hovered,
+  tone = "light",
 }: {
   reduce: boolean;
   hovered: boolean;
+  tone?: "light" | "dark";
 }) {
   return (
     <span
@@ -122,9 +128,10 @@ function AverrGlyph({
           height: 6,
           marginTop: -3,
           marginLeft: -3,
-          background: "var(--color-bg)",
+          background: tone === "dark" ? "var(--color-dark)" : "var(--color-bg)",
           borderRadius: "50%",
           transformOrigin: "center center",
+          transition: "background-color 300ms cubic-bezier(0.65, 0, 0.35, 1)",
         }}
       />
     </span>

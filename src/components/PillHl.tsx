@@ -11,6 +11,8 @@ type Props = {
   delay?: number;
   /** Play the entrance instantly (reader scrolled before the film finished). */
   skip?: boolean;
+  /** Multiplier on the entrance durations — the mobile film runs at 0.5. */
+  speed?: number;
   /** False draws the word with no surface of its own — for the hero takeover,
    *  where a separate dark layer is the pill and a second one would double up. */
   surface?: boolean;
@@ -21,6 +23,7 @@ export default function PillHl({
   entrance = "none",
   delay = 0,
   skip = false,
+  speed = 1,
   surface = true,
 }: Props) {
   const reduce = useReducedMotion();
@@ -50,7 +53,7 @@ export default function PillHl({
           transition={
             instant
               ? { duration: 0 }
-              : { delay, duration: duration.slow, ease: ease.outExpo }
+              : { delay, duration: duration.slow * speed, ease: ease.outExpo }
           }
         />
       ) : null}
@@ -61,7 +64,7 @@ export default function PillHl({
         transition={
           instant
             ? { duration: 0 }
-            : { delay: delay + 0.12, duration: duration.base, ease: ease.outExpo }
+            : { delay: delay + 0.12 * speed, duration: duration.base * speed, ease: ease.outExpo }
         }
       >
         {children}

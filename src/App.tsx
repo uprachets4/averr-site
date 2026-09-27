@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import { PageToneProvider } from "./lib/pageTone";
+import { NavToneProvider } from "./lib/navTone";
 import AmbientEnvironment from "./components/AmbientEnvironment";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
@@ -27,6 +28,7 @@ function ScrollToTop() {
 function App() {
   return (
     <PageToneProvider>
+      <NavToneProvider>
       <ScrollToTop />
       <AmbientEnvironment />
       <Nav />
@@ -42,6 +44,7 @@ function App() {
         </Routes>
       </main>
       <Footer />
+      </NavToneProvider>
     </PageToneProvider>
   );
 }

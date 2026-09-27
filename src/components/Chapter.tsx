@@ -114,7 +114,11 @@ function FlatChapter({ tone, from, children, id, as }: Props) {
   const Surface = (as || "section") as ElementType;
   return (
     <div style={{ backgroundColor: TONE_BG[from] }}>
-      <Surface id={id} style={{ backgroundColor: TONE_BG[tone] }}>
+      <Surface
+        id={id}
+        data-tone={tone === "dark" ? "dark" : undefined}
+        style={{ backgroundColor: TONE_BG[tone] }}
+      >
         {children}
       </Surface>
     </div>
@@ -169,6 +173,7 @@ function AnimatedChapter({ tone, from, children, id, as, settle }: Props) {
     <div ref={outerRef} style={{ backgroundColor: TONE_BG[from] }}>
       <Surface
         id={id}
+        data-tone={tone === "dark" ? "dark" : undefined}
         style={{
           backgroundColor: TONE_BG[tone],
           clipPath,

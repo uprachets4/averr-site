@@ -13,6 +13,7 @@ import Icon from "./icons/Icon";
 import MagneticCTA from "./MagneticCTA";
 import AverrMark from "./AverrMark";
 import { caseStudies } from "../data/caseStudies";
+import { useNavDarkOverride } from "../lib/navTone";
 
 const LINKS = [
   { label: "Work", to: "/work" },
@@ -56,6 +57,64 @@ function useIsMobile() {
   return isMobile;
 }
 
+/**
+ * True when a dark surface sits under the nav's bottom edge.
+ *
+ * Shrinks the observer root to a 1px band at that edge and watches every
+ * [data-tone="dark"] surface against it — no scroll handler, and it re-reads
+ * targets on route change so newly mounted chapters are picked up.
+ */
+function useDarkUnderNav(pathname: string) {
+  const navRef = useRef<HTMLElement | null>(null);
+  const [darkCount, setDarkCount] = useState(0);
+
+  useEffect(
+    function observeSurfaces() {
+      const nav = navRef.current;
+      if (!nav || typeof IntersectionObserver === "undefined") return;
+
+      let observer: IntersectionObserver | null = null;
+      const intersecting = new Set<Element>();
+
+      function build() {
+        observer?.disconnect();
+        intersecting.clear();
+        setDarkCount(0);
+
+        const navH = nav!.getBoundingClientRect().height || 88;
+        const below = Math.max(0, window.innerHeight - navH - 1);
+
+        observer = new IntersectionObserver(
+          function onCross(entries) {
+            for (const entry of entries) {
+              if (entry.isIntersecting) intersecting.add(entry.target);
+              else intersecting.delete(entry.target);
+            }
+            setDarkCount(intersecting.size);
+          },
+          { rootMargin: `-${navH}px 0px -${below}px 0px`, threshold: 0 }
+        );
+
+        for (const el of document.querySelectorAll("[data-tone='dark']")) {
+          observer.observe(el);
+        }
+      }
+
+      // let the route's surfaces mount first
+      const raf = requestAnimationFrame(build);
+      window.addEventListener("resize", build);
+      return function cleanup() {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("resize", build);
+        observer?.disconnect();
+      };
+    },
+    [pathname]
+  );
+
+  return { navRef, darkUnderNav: darkCount > 0 };
+}
+
 /** Case-study routes (/work/:slug) mark Work as current. */
 function isCurrent(pathname: string, to: string) {
   if (to === "/") return pathname === "/";
@@ -68,11 +127,13 @@ function DesktopLink({
   current,
   reduce,
   count,
+  dark,
 }: {
   to: string;
   label: string;
   current: boolean;
   reduce: boolean;
+  dark: boolean;
   /** Superscript tally. aria-hidden, so the accessible name stays the label. */
   count?: number;
 }) {
@@ -100,10 +161,10 @@ function DesktopLink({
         position: "relative",
         display: "inline-block",
         fontWeight: 500,
-        color: "var(--color-ink)",
+        color: dark ? "var(--color-parch)" : "var(--color-ink)",
         opacity: lit ? 1 : 0.72,
         textDecoration: "none",
-        transition: `opacity ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
+        transition: `opacity ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")}), color ${duration.base * 1000}ms cubic-bezier(${ease.inOut.join(",")})`,
       }}
     >
       {label}
@@ -150,8 +211,13 @@ export default function Nav() {
   const { pathname } = useLocation();
   const isMobile = useIsMobile();
 
+  const { navRef, darkUnderNav } = useDarkUnderNav(pathname);
+  const heroDark = useNavDarkOverride();
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  // The mobile overlay paints its own dark ground and already styles the bar.
+  const navDark = (darkUnderNav || heroDark) && !open;
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const hasOpened = useRef(false);
 
@@ -300,9 +366,9 @@ export default function Nav() {
     fontWeight: 500,
     fontSize: "15px",
     letterSpacing: "-0.015em",
-    color: open ? "var(--color-parch)" : "var(--color-ink)",
+    color: open || navDark ? "var(--color-parch)" : "var(--color-ink)",
     textDecoration: "none",
-    transition: "color 200ms ease",
+    transition: `color ${duration.base * 1000}ms cubic-bezier(${ease.inOut.join(",")})`,
   };
 
   const linksWrapStyle: React.CSSProperties = {
@@ -313,6 +379,8 @@ export default function Nav() {
     padding: 0,
   };
 
+  const barTransition = `background-color ${duration.base * 1000}ms cubic-bezier(${ease.inOut.join(",")}), border-color ${duration.base * 1000}ms cubic-bezier(${ease.inOut.join(",")})`;
+
   // While open the bar itself must read as part of the dark overlay.
   const barSurface = open
     ? {
@@ -320,6 +388,13 @@ export default function Nav() {
         backdropFilter: "none",
         WebkitBackdropFilter: "none",
         borderBottomColor: "transparent",
+      }
+    : navDark
+    ? {
+        backgroundColor: "rgba(20, 20, 18, 0.72)",
+        backdropFilter: "blur(12px) saturate(1.4)",
+        WebkitBackdropFilter: "blur(12px) saturate(1.4)",
+        borderBottomColor: "rgba(237, 233, 226, 0.08)",
       }
     : {
         backgroundColor: reduce ? "rgba(244, 240, 230, 0.88)" : bg,
@@ -369,6 +444,7 @@ export default function Nav() {
   return (
     <>
       <motion.nav
+        ref={navRef as React.Ref<HTMLElement>}
         aria-label="Primary"
         initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -382,11 +458,12 @@ export default function Nav() {
           paddingTop: reduce ? 16 : paddingY,
           paddingBottom: reduce ? 16 : paddingY,
           borderBottom: "1px solid",
+          transition: reduce ? "none" : barTransition,
           ...barSurface,
         }}
       >
         <Link to="/" style={brandStyle} aria-label="Averr Studios — home">
-          <AverrMark variant="nav" />
+          <AverrMark variant="nav" tone={open || navDark ? "dark" : "light"} />
         </Link>
 
         {isMobile ? (
@@ -412,8 +489,8 @@ export default function Nav() {
               border: "none",
               padding: 0,
               cursor: "pointer",
-              color: open ? "var(--color-parch)" : "var(--color-ink)",
-              transition: "color 200ms ease",
+              color: open || navDark ? "var(--color-parch)" : "var(--color-ink)",
+              transition: `color ${duration.base * 1000}ms cubic-bezier(${ease.inOut.join(",")})`,
             }}
           >
             <Icon glyph={open ? X : List} size="lg" />
@@ -429,13 +506,20 @@ export default function Nav() {
                       label={link.label}
                       current={isCurrent(pathname, link.to)}
                       reduce={!!reduce}
+                      dark={navDark}
                       count={link.to === "/work" ? WORK_COUNT : undefined}
                     />
                   </li>
                 );
               })}
             </ul>
-            <MagneticCTA to="/contact" variant="primary" size="sm" icon={null}>
+            <MagneticCTA
+              to="/contact"
+              variant="primary"
+              size="sm"
+              icon={null}
+              tone={navDark ? "dark" : "light"}
+            >
               Book a call
             </MagneticCTA>
           </>

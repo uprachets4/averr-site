@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   motion,
+  useInView,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
@@ -13,6 +14,7 @@ import PillHl from "./PillHl";
 import LineReveal from "./LineReveal";
 import TorontoClock from "./TorontoClock";
 import Chapter from "./Chapter";
+import { useSetNavDarkOverride } from "../lib/navTone";
 import HeroReelStatic, {
   ReelCardTile,
   ReelCTA,
@@ -33,7 +35,9 @@ const KICKER =
 
 /* ── load choreography, seconds from mount (≈2.0s film) ────────────── */
 
-const T = {
+type Film = typeof T_DESKTOP;
+
+const T_DESKTOP = {
   topRow: 0.25,
   lead1: 0.35,
   lead2: 0.43,
@@ -44,6 +48,24 @@ const T = {
   ctaPrimary: 1.43,
   ctaSecondary: 1.51,
   scrollCue: 1.5,
+  scale: 1,
+};
+
+/** Below 768 the film runs at half speed (≈1.0s). The kicker is pulled further
+ *  forward than a flat ×0.5 would put it (0.675s) because it is the LCP element
+ *  on mobile — it is the largest text block at the display-2xl floor. */
+const T_MOBILE: Film = {
+  topRow: 0.12,
+  lead1: 0.18,
+  lead2: 0.22,
+  big: 0.32,
+  pillWord: 0.4,
+  slab: 0.58,
+  kicker: 0.55,
+  ctaPrimary: 0.63,
+  ctaSecondary: 0.71,
+  scrollCue: 0.75,
+  scale: 0.5,
 };
 
 const MOBILE_QUERY = "(max-width: 767px)";
@@ -74,7 +96,11 @@ function useHeroMode() {
     };
   }, []);
 
-  return { pinned: !narrow && !short && !reduce, reduce: !!reduce };
+  return {
+    pinned: !narrow && !short && !reduce,
+    reduce: !!reduce,
+    film: narrow ? T_MOBILE : T_DESKTOP,
+  };
 }
 
 /** True once the reader has scrolled at all — the film then completes instantly. */
@@ -110,14 +136,19 @@ function HeroComposition({
   skip,
   pillRef,
   hidePillSurface,
+  film = T_DESKTOP,
 }: {
   skip: boolean;
   pillRef?: React.Ref<HTMLSpanElement>;
   hidePillSurface?: boolean;
+  film?: Film;
 }) {
   const reduce = useReducedMotion();
   const instant = reduce || skip;
+  const T = film;
   const d = (v: number) => (instant ? 0 : v);
+  /** Durations scale with the film. */
+  const dur = (v: number) => (instant ? 0 : v * film.scale);
 
   return (
     <div
@@ -135,7 +166,7 @@ function HeroComposition({
       <motion.div
         initial={{ opacity: instant ? 1 : 0, y: instant ? 0 : 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: d(0.5), ease: ease.outQuart, delay: d(T.topRow) }}
+        transition={{ duration: dur(0.5), ease: ease.outQuart, delay: d(T.topRow) }}
         style={{
           display: "flex",
           alignItems: "baseline",
@@ -165,15 +196,15 @@ function HeroComposition({
             opacity: 0.72,
           }}
         >
-          <LineReveal delay={d(T.lead1)}>{LEAD_1}</LineReveal>
-          <LineReveal delay={d(T.lead2)}>{LEAD_2}</LineReveal>
+          <LineReveal delay={d(T.lead1)} duration={dur(0.8)}>{LEAD_1}</LineReveal>
+          <LineReveal delay={d(T.lead2)} duration={dur(0.8)}>{LEAD_2}</LineReveal>
         </span>
 
         <span
           className="type-display-2xl"
           style={{ display: "block", color: "var(--color-ink)", marginTop: 8 }}
         >
-          <LineReveal delay={d(T.big)} duration={instant ? 0 : duration.slow}>
+          <LineReveal delay={d(T.big)} duration={dur(duration.slow)}>
             {WORD_BIG}
           </LineReveal>
         </span>
@@ -182,11 +213,12 @@ function HeroComposition({
           className="type-display-2xl hero-pill-line"
           style={{ display: "block", marginTop: 4 }}
         >
-          <LineReveal delay={d(T.pillWord)} duration={instant ? 0 : duration.slow}>
+          <LineReveal delay={d(T.pillWord)} duration={dur(duration.slow)}>
             <span ref={pillRef} style={{ display: "inline-block" }}>
               <PillHl
                 entrance="slab"
                 delay={d(T.slab)}
+                speed={film.scale}
                 skip={instant}
                 surface={!hidePillSurface}
               >
@@ -200,7 +232,7 @@ function HeroComposition({
       <motion.p
         initial={{ opacity: instant ? 1 : 0, y: instant ? 0 : 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: d(0.6), ease: ease.outQuart, delay: d(T.kicker) }}
+        transition={{ duration: dur(0.6), ease: ease.outQuart, delay: d(T.kicker) }}
         className="type-body-lg measure-body"
         style={{ color: "var(--color-muted)", margin: "28px 0 0" }}
       >
@@ -239,7 +271,7 @@ function HeroComposition({
 
 /* ── scroll cue ────────────────────────────────────────────────────── */
 
-function ScrollCue({ skip, hidden }: { skip: boolean; hidden: boolean }) {
+function ScrollCue({ skip, hidden, film = T_DESKTOP }: { skip: boolean; hidden: boolean; film?: Film }) {
   const reduce = useReducedMotion();
   const instant = reduce || skip;
   return (
@@ -247,7 +279,7 @@ function ScrollCue({ skip, hidden }: { skip: boolean; hidden: boolean }) {
       aria-hidden
       initial={{ opacity: instant ? 1 : 0 }}
       animate={{ opacity: hidden ? 0 : 1 }}
-      transition={{ duration: instant ? 0 : duration.base, delay: hidden || instant ? 0 : T.scrollCue }}
+      transition={{ duration: instant ? 0 : duration.base, delay: hidden || instant ? 0 : film.scrollCue }}
       style={{
         position: "absolute",
         left: "var(--gutter)",
@@ -270,7 +302,7 @@ function ScrollCue({ skip, hidden }: { skip: boolean; hidden: boolean }) {
           transition={
             reduce
               ? { duration: 0 }
-              : { duration: 2.4, times: [0, 0.4, 0.75, 1], repeat: Infinity, ease: ease.inOut, delay: skip ? 0 : T.scrollCue }
+              : { duration: 2.4, times: [0, 0.4, 0.75, 1], repeat: Infinity, ease: ease.inOut, delay: skip ? 0 : film.scrollCue }
           }
         />
       </span>
@@ -282,7 +314,7 @@ function ScrollCue({ skip, hidden }: { skip: boolean; hidden: boolean }) {
 
 type PillRect = { top: number; right: number; bottom: number; left: number; radius: number };
 
-function PinnedHero({ skip }: { skip: boolean }) {
+function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLDivElement | null>(null);
   const pillRef = useRef<HTMLSpanElement | null>(null);
@@ -294,9 +326,40 @@ function PinnedHero({ skip }: { skip: boolean }) {
   });
 
   const [engaged, setEngaged] = useState(false);
+  const setNavDark = useSetNavDarkOverride();
+
   useMotionValueEvent(scrollYProgress, "change", function onP(p) {
     setEngaged(p > 0.001);
   });
+
+  // The dark layer is full-frame from the start — only clip-path makes it look
+  // like the pill — so an IntersectionObserver would read it as dark at p=0.
+  // Publish from the same progress the clip-path uses: the surface counts as
+  // dark under the nav once its top inset clears the nav's height.
+  const navH = 88;
+  const [coversNav, setCoversNav] = useState(false);
+  const frameInView = useInView(frameRef);
+
+  useMotionValueEvent(scrollYProgress, "change", function onNavTone(p) {
+    if (!rect) return;
+    const t = (p - 0.1) / 0.4;
+    const k = t < 0 ? 0 : t > 1 ? 1 : t;
+    const top = rect.top * (1 - easeInOutAt(k));
+    setCoversNav(p > 0.001 && top < navH);
+  });
+
+  // scrollYProgress clamps at 1 and stops emitting once the wrapper is behind
+  // us, so the progress signal alone latches the override on. Gate it on the
+  // pinned frame actually being on screen.
+  useEffect(
+    function publishNavTone() {
+      setNavDark(frameInView && coversNav);
+      return function reset() {
+        setNavDark(false);
+      };
+    },
+    [frameInView, coversNav, setNavDark]
+  );
 
   /** The pill's box expressed as insets from the sticky frame. */
   const measure = useCallback(function measurePill() {
@@ -374,10 +437,10 @@ function PinnedHero({ skip }: { skip: boolean }) {
         <HeroGround />
 
         <div style={{ position: "relative", zIndex: 1, width: "100%" }}>
-          <HeroComposition skip={skip} pillRef={pillRef} hidePillSurface={engaged} />
+          <HeroComposition skip={skip} pillRef={pillRef} hidePillSurface={engaged} film={film} />
         </div>
 
-        <ScrollCue skip={skip} hidden={engaged} />
+        <ScrollCue skip={skip} hidden={engaged} film={film} />
 
         {/* The dark layer. At p=0 its clip is exactly the pill, so it IS the
             pill; by p=0.5 it is the whole frame. */}
@@ -426,12 +489,26 @@ function PinnedHero({ skip }: { skip: boolean }) {
 }
 
 /**
- * Scroll-linked opacity, applied directly to the node.
+ * Scroll-linked opacity, written straight to the node.
  *
- * framer updates transform values on these elements but leaves a MotionValue
- * bound to `opacity` frozen at its first render, so the reel heading, card row
- * and CTA never faded in. Subscribing and writing style.opacity ourselves is
- * deterministic and keeps the animated property set to transform/opacity only.
+ * Why not `style={{ opacity: someMotionValue }}`:
+ * motion 12.43.0 hardware-accelerates scroll-linked `opacity` by compiling it
+ * into a native Web Animations API animation — and attaches that animation to a
+ * **ViewTimeline**, i.e. the element's own progress through its scrollport,
+ * rather than the useScroll() progress it was derived from. Every element here
+ * lives inside the `position: sticky` frame, so it never moves through the
+ * scrollport and that timeline is meaningless.
+ *
+ * Confirmed via el.getAnimations(): one running Animation, timeline
+ * "ViewTimeline", keyframes exactly [0.45 → 0, 0.6 → 1] — our values on the
+ * wrong clock. Once WAAPI owns the property framer stops writing inline style,
+ * and a WAAPI animation outranks inline style in the cascade, so the element
+ * ignored the MotionValue entirely. `transform` was unaffected because it was
+ * not accelerated and stayed on the JS path.
+ *
+ * Subscribing and assigning style.opacity keeps the property off the
+ * accelerated path, so it tracks the real scroll progress. The animated
+ * property set is still transform/opacity/clip-path only.
  */
 function useScrollOpacity(
   progress: MotionValue<number>,
@@ -620,13 +697,13 @@ function HeroGround() {
 /* ── entry ─────────────────────────────────────────────────────────── */
 
 export default function Hero() {
-  const { pinned } = useHeroMode();
+  const { pinned, film } = useHeroMode();
   const skip = useScrolledEarly();
 
   if (pinned) {
     return (
       <div data-hero-wrapper>
-        <PinnedHero skip={skip} />
+        <PinnedHero skip={skip} film={film} />
       </div>
     );
   }
@@ -645,7 +722,7 @@ export default function Hero() {
         }}
       >
         <HeroGround />
-        <HeroComposition skip={skip} />
+        <HeroComposition skip={skip} film={film} />
       </section>
 
       <Chapter tone="dark" from="cream">
