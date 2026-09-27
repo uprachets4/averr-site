@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
@@ -9,26 +9,59 @@ import {
   type MotionValue,
 } from "motion/react";
 import { ease, spring } from "../lib/motion";
-import { CharRevealInView } from "./CharReveal";
+import { CharRevealInView, type Segment } from "./CharReveal";
 import ImageFrame from "./case-study/ImageFrame";
 
-const STAGES = [
+const STAGES: Array<{
+  eyebrow: string;
+  segments: Segment[];
+  body: string;
+}> = [
   {
     eyebrow: "The Studio",
-    headline: "We started because most agency work looks the same.",
+    segments: [
+      { text: "We started because most agency work" },
+      { text: "looks the same.", accent: true },
+    ],
     body: "Every studio ships the same bento layout, the same hero gradient, the same testimonial carousel. The differentiator was gone.",
   },
   {
     eyebrow: "The Approach",
-    headline: "So we built one that starts from the client's world.",
+    segments: [
+      { text: "So we built one that starts from the" },
+      { text: "client's world.", accent: true },
+    ],
     body: "Palette from your space. Typography from your voice. Signature moments no template could ship. Then engineered to hold up in three years.",
   },
   {
     eyebrow: "The Result",
-    headline: "Sites that earn their portfolio slot. Yours and ours.",
+    segments: [
+      { text: "Sites that earn their portfolio slot." },
+      { text: "Yours and ours.", accent: true },
+    ],
     body: "Every client site ships as Averr's next portfolio piece. No exceptions. No template shortcuts.",
   },
 ];
+
+/** Static (non-revealing) render of segments — used on the pinned desktop
+ *  path, where stage visibility is already driven by scroll opacity and a
+ *  second per-char animation would fight the crossfade. */
+function StaticSegments({ segments }: { segments: Segment[] }) {
+  return (
+    <>
+      {segments.map(function drawSeg(s, i) {
+        return (
+          <Fragment key={i}>
+            {i > 0 ? " " : null}
+            <span className={s.accent ? "type-accent" : undefined}>
+              {s.text}
+            </span>
+          </Fragment>
+        );
+      })}
+    </>
+  );
+}
 
 const CARDS = [
   { src: "/work/capitalcommand/01-overview.jpg", label: "CapitalCommand" },
@@ -215,10 +248,10 @@ function StageBlock({
         className="type-display-l"
         style={{ color: "var(--color-ink)", marginBottom: 32 }}
       >
-        {stage.headline}
+        <StaticSegments segments={stage.segments} />
       </h2>
       <p
-        className="type-body-lg"
+        className="type-body-lg measure-body"
         style={{ color: "var(--color-ink)", margin: 0 }}
       >
         {stage.body}
@@ -424,7 +457,7 @@ function StoryStacked() {
                 style={{ color: "var(--color-ink)", marginBottom: 20 }}
               >
                 <CharRevealInView
-                  text={s.headline}
+                  segments={s.segments}
                   style={{ color: "var(--color-ink)" }}
                 />
               </h2>

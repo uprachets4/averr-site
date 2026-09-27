@@ -192,7 +192,10 @@ function ServicesHeader() {
           initial={{ opacity: 0, y: reduce ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.3 }}
-          className="type-display-xl"
+          // display-l, not -xl: this title lives in a 900px measure, and the v2
+          // display-xl (144px at 1440) wraps it to six lines. display-l lands at
+          // 100.8px — the size this composition was built against.
+          className="type-display-l"
           style={{
             color: "var(--color-ink)",
             marginBottom: 32,
@@ -2086,7 +2089,8 @@ function HowToStart() {
           }}
         >
           Three steps. Two weeks{" "}
-          <span className="fade-h">to kickoff, max.</span>
+          {/* NBSP binds the last two words so "max." can't orphan at 1440 */}
+          <span className="fade-h">to kickoff,&nbsp;max.</span>
         </motion.h2>
 
         <div

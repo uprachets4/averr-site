@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useInView,
@@ -19,6 +19,7 @@ import MagneticCTA from "../components/MagneticCTA";
 import MonogramMark from "../components/MonogramMark";
 import ContactForm from "../components/ContactForm";
 import Icon from "../components/icons/Icon";
+import { CharReveal, CharRevealInView } from "../components/CharReveal";
 
 const EMAIL_ADDR = "prachets@averrstudios.com";
 const CAL_LINK = "prachets/discoverycall";
@@ -27,120 +28,6 @@ const LINKEDIN_URL = "https://www.linkedin.com/in/prachetsupadhyay";
 const LINKEDIN_LABEL = "linkedin.com/in/prachetsupadhyay";
 const INSTAGRAM_URL = "https://instagram.com/averrstudios";
 const INSTAGRAM_LABEL = "@averrstudios";
-
-/* ═══════════════════════════════════════════════════════════════
-   Word-preserving character reveal helper (shared shape with /about)
-   ═══════════════════════════════════════════════════════════════ */
-
-const REVEAL_STAGGER = 0.02;
-const REVEAL_PER_CHAR_DURATION = 0.35;
-
-function splitForReveal(text: string): string[][] {
-  return text.split(" ").map(function toChars(w) {
-    return Array.from(w);
-  });
-}
-
-function CharReveal({
-  text,
-  delay = 0,
-  className,
-  style,
-}: {
-  text: string;
-  delay?: number;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  const reduce = useReducedMotion();
-  const words = splitForReveal(text);
-  let gi = -1;
-  return (
-    <span className={className} style={style}>
-      {words.map(function drawWord(chars, wi) {
-        return (
-          <Fragment key={wi}>
-            <span style={{ display: "inline-block", whiteSpace: "nowrap" }}>
-              {chars.map(function drawChar(ch, ci) {
-                gi++;
-                const idx = gi;
-                return (
-                  <motion.span
-                    key={ci}
-                    initial={{
-                      opacity: reduce ? 1 : 0,
-                      y: reduce ? 0 : 20,
-                    }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
-                      ease: ease.outQuart,
-                      delay: reduce ? 0 : delay + idx * REVEAL_STAGGER,
-                    }}
-                    style={{ display: "inline-block" }}
-                  >
-                    {ch}
-                  </motion.span>
-                );
-              })}
-            </span>
-            {wi < words.length - 1 ? " " : null}
-          </Fragment>
-        );
-      })}
-    </span>
-  );
-}
-
-function CharRevealInView({
-  text,
-  className,
-  style,
-}: {
-  text: string;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  const reduce = useReducedMotion();
-  const words = splitForReveal(text);
-  let gi = -1;
-  return (
-    <span className={className} style={style}>
-      {words.map(function drawWord(chars, wi) {
-        return (
-          <Fragment key={wi}>
-            <span style={{ display: "inline-block", whiteSpace: "nowrap" }}>
-              {chars.map(function drawChar(ch, ci) {
-                gi++;
-                const idx = gi;
-                return (
-                  <motion.span
-                    key={ci}
-                    initial={{
-                      opacity: reduce ? 1 : 0,
-                      y: reduce ? 0 : 20,
-                    }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-15% 0px" }}
-                    transition={{
-                      duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
-                      ease: ease.outQuart,
-                      delay: reduce ? 0 : idx * REVEAL_STAGGER,
-                    }}
-                    style={{ display: "inline-block" }}
-                  >
-                    {ch}
-                  </motion.span>
-                );
-              })}
-            </span>
-            {wi < words.length - 1 ? " " : null}
-          </Fragment>
-        );
-      })}
-    </span>
-  );
-}
 
 /* ═══════════════════════════════════════════════════════════════
    Band 1 — Editorial hero

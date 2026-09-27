@@ -4,7 +4,7 @@ const STUDIO_LINKS = [
   { label: "Work", href: "/work" },
   { label: "Services", href: "/services" },
   { label: "About", href: "/about" },
-  { label: "Process", href: "/process" },
+  { label: "Process", href: "/about#process" },
 ];
 
 const RESOURCE_LINKS = [

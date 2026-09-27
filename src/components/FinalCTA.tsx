@@ -83,9 +83,8 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
 
         {/* Headline: char reveal on the flat portions, PillHl still self-animates */}
         <h2
-          className="type-display-xl"
+          className="type-display-xl measure-wide"
           style={{
-            maxWidth: 900,
             margin: "0 auto 48px",
             color: "var(--color-ink)",
           }}
@@ -107,8 +106,10 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           >
             <PillHl>actually</PillHl>
           </motion.span>{" "}
+          {/* NBSP keeps "meant it." in one reveal token so "it." can't
+              orphan onto its own line at 768. */}
           <CharRevealInView
-            text="looks like you meant it."
+            text={"looks like you meant\u00A0it."}
             style={{ color: "var(--color-ink)" }}
           />
         </h2>

@@ -77,7 +77,9 @@ function WorkHeader() {
         </motion.div>
 
         <h1
-          className="type-display-xl"
+          // display-l, not -xl: in this 900px measure the v2 display-xl (144px
+          // at 1440) wraps the PillHl onto two lines and turns it into a slab.
+          className="type-display-l"
           style={{
             color: "var(--color-ink)",
             marginBottom: 32,

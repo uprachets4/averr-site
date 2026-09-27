@@ -70,15 +70,17 @@ export default function CaseStudies() {
 
           {/* Section title */}
           <h2
-            className="type-h2"
+            className="type-h2 measure-wide"
             style={{
-              maxWidth: 900,
               marginBottom: 30,
               color: "var(--color-parch)",
             }}
           >
             <CharRevealInView
-              text="Recent projects. The rest live in the vault."
+              segments={[
+                { text: "Recent projects. The rest live" },
+                { text: "in the vault.", accent: true },
+              ]}
               style={{ color: "var(--color-parch)" }}
             />
           </h2>
@@ -88,12 +90,9 @@ export default function CaseStudies() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: reduce ? 0 : 0.6, ease: ease.outQuart, delay: 0.2 }}
+            className="type-body-lg measure-body"
             style={{
-              fontFamily: "var(--font-body)",
-              fontSize: 17,
-              lineHeight: 1.6,
               color: "var(--color-muted-l)",
-              maxWidth: 640,
               marginBottom: 60,
             }}
           >
@@ -288,7 +287,7 @@ function FeaturedCard({ reduce }: { reduce: boolean }) {
             }}
           >
             <div
-              className="num-gradient-dark"
+              className="num-gradient-dark tnum"
               style={{
                 fontFamily: "var(--font-display)",
                 fontWeight: 500,

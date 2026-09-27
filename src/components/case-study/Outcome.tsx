@@ -1,51 +1,7 @@
-import { Fragment } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
 import type { CaseStudy } from "../../data/caseStudies";
-
-const REVEAL_STAGGER = 0.02;
-const REVEAL_PER_CHAR_DURATION = 0.35;
-
-function CharRevealInView({ text, style }: { text: string; style?: React.CSSProperties }) {
-  const reduce = useReducedMotion();
-  const words = text.split(" ").map(function toChars(w) {
-    return Array.from(w);
-  });
-  let gi = -1;
-  return (
-    <span style={style}>
-      {words.map(function drawWord(chars, wi) {
-        return (
-          <Fragment key={wi}>
-            <span style={{ display: "inline-block", whiteSpace: "nowrap" }}>
-              {chars.map(function drawChar(ch, ci) {
-                gi++;
-                const idx = gi;
-                return (
-                  <motion.span
-                    key={ci}
-                    initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-15% 0px" }}
-                    transition={{
-                      duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
-                      ease: ease.outQuart,
-                      delay: reduce ? 0 : idx * REVEAL_STAGGER,
-                    }}
-                    style={{ display: "inline-block" }}
-                  >
-                    {ch}
-                  </motion.span>
-                );
-              })}
-            </span>
-            {wi < words.length - 1 ? " " : null}
-          </Fragment>
-        );
-      })}
-    </span>
-  );
-}
+import { CharRevealInView } from "../CharReveal";
 
 export default function Outcome({ text }: { text: CaseStudy["outcome"] }) {
   const reduce = useReducedMotion();

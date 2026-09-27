@@ -114,9 +114,8 @@ export default function Numbers() {
         </motion.div>
 
         <h2
-          className="type-h2"
+          className="type-h2 measure-wide"
           style={{
-            maxWidth: 900,
             marginBottom: 60,
             color: "var(--color-ink)",
           }}
@@ -181,7 +180,7 @@ function StatCard({
         {stat.label}
       </div>
       <div
-        className="num-gradient"
+        className="num-gradient tnum"
         style={{
           fontFamily: "var(--font-display)",
           fontWeight: 500,

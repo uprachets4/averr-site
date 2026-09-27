@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useReducedMotion,
@@ -10,141 +10,7 @@ import { duration, ease } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import MonogramMark from "../components/MonogramMark";
 import ProcessTimeline from "../components/ProcessTimeline";
-
-/* ═══════════════════════════════════════════════════════════════
-   Character-by-character reveal helper
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Word-preserving character reveal — outer span per word has
- * whiteSpace:nowrap so the browser wraps at word boundaries only.
- * Each character inside a word is a motion.span with a globally
- * staggered entrance. Regular text-node spaces between words let
- * the browser handle line breaks naturally.
- */
-function splitTextForReveal(text: string): string[][] {
-  return text.split(" ").map(function toChars(word) {
-    return Array.from(word);
-  });
-}
-
-const REVEAL_STAGGER = 0.02;
-const REVEAL_PER_CHAR_DURATION = 0.35;
-
-function CharReveal({
-  text,
-  delay = 0,
-  className,
-  style,
-  as = "span",
-}: {
-  text: string;
-  delay?: number;
-  className?: string;
-  style?: React.CSSProperties;
-  as?: "span" | "h1" | "h2" | "p";
-}) {
-  const reduce = useReducedMotion();
-  const words = splitTextForReveal(text);
-  const Tag: React.ElementType = motion[
-    as as keyof typeof motion
-  ] as React.ElementType;
-  let globalIdx = -1;
-  return (
-    <Tag className={className} style={style}>
-      {words.map(function drawWord(chars, wi) {
-        return (
-          <Fragment key={wi}>
-            <span
-              style={{
-                display: "inline-block",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {chars.map(function drawChar(ch, ci) {
-                globalIdx++;
-                const gi = globalIdx;
-                return (
-                  <motion.span
-                    key={ci}
-                    initial={{
-                      opacity: reduce ? 1 : 0,
-                      y: reduce ? 0 : 20,
-                    }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
-                      ease: ease.outQuart,
-                      delay: reduce ? 0 : delay + gi * REVEAL_STAGGER,
-                    }}
-                    style={{ display: "inline-block" }}
-                  >
-                    {ch}
-                  </motion.span>
-                );
-              })}
-            </span>
-            {wi < words.length - 1 ? " " : null}
-          </Fragment>
-        );
-      })}
-    </Tag>
-  );
-}
-
-function CharRevealInView({
-  text,
-  className,
-  style,
-}: {
-  text: string;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  const reduce = useReducedMotion();
-  const words = splitTextForReveal(text);
-  let globalIdx = -1;
-  return (
-    <span className={className} style={style}>
-      {words.map(function drawWord(chars, wi) {
-        return (
-          <Fragment key={wi}>
-            <span
-              style={{
-                display: "inline-block",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {chars.map(function drawChar(ch, ci) {
-                globalIdx++;
-                const gi = globalIdx;
-                return (
-                  <motion.span
-                    key={ci}
-                    initial={{
-                      opacity: reduce ? 1 : 0,
-                      y: reduce ? 0 : 20,
-                    }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-15% 0px" }}
-                    transition={{
-                      duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
-                      ease: ease.outQuart,
-                      delay: reduce ? 0 : gi * REVEAL_STAGGER,
-                    }}
-                    style={{ display: "inline-block" }}
-                  >
-                    {ch}
-                  </motion.span>
-                );
-              })}
-            </span>
-            {wi < words.length - 1 ? " " : null}
-          </Fragment>
-        );
-      })}
-    </span>
-  );
-}
+import { CharReveal, CharRevealInView } from "../components/CharReveal";
 
 /* ═══════════════════════════════════════════════════════════════
    Band 1 — The Monogram Moment
@@ -377,7 +243,6 @@ function MonogramHero() {
             maxWidth: "22ch",
             margin: 0,
           }}
-          as="span"
         />
 
         <motion.div
@@ -784,10 +649,12 @@ function HowWeWorkBand() {
   const reduce = useReducedMotion();
   return (
     <section
+      id="process"
       style={{
         position: "relative",
         backgroundColor: "var(--color-bg-alt)",
         padding: "160px 40px",
+        scrollMarginTop: 96,
       }}
     >
       <div className="grain-light" aria-hidden="true" />
@@ -932,7 +799,7 @@ function FounderBand() {
             className="founder-grid"
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
               gap: 48,
               alignItems: "start",
               textAlign: "left",

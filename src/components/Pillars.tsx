@@ -65,9 +65,8 @@ export default function Pillars() {
 
         {/* Section title with word-preserved char reveal */}
         <h2
-          className="type-h2"
+          className="type-h2 measure-wide"
           style={{
-            maxWidth: 900,
             marginBottom: 60,
             color: "var(--color-ink)",
           }}

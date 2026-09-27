@@ -1,67 +1,7 @@
-import { Fragment } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../lib/motion";
 import { Link } from "react-router-dom";
-
-/* Word-preserving character reveal — shared shape with /about and /contact. */
-const REVEAL_STAGGER = 0.02;
-const REVEAL_PER_CHAR_DURATION = 0.35;
-
-function splitForReveal(text: string): string[][] {
-  return text.split(" ").map(function toChars(w) {
-    return Array.from(w);
-  });
-}
-
-function CharRevealInView({
-  text,
-  className,
-  style,
-}: {
-  text: string;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  const reduce = useReducedMotion();
-  const words = splitForReveal(text);
-  let gi = -1;
-  return (
-    <span className={className} style={style}>
-      {words.map(function drawWord(chars, wi) {
-        return (
-          <Fragment key={wi}>
-            <span style={{ display: "inline-block", whiteSpace: "nowrap" }}>
-              {chars.map(function drawChar(ch, ci) {
-                gi++;
-                const idx = gi;
-                return (
-                  <motion.span
-                    key={ci}
-                    initial={{
-                      opacity: reduce ? 1 : 0,
-                      y: reduce ? 0 : 20,
-                    }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-15% 0px" }}
-                    transition={{
-                      duration: reduce ? 0 : REVEAL_PER_CHAR_DURATION,
-                      ease: ease.outQuart,
-                      delay: reduce ? 0 : idx * REVEAL_STAGGER,
-                    }}
-                    style={{ display: "inline-block" }}
-                  >
-                    {ch}
-                  </motion.span>
-                );
-              })}
-            </span>
-            {wi < words.length - 1 ? " " : null}
-          </Fragment>
-        );
-      })}
-    </span>
-  );
-}
+import { CharRevealInView } from "./CharReveal";
 
 export default function Manifesto() {
   const reduce = useReducedMotion();
@@ -130,11 +70,14 @@ export default function Manifesto() {
         </motion.div>
 
         <div
-          className="type-display-l"
-          style={{ color: "var(--color-parch)", marginBottom: 40, maxWidth: "24ch" }}
+          className="type-display-xl measure-wide"
+          style={{ color: "var(--color-parch)", marginBottom: 40 }}
         >
           <CharRevealInView
-            text="Every site we ship gets its own signature moment."
+            segments={[
+              { text: "Every site we ship gets its own" },
+              { text: "signature moment.", accent: true },
+            ]}
             style={{ color: "var(--color-parch)" }}
           />
         </div>
@@ -148,10 +91,9 @@ export default function Manifesto() {
             ease: ease.outQuart,
             delay: reduce ? 0 : 1.4,
           }}
-          className="type-body-lg"
+          className="type-body-lg measure-body"
           style={{
             color: "var(--color-muted-l)",
-            maxWidth: 640,
             marginBottom: 40,
           }}
         >
