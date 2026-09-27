@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ElementType, type ReactNode } from "react";
 import { motion, useInView, useScroll, useTransform, useReducedMotion } from "motion/react";
+import { ease } from "../lib/motion";
 
 /**
  * Chapter — the site's section-transition signature.
@@ -41,6 +42,26 @@ type Props = {
    *  mark is unreachable, which would freeze the reveal part-open forever. */
   settle?: "viewport" | "end";
 };
+
+/** cubic-bezier(ease.outQuart) evaluated at t — fast off the mark, soft
+ *  settle, so the surface arrives rather than slides to a stop. */
+function outQuart(t: number) {
+  const [x1, y1, x2, y2] = ease.outQuart;
+  // Solve x(s) = t for s by bisection, then return y(s). 18 passes is well
+  // inside sub-pixel for the inset range we map onto.
+  let lo = 0;
+  let hi = 1;
+  let s = t;
+  for (let i = 0; i < 18; i++) {
+    s = (lo + hi) / 2;
+    const u = 1 - s;
+    const x = 3 * u * u * s * x1 + 3 * u * s * s * x2 + s * s * s;
+    if (x < t) lo = s;
+    else hi = s;
+  }
+  const u = 1 - s;
+  return 3 * u * u * s * y1 + 3 * u * s * s * y2 + s * s * s;
+}
 
 /** Matches --gutter: clamp(20px, 4vw, 64px). */
 function gutterFor(width: number) {
@@ -135,7 +156,8 @@ function AnimatedChapter({ tone, from, children, id, as, settle }: Props) {
   });
 
   const clipPath = useTransform(scrollYProgress, function toClip(t) {
-    const p = t < 0 ? 0 : t > 1 ? 1 : t;
+    const raw = t < 0 ? 0 : t > 1 ? 1 : t;
+    const p = outQuart(raw);
     const x = geometry.x * (1 - p);
     const r = geometry.r * (1 - p);
     return `inset(0px ${x}px 0px ${x}px round ${r}px ${r}px 0px 0px)`;

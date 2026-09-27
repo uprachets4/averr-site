@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { duration, ease } from "../lib/motion";
 import { CharRevealInView } from "./CharReveal";
+import MagneticCTA from "./MagneticCTA";
 
 
 const FEATURED = {
@@ -123,6 +124,18 @@ export default function CaseStudies() {
               />
             ))}
           </div>
+
+          <motion.div
+            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart, delay: 0.1 }}
+            style={{ marginTop: 56 }}
+          >
+            <MagneticCTA to="/work" variant="text" size="md" tone="dark">
+              All case studies
+            </MagneticCTA>
+          </motion.div>
         </div>
       </section>
 

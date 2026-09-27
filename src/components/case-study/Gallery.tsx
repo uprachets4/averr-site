@@ -221,7 +221,7 @@ export default function Gallery({
                 cursor: reduce ? "default" : "grab",
               }}
             >
-              <GalleryImage item={item} client={client} reduce={!!reduce} />
+              <GalleryImage item={item} client={client} reduce={!!reduce} onDark={onDark} />
             </motion.figure>
           </AnimatePresence>
 
@@ -237,7 +237,7 @@ export default function Gallery({
                 marginLeft: 8,
               }}
             >
-              <PeekImage src={peekItem.src} />
+              <PeekImage src={peekItem.src} onDark={onDark} />
             </div>
           ) : null}
         </div>
@@ -307,10 +307,12 @@ function GalleryImage({
   item,
   client,
   reduce,
+  onDark = false,
 }: {
   item: Item;
   client: string;
   reduce: boolean;
+  onDark?: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
   return (
@@ -319,7 +321,7 @@ function GalleryImage({
       onMouseLeave={() => setHovered(false)}
       style={{ position: "relative" }}
     >
-      <ImageFrame variant="gallery">
+      <ImageFrame variant="gallery" tone={onDark ? "dark" : "light"}>
         <img
           src={item.src}
           alt={`${client} — ${item.caption}`}
@@ -354,9 +356,9 @@ function GalleryImage({
   );
 }
 
-function PeekImage({ src }: { src: string }) {
+function PeekImage({ src, onDark = false }: { src: string; onDark?: boolean }) {
   return (
-    <ImageFrame variant="gallery">
+    <ImageFrame variant="gallery" tone={onDark ? "dark" : "light"}>
       <img src={src} alt="" loading="lazy" decoding="async" draggable={false} />
     </ImageFrame>
   );

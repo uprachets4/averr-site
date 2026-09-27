@@ -12,6 +12,7 @@ import { duration, ease } from "../lib/motion";
 import Icon from "./icons/Icon";
 import MagneticCTA from "./MagneticCTA";
 import AverrMark from "./AverrMark";
+import { caseStudies } from "../data/caseStudies";
 
 const LINKS = [
   { label: "Work", to: "/work" },
@@ -20,6 +21,13 @@ const LINKS = [
 ];
 
 const EMAIL = "prachets@averrstudios.com";
+
+/** Live case studies, counted from the data rather than hardcoded. */
+const WORK_COUNT = Object.values(caseStudies).filter(
+  function isLive(study) {
+    return study.status === "live";
+  }
+).length;
 const MENU_ID = "mobile-nav";
 const MOBILE_QUERY = "(max-width: 767px)";
 
@@ -59,11 +67,14 @@ function DesktopLink({
   label,
   current,
   reduce,
+  count,
 }: {
   to: string;
   label: string;
   current: boolean;
   reduce: boolean;
+  /** Superscript tally. aria-hidden, so the accessible name stays the label. */
+  count?: number;
 }) {
   const [active, setActive] = useState(false);
   const lit = current || active;
@@ -84,17 +95,34 @@ function DesktopLink({
       onBlur={function blur() {
         setActive(false);
       }}
+      className="type-body"
       style={{
         position: "relative",
         display: "inline-block",
-        fontFamily: "Inter, system-ui, sans-serif",
-        fontSize: "13px",
-        color: lit ? "var(--color-ink)" : "var(--color-muted)",
+        fontWeight: 500,
+        color: "var(--color-ink)",
+        opacity: lit ? 1 : 0.72,
         textDecoration: "none",
-        transition: `color ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
+        transition: `opacity ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
       }}
     >
       {label}
+      {typeof count === "number" ? (
+        <span
+          aria-hidden
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--type-eyebrow-size)",
+            letterSpacing: "var(--type-eyebrow-tracking)",
+            verticalAlign: "super",
+            lineHeight: 1,
+            marginLeft: 3,
+            opacity: 0.5,
+          }}
+        >
+          {count}
+        </span>
+      ) : null}
       <span
         aria-hidden
         style={{
@@ -401,6 +429,7 @@ export default function Nav() {
                       label={link.label}
                       current={isCurrent(pathname, link.to)}
                       reduce={!!reduce}
+                      count={link.to === "/work" ? WORK_COUNT : undefined}
                     />
                   </li>
                 );

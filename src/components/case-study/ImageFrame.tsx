@@ -4,10 +4,24 @@ type Props = {
   children: ReactNode;
   variant: "hero" | "inline" | "gallery" | "card";
   className?: string;
+  /** Ground the frame sits on. "light" (default) is the original treatment,
+   *  byte-identical. Its plinth and shadow are both rgba(20,20,18,…), which
+   *  go invisible on a dark surface — "dark" inverts them to parch. */
+  tone?: "light" | "dark";
 };
 
-export default function ImageFrame({ children, variant, className }: Props) {
-  const classes = ["image-frame", `image-frame--${variant}`, className]
+export default function ImageFrame({
+  children,
+  variant,
+  className,
+  tone = "light",
+}: Props) {
+  const classes = [
+    "image-frame",
+    `image-frame--${variant}`,
+    tone === "dark" ? "image-frame--on-dark" : null,
+    className,
+  ]
     .filter(Boolean)
     .join(" ");
 
@@ -22,6 +36,12 @@ export default function ImageFrame({ children, variant, className }: Props) {
           border-radius: 12px;
           box-shadow: 0 8px 32px rgba(20,20,18,0.06), 0 2px 8px rgba(20,20,18,0.04);
           box-sizing: border-box;
+        }
+
+        .image-frame--on-dark {
+          background: linear-gradient(180deg, rgba(237,233,226,0.04), rgba(237,233,226,0.08));
+          border: 1px solid rgba(237,233,226,0.08);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.25);
         }
 
         .image-frame--hero {

@@ -444,6 +444,8 @@ function PillarSection({
         position: "relative",
         height: "250vh",
         backgroundColor: bg,
+        // clears the fixed nav when arriving via /services#design|automate|grow
+        scrollMarginTop: 96,
       }}
     >
       <div
@@ -826,6 +828,7 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
         backgroundColor: bg,
         padding: "112px 24px",
         borderTop: "1px solid rgba(20,20,18,0.08)",
+        scrollMarginTop: 96,
       }}
     >
       <div style={{ maxWidth: 720, margin: "0 auto" }}>

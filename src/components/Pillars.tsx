@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../lib/motion";
 import { CharRevealInView } from "./CharReveal";
+import MagneticCTA from "./MagneticCTA";
 
 
 const PILLARS = [
@@ -92,6 +93,26 @@ export default function Pillars() {
           <PillarCard key={pillar.marker} pillar={pillar} index={i} reduce={!!reduce} />
         ))}
       </div>
+
+      {/* Section-ending wayfinding. The three cards above already link to
+          /services#design|automate|grow, so this is the only link added. */}
+      <motion.div
+        initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart, delay: 0.1 }}
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: "40px 40px 0",
+          display: "flex",
+          justifyContent: "flex-start",
+        }}
+      >
+        <MagneticCTA to="/services" variant="text" size="md">
+          Explore services
+        </MagneticCTA>
+      </motion.div>
 
       {/* Responsive collapse */}
       <style>{`

@@ -11,6 +11,7 @@ import {
 import { ease, spring } from "../lib/motion";
 import { CharRevealInView, type Segment } from "./CharReveal";
 import ImageFrame from "./case-study/ImageFrame";
+import MagneticCTA from "./MagneticCTA";
 
 const STAGES: Array<{
   eyebrow: string;
@@ -83,21 +84,31 @@ const PARALLAX_WEIGHTS = [0.4, 0.6, 0.8, 1.0];
 export default function StorySoFar() {
   const reduce = useReducedMotion();
   const [isDesktop, setIsDesktop] = useState(true);
+  // A 100vh pinned frame cannot hold three stages on a short viewport, so
+  // anything under 700px tall falls back to the unpinned stacked version.
+  const [tallEnough, setTallEnough] = useState(true);
 
   useEffect(function detect() {
     if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(min-width: 901px)");
-    setIsDesktop(mq.matches);
-    function onChange(e: MediaQueryListEvent) {
+    const wide = window.matchMedia("(min-width: 901px)");
+    const tall = window.matchMedia("(min-height: 700px)");
+    setIsDesktop(wide.matches);
+    setTallEnough(tall.matches);
+    function onWide(e: MediaQueryListEvent) {
       setIsDesktop(e.matches);
     }
-    mq.addEventListener("change", onChange);
+    function onTall(e: MediaQueryListEvent) {
+      setTallEnough(e.matches);
+    }
+    wide.addEventListener("change", onWide);
+    tall.addEventListener("change", onTall);
     return function cleanup() {
-      mq.removeEventListener("change", onChange);
+      wide.removeEventListener("change", onWide);
+      tall.removeEventListener("change", onTall);
     };
   }, []);
 
-  const sticky = isDesktop && !reduce;
+  const sticky = isDesktop && tallEnough && !reduce;
 
   if (!sticky) {
     return <StoryStacked />;
@@ -171,8 +182,18 @@ function StoryPinned({ reduce }: { reduce: boolean }) {
           overflow: "hidden",
         }}
       >
-        <div style={{ maxWidth: 520, paddingRight: 40, position: "relative" }}>
-          <motion.div style={{ y: headlineY }}>
+        <div
+          style={{
+            // 44% of the measure, capped by the 40% grid column. Real height
+            // (not the collapsed 0px an all-absolute column produces), so the
+            // stages can actually centre inside the frame.
+            maxWidth: "calc(var(--container-wide) * 0.44)",
+            paddingRight: 40,
+            position: "relative",
+            height: "80vh",
+          }}
+        >
+          <motion.div style={{ y: headlineY, position: "relative", height: "100%" }}>
             <StageBlock
               stage={STAGES[0]}
               opacity={stage1Opacity}
@@ -184,6 +205,11 @@ function StoryPinned({ reduce }: { reduce: boolean }) {
             <StageBlock
               stage={STAGES[2]}
               opacity={stage3Opacity}
+              cta={
+                <MagneticCTA to="/work" variant="text" size="md">
+                  See the work
+                </MagneticCTA>
+              }
             />
           </motion.div>
         </div>
@@ -224,29 +250,32 @@ function StoryPinned({ reduce }: { reduce: boolean }) {
 function StageBlock({
   stage,
   opacity,
+  cta,
 }: {
   stage: (typeof STAGES)[number];
   opacity: MotionValue<number>;
+  cta?: React.ReactNode;
 }) {
   return (
     <motion.div
       style={{
         position: "absolute",
-        top: 0,
+        top: "50%",
         left: 0,
         right: 0,
+        transform: "translateY(-50%)",
         opacity,
       }}
     >
       <div
         className="type-eyebrow"
-        style={{ color: "var(--color-ink-soft)", marginBottom: 24 }}
+        style={{ color: "var(--color-ink-soft)", marginBottom: 20 }}
       >
         {stage.eyebrow}
       </div>
       <h2
-        className="type-display-l"
-        style={{ color: "var(--color-ink)", marginBottom: 32 }}
+        className="type-h1"
+        style={{ color: "var(--color-ink)", marginBottom: 24 }}
       >
         <StaticSegments segments={stage.segments} />
       </h2>
@@ -256,6 +285,7 @@ function StageBlock({
       >
         {stage.body}
       </p>
+      {cta ? <div style={{ marginTop: 28 }}>{cta}</div> : null}
     </motion.div>
   );
 }
@@ -453,7 +483,7 @@ function StoryStacked() {
                 {s.eyebrow}
               </div>
               <h2
-                className="type-display-l"
+                className="type-h1"
                 style={{ color: "var(--color-ink)", marginBottom: 20 }}
               >
                 <CharRevealInView
@@ -467,6 +497,13 @@ function StoryStacked() {
               >
                 {s.body}
               </p>
+              {i === STAGES.length - 1 ? (
+                <div style={{ marginTop: 28 }}>
+                  <MagneticCTA to="/work" variant="text" size="md">
+                    See the work
+                  </MagneticCTA>
+                </div>
+              ) : null}
             </motion.div>
           );
         })}
