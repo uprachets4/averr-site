@@ -81,7 +81,7 @@ function DesignPreview() {
               border: "1px solid var(--hair)",
               boxShadow: "0 8px 24px rgba(20,20,18,0.12)",
               transform: `rotate(${(i - 1) * 3}deg)`,
-              objectFit: "cover",
+              objectFit: "contain",
             }}
           />
         );

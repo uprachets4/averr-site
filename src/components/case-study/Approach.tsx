@@ -183,7 +183,7 @@ export default function Approach({ entries }: { entries: Entry[] }) {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+              gridTemplateColumns: "minmax(0, 45fr) minmax(0, 55fr)",
               gap: 72,
               alignItems: "start",
             }}
@@ -272,6 +272,45 @@ function BlockText({ entry, active }: { entry: Entry; active: boolean }) {
 
 /* ── the sticky frame ───────────────────────────────────────────── */
 
+/**
+ * Every Approach image at its own natural aspect.
+ *
+ * The frame used to force 5/4 with object-fit: cover, which cropped these
+ * ~1.8-2.0 screenshots top and bottom. It now takes the loaded image's
+ * intrinsic ratio and contains it, capped at the natural width so nothing
+ * is upscaled. All of a study's images are preloaded on mount, so a wipe
+ * never reveals an empty frame.
+ */
+function useImageSizes(srcs: string[]) {
+  const [sizes, setSizes] = useState<Record<string, { w: number; h: number }>>({});
+
+  useEffect(
+    function preload() {
+      let alive = true;
+      for (const src of srcs) {
+        const img = new Image();
+        img.decoding = "async";
+        img.src = src;
+        function record() {
+          if (!alive || !img.naturalWidth) return;
+          setSizes(function add(prev) {
+            if (prev[src]) return prev;
+            return { ...prev, [src]: { w: img.naturalWidth, h: img.naturalHeight } };
+          });
+        }
+        if (img.complete) record();
+        else img.addEventListener("load", record, { once: true });
+      }
+      return function cleanup() {
+        alive = false;
+      };
+    },
+    [srcs.join("|")] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+  return sizes;
+}
+
 function StickyFrame({
   entries,
   active,
@@ -281,13 +320,30 @@ function StickyFrame({
   active: number;
   reduce: boolean;
 }) {
+  const srcs = entries
+    .map(function pick(e) {
+      return e.image;
+    })
+    .filter(Boolean) as string[];
+  const sizes = useImageSizes(srcs);
+
   const entry = entries[active];
   if (!entry) return null;
 
+  const size = entry.image ? sizes[entry.image] : undefined;
+  const aspect = size ? size.w / size.h : 16 / 10;
+
   return (
-    <div style={{ position: "relative", width: "100%" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        maxWidth: size ? size.w : undefined,
+        marginInline: "auto",
+      }}
+    >
       <ImageFrame variant="gallery">
-        <div style={{ position: "relative", width: "100%", aspectRatio: "5 / 4" }}>
+        <div style={{ position: "relative", width: "100%", aspectRatio: String(aspect) }}>
           <AnimatePresence initial={false}>
             <motion.div
               key={active}
@@ -304,16 +360,15 @@ function StickyFrame({
               }
               style={{ position: "absolute", inset: 0 }}
             >
-              {entry?.image ? (
+              {entry.image ? (
                 <img
                   src={entry.image}
                   alt={`${entry.pillar} approach visual`}
-                  loading="lazy"
                   decoding="async"
                   style={{
                     width: "100%",
                     height: "100%",
-                    objectFit: "cover",
+                    objectFit: "contain",
                     display: "block",
                   }}
                 />
@@ -340,14 +395,14 @@ function StackedBlock({ entry, reduce }: { entry: Entry; reduce: boolean }) {
     >
       <div style={{ marginBottom: 24 }}>
         <ImageFrame variant="gallery">
-          <div style={{ position: "relative", width: "100%", aspectRatio: "5 / 4" }}>
+          <div style={{ position: "relative", width: "100%" }}>
             {entry.image ? (
               <img
                 src={entry.image}
                 alt={`${entry.pillar} approach visual`}
                 loading="lazy"
                 decoding="async"
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                style={{ width: "100%", height: "auto", display: "block" }}
               />
             ) : (
               <GeometricAnchor pillar={entry.pillar} />
