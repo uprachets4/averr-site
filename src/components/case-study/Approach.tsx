@@ -88,6 +88,11 @@ export default function Approach({ entries }: { entries: Entry[] }) {
   const reduce = useReducedMotion();
   const [desktop, setDesktop] = useState(false);
   const [active, setActive] = useState(0);
+  // React keeps this component (and its state) across a /work/:slug change,
+  // so `active` can outlive a study with more pillars than the next one.
+  // Clamping in render, not just in the scroll handler, because render runs
+  // first: entries[2] on a two-pillar study is undefined.
+  const idx = Math.min(active, Math.max(0, entries.length - 1));
   const blockRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(function watch() {
@@ -199,7 +204,7 @@ export default function Approach({ entries }: { entries: Entry[] }) {
                       justifyContent: "center",
                     }}
                   >
-                    <BlockText entry={entry} active={i === active} />
+                    <BlockText entry={entry} active={i === idx} />
                   </div>
                 );
               })}
@@ -217,13 +222,13 @@ export default function Approach({ entries }: { entries: Entry[] }) {
                 gap: 16,
               }}
             >
-              <StickyFrame entries={entries} active={active} reduce={!!reduce} />
+              <StickyFrame entries={entries} active={idx} reduce={!!reduce} />
               <div
                 className="type-eyebrow"
                 aria-hidden
                 style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}
               >
-                {entries[active]?.pillar.toUpperCase()} · {active + 1} / {entries.length}
+                {entries[idx]?.pillar.toUpperCase()} · {idx + 1} / {entries.length}
               </div>
             </div>
           </div>
@@ -277,6 +282,7 @@ function StickyFrame({
   reduce: boolean;
 }) {
   const entry = entries[active];
+  if (!entry) return null;
 
   return (
     <div style={{ position: "relative", width: "100%" }}>

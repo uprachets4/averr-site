@@ -10,6 +10,7 @@ import Gallery from "../components/case-study/Gallery";
 import Outcome from "../components/case-study/Outcome";
 import Next from "../components/case-study/Next";
 import ReadingRail from "../components/case-study/ReadingRail";
+import SectionBoundary from "../components/case-study/SectionBoundary";
 import Chapter from "../components/Chapter";
 import { railSections } from "../data/caseSections";
 import { useDeclarePageEndTone } from "../lib/pageTone";
@@ -66,7 +67,8 @@ export default function CaseStudy() {
         sections={sections}
         tint={study.tint || "var(--color-ink)"}
       />
-      <CaseHero
+      <SectionBoundary name={`hero-${study.slug}`}>
+        <CaseHero
         hero={study.hero}
         client={study.client}
         pillars={study.pillars}
@@ -76,10 +78,17 @@ export default function CaseStudy() {
         heroImages={study.heroImages}
         heroCaption={study.heroCaption}
         tint={study.tint}
-      />
-      <Context paragraphs={study.context} tint={study.tint} />
-      <Approach entries={study.approach} />
-      <Inventory items={study.inventory} stack={study.stack} tint={study.tint} />
+        />
+      </SectionBoundary>
+      <SectionBoundary name={`context-${study.slug}`}>
+        <Context paragraphs={study.context} tint={study.tint} />
+      </SectionBoundary>
+      <SectionBoundary name={`approach-${study.slug}`}>
+        <Approach entries={study.approach} />
+      </SectionBoundary>
+      <SectionBoundary name={`inventory-${study.slug}`}>
+        <Inventory items={study.inventory} stack={study.stack} tint={study.tint} />
+      </SectionBoundary>
 
       {/* Signatures → Gallery → Outcome is one dark stretch: the Gallery goes
           dark so the run reveals once on entry instead of flickering between
@@ -87,27 +96,37 @@ export default function CaseStudy() {
           Walls) get the Chapter around Outcome alone. */}
       <Chapter tone="dark" from="cream">
         {study.signatures.length > 0 ? (
-          <Signatures
-            items={study.signatures}
-            imageSrc={study.signatureImage}
-            imageAlt={`${study.client} screen`}
-            tint={study.tint}
-          />
+          <SectionBoundary name={`signatures-${study.slug}`}>
+            <Signatures
+              items={study.signatures}
+              imageSrc={study.signatureImage}
+              imageAlt={`${study.client} screen`}
+              tint={study.tint}
+            />
+          </SectionBoundary>
         ) : null}
         {study.gallery && study.gallery.length > 0 ? (
-          <Gallery items={study.gallery} client={study.client} tone="dark" />
+          <SectionBoundary name={`gallery-${study.slug}`}>
+            <Gallery items={study.gallery} client={study.client} tone="dark" />
+          </SectionBoundary>
         ) : null}
-        <Outcome
-          text={study.outcome}
-          figure={study.headlineFigure}
-          tint={study.tint}
-        />
+        <SectionBoundary name={`outcome-${study.slug}`}>
+          <Outcome
+            text={study.outcome}
+            figure={study.headlineFigure}
+            tint={study.tint}
+          />
+        </SectionBoundary>
       </Chapter>
 
       <Chapter tone="cream-alt" from="dark">
-        <Next text={study.next} tint={study.tint} />
+        <SectionBoundary name={`next-${study.slug}`}>
+          <Next text={study.next} tint={study.tint} />
+        </SectionBoundary>
       </Chapter>
-      <CaseFinale slug={study.slug} />
+      <SectionBoundary name={`finale-${study.slug}`}>
+        <CaseFinale slug={study.slug} />
+      </SectionBoundary>
     </>
   );
 }

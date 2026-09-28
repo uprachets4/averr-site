@@ -70,7 +70,10 @@ export default function Inventory({
     };
   }, []);
 
-  const allTicked = ticked >= items.length;
+  // same cross-route state survival as Approach: a longer previous study
+  // could leave `ticked` past this one's item count
+  const done = Math.min(ticked, items.length);
+  const allTicked = done >= items.length;
 
   return (
     <section
@@ -133,13 +136,13 @@ export default function Inventory({
               whiteSpace: "nowrap",
             }}
           >
-            {String(ticked).padStart(2, "0")} / {String(items.length).padStart(2, "0")} shipped
+            {String(done).padStart(2, "0")} / {String(items.length).padStart(2, "0")} shipped
           </div>
         </div>
 
         <ul style={{ listStyle: "none", padding: 0, margin: "0 0 64px" }}>
           {items.map(function row(item, i) {
-            const on = i < ticked;
+            const on = i < done;
             return (
               <li
                 key={i}
