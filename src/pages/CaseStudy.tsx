@@ -75,7 +75,7 @@ export default function CaseStudy() {
       />
       <Context paragraphs={study.context} tint={study.tint} />
       <Approach entries={study.approach} />
-      <Inventory items={study.inventory} stack={study.stack} />
+      <Inventory items={study.inventory} stack={study.stack} tint={study.tint} />
 
       {/* Signatures → Gallery → Outcome is one dark stretch: the Gallery goes
           dark so the run reveals once on entry instead of flickering between
