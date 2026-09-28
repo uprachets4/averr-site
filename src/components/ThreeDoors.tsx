@@ -50,8 +50,9 @@ const DOORS = [
    one line each. */
 const PANEL_W = "clamp(260px, 39.0625vw - 140px, 360px)";
 const PANEL_MAX_H = 225;
-/** Clear space the panel must leave between itself and the row's name. */
-const NAME_CLEARANCE = 24;
+/** Clear space the panel must leave on either side — the row's name to its
+ *  left, the promise copy to its right. */
+const EDGE_CLEARANCE = 24;
 const DRIFT = 40;
 
 /* ── previews ──────────────────────────────────────────────────────── */
@@ -169,9 +170,10 @@ function GrowPreview({ reduce }: { reduce: boolean }) {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         gap: 10,
-        padding: 16,
+        // top pad clears the ILLUSTRATIVE tag; the card fills its frame so the
+        // tag sits on the dashboard rather than floating above it
+        padding: "28px 16px 16px",
       }}
     >
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 8 }}>
@@ -211,7 +213,7 @@ function GrowPreview({ reduce }: { reduce: boolean }) {
       <svg
         viewBox="0 0 240 48"
         preserveAspectRatio="none"
-        style={{ width: "100%", height: 34, display: "block" }}
+        style={{ width: "100%", flex: 1, minHeight: 30, display: "block" }}
       >
         <motion.path
           d="M4 42 C 40 39, 62 30, 92 27 S 150 19, 178 11 S 220 5, 236 3"
@@ -286,6 +288,7 @@ function Door({
   const rowRef = useRef<HTMLAnchorElement | null>(null);
   const nameRef = useRef<HTMLSpanElement | null>(null);
   const cellRef = useRef<HTMLDivElement | null>(null);
+  const promiseRef = useRef<HTMLDivElement | null>(null);
   const px = useMotionValue(0);
   const sx = useSpring(px, spring.soft);
 
@@ -295,14 +298,19 @@ function Door({
     const raw = (e.clientX - r.left) / r.width;
     let next = Math.max(-DRIFT, Math.min(DRIFT, (raw - 0.5) * 160));
 
-    // the panel drifts with the cursor, so cap the leftward travel against the
-    // name's measured right edge — otherwise it slides over the word (/work
-    // clamps its cursor preview the same way). cellRef is the untranslated
-    // grid cell, so its left is the panel's rest position.
+    // the panel drifts with the cursor, so cap that travel against its
+    // neighbours' measured edges — otherwise it slides over the name one way
+    // and the promise the other (/work clamps its cursor preview the same
+    // way). cellRef is the untranslated grid cell, so its box is the panel's
+    // rest position.
     const name = nameRef.current?.getBoundingClientRect();
+    const promise = promiseRef.current?.getBoundingClientRect();
     const cell = cellRef.current?.getBoundingClientRect();
-    if (name && cell) {
-      next = Math.max(name.right + NAME_CLEARANCE - cell.left, next);
+    if (name && promise && cell) {
+      const lo = name.right + EDGE_CLEARANCE - cell.left;
+      const hi = promise.left - EDGE_CLEARANCE - cell.right;
+      // lo wins when the row is too tight for both: never cover the name
+      next = Math.max(lo, Math.min(hi, next));
     }
 
     px.set(next);
@@ -402,6 +410,7 @@ function Door({
         </div>
 
         <div
+          ref={promiseRef}
           style={{
             textAlign: mobile ? "left" : "right",
             marginTop: mobile ? 16 : 0,
