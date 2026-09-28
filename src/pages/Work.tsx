@@ -1,692 +1,596 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { motion, useReducedMotion } from "motion/react";
-import { ease, spring } from "../lib/motion";
+import { useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { motion, useInView, useReducedMotion } from "motion/react";
+import { duration, ease, spring } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
-import FinalCTA from "../components/FinalCTA";
-import PillHl from "../components/PillHl";
 import LineReveal from "../components/LineReveal";
+import Chapter from "../components/Chapter";
+import ImageFrame from "../components/case-study/ImageFrame";
+import { CharRevealInView } from "../components/CharReveal";
+import CursorPreview, {
+  ViewLabel,
+  usePreloadPreviews,
+  type PreviewTarget,
+} from "../components/work/CursorPreview";
+import { vault, liveCount, PILLARS, countFor } from "../data/workIndex";
+import type { Pillar } from "../data/caseStudies";
 
-const T_WORK_HERO = {
-  eyebrow: 0.1,
-  line1: 0.3,
-  line2: 0.5,
-  pillChip: 0.9,
-  kicker: 1.1,
-};
+const T = { eyebrow: 0.2, h1: 0.32, sub: 0.7, chips: 0.85 };
+const MOBILE_QUERY = "(max-width: 767px)";
+const FINE_POINTER = "(pointer: fine)";
 
+function useMedia(query: string) {
+  const [matches, setMatches] = useState(false);
+  useEffect(
+    function watch() {
+      const mq = window.matchMedia(query);
+      function onChange(e: MediaQueryListEvent) {
+        setMatches(e.matches);
+      }
+      setMatches(mq.matches);
+      mq.addEventListener("change", onChange);
+      return function cleanup() {
+        mq.removeEventListener("change", onChange);
+      };
+    },
+    [query]
+  );
+  return matches;
+}
 
-/* ═══════════════════════════════════════════════════════════════
-   Shared: Magnetic CTA (matches Hero / FinalCTA behaviour)
-   ═══════════════════════════════════════════════════════════════ */
+/* ── hero ──────────────────────────────────────────────────────────── */
 
-
-/* ═══════════════════════════════════════════════════════════════
-   Header
-   ═══════════════════════════════════════════════════════════════ */
-
-function WorkHeader() {
+function VaultHeader({
+  pillar,
+  setPillar,
+  shown,
+  mobile,
+}: {
+  pillar: Pillar | null;
+  setPillar: (p: Pillar | null) => void;
+  shown: number;
+  mobile: boolean;
+}) {
   const reduce = useReducedMotion();
+  const d = (v: number) => (reduce ? 0 : v);
+
+  const chips: Array<{ label: string; value: Pillar | null }> = [
+    { label: "All", value: null },
+    ...PILLARS.map(function toChip(p) {
+      return { label: p, value: p as Pillar | null };
+    }),
+  ];
 
   return (
     <section
       style={{
+        backgroundColor: "var(--color-bg)",
+        padding: "168px 0 96px",
         position: "relative",
         overflow: "hidden",
-        backgroundColor: "var(--color-bg)",
-        padding: "180px 40px 100px",
-        textAlign: "center",
       }}
     >
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
-          pointerEvents: "none",
-        }}
-      />
       <div className="grain-light" aria-hidden="true" />
 
-      <div style={{ position: "relative", zIndex: 2, maxWidth: 1000, margin: "0 auto" }}>
+      <div
+        style={{
+          maxWidth: "var(--container-wide)",
+          margin: "0 auto",
+          position: "relative",
+          zIndex: 2,
+        }}
+      >
         <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: reduce ? 0 : 0.5,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : T_WORK_HERO.eyebrow,
-          }}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 10,
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            color: "var(--color-muted)",
-            marginBottom: 40,
-          }}
+          transition={{ duration: d(0.5), ease: ease.outQuart, delay: d(T.eyebrow) }}
+          className="type-eyebrow"
+          style={{ color: "var(--color-muted)", marginBottom: 28 }}
         >
-          <span style={{ height: 1, width: 20, background: "currentColor", opacity: 0.6 }} />
-          Selected work
-          <span style={{ height: 1, width: 20, background: "currentColor", opacity: 0.6 }} />
+          Selected work · {shown} {pillar ? "shown" : "live"}
         </motion.div>
 
         <h1
-          // display-l, not -xl: in this 900px measure the v2 display-xl (144px
-          // at 1440) wraps the PillHl onto two lines and turns it into a slab.
-          className="type-display-l"
-          style={{
-            color: "var(--color-ink)",
-            marginBottom: 32,
-            maxWidth: 900,
-            margin: "0 auto 32px",
-          }}
+          className="type-display-2xl"
+          style={{ color: "var(--color-ink)", marginBottom: 32 }}
         >
-          <LineReveal delay={T_WORK_HERO.line1}>A short list of</LineReveal>
-          <LineReveal delay={T_WORK_HERO.line2}>
-            <motion.span
-              initial={{
-                opacity: reduce ? 1 : 0,
-                scaleX: reduce ? 1 : 0.92,
-              }}
-              animate={{ opacity: 1, scaleX: 1 }}
-              transition={
-                reduce
-                  ? { duration: 0 }
-                  : { delay: T_WORK_HERO.pillChip, ...spring.snappy }
-              }
-              style={{ display: "inline-block", transformOrigin: "center" }}
-            >
-              <PillHl>real projects</PillHl>
-            </motion.span>
-            <span>.</span>
+          <LineReveal delay={d(T.h1)} duration={reduce ? 0 : duration.slow}>
+            The vault.
           </LineReveal>
         </h1>
 
         <motion.p
           initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: reduce ? 0 : 0.6,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : T_WORK_HERO.kicker,
-          }}
-          style={{
-            fontSize: 19,
-            lineHeight: 1.6,
-            color: "var(--color-muted)",
-            maxWidth: 620,
-            margin: "0 auto",
-          }}
+          transition={{ duration: d(0.6), ease: ease.outQuart, delay: d(T.sub) }}
+          className="type-body-lg measure-body"
+          style={{ color: "var(--color-muted)", margin: "0 0 48px" }}
         >
-          Every project below is real. Numbers are measured, not marketing. Descriptions
-          are what happened, not what we wish we had.
+          Every project below is real. Numbers are measured, not marketing.
+          Descriptions are what happened, not what we wish we had.
         </motion.p>
+
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            overflowX: mobile ? "auto" : "visible",
+            scrollSnapType: mobile ? "x proximity" : "none",
+            scrollbarWidth: "none",
+            paddingBottom: mobile ? 4 : 0,
+          }}
+          className="vault-chips"
+          role="group"
+          aria-label="Filter by service"
+        >
+          {chips.map(function drawChip(chip, i) {
+            const selected = pillar === chip.value;
+            return (
+              <motion.button
+                key={chip.label}
+                type="button"
+                onClick={function pick() {
+                  setPillar(chip.value);
+                }}
+                aria-pressed={selected}
+                initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: d(0.4),
+                  ease: ease.outQuart,
+                  delay: d(T.chips + i * 0.06),
+                }}
+                className="type-small"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "10px 18px",
+                  borderRadius: 999,
+                  whiteSpace: "nowrap",
+                  scrollSnapAlign: "start",
+                  cursor: "pointer",
+                  background: selected ? "var(--color-ink)" : "transparent",
+                  color: selected ? "var(--color-parch)" : "var(--color-ink)",
+                  border: `1px solid ${selected ? "var(--color-ink)" : "var(--hair-hi)"}`,
+                  transition: reduce
+                    ? "none"
+                    : `background-color ${duration.base * 1000}ms ease, color ${duration.base * 1000}ms ease, border-color ${duration.base * 1000}ms ease`,
+                }}
+              >
+                {chip.label}
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--type-eyebrow-size)",
+                    opacity: 0.6,
+                  }}
+                >
+                  {countFor(chip.value)}
+                </span>
+              </motion.button>
+            );
+          })}
+        </div>
       </div>
+
+      <style>{`.vault-chips::-webkit-scrollbar { display: none; }`}</style>
     </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Shared card
-   ═══════════════════════════════════════════════════════════════ */
+/* ── one row ───────────────────────────────────────────────────────── */
 
-type Card = {
-  slug: string;
-  name: string;
-  eyebrow: string;
-  kicker: string;
-  tags: string[];
-  live?: boolean;
-};
-
-function ProjectCard({
-  card,
-  size,
+function VaultRow({
+  entry,
   index,
+  active,
+  anyActive,
+  onEnter,
+  onLeave,
+  onFocusRow,
+  mobile,
 }: {
-  card: Card;
-  size: "hero" | "med";
+  entry: (typeof vault)[number];
   index: number;
+  active: boolean;
+  anyActive: boolean;
+  onEnter: (nameRight?: number) => void;
+  onLeave: () => void;
+  onFocusRow: (rect: DOMRect) => void;
+  mobile: boolean;
 }) {
   const reduce = useReducedMotion();
-  const isHero = size === "hero";
-  const bg = isHero ? "var(--color-bg-warm)" : "var(--color-bg-alt)";
-  const bgHover = isHero
-    ? "rgba(232,225,208,0.9)"
-    : "rgba(232,225,208,0.6)";
-  const [hovered, setHovered] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(ref, { once: true, margin: "-12% 0px" });
+  const delay = index * 0.08;
+  const dim = anyActive && !active && !mobile && !reduce;
 
-  // Orchestrated hover — parent variant cascades to children
-  const cardVariants = {
-    rest: {
-      y: 0,
-      boxShadow: "0 0 0 rgba(20,20,18,0)",
-      transition: { duration: reduce ? 0 : 0.3, ease: ease.outQuart },
-    },
-    hover: {
-      y: reduce ? 0 : isHero ? -10 : -6,
-      boxShadow: reduce
-        ? "0 0 0 rgba(20,20,18,0)"
-        : "0 12px 32px rgba(20,20,18,0.08)",
-      transition: { duration: reduce ? 0 : 0.3, ease: ease.outQuart },
-    },
-  };
+  const nameRef = useRef<HTMLDivElement | null>(null);
 
-  const arrowVariants = {
-    rest: { x: 0, transition: { duration: reduce ? 0 : 0.3, ease: ease.outQuart } },
-    hover: {
-      x: reduce ? 0 : isHero ? 6 : 4,
-      transition: { duration: reduce ? 0 : 0.3, ease: ease.outQuart },
-    },
-  };
+  function reportEnter() {
+    const el = nameRef.current;
+    onEnter(el ? el.getBoundingClientRect().right : undefined);
+  }
+
+  const meta = (
+    <>
+      <div
+        className="type-eyebrow"
+        style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted-l)" }}
+      >
+        {entry.sector}
+        {entry.year ? ` · ${entry.year}` : ""}
+      </div>
+      <div
+        className="type-eyebrow"
+        style={{
+          fontFamily: "var(--font-mono)",
+          color: "var(--color-muted-l)",
+          marginTop: 8,
+        }}
+      >
+        {entry.live ? entry.pillars.join(" · ") : "IN PROGRESS"}
+      </div>
+    </>
+  );
+
+  const figure = entry.figure ? (
+    <>
+      <div className="type-h1 tnum" style={{ color: "var(--color-parch)" }}>
+        {entry.figure.value}
+      </div>
+      <div
+        className="type-body"
+        style={{ color: "var(--color-muted-l)", marginTop: 6 }}
+      >
+        {entry.figure.caption}
+      </div>
+    </>
+  ) : null;
+
+  const inner = (
+    <motion.div
+      className="vault-row"
+      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
+      animate={inView ? { opacity: 1, y: 0 } : undefined}
+      transition={{
+        duration: reduce ? 0 : 0.6,
+        ease: ease.outQuart,
+        delay: delay + (reduce ? 0 : 0.22),
+      }}
+      style={{
+        display: "grid",
+        gridTemplateColumns: mobile ? "1fr" : "max-content minmax(0, 1fr) minmax(0, 0.5fr) 20px",
+        alignItems: mobile ? undefined : "center",
+        gap: mobile ? 14 : 32,
+        minHeight: mobile ? undefined : 168,
+        padding: mobile ? "28px 0" : 0,
+      }}
+    >
+      {/* mobile leads with the image */}
+      {mobile && entry.preview ? (
+        <div style={{ aspectRatio: "16 / 10", overflow: "hidden", borderRadius: 10 }}>
+          <ImageFrame variant="gallery" tone="dark">
+            <img
+              src={entry.preview.src}
+              alt={entry.preview.alt}
+              width={1680}
+              height={1050}
+              loading="lazy"
+              decoding="async"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </ImageFrame>
+        </div>
+      ) : null}
+
+      <motion.div
+        ref={nameRef}
+        className="type-display-l"
+        style={{ color: "var(--color-parch)", x: reduce || mobile ? 0 : active ? 12 : 0 }}
+        transition={spring.soft}
+      >
+        <LineReveal delay={reduce ? 0 : delay + 0.1}>{entry.name}</LineReveal>
+      </motion.div>
+
+      <div>{meta}</div>
+
+      <div style={{ textAlign: mobile ? "left" : "right" }}>{figure}</div>
+
+      {!mobile ? (
+        <motion.div
+          aria-hidden
+          style={{ width: 20, height: 20, color: "var(--color-parch)", justifySelf: "end" }}
+          animate={{ rotate: active && !reduce ? -45 : 0 }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
+        >
+          {entry.live ? (
+            <svg viewBox="0 0 20 20" fill="none" style={{ display: "block" }}>
+              <path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+          ) : null}
+        </motion.div>
+      ) : null}
+    </motion.div>
+  );
 
   return (
     <motion.div
-      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{
-        duration: reduce ? 0 : 0.7,
-        ease: ease.outQuart,
-        delay: reduce ? 0 : 0.1 + index * 0.08,
+      ref={ref}
+      layout={reduce ? false : "position"}
+      transition={{ duration: reduce ? 0 : duration.base, ease: ease.inOut }}
+      style={{
+        position: "relative",
+        // the dim lives here, not on the inner row: that one animates opacity
+        // on entrance and framer's animate target would overwrite it
+        opacity: dim ? 0.35 : entry.live ? 1 : 0.4,
+        transition: reduce
+          ? "none"
+          : `opacity ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
       }}
-      style={{ display: "flex" }}
     >
       <motion.div
-        variants={cardVariants}
-        initial="rest"
-        whileHover="hover"
-        onHoverStart={() => setHovered(true)}
-        onHoverEnd={() => setHovered(false)}
-        style={{
-          display: "flex",
-          flex: 1,
-          borderRadius: 4,
-        }}
-      >
+        aria-hidden
+        style={{ height: 1, background: "var(--hair-d)", transformOrigin: "left" }}
+        initial={{ scaleX: reduce ? 1 : 0 }}
+        animate={inView ? { scaleX: 1 } : undefined}
+        transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart, delay }}
+      />
+      {entry.live ? (
         <Link
-          to={`/work/${card.slug}`}
-          className="work-card"
-          style={{
-            position: "relative",
-            overflow: "hidden",
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            padding: isHero ? "56px 48px" : "36px 32px",
-            minHeight: isHero ? 480 : 320,
-            backgroundColor: hovered && !reduce ? bgHover : bg,
-            border: `1px solid ${
-              hovered && !reduce
-                ? "rgba(20,20,18,0.18)"
-                : "rgba(20,20,18,0.08)"
-            }`,
-            borderRadius: 4,
-            color: "var(--color-ink)",
-            textDecoration: "none",
-            transition: "background-color 0.3s ease, border-color 0.3s ease",
+          to={`/work/${entry.slug}`}
+          onMouseEnter={reportEnter}
+          onMouseLeave={onLeave}
+          onFocus={function focus(e) {
+            if (e.currentTarget.matches(":focus-visible")) {
+              reportEnter();
+              onFocusRow(e.currentTarget.getBoundingClientRect());
+            }
           }}
+          onBlur={onLeave}
+          style={{ display: "block", textDecoration: "none", color: "inherit" }}
         >
-          <div className="grain-light" aria-hidden="true" />
-
-          {/* Featured card: shine sweep on hover */}
-          {isHero && !reduce ? (
-            <motion.div
-              aria-hidden
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={hovered ? { x: "200%", opacity: 1 } : { x: "-100%", opacity: 0 }}
-              transition={{ duration: 0.6, ease: ease.outQuart }}
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%)",
-                pointerEvents: "none",
-                zIndex: 1,
-              }}
-            />
-          ) : null}
-
-          <div style={{ position: "relative", zIndex: 2 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: isHero ? 40 : 28,
-              }}
-            >
-              <span
-                className="type-eyebrow"
-                style={{
-                  color:
-                    hovered && !reduce
-                      ? "var(--color-ink-soft)"
-                      : "var(--color-muted)",
-                  fontWeight: hovered && !reduce ? 600 : 500,
-                  transition: `color 300ms cubic-bezier(${ease.outQuart.join(",")}), font-weight 300ms cubic-bezier(${ease.outQuart.join(",")})`,
-                }}
-              >
-                {card.eyebrow}
-              </span>
-              {card.live ? (
-                <span
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 10,
-                    letterSpacing: "0.16em",
-                    textTransform: "uppercase",
-                    color: "var(--color-muted-2)",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
-                >
-                  <motion.span
-                    aria-hidden
-                    animate={
-                      reduce
-                        ? { scale: 1, opacity: 1 }
-                        : hovered
-                        ? { scale: [1, 1.25, 1], opacity: [1, 0.85, 1] }
-                        : { scale: [1, 1.15, 1], opacity: [1, 0.7, 1] }
-                    }
-                    transition={{
-                      duration: hovered ? 1.2 : 2.5,
-                      ease: ease.inOut,
-                      repeat: reduce ? 0 : Infinity,
-                    }}
-                    style={{
-                      display: "inline-block",
-                      width: 6,
-                      height: 6,
-                      borderRadius: "50%",
-                      background: "#4A7C3F",
-                      boxShadow: "0 0 0 3px rgba(74,124,63,0.18)",
-                    }}
-                  />
-                  Live
-                </span>
-              ) : null}
-            </div>
-
-            <h3
-              className="type-h3"
-              style={{
-                marginBottom: isHero ? 32 : 20,
-                color: "var(--color-ink)",
-                letterSpacing:
-                  hovered && !reduce ? "-0.02em" : "-0.015em",
-                transition: `letter-spacing 300ms cubic-bezier(${ease.outQuart.join(",")}), color 300ms cubic-bezier(${ease.outQuart.join(",")})`,
-              }}
-            >
-              {card.name}
-            </h3>
-
-            <p
-              style={{
-                fontSize: isHero ? 17 : 15,
-                lineHeight: 1.55,
-                color: "var(--color-ink-soft)",
-                maxWidth: isHero ? 600 : 420,
-                marginBottom: isHero ? 40 : 24,
-              }}
-            >
-              {card.kicker}
-            </p>
-          </div>
-
-          <div
-            style={{
-              position: "relative",
-              zIndex: 2,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-end",
-              gap: 24,
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {card.tags.map((t) => (
-                <span
-                  key={t}
-                  style={{
-                    padding: "5px 12px",
-                    borderRadius: 999,
-                    fontFamily: "var(--font-body)",
-                    fontSize: 12,
-                    color:
-                      hovered && !reduce
-                        ? "var(--color-ink-soft)"
-                        : "var(--color-muted)",
-                    border: `1px solid ${
-                      hovered && !reduce
-                        ? "rgba(20,20,18,0.28)"
-                        : "rgba(20,20,18,0.14)"
-                    }`,
-                    background: "transparent",
-                    fontWeight: hovered && !reduce ? 500 : 400,
-                    transition: `color 300ms cubic-bezier(${ease.outQuart.join(",")}), border-color 300ms cubic-bezier(${ease.outQuart.join(",")}), font-weight 300ms cubic-bezier(${ease.outQuart.join(",")})`,
-                  }}
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-            <motion.span
-              variants={arrowVariants}
-              className="work-arrow"
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: isHero ? 28 : 22,
-                color: "var(--color-ink)",
-                display: "inline-block",
-              }}
-              aria-hidden
-            >
-              →
-            </motion.span>
-          </div>
+          {inner}
         </Link>
-      </motion.div>
+      ) : (
+        inner
+      )}
     </motion.div>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   //_01 · Portfolio — client-tier live case studies
-   ═══════════════════════════════════════════════════════════════ */
+/* ── the index ─────────────────────────────────────────────────────── */
 
-const PORTFOLIO: Card[] = [
-  {
-    slug: "cg-walls-and-floors",
-    name: "CG Walls & Floors",
-    eyebrow: "Design",
-    kicker:
-      "Built from scratch for a solo operator in a copycat market. The design does the work of the sales team he doesn't have.",
-    tags: ["React", "Custom brand", "Marketing site"],
-    live: true,
-  },
-  {
-    slug: "capitalcommand",
-    name: "CapitalCommand",
-    eyebrow: "Design",
-    kicker:
-      "A research-first command console for tracking portfolios, investigating signals, monitoring risk, and following US and Indian IPOs — built to improve the decision before it introduces the trade.",
-    tags: ["Fintech", "Portfolio intelligence", "SaaS"],
-    live: true,
-  },
-];
-
-function Portfolio() {
+function VaultIndex({
+  pillar,
+  onClear,
+  mobile,
+}: {
+  pillar: Pillar | null;
+  onClear: () => void;
+  mobile: boolean;
+}) {
   const reduce = useReducedMotion();
+  const fine = useMedia(FINE_POINTER);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(ref, { margin: "-10% 0px" });
+  usePreloadPreviews(inView);
+
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [target, setTarget] = useState<PreviewTarget>({ kind: "cursor" });
+  const [nameRight, setNameRight] = useState(0);
+
+  const rows = vault.filter(function matches(e) {
+    if (!pillar) return true;
+    return e.pillars.includes(pillar);
+  });
+
+  const usePreview = fine && !mobile && !reduce;
 
   return (
     <section
+      id="vault"
+      ref={ref}
       style={{
-        backgroundColor: "var(--color-bg)",
-        padding: "80px 40px 100px",
+        backgroundColor: "var(--color-dark)",
+        color: "var(--color-parch)",
+        padding: "96px 0 112px",
         position: "relative",
+        overflow: "hidden",
       }}
     >
-      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-        <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: 32,
-          }}
-        >
-          //_01 · portfolio
-        </motion.div>
+      <div className="grain-dark" aria-hidden="true" />
 
-        <div
-          className="portfolio-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: 16,
-          }}
-        >
-          {PORTFOLIO.map((card, i) => (
-            <ProjectCard key={card.slug} card={card} size="hero" index={i} />
-          ))}
-        </div>
+      <div
+        style={{
+          maxWidth: "var(--container-wide)",
+          margin: "0 auto",
+          position: "relative",
+          zIndex: 2,
+        }}
+      >
+        {rows.length === 0 ? (
+          <p className="type-body-lg" style={{ color: "var(--color-muted-l)" }}>
+            Nothing here yet —{" "}
+            <button
+              type="button"
+              onClick={onClear}
+              style={{
+                color: "var(--color-parch)",
+                textDecoration: "underline",
+                background: "none",
+                border: "none",
+                padding: 0,
+                font: "inherit",
+                cursor: "pointer",
+              }}
+            >
+              see all work
+            </button>
+          </p>
+        ) : (
+          rows.map(function drawRow(entry, i) {
+            return (
+              <VaultRow
+                key={entry.slug}
+                entry={entry}
+                index={i}
+                mobile={mobile}
+                active={hovered === entry.slug}
+                anyActive={hovered !== null}
+                onEnter={function on(nameEdge) {
+                  setHovered(entry.slug);
+                  if (nameEdge) setNameRight(nameEdge + 24);
+                }}
+                onLeave={function off() {
+                  setHovered(null);
+                  setTarget({ kind: "cursor" });
+                }}
+                onFocusRow={function anchor(rect) {
+                  setTarget({
+                    kind: "anchored",
+                    rect: {
+                      top: rect.top,
+                      left: rect.left,
+                      width: rect.width,
+                      height: rect.height,
+                    },
+                  });
+                }}
+              />
+            );
+          })
+        )}
+        <div style={{ height: 1, background: "var(--hair-d)" }} />
       </div>
 
+      {usePreview ? (
+        <>
+          <CursorPreview slug={hovered} target={target} minX={nameRight} />
+          <ViewLabel visible={hovered !== null && target.kind === "cursor"} />
+        </>
+      ) : null}
+
       <style>{`
-        @media (max-width: 900px) {
-          .portfolio-grid { grid-template-columns: 1fr !important; }
+        @media (max-width: 767px) {
+          .vault-row { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   //_02 · In The Lab — our own ventures
-   ═══════════════════════════════════════════════════════════════ */
+/* ── the vault's own closer ────────────────────────────────────────── */
 
-const LAB: Card[] = [
-  {
-    slug: "sift",
-    name: "SIFT",
-    eyebrow: "Job search",
-    kicker:
-      "Our job-search platform. Aggregates listings from YC, LinkedIn, Wellfound, Google Jobs, and every major ATS board; ATS-scores your resume against each one and rewrites it to close the gap.",
-    tags: ["Next.js", "Multi-tenant", "AI"],
-    live: true,
-  },
-  {
-    slug: "cadencestack",
-    name: "CadenceStack",
-    eyebrow: "LinkedIn growth",
-    kicker:
-      "Our LinkedIn presence engine. Turns thought leadership into a managed system — deciding what to say, drafting it in your voice, and remembering what you've already said so the next post doesn't repeat the last one.",
-    tags: ["LinkedIn", "Editorial system", "SaaS"],
-    live: true,
-  },
-  {
-    slug: "careerclarity",
-    name: "CareerClarity AI",
-    eyebrow: "Education",
-    kicker:
-      "Our AI product for education. Analyzes student test data to surface where each learner is actually stuck.",
-    tags: ["AI", "EdTech", "Product"],
-    live: true,
-  },
-];
-
-function InTheLab() {
+function VaultCloser() {
   const reduce = useReducedMotion();
-
-  return (
-    <section
-      style={{
-        backgroundColor: "var(--color-bg-alt)",
-        padding: "120px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
-        position: "relative",
-      }}
-    >
-      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-        <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: 24,
-          }}
-        >
-          //_02 · in the lab
-        </motion.div>
-
-        <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
-          className="type-h2"
-          style={{
-            color: "var(--color-ink)",
-            marginBottom: 24,
-            maxWidth: 900,
-          }}
-        >
-          The ventures we're{" "}
-          <span className="fade-h">building for ourselves.</span>
-        </motion.h2>
-
-        <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 0.2 }}
-          style={{
-            fontSize: 17,
-            lineHeight: 1.65,
-            color: "var(--color-muted)",
-            maxWidth: 640,
-            marginBottom: 56,
-          }}
-        >
-          A proving ground for the same three pillars we sell to clients. If it
-          doesn't work on our own work, we don't ship it to yours.
-        </motion.p>
-
-        <div
-          className="lab-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 16,
-          }}
-        >
-          {LAB.map((card, i) => (
-            <ProjectCard key={card.slug} card={card} size="med" index={i} />
-          ))}
-        </div>
-      </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .lab-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   //_03 · Off-portfolio — honest note about NDA / unpublished work
-   ═══════════════════════════════════════════════════════════════ */
-
-function OffPortfolio() {
-  const reduce = useReducedMotion();
-
   return (
     <section
       style={{
         backgroundColor: "var(--color-bg)",
-        padding: "120px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        padding: "128px 0 144px",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-        <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: 24,
-          }}
-        >
-          //_03 · off-portfolio
-        </motion.div>
-
-        <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
-          style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 500,
-            fontSize: "clamp(28px, 3.4vw, 44px)",
-            lineHeight: 1.15,
-            letterSpacing: "-0.02em",
-            color: "var(--color-ink)",
-            marginBottom: 24,
-            maxWidth: 720,
-          }}
-        >
-          Not every project ends up{" "}
-          <span className="fade-h">here.</span>
-        </motion.h2>
+      <div className="grain-light" aria-hidden="true" style={{ opacity: 0.05 }} />
+      <div
+        style={{
+          maxWidth: "var(--container-wide)",
+          margin: "0 auto",
+          position: "relative",
+          zIndex: 2,
+        }}
+      >
+        <h2 className="type-h2 measure-wide" style={{ color: "var(--color-ink)" }}>
+          <CharRevealInView
+            segments={[
+              { text: "Your project could be" },
+              { text: "the next row.", accent: true },
+            ]}
+            style={{ color: "var(--color-ink)" }}
+          />
+        </h2>
 
         <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 0.2 }}
-          style={{
-            fontSize: 17,
-            lineHeight: 1.65,
-            color: "var(--color-muted)",
-            maxWidth: 620,
-            marginBottom: 40,
-          }}
+          transition={{ duration: reduce ? 0 : 0.6, ease: ease.outQuart, delay: 0.2 }}
+          className="type-body-lg measure-body"
+          style={{ color: "var(--color-muted)", margin: "28px 0 40px" }}
         >
-          Some work is under NDA. Some doesn't need a case study to be worth doing.
-          If your project pattern fits the three pillars but doesn't look like anything
-          above, the call is still the fastest way to find out.
+          A boutique design studio in Toronto. Building the websites, AI systems,
+          and marketing engines for businesses that expect craft.
         </motion.p>
 
-        <MagneticCTA
-          to="/contact"
-          variant="ghost"
-        >
-          Book a discovery call
-        </MagneticCTA>
+        <div style={{ display: "inline-flex", flexWrap: "wrap", gap: 12 }}>
+          <MagneticCTA to="/contact" variant="primary">
+            Book a discovery call
+          </MagneticCTA>
+          <MagneticCTA to="/services" variant="ghost">
+            See services
+          </MagneticCTA>
+        </div>
       </div>
     </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Page
-   ═══════════════════════════════════════════════════════════════ */
+/* ── page ──────────────────────────────────────────────────────────── */
 
 export default function Work() {
-  useEffect(function scrollTopOnMount() {
+  const mobile = useMedia(MOBILE_QUERY);
+  const [params, setParams] = useSearchParams();
+
+  const raw = params.get("pillar");
+  const pillar =
+    raw && PILLARS.some((p) => p.toLowerCase() === raw.toLowerCase())
+      ? (PILLARS.find((p) => p.toLowerCase() === raw.toLowerCase()) as Pillar)
+      : null;
+
+  useEffect(function scrollTopAndTitle() {
     window.scrollTo(0, 0);
+    const prev = document.title;
+    document.title = "The vault — Averr Studios";
+    return function restore() {
+      document.title = prev;
+    };
   }, []);
+
+  function setPillar(next: Pillar | null) {
+    // the URL is the state, so a filtered view is shareable and back/forward works
+    const p = new URLSearchParams(params);
+    if (next) p.set("pillar", next.toLowerCase());
+    else p.delete("pillar");
+    setParams(p);
+  }
+
+  const shown = pillar ? countFor(pillar) : liveCount;
 
   return (
     <>
-      <WorkHeader />
-      <Portfolio />
-      <InTheLab />
-      <OffPortfolio />
-      <FinalCTA markerNumber="04" />
+      <VaultHeader
+        pillar={pillar}
+        setPillar={setPillar}
+        shown={shown}
+        mobile={mobile}
+      />
+
+      <Chapter tone="dark" from="cream">
+        <VaultIndex
+          pillar={pillar}
+          onClear={function clear() {
+            setPillar(null);
+          }}
+          mobile={mobile}
+        />
+      </Chapter>
+
+      <Chapter tone="cream" from="dark">
+        <VaultCloser />
+      </Chapter>
     </>
   );
 }
