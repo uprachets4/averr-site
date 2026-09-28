@@ -59,6 +59,7 @@ export default function CaseStudy() {
         heroImage={study.heroImage}
         heroImages={study.heroImages}
         heroCaption={study.heroCaption}
+        tint={study.tint}
       />
       <Context paragraphs={study.context} />
       <Approach entries={study.approach} />

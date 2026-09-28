@@ -24,6 +24,9 @@ export type CaseStudy = {
   heroImage?: string;
   heroImages?: string[];
   heroCaption?: { eyebrow: string; labels: string[] };
+  /** The client's own accent colour. Ambient only — hero glow and small
+   *  progress accents. Never body text, headings, or Averr buttons. */
+  tint?: string;
   context: string[];
   approach: { pillar: Pillar; body: string; image?: string; layout?: ApproachLayout }[];
   inventory: string[];
@@ -79,6 +82,9 @@ export const caseStudies: Record<string, CaseStudy> = {
       kicker:
         "One-man renovation crew, zero ad budget, turned into a market presence that punches three brokerages above its weight.",
     },
+    /* copper — the accent the site was built around ("Cormorant Garamond
+       display, copper accent"), sampled from /work/cgwalls/hero.jpg */
+    tint: "#9E4139",
     heroImage: "/work/cgwalls/hero.jpg",
     heroImages: [
       "/work/cgwalls/hero.jpg",
@@ -145,6 +151,8 @@ export const caseStudies: Record<string, CaseStudy> = {
       kicker:
         "Portfolios, markets, IPOs, signals, risk, and system health in one place — without pretending analysis and execution are the same thing.",
     },
+    /* the console's own UI blue, sampled from 01-overview.jpg */
+    tint: "#87B6EB",
     heroImage: "/work/capitalcommand/01-overview.jpg",
     heroImages: [
       "/work/capitalcommand/01-overview.jpg",
@@ -243,6 +251,8 @@ export const caseStudies: Record<string, CaseStudy> = {
       kicker:
         "Every job board watched, every resume tailored, every application tracked — for the job-seeker who treats every application as a portfolio shot, not a lottery ticket.",
     },
+    /* sodium amber — SIFT's stated primary accent, see approach + signatures */
+    tint: "#F2A93C",
     heroImage: "/work/sift/01-command-overview.jpg",
     heroImages: [
       "/work/sift/01-command-overview.jpg",
@@ -330,6 +340,8 @@ export const caseStudies: Record<string, CaseStudy> = {
       kicker:
         "Founder thought leadership as an editorial pipeline — deciding what to say, drafting in the founder's voice, moving it through review, and learning from what happens after. Not a text generator with a calendar attached.",
     },
+    /* the product's accent blue, sampled from 01-command-center.jpg */
+    tint: "#447ED2",
     heroImage: "/work/cadencestack/01-command-center.jpg",
     heroImages: [
       "/work/cadencestack/01-command-center.jpg",

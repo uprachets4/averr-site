@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import {
   motion,
-  useMotionValue,
   useReducedMotion,
   useScroll,
-  useSpring,
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { ease, spring } from "../../lib/motion";
-import PillHl from "../PillHl";
+import { duration, ease, easing } from "../../lib/motion";
+import { useScrollStyle } from "../../lib/useScrollStyle";
 import type { CaseStudy } from "../../data/caseStudies";
 import ImageFrame from "./ImageFrame";
 
@@ -23,13 +21,32 @@ type Props = Pick<
   | "heroImage"
   | "heroImages"
   | "heroCaption"
+  | "tint"
 >;
 
-function splitOnPill(thesis: string, pill: string): [string, string, string] {
-  const i = thesis.indexOf(pill);
+const FALLBACK_TINT = "#A8916D";
+
+/** Split the thesis around its accent phrase, preserving whole words. */
+function splitOnAccent(thesis: string, phrase: string): [string, string, string] {
+  const i = phrase ? thesis.indexOf(phrase) : -1;
   if (i < 0) return [thesis, "", ""];
-  return [thesis.slice(0, i), pill, thesis.slice(i + pill.length)];
+  return [thesis.slice(0, i), phrase, thesis.slice(i + phrase.length)];
 }
+
+function rgba(hex: string, alpha: number) {
+  const h = hex.replace("#", "");
+  const n = parseInt(h.length === 3 ? h.replace(/./g, (c) => c + c) : h, 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Zoom-into-the-work hero
+
+   The wrapper is ~160vh and NOT sticky: the cluster simply travels
+   up the viewport while the front screen scales and flattens out of
+   its fan, so by the time its top reaches ~15% of the screen it is
+   a flat, full-width shot of the work.
+   ═══════════════════════════════════════════════════════════════ */
 
 export default function CaseHero({
   hero,
@@ -40,47 +57,41 @@ export default function CaseHero({
   heroImage,
   heroImages,
   heroCaption,
+  tint,
 }: Props) {
   const reduce = useReducedMotion();
-  const [before, pill, after] = splitOnPill(hero.thesis, hero.thesisPill);
+  const [before, accent, after] = splitOnAccent(hero.thesis, hero.thesisPill);
+  const glow = tint || FALLBACK_TINT;
 
-  // Cluster takes precedence over single heroImage when 2-3 images provided.
-  const clusterImages =
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: wrapRef,
+    offset: ["start start", "end start"],
+  });
+
+  const cluster =
     heroImages && heroImages.length >= 2 && heroImages.length <= 3
       ? heroImages
-      : null;
-  const singleImage = !clusterImages && heroImage ? heroImage : null;
+      : heroImage
+        ? [heroImage]
+        : null;
 
   return (
     <section
       style={{
         position: "relative",
-        overflow: "hidden",
         backgroundColor: "var(--color-bg)",
-        padding: "180px 40px 100px",
+        paddingTop: 180,
       }}
     >
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        className="grain-light"
-        aria-hidden="true"
-        style={{ opacity: 0.05 }}
-      />
+      <div className="grain-light" aria-hidden="true" style={{ opacity: 0.05 }} />
 
+      {/* headline block */}
       <div
         style={{
           position: "relative",
           zIndex: 2,
-          maxWidth: 1200,
+          maxWidth: "var(--container-wide)",
           margin: "0 auto",
         }}
       >
@@ -90,7 +101,7 @@ export default function CaseHero({
           transition={{
             duration: reduce ? 0 : 0.5,
             ease: ease.outQuart,
-            delay: reduce ? 0 : 0.2,
+            delay: reduce ? 0 : 0.15,
           }}
           className="type-eyebrow"
           style={{
@@ -98,7 +109,7 @@ export default function CaseHero({
             alignItems: "center",
             gap: 10,
             color: "var(--color-muted)",
-            marginBottom: 32,
+            marginBottom: 28,
           }}
         >
           <span style={{ height: 1, width: 20, background: "currentColor", opacity: 0.6 }} />
@@ -107,54 +118,41 @@ export default function CaseHero({
         </motion.div>
 
         <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
             duration: reduce ? 0 : 0.5,
             ease: ease.outQuart,
-            delay: reduce ? 0 : 0.3,
+            delay: reduce ? 0 : 0.25,
           }}
           className="type-eyebrow"
-          style={{
-            color: "var(--color-muted-2)",
-            marginBottom: 24,
-          }}
+          style={{ color: "var(--color-muted-2)", marginBottom: 24 }}
         >
           {client}
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: reduce ? 0 : 0.7,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 0.4,
-          }}
+        {/* the line masks up out of its own box, one element, exact sentence */}
+        <h1
           className="type-display-l"
-          style={{
-            color: "var(--color-ink)",
-            marginBottom: 48,
-            maxWidth: 1080,
-          }}
+          style={{ color: "var(--color-ink)", marginBottom: 40, maxWidth: 1080 }}
         >
-          {before}
-          {pill ? (
+          <span style={{ display: "block", overflow: "hidden", paddingBottom: "0.08em" }}>
             <motion.span
-              initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
+              style={{ display: "block" }}
+              initial={{ y: reduce ? 0 : "110%" }}
+              animate={{ y: 0 }}
               transition={{
-                duration: reduce ? 0 : 0.5,
-                ease: ease.bounce,
-                delay: reduce ? 0 : 0.9,
+                duration: reduce ? 0 : duration.slow,
+                ease: ease.outExpo,
+                delay: reduce ? 0 : 0.35,
               }}
-              style={{ display: "inline-block" }}
             >
-              <PillHl>{pill}</PillHl>
+              {before}
+              {accent ? <span className="type-accent">{accent}</span> : null}
+              {after}
             </motion.span>
-          ) : null}
-          {after}
-        </motion.h1>
+          </span>
+        </h1>
 
         <motion.p
           initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
@@ -162,14 +160,10 @@ export default function CaseHero({
           transition={{
             duration: reduce ? 0 : 0.6,
             ease: ease.outQuart,
-            delay: reduce ? 0 : 1.1,
+            delay: reduce ? 0 : 0.75,
           }}
           className="type-body-lg"
-          style={{
-            color: "var(--color-muted)",
-            maxWidth: 720,
-            marginBottom: 64,
-          }}
+          style={{ color: "var(--color-muted)", maxWidth: 720, marginBottom: 56 }}
         >
           {hero.kicker}
         </motion.p>
@@ -180,14 +174,14 @@ export default function CaseHero({
           transition={{
             duration: reduce ? 0 : 0.6,
             ease: ease.outQuart,
-            delay: reduce ? 0 : 1.3,
+            delay: reduce ? 0 : 0.9,
           }}
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
             gap: 40,
             paddingTop: 32,
-            borderTop: "1px solid rgba(20,20,18,0.10)",
+            borderTop: "1px solid var(--hair)",
           }}
           className="case-meta-grid"
         >
@@ -195,492 +189,36 @@ export default function CaseHero({
           <Meta label="Sector" value={sector} />
           <Meta label="Year" value={year} />
         </motion.div>
+      </div>
 
-        {clusterImages ? (
-          <HeroCluster
-            images={clusterImages}
+      {/* the zoom */}
+      {cluster ? (
+        <div
+          ref={wrapRef}
+          style={{ position: "relative", height: "160vh", marginTop: 72 }}
+          className="case-zoom-wrap"
+        >
+          <TintGlow progress={scrollYProgress} tint={glow} reduce={!!reduce} />
+          <ZoomCluster
+            images={cluster}
             client={client}
             caption={heroCaption}
+            progress={scrollYProgress}
             reduce={!!reduce}
           />
-        ) : singleImage ? (
-          <HeroImage src={singleImage} client={client} reduce={!!reduce} />
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       <style>{`
         @media (max-width: 720px) {
-          .case-meta-grid {
-            grid-template-columns: 1fr !important;
-            gap: 20px !important;
-          }
+          .case-meta-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+        }
+        @media (max-width: 900px) {
+          /* no room to fan or travel: the front shot just rises into place */
+          .case-zoom-wrap { height: auto !important; }
         }
       `}</style>
     </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Single-image hero (backwards compatibility)
-   ═══════════════════════════════════════════════════════════════ */
-
-function HeroImage({
-  src,
-  client,
-  reduce,
-}: {
-  src: string;
-  client: string;
-  reduce: boolean;
-}) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "-20%"]);
-
-  return (
-    <motion.figure
-      ref={ref}
-      initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 1.03 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{
-        duration: reduce ? 0 : 1.2,
-        ease: ease.outExpo,
-      }}
-      style={{
-        marginTop: 64,
-        y: reduce ? "0%" : imageY,
-      }}
-    >
-      <ImageFrame variant="hero">
-        <img
-          src={src}
-          alt={`${client} overview screen`}
-          loading="eager"
-          decoding="async"
-        />
-      </ImageFrame>
-    </motion.figure>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Hero cluster — 2-3 rotated hanging cards + ambient marks
-   ═══════════════════════════════════════════════════════════════ */
-
-function HeroCluster({
-  images,
-  client,
-  caption,
-  reduce,
-}: {
-  images: string[];
-  client: string;
-  caption?: CaseStudy["heroCaption"];
-  reduce: boolean;
-}) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [isDesktop, setIsDesktop] = useState(true);
-  useEffect(function detect() {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(min-width: 901px)");
-    setIsDesktop(mq.matches);
-    function onChange(e: MediaQueryListEvent) {
-      setIsDesktop(e.matches);
-    }
-    mq.addEventListener("change", onChange);
-    return function cleanup() {
-      mq.removeEventListener("change", onChange);
-    };
-  }, []);
-
-  // Cursor parallax — cluster-wide, per-card weighted below.
-  const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-  const sX = useSpring(rawX, spring.soft);
-  const sY = useSpring(rawY, spring.soft);
-
-  function onMove(e: React.MouseEvent<HTMLDivElement>) {
-    if (reduce || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const px = (e.clientX - rect.left) / rect.width - 0.5;
-    const py = (e.clientY - rect.top) / rect.height - 0.5;
-    rawX.set(px * 32);
-    rawY.set(py * 32);
-  }
-  function onLeave() {
-    rawX.set(0);
-    rawY.set(0);
-  }
-
-  // Mobile falls back to single centered middle-card image.
-  if (!isDesktop) {
-    return (
-      <div style={{ position: "relative", marginTop: 64 }}>
-        <AmbientMarks reduce={reduce} />
-        <MobileCluster images={images} client={client} reduce={reduce} />
-        {caption ? <ClusterCaption caption={caption} reduce={reduce} /> : null}
-      </div>
-    );
-  }
-
-  return (
-    <div
-      ref={containerRef}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{
-        position: "relative",
-        marginTop: 72,
-        minHeight: "min(70vh, 640px)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {/* Warm gradient wash */}
-      <motion.div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          width: "80vmin",
-          height: "80vmin",
-          marginTop: "-40vmin",
-          marginLeft: "-40vmin",
-          background:
-            "radial-gradient(circle at 50% 50%, rgba(237,233,226,0.55), transparent 60%)",
-          opacity: 0.7,
-          pointerEvents: "none",
-        }}
-        animate={reduce ? undefined : { rotate: 360 }}
-        transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
-      />
-
-      <AmbientMarks reduce={reduce} />
-
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          maxWidth: 1200,
-          height: "min(70vh, 640px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {images.map(function drawCard(src, index) {
-          return (
-            <ClusterCard
-              key={src}
-              src={src}
-              index={index}
-              total={images.length}
-              client={client}
-              parallaxX={sX}
-              parallaxY={sY}
-              reduce={reduce}
-            />
-          );
-        })}
-      </div>
-
-      {caption ? <ClusterCaption caption={caption} reduce={reduce} /> : null}
-    </div>
-  );
-}
-
-function MobileCluster({
-  images,
-  client,
-  reduce,
-}: {
-  images: string[];
-  client: string;
-  reduce: boolean;
-}) {
-  // Show the middle card (or the sole one for length-2, using index 1 which
-  // reads as the "front" card in the 2-image layout).
-  const idx = images.length === 3 ? 1 : Math.min(1, images.length - 1);
-  const src = images[idx];
-  return (
-    <motion.figure
-      initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 1.03 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: reduce ? 0 : 1.0, ease: ease.outExpo }}
-      style={{ margin: 0 }}
-    >
-      <ImageFrame variant="hero">
-        <img
-          src={src}
-          alt={`${client} overview screen`}
-          loading="eager"
-          decoding="async"
-        />
-      </ImageFrame>
-    </motion.figure>
-  );
-}
-
-/* Per-card geometry, entrance state, and weighted parallax. */
-function ClusterCard({
-  src,
-  index,
-  total,
-  client,
-  parallaxX,
-  parallaxY,
-  reduce,
-}: {
-  src: string;
-  index: number;
-  total: number;
-  client: string;
-  parallaxX: MotionValue<number>;
-  parallaxY: MotionValue<number>;
-  reduce: boolean;
-}) {
-  // Geometry sets.
-  // 3-card fan: back(0), middle(1), front(2).
-  // 2-card fan: back(0), front(1).
-  const restRotate =
-    total === 3 ? [-8, 3, 6][index] : [-5, 5][index];
-  const restX = total === 3 ? [-60, 0, 80][index] : [-40, 40][index];
-  const restY = total === 3 ? [20, 0, -30][index] : [10, -10][index];
-  const restScale = total === 3 ? [0.92, 1.0, 0.88][index] : [0.95, 1.0][index];
-  const zIndex = total === 3 ? [1, 3, 2][index] : [1, 2][index];
-
-  // Entrance rotate. Alternate direction for visual variety.
-  const enterRotate = total === 3 ? [-20, 25, -25][index] : [-20, 20][index];
-  const enterDelay = total === 3 ? [0.2, 0.4, 0.6][index] : [0.2, 0.5][index];
-
-  // Depth weighting for cursor parallax.
-  const parallaxWeight =
-    total === 3 ? [0.4, 0.7, 1.0][index] : [0.5, 1.0][index];
-  const weightedX = useTransform(parallaxX, function m(v) {
-    return v * parallaxWeight * 0.5;
-  });
-  const weightedY = useTransform(parallaxY, function m(v) {
-    return v * parallaxWeight * 0.5;
-  });
-
-  // Combine rest offset + parallax on desktop.
-  const totalX = useTransform(
-    [weightedX] as MotionValue<number>[],
-    function combine([px]) {
-      return restX + (px as number);
-    }
-  );
-  const totalY = useTransform(
-    [weightedY] as MotionValue<number>[],
-    function combine([py]) {
-      return restY + (py as number);
-    }
-  );
-
-  // Shadow depth cue — front card heaviest.
-  const shadow =
-    index === 0
-      ? "0 6px 20px rgba(20,20,18,0.10)"
-      : index === total - 1
-        ? "0 24px 60px rgba(20,20,18,0.22)"
-        : "0 14px 40px rgba(20,20,18,0.15)";
-
-  return (
-    <motion.figure
-      initial={{
-        opacity: reduce ? 1 : 0,
-        rotate: reduce ? restRotate : enterRotate,
-        scale: reduce ? restScale : 0.6,
-      }}
-      animate={{
-        opacity: 1,
-        rotate: restRotate,
-        scale: restScale,
-      }}
-      transition={{
-        duration: reduce ? 0 : 0.9,
-        ease: ease.outQuart,
-        delay: reduce ? 0 : enterDelay,
-      }}
-      style={{
-        position: "absolute",
-        width: "clamp(320px, 32vw, 520px)",
-        margin: 0,
-        zIndex,
-        x: reduce ? restX : totalX,
-        y: reduce ? restY : totalY,
-        transformOrigin: "center center",
-        boxShadow: shadow,
-        borderRadius: 12,
-        overflow: "hidden",
-      }}
-    >
-      <ImageFrame variant="hero">
-        <img
-          src={src}
-          alt={`${client} — screen ${index + 1}`}
-          loading="eager"
-          decoding="async"
-          draggable={false}
-        />
-      </ImageFrame>
-    </motion.figure>
-  );
-}
-
-function ClusterCaption({
-  caption,
-  reduce,
-}: {
-  caption: NonNullable<CaseStudy["heroCaption"]>;
-  reduce: boolean;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{ duration: reduce ? 0 : 0.6, ease: ease.outQuart, delay: reduce ? 0 : 1.0 }}
-      style={{
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 8,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 10,
-        pointerEvents: "none",
-      }}
-      className="cluster-caption"
-    >
-      <div
-        className="type-eyebrow"
-        style={{ color: "var(--color-muted-2)" }}
-      >
-        {caption.eyebrow}
-      </div>
-      <div
-        className="type-eyebrow"
-        style={{ color: "var(--color-ink-soft)" }}
-      >
-        {caption.labels.join(" · ")}
-      </div>
-      <style>{`
-        @media (max-width: 900px) {
-          .cluster-caption {
-            position: static !important;
-            margin-top: 32px;
-          }
-        }
-      `}</style>
-    </motion.div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Ambient marks (behind + around the cluster)
-   ═══════════════════════════════════════════════════════════════ */
-
-function AmbientMarks({ reduce }: { reduce: boolean }) {
-  return (
-    <>
-      <motion.div
-        aria-hidden
-        className="cluster-ambient cluster-ambient--keep"
-        style={{
-          position: "absolute",
-          top: "10%",
-          left: "6%",
-          width: 32,
-          height: 32,
-          borderRadius: "50%",
-          border: "1px solid var(--color-ink)",
-          opacity: 0.2,
-          pointerEvents: "none",
-        }}
-        animate={
-          reduce
-            ? undefined
-            : { x: [0, 18, 0, -16, 0], y: [0, -12, 12, 0, 0] }
-        }
-        transition={{ duration: 45, repeat: Infinity, ease: ease.inOut }}
-      />
-      <motion.div
-        aria-hidden
-        className="cluster-ambient cluster-ambient--keep"
-        style={{
-          position: "absolute",
-          bottom: "12%",
-          right: "6%",
-          width: 24,
-          height: 24,
-          border: "1px solid var(--color-parch)",
-          opacity: 0.4,
-          pointerEvents: "none",
-        }}
-        animate={
-          reduce
-            ? undefined
-            : { x: [0, -22, 0, 18, 0], y: [0, 16, -12, 0, 0] }
-        }
-        transition={{ duration: 55, repeat: Infinity, ease: ease.inOut }}
-      />
-      <motion.div
-        aria-hidden
-        className="cluster-ambient"
-        style={{
-          position: "absolute",
-          top: "48%",
-          left: "3%",
-          width: 48,
-          height: 2,
-          background: "var(--color-parch)",
-          opacity: 0.4,
-          pointerEvents: "none",
-        }}
-        animate={
-          reduce
-            ? undefined
-            : { x: [0, 18, 0, -12, 0], y: [0, -6, 6, 0, 0] }
-        }
-        transition={{ duration: 60, repeat: Infinity, ease: ease.inOut }}
-      />
-      <motion.div
-        aria-hidden
-        className="cluster-ambient"
-        style={{
-          position: "absolute",
-          top: "46%",
-          right: "3%",
-          width: 10,
-          height: 10,
-          borderRadius: "50%",
-          background: "var(--color-ink)",
-          opacity: 0.25,
-          pointerEvents: "none",
-        }}
-        animate={
-          reduce
-            ? undefined
-            : { x: [0, -14, 0, 10, 0], y: [0, 10, -10, 0, 0] }
-        }
-        transition={{ duration: 50, repeat: Infinity, ease: ease.inOut }}
-      />
-      <style>{`
-        @media (max-width: 900px) {
-          .cluster-ambient { display: none !important; }
-          .cluster-ambient--keep { display: block !important; }
-        }
-      `}</style>
-    </>
   );
 }
 
@@ -689,20 +227,305 @@ function Meta({ label, value }: { label: string; value: string }) {
     <div>
       <div
         className="type-eyebrow"
-        style={{
-          color: "var(--color-muted-2)",
-          marginBottom: 10,
-        }}
+        style={{ color: "var(--color-muted-2)", marginBottom: 8 }}
       >
         {label}
       </div>
+      <div className="type-body" style={{ color: "var(--color-ink)" }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+/* ── the glow ───────────────────────────────────────────────────── */
+
+/** Radial wash in the client's tint: 10% at rest, 16% as the shot lands. */
+function TintGlow({
+  progress,
+  tint,
+  reduce,
+}: {
+  progress: MotionValue<number>;
+  tint: string;
+  reduce: boolean;
+}) {
+  const alpha = useTransform(progress, [0, 0.34], [0.1, 0.16]);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(
+    function paint() {
+      function write(a: number) {
+        const el = ref.current;
+        if (!el) return;
+        el.style.background = `radial-gradient(ellipse 70% 55% at 50% 45%, ${rgba(
+          tint,
+          a
+        )}, transparent 70%)`;
+      }
+      write(reduce ? 0.1 : progress.get());
+      if (reduce) return;
+      write(alpha.get());
+      return alpha.on("change", write);
+    },
+    [alpha, progress, tint, reduce]
+  );
+
+  return (
+    <div
+      ref={ref}
+      aria-hidden
+      style={{
+        position: "sticky",
+        top: 0,
+        height: "100vh",
+        marginBottom: "-100vh",
+        pointerEvents: "none",
+        zIndex: 1,
+      }}
+    />
+  );
+}
+
+/* ── the cluster ────────────────────────────────────────────────── */
+
+function ZoomCluster({
+  images,
+  client,
+  caption,
+  progress,
+  reduce,
+}: {
+  images: string[];
+  client: string;
+  caption?: CaseStudy["heroCaption"];
+  progress: MotionValue<number>;
+  reduce: boolean;
+}) {
+  const [desktop, setDesktop] = useState(true);
+  useEffect(function detect() {
+    const mq = window.matchMedia("(min-width: 901px)");
+    setDesktop(mq.matches);
+    function onChange(e: MediaQueryListEvent) {
+      setDesktop(e.matches);
+    }
+    mq.addEventListener("change", onChange);
+    return function cleanup() {
+      mq.removeEventListener("change", onChange);
+    };
+  }, []);
+
+  // front is the last card in the fan; the rest sit behind it
+  const frontIndex = images.length === 3 ? 1 : images.length - 1;
+  const front = images[frontIndex];
+  const backs = images.filter(function notFront(_, i) {
+    return i !== frontIndex;
+  });
+
+  if (!desktop || reduce) {
+    return (
+      <div style={{ maxWidth: "var(--container-wide)", margin: "0 auto" }}>
+        <motion.figure
+          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outExpo }}
+          style={{ margin: 0 }}
+        >
+          <ImageFrame variant="hero">
+            <img
+              src={front}
+              alt={`${client} overview screen`}
+              loading="eager"
+              decoding="async"
+            />
+          </ImageFrame>
+        </motion.figure>
+        {caption ? <ClusterCaption caption={caption} /> : null}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        position: "sticky",
+        top: 0,
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 2,
+      }}
+    >
       <div
-        className="type-h3"
         style={{
-          color: "var(--color-ink)",
+          position: "relative",
+          width: "100%",
+          maxWidth: "var(--container-wide)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {value}
+        {backs.map(function drawBack(src, i) {
+          return (
+            <BackScreen
+              key={src}
+              src={src}
+              side={i === 0 ? -1 : 1}
+              progress={progress}
+            />
+          );
+        })}
+        <FrontScreen src={front} client={client} progress={progress} />
+        {caption ? (
+          <CaptionFade caption={caption} progress={progress} />
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+/** The shot the reader zooms into: 0.62 → 1, tilted → flat, radius 12 → 8. */
+function FrontScreen({
+  src,
+  client,
+  progress,
+}: {
+  src: string;
+  client: string;
+  progress: MotionValue<number>;
+}) {
+  const scale = useTransform(progress, [0, 0.34], [0.62, 1], { ease: [easing.inOut] });
+  const rotateX = useTransform(progress, [0, 0.34], [12, 0], { ease: [easing.inOut] });
+  const rotateZ = useTransform(progress, [0, 0.34], [3, 0], { ease: [easing.inOut] });
+  const radius = useTransform(progress, [0, 0.34], [12, 8], { ease: [easing.inOut] });
+
+  return (
+    <motion.figure
+      style={{
+        position: "relative",
+        zIndex: 3,
+        width: "100%",
+        margin: 0,
+        transformPerspective: 1400,
+        scale,
+        rotateX,
+        rotateZ,
+        borderRadius: radius,
+        overflow: "hidden",
+        boxShadow: "0 24px 60px rgba(20,20,18,0.22)",
+      }}
+    >
+      <img
+        src={src}
+        alt={`${client} overview screen`}
+        loading="eager"
+        decoding="async"
+        style={{ display: "block", width: "100%", height: "auto" }}
+      />
+    </motion.figure>
+  );
+}
+
+/** Fans outward and fades as the front screen takes the frame. */
+function BackScreen({
+  src,
+  side,
+  progress,
+}: {
+  src: string;
+  side: 1 | -1;
+  progress: MotionValue<number>;
+}) {
+  // fans out to +-8vw of the frame, rotating a little further as it goes
+  const x = useTransform(progress, [0, 0.34], [side * 12, side * 64], {
+    ease: [easing.inOut],
+  });
+  const rotate = useTransform(progress, [0, 0.34], [side * 5, side * 6], {
+    ease: [easing.inOut],
+  });
+  const opacity = useTransform(progress, [0, 0.25], [1, 0]);
+  const ref = useScrollStyle<HTMLDivElement>(opacity);
+
+  return (
+    <motion.div
+      ref={ref}
+      aria-hidden
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        width: "62%",
+        marginLeft: "-31%",
+        zIndex: 2,
+        x,
+        rotate,
+        y: "-50%",
+        borderRadius: 10,
+        overflow: "hidden",
+        boxShadow: "0 14px 40px rgba(20,20,18,0.15)",
+      }}
+    >
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        style={{ display: "block", width: "100%", height: "auto" }}
+      />
+    </motion.div>
+  );
+}
+
+/* ── caption ────────────────────────────────────────────────────── */
+
+function CaptionFade({
+  caption,
+  progress,
+}: {
+  caption: NonNullable<CaseStudy["heroCaption"]>;
+  progress: MotionValue<number>;
+}) {
+  // the caption names all three screens, so it leaves with the back two
+  const opacity = useTransform(progress, [0, 0.22], [1, 0]);
+  const ref = useScrollStyle<HTMLDivElement>(opacity);
+  return (
+    <div
+      ref={ref}
+      style={{
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: -56,
+        zIndex: 4,
+        pointerEvents: "none",
+      }}
+    >
+      <ClusterCaption caption={caption} />
+    </div>
+  );
+}
+
+function ClusterCaption({
+  caption,
+}: {
+  caption: NonNullable<CaseStudy["heroCaption"]>;
+}) {
+  return (
+    <div style={{ marginTop: 24, textAlign: "center" }}>
+      <div
+        className="type-eyebrow"
+        style={{ color: "var(--color-muted-2)", marginBottom: 8 }}
+      >
+        {caption.eyebrow}
+      </div>
+      <div
+        className="type-eyebrow"
+        style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}
+      >
+        {caption.labels.join(" · ")}
       </div>
     </div>
   );
