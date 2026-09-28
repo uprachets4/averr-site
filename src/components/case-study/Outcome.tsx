@@ -109,6 +109,7 @@ export default function Outcome({
           progress={scrollYProgress}
           reduce={!!reduce}
           tint={accent}
+          emphasis={text.emphasis}
           className="type-body-lg"
           style={{
             color: "var(--color-muted-l)",

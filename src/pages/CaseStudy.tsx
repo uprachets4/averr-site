@@ -91,7 +91,12 @@ export default function CaseStudy() {
         <Approach entries={study.approach} />
       </SectionBoundary>
       <SectionBoundary name={`inventory-${study.slug}`}>
-        <Inventory items={study.inventory} stack={study.stack} tint={study.tint} />
+        <Inventory
+          items={study.inventory}
+          labels={study.inventoryLabels}
+          stack={study.stack}
+          tint={study.tint}
+        />
       </SectionBoundary>
 
       {/* Signatures → Gallery → Outcome is one dark stretch: the Gallery goes

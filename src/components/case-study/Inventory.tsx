@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { SECTIONS, eyebrowFor } from "../../data/caseSections";
+import { CharRevealInView } from "../CharReveal";
 import { duration, ease } from "../../lib/motion";
 
 /**
@@ -13,10 +14,12 @@ import { duration, ease } from "../../lib/motion";
  */
 export default function Inventory({
   items,
+  labels,
   stack,
   tint,
 }: {
   items: string[];
+  labels?: string[];
   stack: string[];
   tint?: string;
 }) {
@@ -124,7 +127,10 @@ export default function Inventory({
             className="type-h2"
             style={{ color: "var(--color-ink)", maxWidth: 900, margin: 0 }}
           >
-            What <span className="fade-h">actually shipped.</span>
+            <CharRevealInView
+              segments={[{ text: "What" }, { text: "actually shipped." }]}
+              style={{ color: "var(--color-ink)" }}
+            />
           </motion.h2>
 
           <div
@@ -157,18 +163,29 @@ export default function Inventory({
                 }}
               >
                 <CheckBox on={on} accent={accent} reduce={!!reduce} />
-                <span
-                  className="type-body"
+                <div
                   style={{
-                    color: "var(--color-ink)",
                     opacity: on ? 1 : 0.45,
                     transition: reduce
                       ? "none"
                       : `opacity ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
                   }}
                 >
-                  {item}
-                </span>
+                  {labels?.[i] ? (
+                    <div
+                      className="type-h3"
+                      style={{ color: "var(--color-ink)", marginBottom: 8 }}
+                    >
+                      {labels[i]}
+                    </div>
+                  ) : null}
+                  <div
+                    className="type-body"
+                    style={{ color: labels?.[i] ? "var(--color-muted)" : "var(--color-ink)" }}
+                  >
+                    {item}
+                  </div>
+                </div>
               </li>
             );
           })}
