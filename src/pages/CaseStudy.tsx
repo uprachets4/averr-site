@@ -73,7 +73,7 @@ export default function CaseStudy() {
         heroCaption={study.heroCaption}
         tint={study.tint}
       />
-      <Context paragraphs={study.context} />
+      <Context paragraphs={study.context} tint={study.tint} />
       <Approach entries={study.approach} />
       <Inventory items={study.inventory} stack={study.stack} />
 
