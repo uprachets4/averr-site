@@ -234,7 +234,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     year: "2025 — ongoing",
     headlineFigure: {
       value: "42%",
-      caption: "ATS-score improvement average after AI resume rewrite.",
+      caption: "ATS-score improvement average after AI resume rewrite",
     },
     hero: {
       eyebrow: "//_CASE_STUDY",

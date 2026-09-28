@@ -4,14 +4,19 @@ import { caseStudies, type Pillar } from "./caseStudies";
  * The vault index. Every field comes straight from the case-study records,
  * including the headline figure — home and /work read the same one.
  *
- * Studies without a published figure fall back to their status, derived from
- * the tail of their own `year` string ("2026 — internal alpha" → "Internal
- * alpha"). Nothing is invented.
+ * A study's `year` carries both halves of its timeline ("2026 — internal
+ * alpha"). The vault shows each half exactly once: the number in the row's
+ * meta line, and the status only in the figure slot of rows with no measured
+ * figure. Nothing is invented — both halves are the study's own string.
+ * The case-study page still prints the full year unsplit.
  */
-function statusFrom(year: string) {
-  const tail = year.split("—").pop()?.trim();
-  if (!tail) return undefined;
-  return tail.charAt(0).toUpperCase() + tail.slice(1);
+function splitYear(year: string) {
+  const [head, ...rest] = year.split("—");
+  const tail = rest.join("—").trim();
+  return {
+    number: head.trim(),
+    status: tail ? tail.charAt(0).toUpperCase() + tail.slice(1) : undefined,
+  };
 }
 
 const PREVIEWS: Record<string, { src: string; alt: string }> = {
@@ -37,6 +42,7 @@ export type VaultEntry = {
   slug: string;
   name: string;
   sector: string;
+  /** The year number alone — the status tail is carried by `status`. */
   year: string;
   pillars: Pillar[];
   figure?: { value: string; caption: string };
@@ -49,14 +55,15 @@ export type VaultEntry = {
 /** Live studies in data order, then anything still in production. */
 export const vault: VaultEntry[] = Object.values(caseStudies)
   .map(function toEntry(study): VaultEntry {
+    const year = splitYear(study.year);
     return {
       slug: study.slug,
       name: study.client,
       sector: study.sector,
-      year: study.year,
+      year: year.number,
       pillars: study.pillars,
       figure: study.headlineFigure,
-      status: study.headlineFigure ? undefined : statusFrom(study.year),
+      status: study.headlineFigure ? undefined : year.status,
       preview: PREVIEWS[study.slug],
       live: study.status === "live",
     };
