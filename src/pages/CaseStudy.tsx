@@ -12,7 +12,8 @@ import Next from "../components/case-study/Next";
 import ReadingRail from "../components/case-study/ReadingRail";
 import Chapter from "../components/Chapter";
 import { railSections } from "../data/caseSections";
-import FinalCTA from "../components/FinalCTA";
+import { useDeclarePageEndTone } from "../lib/pageTone";
+import CaseFinale from "../components/case-study/CaseFinale";
 import NotFound from "./NotFound";
 import ComingSoon from "./ComingSoon";
 
@@ -40,6 +41,9 @@ export default function CaseStudy() {
     },
     [study]
   );
+
+  // the finale is cream, so the Footer reveals over cream
+  useDeclarePageEndTone("cream");
 
   useEffect(
     function scrollTopOnSlug() {
@@ -103,7 +107,7 @@ export default function CaseStudy() {
       <Chapter tone="cream-alt" from="dark">
         <Next text={study.next} tint={study.tint} />
       </Chapter>
-      <FinalCTA markerNumber="07" />
+      <CaseFinale slug={study.slug} />
     </>
   );
 }
