@@ -1,8 +1,7 @@
 import Hero from "../components/Hero";
-import StorySoFar from "../components/StorySoFar";
-import Pillars from "../components/Pillars";
-import Numbers from "../components/Numbers";
-import CaseStudies from "../components/CaseStudies";
+import ThreeScenes from "../components/ThreeScenes";
+import ThreeDoors from "../components/ThreeDoors";
+import ProofLedger from "../components/ProofLedger";
 import Manifesto from "../components/Manifesto";
 import FinalCTA from "../components/FinalCTA";
 import Chapter from "../components/Chapter";
@@ -16,15 +15,13 @@ export default function Home() {
           static reel block otherwise — so the handoff back to cream uses the
           site's own transition signature. */}
       <Chapter tone="cream" from="dark">
-        <StorySoFar />
+        <ThreeScenes />
+        <ThreeDoors />
       </Chapter>
-      <Pillars />
-      <Numbers />
 
-      {/* CaseStudies and Manifesto are one continuous dark stretch — one
-          reveal in, one out, rather than a boundary between them. */}
+      {/* One dark chapter: the ledger states the proof, the manifesto says why. */}
       <Chapter tone="dark" from="cream-alt">
-        <CaseStudies />
+        <ProofLedger />
         <Manifesto />
       </Chapter>
 

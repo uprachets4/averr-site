@@ -149,7 +149,7 @@ export default function CaseStudies() {
   );
 }
 
-function FeaturedCard({ reduce }: { reduce: boolean }) {
+export function FeaturedCard({ reduce }: { reduce: boolean }) {
   const [hovered, setHovered] = useState(false);
   return (
     <motion.a
