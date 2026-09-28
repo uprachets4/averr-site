@@ -149,6 +149,14 @@ export default function Inventory({
         <ul style={{ listStyle: "none", padding: 0, margin: "0 0 64px" }}>
           {items.map(function row(item, i) {
             const on = i < done;
+            // the label is a prefix of the item, so the detail drops that
+            // prefix and whatever punctuation separated the two, rather
+            // than echoing it — the words and their order are untouched
+            const label = labels?.[i];
+            const detail =
+              label && item.startsWith(label)
+                ? item.slice(label.length).trimStart().replace(/^[:,—–-]\s*/, "")
+                : item;
             return (
               <li
                 key={i}
@@ -171,19 +179,19 @@ export default function Inventory({
                       : `opacity ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
                   }}
                 >
-                  {labels?.[i] ? (
+                  {label ? (
                     <div
                       className="type-h3"
                       style={{ color: "var(--color-ink)", marginBottom: 8 }}
                     >
-                      {labels[i]}
+                      {label}
                     </div>
                   ) : null}
                   <div
                     className="type-body"
-                    style={{ color: labels?.[i] ? "var(--color-muted)" : "var(--color-ink)" }}
+                    style={{ color: label ? "var(--color-muted)" : "var(--color-ink)" }}
                   >
-                    {item}
+                    {detail}
                   </div>
                 </div>
               </li>
