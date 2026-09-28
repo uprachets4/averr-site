@@ -136,7 +136,8 @@ export function ReadFill({
         .join(" ")}
       style={
         {
-          margin: 0,
+          // margin lives in .read-fill, not inline: an inline shorthand here
+          // would beat any margin a caller sets via a class
           ["--tint" as string]: tint || "var(--color-ink)",
           ...(reduce ? { ["--p" as string]: 1 } : null),
           ...style,
