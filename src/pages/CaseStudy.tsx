@@ -81,7 +81,11 @@ export default function CaseStudy() {
         />
       </SectionBoundary>
       <SectionBoundary name={`context-${study.slug}`}>
-        <Context paragraphs={study.context} tint={study.tint} />
+        <Context
+          paragraphs={study.context}
+          emphasis={study.contextEmphasis}
+          tint={study.tint}
+        />
       </SectionBoundary>
       <SectionBoundary name={`approach-${study.slug}`}>
         <Approach entries={study.approach} />

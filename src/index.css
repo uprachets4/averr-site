@@ -457,6 +457,25 @@ a { color: inherit; text-decoration: none; }
       1
     );
   }
+  /* the one flourish per paragraph: a sweep in the study's tint, once the
+     paragraph has been read */
+  .read-fill__hl {
+    background-image: linear-gradient(
+      to right,
+      color-mix(in oklab, var(--tint) 22%, transparent),
+      color-mix(in oklab, var(--tint) 22%, transparent)
+    );
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 0% 82%;
+    transition: background-size var(--duration-slow) var(--ease-out-quart);
+    border-radius: 2px;
+  }
+  .read-fill--lit .read-fill__hl { background-size: 100% 82%; }
+  @media (prefers-reduced-motion: reduce) {
+    .read-fill__hl { background-size: 100% 82%; transition: none; }
+  }
+
   .read-fill__num {
     color: color-mix(
       in oklab,
@@ -466,7 +485,26 @@ a { color: inherit; text-decoration: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .read-fill__w { opacity: 1; }
-    .read-fill__num { color: var(--tint); }
+    /* the one flourish per paragraph: a sweep in the study's tint, once the
+     paragraph has been read */
+  .read-fill__hl {
+    background-image: linear-gradient(
+      to right,
+      color-mix(in oklab, var(--tint) 22%, transparent),
+      color-mix(in oklab, var(--tint) 22%, transparent)
+    );
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 0% 82%;
+    transition: background-size var(--duration-slow) var(--ease-out-quart);
+    border-radius: 2px;
+  }
+  .read-fill--lit .read-fill__hl { background-size: 100% 82%; }
+  @media (prefers-reduced-motion: reduce) {
+    .read-fill__hl { background-size: 100% 82%; transition: none; }
+  }
+
+  .read-fill__num { color: var(--tint); }
   }
 
   /* Visible to screen readers, not to the eye. */

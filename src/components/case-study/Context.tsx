@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { motion, useReducedMotion, useScroll } from "motion/react";
 import { SECTIONS, eyebrowFor } from "../../data/caseSections";
-import { FillWords, useFillVar } from "./ReadFill";
+import { ReadFill } from "./ReadFill";
 import { ease } from "../../lib/motion";
 
 /**
@@ -17,11 +17,20 @@ import { ease } from "../../lib/motion";
  * hidden copy beside them, so assistive tech reads the paragraph once, as
  * prose, rather than word by word.
  */
+/** First sentence carries the point; the rest is the support. */
+function split(paragraph: string): [string, string] {
+  const m = paragraph.match(/^.*?[.!?](?=\s|$)/);
+  if (!m) return [paragraph, ""];
+  return [m[0], paragraph.slice(m[0].length).trim()];
+}
+
 export default function Context({
   paragraphs,
+  emphasis,
   tint,
 }: {
   paragraphs: string[];
+  emphasis?: string[];
   tint?: string;
 }) {
   const reduce = useReducedMotion();
@@ -65,6 +74,7 @@ export default function Context({
                 index={i}
                 last={i === paragraphs.length - 1}
                 paragraph={p}
+                emphasis={emphasis?.[i]}
                 tint={tint || "var(--color-ink)"}
                 reduce={!!reduce}
               />
@@ -74,8 +84,10 @@ export default function Context({
       </div>
 
       <style>{`
+        .context-support { margin-left: 12%; }
         @media (max-width: 720px) {
           .context-row { grid-template-columns: 1fr !important; gap: 20px !important; }
+          .context-support { margin-left: 0 !important; }
         }
       `}</style>
     </section>
@@ -86,12 +98,14 @@ function ContextRow({
   index,
   last,
   paragraph,
+  emphasis,
   tint,
   reduce,
 }: {
   index: number;
   last: boolean;
   paragraph: string;
+  emphasis?: string;
   tint: string;
   reduce: boolean;
 }) {
@@ -102,7 +116,7 @@ function ContextRow({
     // filling as its top passes it and completes as its last line does
     offset: ["start 0.8", "end 0.45"],
   });
-  const attach = useFillVar(scrollYProgress, reduce);
+  const [statement, support] = split(paragraph);
 
   return (
     <li
@@ -127,12 +141,31 @@ function ContextRow({
         {String(index + 1).padStart(2, "0")}
       </div>
 
-      <p
-        className="type-body-lg"
-        style={{ color: "var(--color-ink)", maxWidth: 780, margin: 0 }}
-      >
-        <FillWords text={paragraph} attach={attach} />
-      </p>
+      <div>
+        {/* the statement: what this paragraph is actually saying */}
+        <ReadFill
+          as="div"
+          text={statement}
+          progress={scrollYProgress}
+          reduce={reduce}
+          tint={tint}
+          emphasis={emphasis}
+          className="type-h2"
+          style={{ color: "var(--color-ink)", maxWidth: 900 }}
+        />
+
+        {/* the support, narrower and offset right so the eye can skip it */}
+        {support ? (
+          <ReadFill
+            text={support}
+            progress={scrollYProgress}
+            reduce={reduce}
+            tint={tint}
+            className="type-body-lg context-support"
+            style={{ color: "var(--color-muted)", maxWidth: 620, marginTop: 28 }}
+          />
+        ) : null}
+      </div>
     </li>
   );
 }

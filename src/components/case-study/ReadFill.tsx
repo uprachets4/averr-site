@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { MotionValue } from "motion/react";
 
 /**
@@ -48,23 +48,50 @@ export function useFillVar(progress: MotionValue<number>, reduce: boolean) {
   );
 }
 
-/** The words the eye reads, plus the sentence a screen reader reads once. */
+/**
+ * The words the eye reads, plus the sentence a screen reader reads once.
+ *
+ * `emphasis`, when it is a verbatim substring, marks the words it covers so
+ * the highlighter can sweep them. A phrase that isn't found is ignored
+ * rather than approximated.
+ */
 export function FillWords({
   text,
   attach,
+  emphasis,
 }: {
   text: string;
   attach: (node: HTMLElement | null) => void;
+  emphasis?: string;
 }) {
   const words = text.split(" ");
+
+  // word range covered by the emphasis, by character offset
+  let from = -1;
+  let to = -1;
+  if (emphasis) {
+    const at = text.indexOf(emphasis);
+    if (at >= 0) {
+      let cursor = 0;
+      words.forEach(function locate(w, i) {
+        const start = cursor;
+        const end = cursor + w.length;
+        if (from < 0 && end > at) from = i;
+        if (start < at + emphasis.length) to = i;
+        cursor = end + 1;
+      });
+    }
+  }
+
   return (
     <>
       <span aria-hidden="true" ref={attach}>
         {words.map(function word(w, i) {
+          const lit = from >= 0 && i >= from && i <= to;
           return (
             <span
               key={i}
-              className="read-fill__w"
+              className={lit ? "read-fill__w read-fill__hl" : "read-fill__w"}
               style={
                 { ["--i" as string]: i, ["--n" as string]: words.length } as React.CSSProperties
               }
@@ -86,20 +113,27 @@ export function ReadFill({
   progress,
   reduce,
   tint,
+  emphasis,
   className,
   style,
+  as: Tag = "p",
 }: {
   text: string;
   progress: MotionValue<number>;
   reduce: boolean;
   tint?: string;
+  emphasis?: string;
   className?: string;
   style?: React.CSSProperties;
+  as?: "p" | "div";
 }) {
   const attach = useFillVar(progress, reduce);
+  const lit = useLitOnce(progress, reduce);
   return (
-    <p
-      className={["read-fill", className].filter(Boolean).join(" ")}
+    <Tag
+      className={["read-fill", lit ? "read-fill--lit" : null, className]
+        .filter(Boolean)
+        .join(" ")}
       style={
         {
           margin: 0,
@@ -109,7 +143,27 @@ export function ReadFill({
         } as React.CSSProperties
       }
     >
-      <FillWords text={text} attach={attach} />
-    </p>
+      <FillWords text={text} attach={attach} emphasis={emphasis} />
+    </Tag>
   );
+}
+
+/** Flips true the first time the paragraph finishes filling, and stays true. */
+export function useLitOnce(progress: MotionValue<number>, reduce: boolean) {
+  const [lit, setLit] = useState(reduce);
+  useEffect(
+    function watch() {
+      if (reduce) {
+        setLit(true);
+        return;
+      }
+      function check(v: number) {
+        if (v >= 0.92) setLit(true);
+      }
+      check(progress.get());
+      return progress.on("change", check);
+    },
+    [progress, reduce]
+  );
+  return lit;
 }

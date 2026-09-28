@@ -28,8 +28,14 @@ export type CaseStudy = {
    *  progress accents. Never body text, headings, or Averr buttons. */
   tint?: string;
   context: string[];
+  /** One verbatim phrase per context paragraph, highlighted as it is read.
+   *  Parallel to `context`; a phrase that isn't a substring is ignored. */
+  contextEmphasis?: string[];
   approach: { pillar: Pillar; body: string; image?: string; layout?: ApproachLayout }[];
   inventory: string[];
+  /** A short label per inventory item, built only from that item's own
+   *  words. Parallel to `inventory`. */
+  inventoryLabels?: string[];
   signatures: {
     title: string;
     body: string;
@@ -42,6 +48,8 @@ export type CaseStudy = {
   outcome: {
     headline: string;
     body: string;
+    /** A verbatim phrase from `body`, highlighted as the prose is read. */
+    emphasis?: string;
   };
   stack: string[];
   next: string;
@@ -105,6 +113,10 @@ export const caseStudies: Record<string, CaseStudy> = {
       "CG Walls & Floors is Max Francis's renovation business — drywall, paint, flooring, framing, trim, and door-and-window install. Ontario-registered, fully insured, one person in the truck.",
       "The mandate was blunt: no ad budget, no headcount, no time to burn. Growth had to come from realtor referrals — the single highest-leverage channel in the trade, where one relationship compounds into ten jobs a year. But realtors get pitched by every contractor in the GTA. The work was to make CG feel like the obvious call.",
     ],
+    contextEmphasis: [
+      "Max Francis's renovation business",
+      "no ad budget, no headcount, no time to burn",
+    ],
     approach: [
       {
         pillar: "Design",
@@ -129,10 +141,18 @@ export const caseStudies: Record<string, CaseStudy> = {
       "Google Business Profile seeded with an authentic Brampton homeowner review (basement flooring + paint, on-time delivery, transparent pricing)",
       "Zero-budget channel stack: Kijiji monitoring, Facebook Groups, building-permit data, NextDoor",
     ],
+    inventoryLabels: [
+      "Premium React site",
+      "Realtor lead-gen infrastructure",
+      "Durham Region hotspot map",
+      "Google Business Profile",
+      "Zero-budget channel stack",
+    ],
     signatures: [],
     outcome: {
       headline: "A premium presence, built for one-person growth.",
       body: "The business now has a repeatable outreach rhythm one person can run between jobs, a website that reads at the same level as firms three tiers up, and referral infrastructure aimed at the trade's highest-leverage segment. Realtor outreach that was once ad hoc is now templated, targeted, and personalized at scale — without added headcount.",
+      emphasis: "a repeatable outreach rhythm one person can run between jobs",
     },
     stack: [
       "React",
@@ -174,6 +194,11 @@ export const caseStudies: Record<string, CaseStudy> = {
       "The second mistake is collapsing research and execution into one loop. A signal appears, confidence gets implied, and the interface pushes the user toward a trade before the thesis, exposure, data freshness, and downside have been examined.",
       "CapitalCommand exists to put those steps back in order. Start with the portfolio. Establish the market context. Inspect the signal. Test the thesis. Check the risk. Verify the underlying data. Execution comes later, behind explicit controls — not disguised as a convenient button.",
     ],
+    contextEmphasis: [
+      "confuse access to data with investment intelligence",
+      "collapsing research and execution into one loop",
+      "put those steps back in order",
+    ],
     approach: [
       {
         pillar: "Design",
@@ -195,6 +220,16 @@ export const caseStudies: Record<string, CaseStudy> = {
       "Signal Desk and Research Lab for collecting signals, inspecting confidence and provenance, opening a research workspace, testing a thesis, and separating a research observation from an executable action — Discord signal models and ingestion jobs exist, real Discord ingestion still disabled",
       "Risk Center and System Health covering portfolio exposure, stale-data detection, provider status, readiness, worker health, structured logs, request and correlation IDs, internal metrics, alert rules, degraded-state reporting, and a protected metrics route",
       "Redis-backed BullMQ worker system with schedules, retries, leases, persistent job metadata, dead-letter handling, replay, graceful shutdown, and jobs for portfolio research, IPO monitoring, options paper workflows, signals, alerts, and notifications — Docker packaging, GitHub Actions validation, backup and restore guardrails, and recovery runbooks in place",
+    ],
+    inventoryLabels: [
+      "TypeScript monorepo",
+      "Prisma and PostgreSQL data layer",
+      "Database-backed authentication context",
+      "Portfolio and command surfaces",
+      "Markets and IPO research",
+      "Signal Desk and Research Lab",
+      "Risk Center and System Health",
+      "Redis-backed BullMQ worker system",
     ],
     signatures: [
       {
@@ -223,6 +258,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     outcome: {
       headline: "An internal build, ready for controlled beta.",
       body: "CapitalCommand currently works as an internal, research-first engineering build with deterministic seeded data. Users move through portfolio state, market context, IPO research, signals, thesis work, exposure checks, system status, and audit history — with database, jobs, and adapters wired and observable.",
+      emphasis: "an internal, research-first engineering build",
     },
     stack: [
       "Next.js",
@@ -277,6 +313,11 @@ export const caseStudies: Record<string, CaseStudy> = {
       "The other half of the problem is fragmentation. YC's job board lives at ycombinator.com/jobs. LinkedIn's ATS scoring is a paid feature buried three levels deep. Google Jobs surfaces listings but doesn't score them. Wellfound is startup-only. Every serious job-seeker keeps four to six tabs open, tracks applications in a Notion doc, and rewrites their resume per job at 11pm after their day job — badly.",
       "SIFT bets the market wants craft, not volume — and that the winning product will do the manual work well, not do more of it fast.",
     ],
+    contextEmphasis: [
+      "over-served on volume and under-served on precision",
+      "fragmentation",
+      "craft, not volume",
+    ],
     approach: [
       {
         pillar: "Design",
@@ -297,6 +338,15 @@ export const caseStudies: Record<string, CaseStudy> = {
       "Documents system: cover letter generator, ExportedDocument schema with export logging, aggregation page across every generated document, DOCX and PDF as fully separate generators",
       "Application pipeline: Top Matches, Saved, Applied, Interviews — all with server-side filter, sort, search, and pagination via a real /api/jobs endpoint",
       "Marketing and launch surface: onboarding, /pricing, /about, /faq, three-post blog, favicon, robots.txt, sitemap, full OpenGraph and Twitter metadata",
+    ],
+    inventoryLabels: [
+      "Multi-tenant SaaS on Next.js 16",
+      "Job source aggregation",
+      "AI matching engine",
+      "Resume tailoring",
+      "Documents system",
+      "Application pipeline",
+      "Marketing and launch surface",
     ],
     signatures: [
       {
@@ -325,6 +375,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     outcome: {
       headline: "The engine now runs end to end.",
       body: "Source → score → tailor → apply → track works live at sifthq.app. Cron fires on schedule, sync respects cooldowns, AI scoring runs separately, documents export cleanly, and pipeline pages use real server-side queries. What remains is quality, not architecture: matching, tailoring, and cover-letter output need another pass before public launch.",
+      emphasis: "Source → score → tailor → apply → track",
     },
     stack: [
       "Next.js 16",
@@ -369,6 +420,11 @@ export const caseStudies: Record<string, CaseStudy> = {
       "Founders rarely lack ideas. They lack a system for deciding which ideas support their reputation, which angle has already been exhausted, what evidence makes a post credible, and what should come next. Without that memory, automation produces competent-looking repetition: the same hook, the same lesson, the same vague CTA.",
       "CadenceStack exists because thought leadership is a state-management problem before it is a writing problem. The system has to understand the operator, preserve editorial decisions, rotate ideas deliberately, and connect published work back to future recommendations. Otherwise it's just another text generator with a calendar attached.",
     ],
+    contextEmphasis: [
+      "treat the problem as content production",
+      "rarely lack ideas",
+      "a state-management problem before it is a writing problem",
+    ],
     approach: [
       {
         pillar: "Design",
@@ -399,6 +455,16 @@ export const caseStudies: Record<string, CaseStudy> = {
       "A persistent product layer in Supabase holding authentication, post records, AI runs, generated outputs, pillars, prompts, visuals, metrics, onboarding state, and recommendation state — service-level credentials stay server-side, user boundaries tested rather than assumed",
       "A staging product on Vercel with interactive onboarding, deterministic Presence Score, diagnosis, personalized strategy roadmap, first-post handoff, adaptive recommendations, review controls, and controlled-beta foundations",
     ],
+    inventoryLabels: [
+      "The 7S Methodology as system logic",
+      "A five-pillar model",
+      "A stateful content pipeline",
+      "Rotation and repetition controls",
+      "A deterministic Structure Guide",
+      "A guarded AI drafting core",
+      "A persistent product layer in Supabase",
+      "A staging product on Vercel",
+    ],
     signatures: [
       {
         title: "A voice, not a template.",
@@ -426,6 +492,7 @@ export const caseStudies: Record<string, CaseStudy> = {
     outcome: {
       headline: "The operating model is built and working.",
       body: "CadenceStack now carries an idea through structure, drafting, review, visual planning, approval, publication tracking, and repurposing without reducing the work to one prompt. The editorial model and persistent state are proven internally. Repeatable customer performance, production AI, unrestricted publishing, multi-tenant scale, and commercial retention remain unproven ahead of a controlled beta.",
+      emphasis: "without reducing the work to one prompt",
     },
     stack: [
       "TanStack Start",
