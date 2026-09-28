@@ -291,6 +291,13 @@ a { color: inherit; text-decoration: none; }
 .pill-hl--bare {
   background: none;
   box-shadow: none;
+  /* The hero pill is display-2xl, where .pill-hl's 0.75em side padding is
+     ~119px a side at 1440 and pushes the box past --container-wide (which
+     caps at 1440 while the type keeps scaling with vw). 0.28em keeps the
+     whole box — radius and period included — inside the measure at every
+     width. Scoped to the slab variant so every other PillHl is untouched. */
+  padding-left: 0.28em;
+  padding-right: 0.28em;
 }
 .pill-hl__slab {
   position: absolute;

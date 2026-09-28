@@ -556,11 +556,14 @@ function ReelStage({
     };
   }, []);
 
-  const rowX = useTransform(progress, [0.5, 0.85], [0, -overflow]);
-  const cardsY = useTransform(progress, [0.5, 0.62], [80, 0]);
+  // The cards must finish arriving before the row moves: entrance runs
+  // 0.50 → 0.58 (opacity 0.50 → 0.56, y 0.50 → 0.58), the pan 0.58 → 0.90,
+  // then a hold in which the CTA lands.
+  const rowX = useTransform(progress, [0.58, 0.9], [0, -overflow]);
+  const cardsY = useTransform(progress, [0.5, 0.58], [80, 0]);
   const headingRef = useScrollOpacity(progress, 0.45, 0.6);
   const cardsRef = useScrollOpacity(progress, 0.5, 0.56);
-  const ctaRef = useScrollOpacity(progress, 0.82, 0.9);
+  const ctaRef = useScrollOpacity(progress, 0.9, 0.96);
 
   const scrollCardIntoView = useCallback(function focusCard(slug: string) {
     const index = reelCards.findIndex((c) => c.slug === slug);

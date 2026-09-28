@@ -1793,7 +1793,9 @@ function GrowDashboard({
         style={{
           position: "relative",
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          // minmax(0, 1fr), not 1fr: the numbers' min-content width otherwise
+          // forces each track past its share and overflow:hidden clips them.
+          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
           gap: 18,
           padding: 32,
           x: parallax.x,
@@ -1937,7 +1939,9 @@ function MetricCard({
         {metric.label}
       </div>
       <div
-        className="type-display-xl"
+        // h1, not display-xl: these cards are ~320px wide once the tracks are
+        // capped, and display-xl (144px at 1440) cannot fit "48.2K" in that.
+        className="type-h1"
         style={{
           color: "var(--color-ink)",
           fontVariantNumeric: "tabular-nums",

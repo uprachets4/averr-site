@@ -290,7 +290,7 @@ type Principle = {
   title: string;
   body: string;
   variant: "stroke-fill" | "scale-up" | "skew-straighten" | "slow-rotate";
-  numeralPosition: "top-right" | "top-left" | "center";
+  numeralPosition: "top-right" | "top-left" | "behind-headline";
   bg: "cream" | "alt" | "dark";
 };
 
@@ -324,7 +324,7 @@ const PRINCIPLES: Principle[] = [
     title: "A site that ages well.",
     body: "Trend-driven design ages in 18 months. The studio designs for typography, spacing, and interaction fundamentals that hold up in three years. Every project is built to be portfolio-worthy for the studio and for the client.",
     variant: "slow-rotate",
-    numeralPosition: "center",
+    numeralPosition: "behind-headline",
     bg: "dark",
   },
 ];
@@ -528,6 +528,14 @@ function NumeralBackdrop({
   // 04 — continuous rotation handled by motion animate loop
 
   // Positioning
+  // 04 used to sit dead centre, directly behind the body copy — it covered
+  // ~50% of the paragraph at every scroll position. The text column is a fixed
+  // 640px (60ch), leaving only 192px beside it at 1024, so no side position
+  // fits a ~480px numeral. It now sits centred but raised, behind the headline
+  // region and clear of the paragraph, with its slow-rotate choreography
+  // intact. left/right + textAlign rather than translateX, because the rotate
+  // animation owns `transform`.
+  const isBehindHeadline = principle.numeralPosition === "behind-headline";
   const positionStyle: React.CSSProperties =
     principle.numeralPosition === "top-right"
       ? { position: "absolute", top: "clamp(24px, 6vh, 96px)", right: 40 }
@@ -535,15 +543,22 @@ function NumeralBackdrop({
         ? { position: "absolute", top: "clamp(24px, 6vh, 96px)", left: 40 }
         : {
             position: "absolute",
-            top: "50%",
+            top: "clamp(16px, 4vh, 64px)",
             left: "50%",
-            transform: "translate(-50%, -50%)",
+            transform: "translateX(-50%)",
           };
 
   const base: React.CSSProperties = {
     ...positionStyle,
     fontFamily: "var(--font-display), Georgia, serif",
-    fontSize: "clamp(160px, 28vw, 320px)",
+    // 01-03 keep the full 320px because their corners are horizontally clear
+    // of the 640px text column. 04 is centred, so its rotating box has to fit
+    // between the top of the band and the eyebrow — at 320px it covered the
+    // eyebrow (contrast 2.9:1) and at any side anchor it covered the paragraph
+    // at <=1440. This is the largest size that clears both at every width.
+    fontSize: isBehindHeadline
+      ? "clamp(110px, 10vw, 150px)"
+      : "clamp(160px, 28vw, 320px)",
     fontWeight: 700,
     lineHeight: 1,
     color: numeralColor,
@@ -642,22 +657,29 @@ function NumeralBackdrop({
         </motion.div>
       );
     case "slow-rotate":
+      // The rotation lives on an inner span so the outer box keeps its static
+      // translateX(-50%) centring — motion would otherwise own `transform` and
+      // drop it, and a left/right-stretched box would sit over the paragraph.
       return (
-        <motion.div
+        <div
           aria-hidden
-          animate={reduce ? undefined : { rotate: 360 }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: "linear",
-          }}
           style={{
             ...base,
             opacity: principle.bg === "dark" ? 0.22 : 0.18,
           }}
         >
-          {principle.n}
-        </motion.div>
+          <motion.span
+            style={{ display: "inline-block" }}
+            animate={reduce ? undefined : { rotate: 360 }}
+            transition={{
+              duration: 30,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            {principle.n}
+          </motion.span>
+        </div>
       );
   }
 }
