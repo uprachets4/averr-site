@@ -3,16 +3,16 @@ import { useReducedMotion } from "motion/react";
 import { duration, ease } from "../../lib/motion";
 import type { CaseSection } from "../../data/caseSections";
 
-const WIDE = "(min-width: 1600px)";
+const WIDE = "(min-width: 1700px)";
 
 /**
  * The reading rail.
  *
- * Only at >= 1600px, where a 1440-capped container leaves a real margin,
+ * Only at >= 1700px, where a 1440-capped container leaves a real margin,
  * does the fixed left rail appear: one label per chapter, a 1px
  * track beside them that fills in the study's tint as you read, and the
  * current chapter at full ink. Narrow screens get the same progress as a
- * 2px bar under the nav (everything below 1600) — this is the page's only
+ * 2px bar under the nav (everything below 1700) — this is the page's only
  * progress indicator, so case studies no longer render ScrollProgress.
  *
  * Everything here is driven by one rAF-throttled scroll handler writing
@@ -178,12 +178,12 @@ export default function ReadingRail({
       style={{
         position: "fixed",
         top: "50%",
-        // Only >= 1600 is there enough margin beside a 1440-capped container
-        // for the rail to clear the copy by 48px. The first term guarantees
-        // that clearance; the second keeps the rail a quarter into the margin
-        // on wider screens instead of drifting toward the text.
+        // Only >= 1700 is the margin beside a 1440-capped container wide
+        // enough for 24px of edge, the 31px rail and 48px of clearance.
+        // The inner min() keeps the rail a quarter into the margin rather
+        // than drifting toward the copy; the outer max() holds the edge.
         left:
-          "max(0px, min(calc((100vw - var(--container-wide)) / 2 - 79px), calc((100vw - var(--container-wide)) / 4)))",
+          "max(24px, min(calc((100vw - var(--container-wide)) / 2 - 79px), calc((100vw - var(--container-wide)) / 4)))",
         transform: "translateY(-50%)",
         zIndex: 40,
         display: "flex",
