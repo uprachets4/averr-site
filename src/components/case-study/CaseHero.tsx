@@ -69,12 +69,12 @@ export default function CaseHero({
     offset: ["start start", "end start"],
   });
 
-  const cluster =
-    heroImages && heroImages.length >= 2 && heroImages.length <= 3
-      ? heroImages
-      : heroImage
-        ? [heroImage]
-        : null;
+  // One screenshot, not three. The cluster's depth used to come from two
+  // other screens, which meant every study showed the same shot twice —
+  // once here, once in Approach or the Gallery. The depth is now blurred
+  // copies of this same image, so the hero borrows nothing.
+  // heroImages[0] is this image on every study; the rest are unused.
+  const front = heroImage || heroImages?.[0] || null;
 
   return (
     <section
@@ -192,7 +192,7 @@ export default function CaseHero({
       </div>
 
       {/* the zoom */}
-      {cluster ? (
+      {front ? (
         <div
           ref={wrapRef}
           style={{ position: "relative", height: "160vh", marginTop: 72 }}
@@ -200,7 +200,8 @@ export default function CaseHero({
         >
           <TintGlow progress={scrollYProgress} tint={glow} reduce={!!reduce} />
           <ZoomCluster
-            images={cluster}
+            src={front}
+            tint={glow}
             client={client}
             caption={heroCaption}
             progress={scrollYProgress}
@@ -290,13 +291,15 @@ function TintGlow({
 /* ── the cluster ────────────────────────────────────────────────── */
 
 function ZoomCluster({
-  images,
+  src,
+  tint,
   client,
   caption,
   progress,
   reduce,
 }: {
-  images: string[];
+  src: string;
+  tint: string;
   client: string;
   caption?: CaseStudy["heroCaption"];
   progress: MotionValue<number>;
@@ -315,13 +318,6 @@ function ZoomCluster({
     };
   }, []);
 
-  // front is the last card in the fan; the rest sit behind it
-  const frontIndex = images.length === 3 ? 1 : images.length - 1;
-  const front = images[frontIndex];
-  const backs = images.filter(function notFront(_, i) {
-    return i !== frontIndex;
-  });
-
   if (!desktop || reduce) {
     return (
       <div style={{ maxWidth: "var(--container-wide)", margin: "0 auto" }}>
@@ -334,7 +330,7 @@ function ZoomCluster({
         >
           <ImageFrame variant="hero">
             <img
-              src={front}
+              src={src}
               alt={`${client} overview screen`}
               loading="eager"
               decoding="async"
@@ -368,17 +364,9 @@ function ZoomCluster({
           justifyContent: "center",
         }}
       >
-        {backs.map(function drawBack(src, i) {
-          return (
-            <BackScreen
-              key={src}
-              src={src}
-              side={i === 0 ? -1 : 1}
-              progress={progress}
-            />
-          );
-        })}
-        <FrontScreen src={front} client={client} progress={progress} />
+        <DepthScreen src={src} tint={tint} side={-1} progress={progress} />
+        <DepthScreen src={src} tint={tint} side={1} progress={progress} />
+        <FrontScreen src={src} client={client} progress={progress} />
         {caption ? (
           <CaptionFade caption={caption} progress={progress} />
         ) : null}
@@ -429,24 +417,28 @@ function FrontScreen({
   );
 }
 
-/** Fans outward and fades as the front screen takes the frame. */
-function BackScreen({
+/**
+ * Depth, not content: a blurred, tinted copy of the front image fanning
+ * outward behind it. Same src, so the hero introduces no second screenshot.
+ */
+function DepthScreen({
   src,
+  tint,
   side,
   progress,
 }: {
   src: string;
+  tint: string;
   side: 1 | -1;
   progress: MotionValue<number>;
 }) {
-  // fans out to +-8vw of the frame, rotating a little further as it goes
   const x = useTransform(progress, [0, 0.34], [side * 12, side * 64], {
     ease: [easing.inOut],
   });
   const rotate = useTransform(progress, [0, 0.34], [side * 5, side * 6], {
     ease: [easing.inOut],
   });
-  const opacity = useTransform(progress, [0, 0.25], [1, 0]);
+  const opacity = useTransform(progress, [0, 0.25], [0.35, 0]);
   const ref = useScrollStyle<HTMLDivElement>(opacity);
 
   return (
@@ -465,6 +457,7 @@ function BackScreen({
         y: "-50%",
         borderRadius: 10,
         overflow: "hidden",
+        filter: "blur(8px)",
         boxShadow: "0 14px 40px rgba(20,20,18,0.15)",
       }}
     >
@@ -474,6 +467,15 @@ function BackScreen({
         loading="lazy"
         decoding="async"
         style={{ display: "block", width: "100%", height: "auto" }}
+      />
+      {/* the study's own colour, so the depth reads as atmosphere */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: rgba(tint, 0.2),
+          pointerEvents: "none",
+        }}
       />
     </motion.div>
   );

@@ -22,6 +22,9 @@ export type CaseStudy = {
    *  the figure has exactly one source. */
   headlineFigure?: { value: string; caption: string };
   heroImage?: string;
+  /** Legacy hero cluster. The hero now renders `heroImage` alone (its depth
+   *  is blurred copies of that same shot), so only [0] is ever read, as a
+   *  fallback. Kept rather than deleted; safe to drop with the fallback. */
   heroImages?: string[];
   heroCaption?: { eyebrow: string; labels: string[] };
   /** The client's own accent colour. Ambient only — hero glow and small
@@ -106,8 +109,8 @@ export const caseStudies: Record<string, CaseStudy> = {
       "/work/cgwalls/gallery2.jpg",
     ],
     heroCaption: {
-      eyebrow: "Site + project shots",
-      labels: ["Live site", "Renovation in progress", "Finished space"],
+      eyebrow: "Site shot",
+      labels: ["Live site"],
     },
     context: [
       "CG Walls & Floors is Max Francis's renovation business — drywall, paint, flooring, framing, trim, and door-and-window install. Ontario-registered, fully insured, one person in the truck.",
@@ -186,8 +189,8 @@ export const caseStudies: Record<string, CaseStudy> = {
       "/work/capitalcommand/05-signal-desk.jpg",
     ],
     heroCaption: {
-      eyebrow: "Featured screens",
-      labels: ["Overview", "IPO Intelligence", "Signal Desk"],
+      eyebrow: "Featured screen",
+      labels: ["Overview"],
     },
     context: [
       "Most investing products confuse access to data with investment intelligence. They add charts, news feeds, screeners, alerts, and AI summaries until the interface looks sophisticated, but the investor is still responsible for connecting everything into a decision.",
@@ -305,8 +308,8 @@ export const caseStudies: Record<string, CaseStudy> = {
       "/work/sift/04-pipeline.jpg",
     ],
     heroCaption: {
-      eyebrow: "Featured screens",
-      labels: ["Command Overview", "Pipeline Insights", "Sample Pipeline"],
+      eyebrow: "Featured screen",
+      labels: ["Command Overview"],
     },
     context: [
       "The job-search market is over-served on volume and under-served on precision. Every product built in the last two years is some flavor of auto-apply — mass-blast tools optimizing for applications submitted per hour. But every job-seeker who's been on the market knows the truth: volume doesn't get you interviews, fit does. Two hundred templated applications produce the same interview rate as twenty mediocre ones. The market is loud about the wrong metric.",
@@ -412,8 +415,8 @@ export const caseStudies: Record<string, CaseStudy> = {
       "/work/cadencestack/03-content-pipeline.jpg",
     ],
     heroCaption: {
-      eyebrow: "Featured screens",
-      labels: ["Command Center", "Content Pillars", "Content Pipeline"],
+      eyebrow: "Featured screen",
+      labels: ["Command Center"],
     },
     context: [
       "Most LinkedIn tools treat the problem as content production. Give the model a topic, generate five posts, schedule them, repeat. That solves typing. It does not solve positioning.",
