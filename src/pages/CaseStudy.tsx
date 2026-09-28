@@ -93,11 +93,15 @@ export default function CaseStudy() {
         {study.gallery && study.gallery.length > 0 ? (
           <Gallery items={study.gallery} client={study.client} tone="dark" />
         ) : null}
-        <Outcome text={study.outcome} />
+        <Outcome
+          text={study.outcome}
+          figure={study.headlineFigure}
+          tint={study.tint}
+        />
       </Chapter>
 
       <Chapter tone="cream-alt" from="dark">
-        <Next text={study.next} />
+        <Next text={study.next} tint={study.tint} />
       </Chapter>
       <FinalCTA markerNumber="07" />
     </>

@@ -1,24 +1,30 @@
-import { motion, useReducedMotion } from "motion/react";
+import { useRef } from "react";
+import { motion, useReducedMotion, useScroll } from "motion/react";
 import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { ease } from "../../lib/motion";
-import MagneticCTA from "../MagneticCTA";
+import { ReadFill } from "./ReadFill";
 
-export default function Next({ text }: { text: string }) {
+export default function Next({ text, tint }: { text: string; tint?: string }) {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 0.85", "end 0.6"],
+  });
   return (
     <section
       id={SECTIONS.next.id}
       style={{
         backgroundColor: "var(--color-bg-alt)",
-        padding: "128px 40px",
-        borderTop: "1px solid rgba(20,20,18,0.10)",
+        padding: "128px 0",
+        borderTop: "1px solid var(--hair)",
         position: "relative",
       }}
     >
       <div className="grain-light" aria-hidden="true" />
       <div
         style={{
-          maxWidth: 1200,
+          maxWidth: "var(--container-wide)",
           margin: "0 auto",
           position: "relative",
           zIndex: 2,
@@ -41,44 +47,15 @@ export default function Next({ text }: { text: string }) {
           {eyebrowFor(SECTIONS.next)}
         </motion.div>
 
-        <div>
-          <motion.p
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{
-              duration: reduce ? 0 : 0.7,
-              ease: ease.outQuart,
-              delay: reduce ? 0 : 0.1,
-            }}
+        <div ref={ref}>
+          <ReadFill
+            text={text}
+            progress={scrollYProgress}
+            reduce={!!reduce}
+            tint={tint}
             className="type-body-lg"
-            style={{
-              color: "var(--color-ink-soft)",
-              maxWidth: 900,
-              marginBottom: 40,
-            }}
-          >
-            {text}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{
-              duration: reduce ? 0 : 0.6,
-              ease: ease.outQuart,
-              delay: reduce ? 0 : 0.25,
-            }}
-            style={{ display: "inline-flex", gap: 12, flexWrap: "wrap" }}
-          >
-            <MagneticCTA to="/contact" variant="primary">
-              Book a discovery call
-            </MagneticCTA>
-            <MagneticCTA to="/work" variant="ghost">
-              See related work
-            </MagneticCTA>
-          </motion.div>
+            style={{ color: "var(--color-ink-soft)", maxWidth: 900 }}
+          />
         </div>
       </div>
       <style>{`
