@@ -30,7 +30,13 @@ export type CaseStudy = {
   context: string[];
   approach: { pillar: Pillar; body: string; image?: string; layout?: ApproachLayout }[];
   inventory: string[];
-  signatures: { title: string; body: string; image?: string }[];
+  signatures: {
+    title: string;
+    body: string;
+    image?: string;
+    /** Where the detail-zoom lands, 0-1 of the image. Default {0.5, 0.5}. */
+    focal?: { x: number; y: number };
+  }[];
   signatureImage?: string;
   gallery?: { src: string; caption: string }[];
   outcome: {
@@ -195,21 +201,24 @@ export const caseStudies: Record<string, CaseStudy> = {
         title: "Research before execution",
         body: "CapitalCommand treats a signal as the beginning of an investigation, not permission to place an order. The product forces the path through thesis, provenance, portfolio exposure, and risk before brokerage access is even considered.",
         image: "/work/capitalcommand/05-signal-desk.jpg",
+        focal: { x: 0.86, y: 0.37 },
       },
       {
         title: "Operational truth is part of the interface",
         body: "Most investment dashboards display a number without telling you whether the provider is delayed, the worker failed, or the data is stale. CapitalCommand exposes provider status, data quality, job health, readiness, and audit history — because unreliable infrastructure produces unreliable investment decisions.",
-        image: "/work/capitalcommand/06-research-lab.jpg",
+        image: "/work/capitalcommand/08-system-health.jpg",
+        focal: { x: 0.46, y: 0.29 },
       },
       {
         title: "Deterministic before generative",
         body: "Portfolio calculations, risk rules, job state, ownership checks, and safety controls stay outside the model. AI is restricted to bounded research assistance with schema-validated output, sanitized telemetry, feature flags, and fail-closed behaviour. A fluent answer does not get to override system state.",
         image: "/work/capitalcommand/07-risk-center.jpg",
+        focal: { x: 0.29, y: 0.44 },
       },
     ],
     gallery: [
       { src: "/work/capitalcommand/03-markets.jpg", caption: "Markets overview" },
-      { src: "/work/capitalcommand/08-system-health.jpg", caption: "System health monitor" },
+      { src: "/work/capitalcommand/06-research-lab.jpg", caption: "Research lab" },
     ],
     outcome: {
       headline: "An internal build, ready for controlled beta.",
@@ -277,7 +286,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         pillar: "Automate",
         body: "The entire product is automation. Cron-driven daily sync across every connected job source. AI scoring on each new posting against the user's confirmed resume, running post-response via Vercel's after() API so the UI never waits. AI resume rewriting per job to close the ATS keyword gap. AI cover letter generation. The user's job is to review, not to grind.",
-        image: "/work/sift/07-sources.jpg",
+        image: "/work/sift/06-funnel.jpg",
       },
     ],
     inventory: [
@@ -294,16 +303,19 @@ export const caseStudies: Record<string, CaseStudy> = {
         title: "Sodium amber on dark",
         body: "#F2A93C on a four-step dark surface ladder. The productivity-SaaS default is either blue-on-white or clinical-white minimalism. Sodium amber is warmer, more editorial — reads as a tool built by someone who cares about how a screen feels at midnight, not just what it does at noon.",
         image: "/work/sift/05-outreach.jpg",
+        focal: { x: 0.4, y: 0.9 },
       },
       {
         title: "The sync engine's concurrency model",
         body: "Paid job sources run sequentially — because a credit race condition, where two concurrent fetches both passed the credit check before either incremented usage, was silently double-charging on first sync. Free sources run parallelized at concurrency 4. The fix came from a bug and became architecture.",
-        image: "/work/sift/06-funnel.jpg",
+        image: "/work/sift/07-sources.jpg",
+        focal: { x: 0.52, y: 0.58 },
       },
       {
         title: "Craft over volume as a positioning bet",
         body: "SIFT explicitly isn't an auto-apply product, and won't be. It's built for the job-seeker willing to spend 30 focused minutes on one application instead of blasting 200. The pricing, the copy, the entire UX assumes the user is treating their job search as a portfolio of shots, not a lottery of tickets.",
         image: "/work/sift/03-cover-letter.jpg",
+        focal: { x: 0.78, y: 0.19 },
       },
     ],
     gallery: [
@@ -392,16 +404,19 @@ export const caseStudies: Record<string, CaseStudy> = {
         title: "A voice, not a template.",
         body: "Scored prompts for hooks, rewrites, visuals, and post-mortems — every one tuned to the brand's diagnostic voice and reused across the pipeline. Writing stays consistent even when the writer changes.",
         image: "/work/cadencestack/05-prompt-library.jpg",
+        focal: { x: 0.29, y: 0.35 },
       },
       {
         title: "Every post has a second life.",
         body: "Once a post logs real metrics, the engine reads what worked and proposes format extensions — carousel, newsletter, video script — with a Plan Assets action that opens the next artifact in the pipeline. Compounding, not restarting.",
         image: "/work/cadencestack/06-repurpose-engine.jpg",
+        focal: { x: 0.66, y: 0.36 },
       },
       {
         title: "The voice is a settings file.",
         body: "Positioning, brand thesis, voice guide, SLA thresholds, approval escalation — the strategy lives in one place and every downstream surface reads from it. Rewrites and reviewers stay honest to it.",
         image: "/work/cadencestack/07-brand-voice.jpg",
+        focal: { x: 0.78, y: 0.73 },
       },
     ],
     gallery: [

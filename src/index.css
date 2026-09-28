@@ -441,6 +441,34 @@ a { color: inherit; text-decoration: none; }
      max one phrase per headline, never alongside PillHl, never in
      body copy / eyebrows / CTAs / nav. Inherits line-height so it
      can't disturb the leading of the headline it sits inside. */
+
+  /* ── Read-fill: words brighten as the paragraph crosses the reading line.
+     `--p` (0-1) is written once per paragraph per frame by useFillVar;
+     each word derives its own opacity from --i / --n. ── */
+  .read-fill { --p: 0; }
+  .read-fill__w {
+    --span: calc(1.8 / var(--n));
+    /* starts are compressed into [0, 1 - span] so the LAST word still
+       reaches 1 by the time --p does */
+    --start: calc((var(--i) / var(--n)) * (1 - var(--span)));
+    opacity: clamp(
+      0.22,
+      calc(0.22 + 0.78 * ((var(--p) - var(--start)) / var(--span))),
+      1
+    );
+  }
+  .read-fill__num {
+    color: color-mix(
+      in oklab,
+      var(--tint) calc(clamp(0, var(--p), 1) * 100%),
+      var(--hair)
+    );
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .read-fill__w { opacity: 1; }
+    .read-fill__num { color: var(--tint); }
+  }
+
   /* Visible to screen readers, not to the eye. */
   .sr-only {
     position: absolute;

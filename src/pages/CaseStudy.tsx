@@ -87,6 +87,7 @@ export default function CaseStudy() {
             items={study.signatures}
             imageSrc={study.signatureImage}
             imageAlt={`${study.client} screen`}
+            tint={study.tint}
           />
         ) : null}
         {study.gallery && study.gallery.length > 0 ? (
