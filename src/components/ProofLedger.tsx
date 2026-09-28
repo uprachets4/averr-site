@@ -36,11 +36,8 @@ function fromData(slug: string) {
 }
 
 const ROWS: Row[] = [
-  {
-    label: "CG Walls & Floors",
-    ...fromData("cg-walls-and-floors"),
-    href: "/work/cg-walls-and-floors",
-  },
+  // No CG Walls row: the FeaturedCard directly above already leads with its
+  // 85%, and printing the same figure twice reads as two results.
   {
     label: "CareerClarity AI",
     target: 3.2,

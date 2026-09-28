@@ -10,35 +10,49 @@ import { duration, ease, spring } from "../lib/motion";
 import LineReveal from "./LineReveal";
 import MagneticCTA from "./MagneticCTA";
 import { DESIGN_PREVIEW_SHOTS } from "../data/homeScenes";
+import {
+  GROW_METRICS,
+  ILLUSTRATIVE_LABEL,
+  PILLAR_TIMELINE,
+} from "../data/servicePillars";
 
 const MOBILE_QUERY = "(max-width: 767px)";
 
-/** Name, promise and price all read from the /services pillar data. */
+/** Name and promise are home's own copy; the timeline is the pillar's, read
+ *  from the shared record so the two pages can't disagree. No prices — the
+ *  studio quotes on the call. */
 const DOORS = [
   {
     id: "design",
     name: "Design",
     promise:
       "Marketing sites, product interfaces and design systems that don't look templated.",
-    price: "$3,500 – $5,000 CAD",
+    timeline: PILLAR_TIMELINE.design,
   },
   {
     id: "automate",
     name: "Automate",
     promise:
       "AI systems and workflow automations that take the weekly busywork off your team.",
-    price: "$2,500 – $4,000 CAD",
+    timeline: PILLAR_TIMELINE.automate,
   },
   {
     id: "grow",
     name: "Grow",
-    // Grow is a retainer, not a project fee — printing the real terms rather
-    // than inventing a "From $X" figure for it.
     promise:
       "Paid acquisition and organic content that fills the funnel above the rest of the work.",
-    price: "Retainer from $1,500 CAD/month",
+    timeline: PILLAR_TIMELINE.grow,
   },
 ] as const;
+
+/* Preview panel geometry. 360x225 (16:10) where the row has room at 1280+,
+   easing down to 260 wide at 1024 so the name, preview and promise still fit
+   one line each. */
+const PANEL_W = "clamp(260px, 39.0625vw - 140px, 360px)";
+const PANEL_MAX_H = 225;
+/** Clear space the panel must leave between itself and the row's name. */
+const NAME_CLEARANCE = 24;
+const DRIFT = 40;
 
 /* ── previews ──────────────────────────────────────────────────────── */
 
@@ -135,8 +149,18 @@ function AutomatePreview({ reduce }: { reduce: boolean }) {
   );
 }
 
-/** Grow — the /services dashboard's own headline metric. */
+const MONO_MICRO = {
+  fontFamily: "var(--font-mono)",
+  fontSize: 10,
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+} as const;
+
+/** Grow — a mini of the /services dashboard: two tiles off the same sample
+ *  figures, plus the trend line. Labelled, because the numbers are invented. */
 function GrowPreview({ reduce }: { reduce: boolean }) {
+  const tiles = GROW_METRICS.slice(0, 2);
+
   return (
     <div
       aria-hidden
@@ -150,9 +174,47 @@ function GrowPreview({ reduce }: { reduce: boolean }) {
         padding: 16,
       }}
     >
-      <svg viewBox="0 0 240 70" style={{ width: "100%", height: "auto", display: "block" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 8 }}>
+        {tiles.map(function drawTile(m) {
+          return (
+            <div
+              key={m.label}
+              style={{
+                border: "1px solid var(--hair)",
+                borderRadius: 6,
+                padding: "8px 10px",
+                background: "rgba(200,175,120,0.06)",
+              }}
+            >
+              <div style={{ ...MONO_MICRO, color: "var(--color-muted)" }}>{m.label}</div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: 6,
+                  marginTop: 4,
+                }}
+              >
+                <span
+                  className="tnum"
+                  style={{ fontSize: 17, lineHeight: 1, color: "var(--color-ink)" }}
+                >
+                  {m.format(m.end)}
+                </span>
+                <span style={{ ...MONO_MICRO, color: "#B18544" }}>{m.delta}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <svg
+        viewBox="0 0 240 48"
+        preserveAspectRatio="none"
+        style={{ width: "100%", height: 34, display: "block" }}
+      >
         <motion.path
-          d="M4 62 C 40 58, 62 44, 92 40 S 150 28, 178 16 S 220 8, 236 5"
+          d="M4 42 C 40 39, 62 30, 92 27 S 150 19, 178 11 S 220 5, 236 3"
           fill="none"
           stroke="#B18544"
           strokeWidth={2}
@@ -164,17 +226,27 @@ function GrowPreview({ reduce }: { reduce: boolean }) {
           }
         />
       </svg>
-      <div
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: 10,
-          letterSpacing: "0.14em",
-          textTransform: "uppercase",
-          color: "var(--color-muted)",
-        }}
-      >
-        Impressions <span style={{ color: "#B18544" }}>48.2K · +42%</span>
-      </div>
+    </div>
+  );
+}
+
+/** Sits on any preview whose numbers are made up. */
+function IllustrativeTag() {
+  return (
+    <div
+      aria-hidden
+      className="type-eyebrow"
+      style={{
+        position: "absolute",
+        top: 6,
+        right: 8,
+        zIndex: 3,
+        fontFamily: "var(--font-mono)",
+        color: "var(--color-muted-2)",
+        pointerEvents: "none",
+      }}
+    >
+      {ILLUSTRATIVE_LABEL}
     </div>
   );
 }
@@ -182,7 +254,12 @@ function GrowPreview({ reduce }: { reduce: boolean }) {
 function Preview({ id, reduce }: { id: string; reduce: boolean }) {
   if (id === "design") return <DesignPreview />;
   if (id === "automate") return <AutomatePreview reduce={reduce} />;
-  return <GrowPreview reduce={reduce} />;
+  return (
+    <>
+      <GrowPreview reduce={reduce} />
+      <IllustrativeTag />
+    </>
+  );
 }
 
 /* ── one door ──────────────────────────────────────────────────────── */
@@ -207,16 +284,28 @@ function Door({
   reduce: boolean;
 }) {
   const rowRef = useRef<HTMLAnchorElement | null>(null);
+  const nameRef = useRef<HTMLSpanElement | null>(null);
+  const cellRef = useRef<HTMLDivElement | null>(null);
   const px = useMotionValue(0);
   const sx = useSpring(px, spring.soft);
 
   function onMove(e: React.MouseEvent<HTMLAnchorElement>) {
     if (reduce || mobile || !rowRef.current) return;
     const r = rowRef.current.getBoundingClientRect();
-    // keep the panel inside the row: clamp its centre to the track
-    // the panel's track is 240px wide; let it drift +-40px with the cursor
     const raw = (e.clientX - r.left) / r.width;
-    px.set(Math.max(-40, Math.min(40, (raw - 0.5) * 160)));
+    let next = Math.max(-DRIFT, Math.min(DRIFT, (raw - 0.5) * 160));
+
+    // the panel drifts with the cursor, so cap the leftward travel against the
+    // name's measured right edge — otherwise it slides over the word (/work
+    // clamps its cursor preview the same way). cellRef is the untranslated
+    // grid cell, so its left is the panel's rest position.
+    const name = nameRef.current?.getBoundingClientRect();
+    const cell = cellRef.current?.getBoundingClientRect();
+    if (name && cell) {
+      next = Math.max(name.right + NAME_CLEARANCE - cell.left, next);
+    }
+
+    px.set(next);
   }
 
   const dim = anyActive && !active && !mobile && !reduce;
@@ -244,12 +333,14 @@ function Door({
           maxWidth: "var(--container-wide)",
           margin: "0 auto",
           // fixed height so hover never animates layout
-          minHeight: mobile ? undefined : 196,
+          minHeight: mobile ? undefined : PANEL_MAX_H + 24,
           padding: mobile ? "28px 0" : 0,
           display: mobile ? "block" : "grid",
           // max-content on the name: a fractional track squeezes it and
           // LineReveal's overflow:hidden then clips the word.
-          gridTemplateColumns: mobile ? undefined : "max-content 240px minmax(0, 1fr) 20px",
+          gridTemplateColumns: mobile
+            ? undefined
+            : `max-content ${PANEL_W} minmax(0, 1fr) 20px`,
           alignItems: "center",
           gap: mobile ? 16 : 24,
           opacity: dim ? 0.4 : 1,
@@ -269,14 +360,20 @@ function Door({
           }}
           transition={spring.soft}
         >
-          <LineReveal delay={0.08 * index}>{door.name}</LineReveal>
+          <span ref={nameRef} style={{ display: "inline-block" }}>
+            <LineReveal delay={0.08 * index}>{door.name}</LineReveal>
+          </span>
         </motion.div>
 
         {/* preview panel — lives inside the row, between name and promise */}
         <div
+          ref={cellRef}
           style={{
             position: "relative",
-            height: mobile ? 120 : 180,
+            // 16:10, capped so the panel never outgrows the row
+            height: mobile ? 120 : undefined,
+            aspectRatio: mobile ? undefined : "16 / 10",
+            maxHeight: mobile ? undefined : PANEL_MAX_H,
             marginTop: mobile ? 16 : 0,
             pointerEvents: "none",
           }}
@@ -320,7 +417,7 @@ function Door({
             className="type-eyebrow"
             style={{ fontFamily: "var(--font-mono)", color: "var(--color-ink-soft)" }}
           >
-            {door.price}
+            {door.timeline}
           </div>
         </div>
 

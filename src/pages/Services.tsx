@@ -18,14 +18,19 @@ import {
 import { duration, ease, spring } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import FinalCTA from "../components/FinalCTA";
-import PillHl from "../components/PillHl";
 import Chapter from "../components/Chapter";
 import { useScrollStyle } from "../lib/useScrollStyle";
+import {
+  GROW_METRICS,
+  ILLUSTRATIVE_LABEL,
+  PILLAR_TIMELINE,
+  type GrowMetric,
+} from "../data/servicePillars";
 
 /* ═══════════════════════════════════════════════════════════════
    Pillar data — names + descriptions preserved verbatim.
-   Added: investment, timeline. Bullets rewritten as concrete
-   short-form deliverables per Session 7a spec.
+   Timeline lives in data/servicePillars (home prints it too).
+   No investment field: the studio does not publish prices.
    ═══════════════════════════════════════════════════════════════ */
 
 type ServiceChip = { label: string; tooltip: string };
@@ -36,7 +41,6 @@ type Pillar = {
   name: string;
   intro: string;
   included: string[];
-  investment: string;
   timeline: string;
   chips: ServiceChip[];
 };
@@ -55,8 +59,7 @@ const PILLARS: Pillar[] = [
       "Design tokens + motion primitives",
       "Iterative refinement post-launch",
     ],
-    investment: "$3,500 – $5,000 CAD",
-    timeline: "2 – 3 weeks",
+    timeline: PILLAR_TIMELINE.design,
     chips: [
       { label: "Marketing sites", tooltip: "Framer, Next.js, Astro" },
       {
@@ -86,8 +89,7 @@ const PILLARS: Pillar[] = [
       "Human-review layer for LLM outputs",
       "Documentation for team handoff",
     ],
-    investment: "$2,500 – $4,000 CAD",
-    timeline: "1 – 2 weeks",
+    timeline: PILLAR_TIMELINE.automate,
     chips: [
       {
         label: "AI agents",
@@ -119,8 +121,7 @@ const PILLARS: Pillar[] = [
       "Long-form content + LinkedIn + YouTube",
       "Attribution + monthly reporting",
     ],
-    investment: "Retainer from $1,500 CAD/month",
-    timeline: "Ongoing",
+    timeline: PILLAR_TIMELINE.grow,
     chips: [
       {
         label: "Social & organic content",
@@ -210,9 +211,10 @@ function ServicesHeader() {
             initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.bounce, delay: 0.8 }}
+            className="type-accent"
             style={{ display: "inline-block" }}
           >
-            <PillHl>One studio</PillHl>
+            One studio
           </motion.span>{" "}
           behind them all.
         </motion.h1>
@@ -454,13 +456,23 @@ function PillarSection({
           position: "sticky",
           top: 0,
           height: "100vh",
-          display: "grid",
-          gridTemplateColumns: "40% 60%",
+          display: "flex",
           alignItems: "center",
-          padding: "0 40px",
           overflow: "hidden",
         }}
       >
+        {/* the container, not a fixed 40px pad: content starts on the same
+            gutter as every other page and caps at --container-wide */}
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "var(--container-wide)",
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "40% 60%",
+            alignItems: "center",
+          }}
+        >
         <div
           style={{
             maxWidth: 520,
@@ -570,10 +582,7 @@ function PillarSection({
                 stageRefs.current[2] = el;
               }}
             >
-              <StageThree
-                investment={pillar.investment}
-                timeline={pillar.timeline}
-              />
+              <StageThree timeline={pillar.timeline} />
             </StageBody>
           </div>
         </div>
@@ -591,6 +600,7 @@ function PillarSection({
             pillar={pillar.id}
             scrollYProgress={scrollYProgress}
           />
+        </div>
         </div>
       </div>
     </section>
@@ -773,43 +783,18 @@ function StageBody({
   );
 }
 
-function StageThree({
-  investment,
-  timeline,
-}: {
-  investment: string;
-  timeline: string;
-}) {
+function StageThree({ timeline }: { timeline: string }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
-        <div>
-          <div
-            className="type-eyebrow"
-            style={{ color: "var(--color-muted-2)", marginBottom: 10 }}
-          >
-            Investment
-          </div>
-          <div
-            className="type-h3"
-            style={{ color: "var(--color-ink)" }}
-          >
-            {investment}
-          </div>
+      <div>
+        <div
+          className="type-eyebrow"
+          style={{ color: "var(--color-muted-2)", marginBottom: 10 }}
+        >
+          Timeline
         </div>
-        <div>
-          <div
-            className="type-eyebrow"
-            style={{ color: "var(--color-muted-2)", marginBottom: 10 }}
-          >
-            Timeline
-          </div>
-          <div
-            className="type-h3"
-            style={{ color: "var(--color-ink)" }}
-          >
-            {timeline}
-          </div>
+        <div className="type-h3" style={{ color: "var(--color-ink)" }}>
+          {timeline}
         </div>
       </div>
       <div>
@@ -928,41 +913,15 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
           </ul>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 24,
-            marginBottom: 40,
-          }}
-        >
-          <div>
-            <div
-              className="type-eyebrow"
-              style={{ color: "var(--color-muted-2)", marginBottom: 10 }}
-            >
-              Investment
-            </div>
-            <div
-              className="type-h3"
-              style={{ color: "var(--color-ink)" }}
-            >
-              {pillar.investment}
-            </div>
+        <div style={{ marginBottom: 40 }}>
+          <div
+            className="type-eyebrow"
+            style={{ color: "var(--color-muted-2)", marginBottom: 10 }}
+          >
+            Timeline
           </div>
-          <div>
-            <div
-              className="type-eyebrow"
-              style={{ color: "var(--color-muted-2)", marginBottom: 10 }}
-            >
-              Timeline
-            </div>
-            <div
-              className="type-h3"
-              style={{ color: "var(--color-ink)" }}
-            >
-              {pillar.timeline}
-            </div>
+          <div className="type-h3" style={{ color: "var(--color-ink)" }}>
+            {pillar.timeline}
           </div>
         </div>
 
@@ -995,7 +954,8 @@ function SequenceProgressIndicator({
       style={{
         position: "fixed",
         top: "50%",
-        right: 32,
+        // the gutter, so the rail lines up with the page's own edge
+        right: "var(--gutter)",
         transform: "translateY(-50%)",
         display: "flex",
         flexDirection: "column",
@@ -1711,37 +1671,6 @@ function WorkflowLabel({
 
 /* ── grow dashboard ─────────────────────────────────────────── */
 
-const METRICS: Array<{
-  label: string;
-  end: number;
-  format: (n: number) => string;
-  delta: string;
-}> = [
-  {
-    label: "Impressions",
-    end: 48.2,
-    format: (n) => `${n.toFixed(1)}K`,
-    delta: "+42%",
-  },
-  {
-    label: "Engagement",
-    end: 6.8,
-    format: (n) => `${n.toFixed(1)}%`,
-    delta: "+18%",
-  },
-  {
-    label: "CTR",
-    end: 3.4,
-    format: (n) => `${n.toFixed(1)}%`,
-    delta: "+24%",
-  },
-  {
-    label: "Sessions",
-    end: 12.1,
-    format: (n) => `${n.toFixed(1)}K`,
-    delta: "+36%",
-  },
-];
 
 function GrowDashboard({
   scrollYProgress,
@@ -1789,6 +1718,22 @@ function GrowDashboard({
         }}
       />
 
+      {/* these are sample figures, not a client result — say so on the face */}
+      <div
+        className="type-eyebrow"
+        style={{
+          position: "absolute",
+          top: 10,
+          right: 12,
+          zIndex: 3,
+          fontFamily: "var(--font-mono)",
+          color: "var(--color-muted-2)",
+          pointerEvents: "none",
+        }}
+      >
+        {ILLUSTRATIVE_LABEL}
+      </div>
+
       <motion.div
         style={{
           position: "relative",
@@ -1802,7 +1747,7 @@ function GrowDashboard({
           y: parallax.y,
         }}
       >
-        {METRICS.map(function drawMetric(m, i) {
+        {GROW_METRICS.map(function drawMetric(m, i) {
           return (
             <MetricCard
               key={m.label}
@@ -1888,7 +1833,7 @@ function MetricCard({
   index,
   scrollYProgress,
 }: {
-  metric: (typeof METRICS)[number];
+  metric: GrowMetric;
   index: number;
   scrollYProgress: MotionValue<number>;
 }) {
