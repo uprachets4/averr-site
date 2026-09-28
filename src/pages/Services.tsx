@@ -757,7 +757,7 @@ function StageBody({
   return (
     <motion.div
       ref={function setRefs(node: HTMLDivElement | null) {
-        opacityRef.current = node;
+        opacityRef(node);
         elRef(node);
       }}
       style={{

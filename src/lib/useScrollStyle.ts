@@ -36,6 +36,19 @@ export function useScrollStyle<T extends HTMLElement = HTMLElement>(
 
   useMotionValueEvent(opacity, "change", write);
 
+  // A callback ref, not a RefObject: elements that mount conditionally (the
+  // hero's floating "serious." clone remounts whenever the pill is
+  // re-measured) otherwise keep the browser default until the next scroll
+  // event, which leaves them fully opaque if the reader is already parked
+  // past the fade. Writing on attach makes the first paint correct.
+  const setRef = useCallback(
+    function attach(node: T | null) {
+      ref.current = node;
+      if (node) node.style.opacity = String(opacity.get());
+    },
+    [opacity]
+  );
+
   useLayoutEffect(
     function setInitial() {
       write(opacity.get());
@@ -43,7 +56,7 @@ export function useScrollStyle<T extends HTMLElement = HTMLElement>(
     [opacity, write]
   );
 
-  return ref;
+  return setRef;
 }
 
 export default useScrollStyle;
