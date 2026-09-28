@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { duration, ease } from "../lib/motion";
-import { CharRevealInView } from "./CharReveal";
-import MagneticCTA from "./MagneticCTA";
+import { caseStudies } from "../data/caseStudies";
 
 
 const FEATURED = {
@@ -11,143 +10,12 @@ const FEATURED = {
   title: "Realtor outreach automation + website rebuild",
   desc:
     "Custom marketing site + AI agent scraping realtor listings to identify renovation-ready properties, generating personalized outreach at scale.",
-  result: "85%",
-  resultLabel: "Reduction in manual outreach hours",
   href: "/work/cg-walls-and-floors",
 };
 
-const SUPPORTING = [
-  {
-    label: "CareerClarity AI · Automated exam analysis",
-    value: "3.2×",
-    caption: "Student throughput increase after AI-driven test analysis shipped.",
-  },
-  {
-    label: "SIFT · Job platform launch",
-    value: "42%",
-    caption: "ATS-score improvement average after AI resume rewrite.",
-  },
-];
+/** Single source: the study's own record. */
+const FEATURED_FIGURE = caseStudies["cg-walls-and-floors"].headlineFigure;
 
-export default function CaseStudies() {
-  const reduce = useReducedMotion();
-
-  return (
-    <>
-      <section
-        id="work"
-        style={{
-          backgroundColor: "var(--color-dark)",
-          color: "var(--color-parch)",
-          padding: "120px 40px",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div className="grain-dark" aria-hidden="true" />
-
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            position: "relative",
-            zIndex: 2,
-          }}
-        >
-          {/* Section marker */}
-          <motion.div
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
-            className="type-eyebrow"
-            style={{
-              color: "var(--color-muted-l)",
-              marginBottom: 20,
-            }}
-          >
-            //_03 · selected work
-          </motion.div>
-
-          {/* Section title */}
-          <h2
-            className="type-h2 measure-wide"
-            style={{
-              marginBottom: 30,
-              color: "var(--color-parch)",
-            }}
-          >
-            <CharRevealInView
-              segments={[
-                { text: "Recent projects. The rest live" },
-                { text: "in the vault.", accent: true },
-              ]}
-              style={{ color: "var(--color-parch)" }}
-            />
-          </h2>
-
-          <motion.p
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: reduce ? 0 : 0.6, ease: ease.outQuart, delay: 0.2 }}
-            className="type-body-lg measure-body"
-            style={{
-              color: "var(--color-muted-l)",
-              marginBottom: 60,
-            }}
-          >
-            Every project starts with a clear brief and ends with a site your
-            team can actually run — no gatekeeping, no proprietary lock-in,
-            no monthly retainer to change a headline.
-          </motion.p>
-
-          {/* Featured case study */}
-          <FeaturedCard reduce={!!reduce} />
-
-          {/* Supporting stats */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: 40,
-              marginTop: 60,
-            }}
-            className="supporting-grid"
-          >
-            {SUPPORTING.map((stat, i) => (
-              <SupportingStat
-                key={stat.label}
-                stat={stat}
-                index={i}
-                reduce={!!reduce}
-              />
-            ))}
-          </div>
-
-          <motion.div
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart, delay: 0.1 }}
-            style={{ marginTop: 56 }}
-          >
-            <MagneticCTA to="/work" variant="text" size="md" tone="dark">
-              All case studies
-            </MagneticCTA>
-          </motion.div>
-        </div>
-      </section>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .featured-grid { grid-template-columns: 1fr !important; }
-          .supporting-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
-        }
-      `}</style>
-    </>
-  );
-}
 
 export function FeaturedCard({ reduce }: { reduce: boolean }) {
   const [hovered, setHovered] = useState(false);
@@ -309,7 +177,7 @@ export function FeaturedCard({ reduce }: { reduce: boolean }) {
                 letterSpacing: "-0.04em",
               }}
             >
-              {FEATURED.result}
+              {FEATURED_FIGURE?.value}
             </div>
             <div
               style={{
@@ -319,7 +187,7 @@ export function FeaturedCard({ reduce }: { reduce: boolean }) {
                 color: "var(--color-muted-l)",
               }}
             >
-              {FEATURED.resultLabel}
+              {FEATURED_FIGURE?.caption}
             </div>
           </div>
 
@@ -349,68 +217,5 @@ export function FeaturedCard({ reduce }: { reduce: boolean }) {
         </div>
       </div>
     </motion.a>
-  );
-}
-
-type Stat = {
-  label: string;
-  value: string;
-  caption: string;
-};
-
-function SupportingStat({
-  stat,
-  index,
-  reduce,
-}: {
-  stat: Stat;
-  index: number;
-  reduce: boolean;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{
-        duration: reduce ? 0 : 0.7,
-        ease: ease.outQuart,
-        delay: reduce ? 0 : 0.4 + index * 0.1,
-      }}
-    >
-      <div
-        className="type-eyebrow"
-        style={{
-          color: "var(--color-muted-l)",
-          marginBottom: 20,
-        }}
-      >
-        {stat.label}
-      </div>
-      <div
-        className="num-gradient-dark"
-        style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 500,
-          fontSize: "clamp(64px, 8vw, 100px)",
-          lineHeight: 0.9,
-          letterSpacing: "-0.05em",
-          marginBottom: 24,
-        }}
-      >
-        {stat.value}
-      </div>
-      <div
-        style={{
-          fontFamily: "var(--font-body)",
-          fontSize: 15,
-          lineHeight: 1.55,
-          color: "var(--color-muted-l)",
-          maxWidth: 320,
-        }}
-      >
-        {stat.caption}
-      </div>
-    </motion.div>
   );
 }

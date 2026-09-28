@@ -1,24 +1,18 @@
 import { caseStudies, type Pillar } from "./caseStudies";
 
 /**
- * The vault index. Everything except the headline figure comes straight from
- * the case-study records.
+ * The vault index. Every field comes straight from the case-study records,
+ * including the headline figure — home and /work read the same one.
  *
- * Figures: the case-study data has no numeric outcome — `outcome` is prose —
- * so the two published figures are carried over from the home page's own
- * constants. CapitalCommand and CadenceStack have no figure anywhere, and
- * deliberately show none rather than inventing one.
+ * Studies without a published figure fall back to their status, derived from
+ * the tail of their own `year` string ("2026 — internal alpha" → "Internal
+ * alpha"). Nothing is invented.
  */
-const FIGURES: Record<string, { value: string; caption: string }> = {
-  "cg-walls-and-floors": {
-    value: "85%",
-    caption: "Reduction in manual outreach hours",
-  },
-  sift: {
-    value: "42%",
-    caption: "ATS-score improvement average after AI resume rewrite",
-  },
-};
+function statusFrom(year: string) {
+  const tail = year.split("—").pop()?.trim();
+  if (!tail) return undefined;
+  return tail.charAt(0).toUpperCase() + tail.slice(1);
+}
 
 const PREVIEWS: Record<string, { src: string; alt: string }> = {
   "cg-walls-and-floors": {
@@ -46,6 +40,8 @@ export type VaultEntry = {
   year: string;
   pillars: Pillar[];
   figure?: { value: string; caption: string };
+  /** Shown in the figure slot when there is no measured figure. */
+  status?: string;
   preview?: { src: string; alt: string };
   live: boolean;
 };
@@ -59,7 +55,8 @@ export const vault: VaultEntry[] = Object.values(caseStudies)
       sector: study.sector,
       year: study.year,
       pillars: study.pillars,
-      figure: FIGURES[study.slug],
+      figure: study.headlineFigure,
+      status: study.headlineFigure ? undefined : statusFrom(study.year),
       preview: PREVIEWS[study.slug],
       live: study.status === "live",
     };
@@ -72,10 +69,3 @@ export const liveCount = vault.filter(function isLive(e) {
   return e.live;
 }).length;
 
-export const PILLARS: Pillar[] = ["Design", "Automate", "Grow"];
-
-export function countFor(pillar: Pillar | null) {
-  return vault.filter(function matches(e) {
-    return e.live && (pillar === null || e.pillars.includes(pillar));
-  }).length;
-}

@@ -17,6 +17,10 @@ export type CaseStudy = {
     thesisPill: string;
     kicker: string;
   };
+  /** The one measured result worth leading with. Optional: only studies with
+   *  a published number carry it, and home + /work both read it from here so
+   *  the figure has exactly one source. */
+  headlineFigure?: { value: string; caption: string };
   heroImage?: string;
   heroImages?: string[];
   heroCaption?: { eyebrow: string; labels: string[] };
@@ -64,6 +68,10 @@ export const caseStudies: Record<string, CaseStudy> = {
     pillars: ["Design", "Automate", "Grow"],
     sector: "Home renovation, GTA",
     year: "2025 — ongoing",
+    headlineFigure: {
+      value: "85%",
+      caption: "Reduction in manual outreach hours",
+    },
     hero: {
       eyebrow: "//_CASE_STUDY",
       thesis: "A realtor referral engine that runs itself.",
@@ -224,6 +232,10 @@ export const caseStudies: Record<string, CaseStudy> = {
     pillars: ["Design", "Automate"],
     sector: "SaaS — job search",
     year: "2025 — ongoing",
+    headlineFigure: {
+      value: "42%",
+      caption: "ATS-score improvement average after AI resume rewrite.",
+    },
     hero: {
       eyebrow: "//_CASE_STUDY",
       thesis: "A job search built for craft, not volume.",

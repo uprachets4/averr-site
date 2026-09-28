@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { duration, ease, spring } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
@@ -12,10 +12,9 @@ import CursorPreview, {
   usePreloadPreviews,
   type PreviewTarget,
 } from "../components/work/CursorPreview";
-import { vault, liveCount, PILLARS, countFor } from "../data/workIndex";
-import type { Pillar } from "../data/caseStudies";
+import { vault, liveCount } from "../data/workIndex";
 
-const T = { eyebrow: 0.2, h1: 0.32, sub: 0.7, chips: 0.85 };
+const T = { eyebrow: 0.2, h1: 0.32, sub: 0.7 };
 const MOBILE_QUERY = "(max-width: 767px)";
 const FINE_POINTER = "(pointer: fine)";
 
@@ -40,26 +39,9 @@ function useMedia(query: string) {
 
 /* ── hero ──────────────────────────────────────────────────────────── */
 
-function VaultHeader({
-  pillar,
-  setPillar,
-  shown,
-  mobile,
-}: {
-  pillar: Pillar | null;
-  setPillar: (p: Pillar | null) => void;
-  shown: number;
-  mobile: boolean;
-}) {
+function VaultHeader() {
   const reduce = useReducedMotion();
   const d = (v: number) => (reduce ? 0 : v);
-
-  const chips: Array<{ label: string; value: Pillar | null }> = [
-    { label: "All", value: null },
-    ...PILLARS.map(function toChip(p) {
-      return { label: p, value: p as Pillar | null };
-    }),
-  ];
 
   return (
     <section
@@ -87,7 +69,7 @@ function VaultHeader({
           className="type-eyebrow"
           style={{ color: "var(--color-muted)", marginBottom: 28 }}
         >
-          Selected work · {shown} {pillar ? "shown" : "live"}
+          Selected work · {liveCount} live
         </motion.div>
 
         <h1
@@ -104,77 +86,12 @@ function VaultHeader({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: d(0.6), ease: ease.outQuart, delay: d(T.sub) }}
           className="type-body-lg measure-body"
-          style={{ color: "var(--color-muted)", margin: "0 0 48px" }}
+          style={{ color: "var(--color-muted)", margin: 0 }}
         >
           Every project below is real. Numbers are measured, not marketing.
           Descriptions are what happened, not what we wish we had.
         </motion.p>
-
-        <div
-          style={{
-            display: "flex",
-            gap: 10,
-            overflowX: mobile ? "auto" : "visible",
-            scrollSnapType: mobile ? "x proximity" : "none",
-            scrollbarWidth: "none",
-            paddingBottom: mobile ? 4 : 0,
-          }}
-          className="vault-chips"
-          role="group"
-          aria-label="Filter by service"
-        >
-          {chips.map(function drawChip(chip, i) {
-            const selected = pillar === chip.value;
-            return (
-              <motion.button
-                key={chip.label}
-                type="button"
-                onClick={function pick() {
-                  setPillar(chip.value);
-                }}
-                aria-pressed={selected}
-                initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: d(0.4),
-                  ease: ease.outQuart,
-                  delay: d(T.chips + i * 0.06),
-                }}
-                className="type-small"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "10px 18px",
-                  borderRadius: 999,
-                  whiteSpace: "nowrap",
-                  scrollSnapAlign: "start",
-                  cursor: "pointer",
-                  background: selected ? "var(--color-ink)" : "transparent",
-                  color: selected ? "var(--color-parch)" : "var(--color-ink)",
-                  border: `1px solid ${selected ? "var(--color-ink)" : "var(--hair-hi)"}`,
-                  transition: reduce
-                    ? "none"
-                    : `background-color ${duration.base * 1000}ms ease, color ${duration.base * 1000}ms ease, border-color ${duration.base * 1000}ms ease`,
-                }}
-              >
-                {chip.label}
-                <span
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "var(--type-eyebrow-size)",
-                    opacity: 0.6,
-                  }}
-                >
-                  {countFor(chip.value)}
-                </span>
-              </motion.button>
-            );
-          })}
-        </div>
       </div>
-
-      <style>{`.vault-chips::-webkit-scrollbar { display: none; }`}</style>
     </section>
   );
 }
@@ -247,6 +164,11 @@ function VaultRow({
         {entry.figure.caption}
       </div>
     </>
+  ) : entry.status ? (
+    // no measured figure — the study's own status stands in its place
+    <div className="type-h3" style={{ color: "var(--color-muted-l)" }}>
+      {entry.status}
+    </div>
   ) : null;
 
   const inner = (
@@ -362,15 +284,7 @@ function VaultRow({
 
 /* ── the index ─────────────────────────────────────────────────────── */
 
-function VaultIndex({
-  pillar,
-  onClear,
-  mobile,
-}: {
-  pillar: Pillar | null;
-  onClear: () => void;
-  mobile: boolean;
-}) {
+function VaultIndex({ mobile }: { mobile: boolean }) {
   const reduce = useReducedMotion();
   const fine = useMedia(FINE_POINTER);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -381,10 +295,7 @@ function VaultIndex({
   const [target, setTarget] = useState<PreviewTarget>({ kind: "cursor" });
   const [nameRight, setNameRight] = useState(0);
 
-  const rows = vault.filter(function matches(e) {
-    if (!pillar) return true;
-    return e.pillars.includes(pillar);
-  });
+  const rows = vault;
 
   const usePreview = fine && !mobile && !reduce;
 
@@ -410,27 +321,7 @@ function VaultIndex({
           zIndex: 2,
         }}
       >
-        {rows.length === 0 ? (
-          <p className="type-body-lg" style={{ color: "var(--color-muted-l)" }}>
-            Nothing here yet —{" "}
-            <button
-              type="button"
-              onClick={onClear}
-              style={{
-                color: "var(--color-parch)",
-                textDecoration: "underline",
-                background: "none",
-                border: "none",
-                padding: 0,
-                font: "inherit",
-                cursor: "pointer",
-              }}
-            >
-              see all work
-            </button>
-          </p>
-        ) : (
-          rows.map(function drawRow(entry, i) {
+        {rows.map(function drawRow(entry, i) {
             return (
               <VaultRow
                 key={entry.slug}
@@ -460,8 +351,7 @@ function VaultIndex({
                 }}
               />
             );
-          })
-        )}
+        })}
         <div style={{ height: 1, background: "var(--hair-d)" }} />
       </div>
 
@@ -542,13 +432,6 @@ function VaultCloser() {
 
 export default function Work() {
   const mobile = useMedia(MOBILE_QUERY);
-  const [params, setParams] = useSearchParams();
-
-  const raw = params.get("pillar");
-  const pillar =
-    raw && PILLARS.some((p) => p.toLowerCase() === raw.toLowerCase())
-      ? (PILLARS.find((p) => p.toLowerCase() === raw.toLowerCase()) as Pillar)
-      : null;
 
   useEffect(function scrollTopAndTitle() {
     window.scrollTo(0, 0);
@@ -559,33 +442,12 @@ export default function Work() {
     };
   }, []);
 
-  function setPillar(next: Pillar | null) {
-    // the URL is the state, so a filtered view is shareable and back/forward works
-    const p = new URLSearchParams(params);
-    if (next) p.set("pillar", next.toLowerCase());
-    else p.delete("pillar");
-    setParams(p);
-  }
-
-  const shown = pillar ? countFor(pillar) : liveCount;
-
   return (
     <>
-      <VaultHeader
-        pillar={pillar}
-        setPillar={setPillar}
-        shown={shown}
-        mobile={mobile}
-      />
+      <VaultHeader />
 
       <Chapter tone="dark" from="cream">
-        <VaultIndex
-          pillar={pillar}
-          onClear={function clear() {
-            setPillar(null);
-          }}
-          mobile={mobile}
-        />
+        <VaultIndex mobile={mobile} />
       </Chapter>
 
       <Chapter tone="cream" from="dark">

@@ -5,6 +5,7 @@ import { duration, ease } from "../lib/motion";
 import { CharRevealInView } from "./CharReveal";
 import MagneticCTA from "./MagneticCTA";
 import { FeaturedCard } from "./CaseStudies";
+import { caseStudies } from "../data/caseStudies";
 
 /**
  * Every figure below already lived on home — the three project results from
@@ -20,13 +21,24 @@ type Row = {
   href?: string;
 };
 
+/** Split "85%" into the number the counter animates and its suffix. */
+function fromData(slug: string) {
+  const fig = caseStudies[slug].headlineFigure;
+  if (!fig) throw new Error(`${slug} has no headlineFigure`);
+  const m = fig.value.match(/^([\d.]+)(.*)$/);
+  const num = m ? parseFloat(m[1]) : 0;
+  return {
+    target: num,
+    decimals: m && m[1].includes(".") ? 1 : 0,
+    suffix: m ? m[2] : "",
+    caption: fig.caption,
+  };
+}
+
 const ROWS: Row[] = [
   {
     label: "CG Walls & Floors",
-    target: 85,
-    decimals: 0,
-    suffix: "%",
-    caption: "Reduction in manual outreach hours",
+    ...fromData("cg-walls-and-floors"),
     href: "/work/cg-walls-and-floors",
   },
   {
@@ -38,10 +50,7 @@ const ROWS: Row[] = [
   },
   {
     label: "SIFT",
-    target: 42,
-    decimals: 0,
-    suffix: "%",
-    caption: "ATS-score improvement average after AI resume rewrite.",
+    ...fromData("sift"),
     href: "/work/sift",
   },
   {
