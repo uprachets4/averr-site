@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "motion/react";
+import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { ease } from "../../lib/motion";
 import type { ApproachLayout, Pillar } from "../../data/caseStudies";
 import ImageFrame from "./ImageFrame";
@@ -63,6 +64,7 @@ export default function Approach({ entries }: { entries: Entry[] }) {
   const reduce = useReducedMotion();
   return (
     <section
+      id={SECTIONS.approach.id}
       style={{
         backgroundColor: "var(--color-bg-alt)",
         padding: "128px 40px",
@@ -85,9 +87,10 @@ export default function Approach({ entries }: { entries: Entry[] }) {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
+          data-section-heading
           style={{ color: "var(--color-muted)", marginBottom: 24 }}
         >
-          //_02 · approach
+          {eyebrowFor(SECTIONS.approach)}
         </motion.div>
 
         <h2

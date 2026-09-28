@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "motion/react";
+import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { ease } from "../../lib/motion";
 
 
@@ -13,6 +14,7 @@ export default function Inventory({
 
   return (
     <section
+      id={SECTIONS.inventory.id}
       style={{
         backgroundColor: "var(--color-bg)",
         padding: "128px 40px",
@@ -35,12 +37,13 @@ export default function Inventory({
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
+          data-section-heading
           style={{
             color: "var(--color-muted)",
             marginBottom: 24,
           }}
         >
-          //_03 · what we built
+          {eyebrowFor(SECTIONS.inventory)}
         </motion.div>
 
         <motion.h2

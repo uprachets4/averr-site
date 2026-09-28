@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../../lib/motion";
 import ImageFrame from "./ImageFrame";
@@ -25,6 +26,7 @@ export default function Signatures({
 
   return (
     <section
+      id={SECTIONS.signatures.id}
       style={{
         backgroundColor: "var(--color-dark)",
         color: "var(--color-parch)",
@@ -58,9 +60,10 @@ export default function Signatures({
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
             className="type-eyebrow"
+            data-section-heading
             style={{ color: "var(--color-muted-l)", paddingTop: 12 }}
           >
-            //_04 · signature moments
+            {eyebrowFor(SECTIONS.signatures)}
           </motion.div>
 
           <h2

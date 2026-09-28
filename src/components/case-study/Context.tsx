@@ -1,10 +1,12 @@
 import { motion, useReducedMotion } from "motion/react";
+import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { ease } from "../../lib/motion";
 
 export default function Context({ paragraphs }: { paragraphs: string[] }) {
   const reduce = useReducedMotion();
   return (
     <section
+      id={SECTIONS.context.id}
       style={{
         backgroundColor: "var(--color-bg)",
         padding: "128px 40px",
@@ -27,9 +29,10 @@ export default function Context({ paragraphs }: { paragraphs: string[] }) {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
+          data-section-heading
           style={{ color: "var(--color-muted)", marginBottom: 64 }}
         >
-          //_01 · context
+          {eyebrowFor(SECTIONS.context)}
         </motion.div>
 
         <ol style={{ listStyle: "none", padding: 0, margin: 0 }}>

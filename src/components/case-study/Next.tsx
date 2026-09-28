@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "motion/react";
+import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { ease } from "../../lib/motion";
 import MagneticCTA from "../MagneticCTA";
 
@@ -6,6 +7,7 @@ export default function Next({ text }: { text: string }) {
   const reduce = useReducedMotion();
   return (
     <section
+      id={SECTIONS.next.id}
       style={{
         backgroundColor: "var(--color-bg-alt)",
         padding: "128px 40px",
@@ -33,9 +35,10 @@ export default function Next({ text }: { text: string }) {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
+          data-section-heading
           style={{ color: "var(--color-muted)" }}
         >
-          //_06 · what's next
+          {eyebrowFor(SECTIONS.next)}
         </motion.div>
 
         <div>

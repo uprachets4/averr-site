@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "motion/react";
+import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { ease } from "../../lib/motion";
 import type { CaseStudy } from "../../data/caseStudies";
 import { CharRevealInView } from "../CharReveal";
@@ -7,6 +8,7 @@ export default function Outcome({ text }: { text: CaseStudy["outcome"] }) {
   const reduce = useReducedMotion();
   return (
     <section
+      id={SECTIONS.outcome.id}
       style={{
         backgroundColor: "var(--color-dark)",
         color: "var(--color-parch)",
@@ -31,9 +33,10 @@ export default function Outcome({ text }: { text: CaseStudy["outcome"] }) {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
+          data-section-heading
           style={{ color: "var(--color-muted-l)", marginBottom: 40 }}
         >
-          //_05 · outcome
+          {eyebrowFor(SECTIONS.outcome)}
         </motion.div>
 
         <h2

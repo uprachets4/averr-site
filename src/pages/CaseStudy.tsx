@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { caseStudies } from "../data/caseStudies";
 import CaseHero from "../components/case-study/CaseHero";
@@ -9,8 +9,9 @@ import Signatures from "../components/case-study/Signatures";
 import Gallery from "../components/case-study/Gallery";
 import Outcome from "../components/case-study/Outcome";
 import Next from "../components/case-study/Next";
-import ScrollProgress from "../components/case-study/ScrollProgress";
+import ReadingRail from "../components/case-study/ReadingRail";
 import Chapter from "../components/Chapter";
+import { railSections } from "../data/caseSections";
 import FinalCTA from "../components/FinalCTA";
 import NotFound from "./NotFound";
 import ComingSoon from "./ComingSoon";
@@ -32,6 +33,14 @@ export default function CaseStudy() {
     [study, isPublishable]
   );
 
+  // a fresh array each render would restart the rail's scroll listener
+  const sections = useMemo(
+    function chapters() {
+      return railSections({ hasSignatures: !!study && study.signatures.length > 0 });
+    },
+    [study]
+  );
+
   useEffect(
     function scrollTopOnSlug() {
       window.scrollTo(0, 0);
@@ -49,7 +58,10 @@ export default function CaseStudy() {
 
   return (
     <>
-      <ScrollProgress />
+      <ReadingRail
+        sections={sections}
+        tint={study.tint || "var(--color-ink)"}
+      />
       <CaseHero
         hero={study.hero}
         client={study.client}
