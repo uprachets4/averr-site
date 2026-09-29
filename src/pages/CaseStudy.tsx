@@ -88,7 +88,7 @@ export default function CaseStudy() {
         />
       </SectionBoundary>
       <SectionBoundary name={`approach-${study.slug}`}>
-        <Approach entries={study.approach} />
+        <Approach entries={study.approach} tint={study.tint} />
       </SectionBoundary>
       <SectionBoundary name={`inventory-${study.slug}`}>
         <Inventory

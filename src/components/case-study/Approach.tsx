@@ -1,17 +1,96 @@
-import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  type MotionValue,
+} from "motion/react";
 import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { duration, ease } from "../../lib/motion";
 import type { ApproachLayout, Pillar } from "../../data/caseStudies";
 import ImageFrame from "./ImageFrame";
 import { CharRevealInView } from "../CharReveal";
+import { ReadFill } from "./ReadFill";
 
 type Entry = {
   pillar: Pillar;
   body: string;
   image?: string;
   layout?: ApproachLayout;
+  emphasis?: string;
 };
+
+/** First sentence carries the point; the rest is the support. */
+function split(body: string): [string, string] {
+  const m = body.match(/^.*?[.!?](?=\s|$)/);
+  if (!m) return [body, ""];
+  return [m[0], body.slice(m[0].length).trim()];
+}
+
+/**
+ * The pillar name as an outline that fills left to right.
+ *
+ * One scroll-written custom property per block (--fill, 0 → 1). Because it
+ * is scroll-linked rather than a one-shot, walking back up drains it again
+ * with no extra code. The underline rides the same variable.
+ */
+function PillarName({
+  pillar,
+  tint,
+  fillRef,
+}: {
+  pillar: Pillar;
+  tint: string;
+  fillRef?: (node: HTMLElement | null) => void;
+}) {
+  return (
+    <div ref={fillRef} className="pillar-name" style={{ marginBottom: 20 }}>
+      <span
+        className="type-display-xl pillar-name__outline"
+        style={{ color: "var(--color-ink)" }}
+        aria-hidden
+      >
+        {pillar}
+      </span>
+      <span
+        className="type-display-xl pillar-name__fill"
+        style={{ color: "var(--color-ink)" }}
+      >
+        {pillar}
+      </span>
+      <span
+        aria-hidden
+        className="pillar-name__rule"
+        style={{ background: tint, marginTop: 10 }}
+      />
+    </div>
+  );
+}
+
+/** Writes --fill on the block as it approaches and passes the reading line. */
+function useFillProgress(progress: MotionValue<number>, reduce: boolean) {
+  const node = useRef<HTMLElement | null>(null);
+  const write = useCallback(
+    function w(v: number) {
+      if (node.current) node.current.style.setProperty("--fill", String(reduce ? 1 : v));
+    },
+    [reduce]
+  );
+  useEffect(
+    function sub() {
+      write(progress.get());
+      return progress.on("change", write);
+    },
+    [progress, write]
+  );
+  return useCallback(
+    function attach(el: HTMLElement | null) {
+      node.current = el;
+      write(progress.get());
+    },
+    [progress, write]
+  );
+}
 
 const COUNT_WORD = ["No", "One", "Two", "Three", "Four", "Five", "Six"];
 
@@ -20,20 +99,6 @@ function headline(n: number) {
   const word = COUNT_WORD[n] ?? String(n);
   return `${word} ${n === 1 ? "pillar" : "pillars"}, one plan.`;
 }
-
-const pillarChipStyle: React.CSSProperties = {
-  display: "inline-block",
-  padding: "6px 14px",
-  borderRadius: 999,
-  border: "1px solid var(--hair-hi)",
-  background: "transparent",
-  color: "var(--color-ink-soft)",
-  fontFamily: "var(--font-mono)",
-  fontSize: 11,
-  letterSpacing: "0.14em",
-  textTransform: "uppercase" as const,
-  marginBottom: 20,
-};
 
 function GeometricAnchor({ pillar }: { pillar: Pillar }) {
   // Muted geometric fallback when no image is provided
@@ -84,7 +149,14 @@ function GeometricAnchor({ pillar }: { pillar: Pillar }) {
    ApproachLayout union rather than being deleted.
    ═══════════════════════════════════════════════════════════════ */
 
-export default function Approach({ entries }: { entries: Entry[] }) {
+export default function Approach({
+  entries,
+  tint,
+}: {
+  entries: Entry[];
+  tint?: string;
+}) {
+  const accent = tint || "var(--color-ink)";
   const reduce = useReducedMotion();
   const [desktop, setDesktop] = useState(false);
   const [active, setActive] = useState(0);
@@ -204,7 +276,7 @@ export default function Approach({ entries }: { entries: Entry[] }) {
                       justifyContent: "center",
                     }}
                   >
-                    <BlockText entry={entry} active={i === idx} />
+                    <BlockText entry={entry} active={i === idx} tint={accent} />
                   </div>
                 );
               })}
@@ -240,6 +312,7 @@ export default function Approach({ entries }: { entries: Entry[] }) {
                   key={`${entry.pillar}-${i}`}
                   entry={entry}
                   reduce={!!reduce}
+                  tint={accent}
                 />
               );
             })}
@@ -252,21 +325,61 @@ export default function Approach({ entries }: { entries: Entry[] }) {
 
 /* ── the copy ───────────────────────────────────────────────────── */
 
-function BlockText({ entry, active }: { entry: Entry; active: boolean }) {
+function BlockText({
+  entry,
+  active,
+  tint,
+}: {
+  entry: Entry;
+  active: boolean;
+  tint: string;
+}) {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [statement, support] = split(entry.body);
+
+  // fills as the block comes up to the reading line, drains as it leaves
+  const { scrollYProgress: fill } = useScroll({
+    target: ref,
+    offset: ["start 0.85", "center 0.45"],
+  });
+  const { scrollYProgress: read } = useScroll({
+    target: ref,
+    offset: ["start 0.8", "end 0.5"],
+  });
+  const attachFill = useFillProgress(fill, !!reduce);
+
   return (
-    <motion.div
-      animate={{ opacity: active || reduce ? 1 : 0.45 }}
-      transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
-    >
-      <span style={pillarChipStyle}>{entry.pillar}</span>
-      <p
-        className="type-body-lg"
-        style={{ color: "var(--color-ink)", maxWidth: 560, margin: 0 }}
+    <div ref={ref}>
+      <PillarName pillar={entry.pillar} tint={tint} fillRef={attachFill} />
+
+      <motion.div
+        animate={{ opacity: active || reduce ? 1 : 0.45 }}
+        transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
       >
-        {entry.body}
-      </p>
-    </motion.div>
+        <ReadFill
+          as="div"
+          text={statement}
+          progress={read}
+          reduce={!!reduce}
+          tint={tint}
+          emphasis={entry.emphasis}
+          className="type-h3"
+          style={{ color: "var(--color-ink)", maxWidth: 560 }}
+        />
+        {support ? (
+          <ReadFill
+            text={support}
+            progress={read}
+            reduce={!!reduce}
+            tint={tint}
+            emphasis={entry.emphasis}
+            className="type-body"
+            style={{ color: "var(--color-muted)", maxWidth: 560, marginTop: 16 }}
+          />
+        ) : null}
+      </motion.div>
+    </div>
   );
 }
 
@@ -399,9 +512,24 @@ function Shot({ entry }: { entry: Entry }) {
 
 /* ── mobile / reduced motion ────────────────────────────────────── */
 
-function StackedBlock({ entry, reduce }: { entry: Entry; reduce: boolean }) {
+function StackedBlock({
+  entry,
+  reduce,
+  tint,
+}: {
+  entry: Entry;
+  reduce: boolean;
+  tint: string;
+}) {
+  const [statement, support] = split(entry.body);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const { scrollYProgress: read } = useScroll({
+    target: ref,
+    offset: ["start 0.9", "end 0.6"],
+  });
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
@@ -424,10 +552,47 @@ function StackedBlock({ entry, reduce }: { entry: Entry; reduce: boolean }) {
           </div>
         </ImageFrame>
       </div>
-      <span style={pillarChipStyle}>{entry.pillar}</span>
-      <p className="type-body-lg" style={{ color: "var(--color-ink)", margin: 0 }}>
-        {entry.body}
-      </p>
+      {/* mobile fills the name once, on entry */}
+      <motion.div
+        className="pillar-name"
+        initial={{ opacity: 1 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-25%" }}
+        ref={function mark(node: HTMLDivElement | null) {
+          if (node) node.style.setProperty("--fill", "1");
+        }}
+        style={{ marginBottom: 16 }}
+      >
+        <span className="type-display-l pillar-name__outline" aria-hidden style={{ color: "var(--color-ink)" }}>
+          {entry.pillar}
+        </span>
+        <span className="type-display-l pillar-name__fill" style={{ color: "var(--color-ink)" }}>
+          {entry.pillar}
+        </span>
+        <span aria-hidden className="pillar-name__rule" style={{ background: tint, marginTop: 8 }} />
+      </motion.div>
+
+      <ReadFill
+        as="div"
+        text={statement}
+        progress={read}
+        reduce={reduce}
+        tint={tint}
+        emphasis={entry.emphasis}
+        className="type-h3"
+        style={{ color: "var(--color-ink)" }}
+      />
+      {support ? (
+        <ReadFill
+          text={support}
+          progress={read}
+          reduce={reduce}
+          tint={tint}
+          emphasis={entry.emphasis}
+          className="type-body"
+          style={{ color: "var(--color-muted)", marginTop: 12 }}
+        />
+      ) : null}
     </motion.div>
   );
 }

@@ -34,7 +34,14 @@ export type CaseStudy = {
   /** One verbatim phrase per context paragraph, highlighted as it is read.
    *  Parallel to `context`; a phrase that isn't a substring is ignored. */
   contextEmphasis?: string[];
-  approach: { pillar: Pillar; body: string; image?: string; layout?: ApproachLayout }[];
+  approach: {
+    pillar: Pillar;
+    body: string;
+    image?: string;
+    layout?: ApproachLayout;
+    /** A verbatim phrase from `body`, highlighted as the block is read. */
+    emphasis?: string;
+  }[];
   inventory: string[];
   /** A short label per inventory item, built only from that item's own
    *  words. Parallel to `inventory`. */
@@ -124,17 +131,20 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         pillar: "Design",
         body: "A single-page site that opens with the work, not the company. Cormorant Garamond display, copper accent — deliberately positioned to read like a boutique interior firm, not a Kijiji handyman.",
+        emphasis: "opens with the work, not the company",
         image: "/work/cgwalls/testimonials.jpg",
       },
       {
         pillar: "Automate",
         body: "A realtor activity monitor that surfaces which properties are about to hit market and need pre-listing touch-ups, plus an outreach system that drafts personalized emails per realtor, per listing.",
+        emphasis: "personalized emails per realtor, per listing",
         image: "/work/cgwalls/gallery.jpg",
       },
       {
         pillar: "Grow",
         body: 'A Durham Region door-to-door playbook covering 29 neighbourhoods tier-ranked by home era and density, Google Business Profile optimization, and a single repeatable "free estimate" CTA baked into every touchpoint.',
         image: "/work/cgwalls/gallery2.jpg",
+        emphasis: "29 neighbourhoods tier-ranked by home era and density",
       },
     ],
     inventory: [
@@ -206,11 +216,13 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         pillar: "Design",
         body: "CapitalCommand demonstrates product UI and systems design across a dense financial application. The interface covers Overview, Markets, Portfolio, IPO Intelligence, Signal Desk, Research Lab, Risk Center, and System Health without reducing each area to a disconnected dashboard. Information hierarchy, confidence states, source freshness, exposure, and system status are treated as parts of the same decision environment.",
+        emphasis: "a dense financial application",
         image: "/work/capitalcommand/02-portfolio.jpg",
       },
       {
         pillar: "Automate",
         body: "Scheduled research jobs, IPO refresh and classification workflows, signal processing, portfolio calculations, alerts, notification records, audit logging, and health monitoring. Redis and BullMQ handle durable jobs, retries, leases, dead letters, and replay. A server-side OpenAI adapter exists behind feature flags and strict output validation, but AI and external provider calls remain disabled by default.",
+        emphasis: "durable jobs, retries, leases, dead letters, and replay",
         image: "/work/capitalcommand/04-ipo-intelligence.jpg",
       },
     ],
@@ -325,11 +337,13 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         pillar: "Design",
         body: "Dark-first UI, sodium amber (#F2A93C) as the primary accent, Instrument Serif in the display, Geist for the interface, Geist Mono where numbers or identifiers appear. Deliberate departure from the blue-and-white productivity-SaaS default. shadcn/ui as primitive scaffolding, not as identity — every card, table, and modal styled to SIFT's own system. Dark-first was a call about the actual user: job-seekers work on this at night, on their own time.",
+        emphasis: "sodium amber (#F2A93C) as the primary accent",
         image: "/work/sift/02-tailor-resume.jpg",
       },
       {
         pillar: "Automate",
         body: "The entire product is automation. Cron-driven daily sync across every connected job source. AI scoring on each new posting against the user's confirmed resume, running post-response via Vercel's after() API so the UI never waits. AI resume rewriting per job to close the ATS keyword gap. AI cover letter generation. The user's job is to review, not to grind.",
+        emphasis: "entire product is automation",
         image: "/work/sift/06-funnel.jpg",
       },
     ],
@@ -433,18 +447,21 @@ export const caseStudies: Record<string, CaseStudy> = {
         pillar: "Design",
         layout: "text-then-image-full",
         body: "CadenceStack required a product system, not a prompt box. The interface makes editorial state visible: what is only an idea, what needs work, what is ready, what has been published, and what the system recommends next. The composer, Structure Guide, review states, Presence Score, personalized roadmap, onboarding, performance views, and founder controls all sit as first-class product surfaces — not settings buried in a sidebar.",
+        emphasis: "a product system, not a prompt box",
         image: "/work/cadencestack/02-content-pillars.jpg",
       },
       {
         pillar: "Automate",
         layout: "text-then-image-full",
         body: "The drafting path sits behind server-side gates, authentication, quotas, validation, timeouts, telemetry, and fail-closed provider handling. Supabase holds the persistent product state. The productized path is provider-neutral, with a direct OpenAI adapter live in the application and Claude used in the earlier operator-side research workflow. Trigger.dev and ClickUp move operator work through research, drafting, visual production, and completion.",
+        emphasis: "fail-closed provider handling",
         image: "/work/cadencestack/03-content-pipeline.jpg",
       },
       {
         pillar: "Grow",
         layout: "text-then-image-full",
         body: "CadenceStack encodes an actual LinkedIn operating model — the 7S Methodology, five editorial pillars, hook patterns, content rotation, publishing states, and a performance-learning loop. The objective is not to publish more often at any cost. It is to build a recognizable body of work without repeating the same point until it becomes wallpaper.",
+        emphasis: "an actual LinkedIn operating model",
         image: "/work/cadencestack/04-performance-analytics.jpg",
       },
     ],
