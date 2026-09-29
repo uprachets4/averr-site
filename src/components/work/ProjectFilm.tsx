@@ -213,9 +213,11 @@ function Segment({
   // a slow drift across the segment; the frame never leaves the stage
   const drift = reduce ? 1 : 1 + within * 0.03;
 
-  function open(e: React.MouseEvent) {
+  // MagneticCTA's onClick hands the event as optional, so guard it: with no
+  // event there is nothing to preventDefault and the Link should just run.
+  function open(e?: React.MouseEvent | React.FormEvent) {
     const el = frameRef.current;
-    if (!onOpen || !el || !entry.live) return;
+    if (!onOpen || !el || !entry.live || !e) return;
     if (onOpen(entry, el.getBoundingClientRect())) e.preventDefault();
   }
 

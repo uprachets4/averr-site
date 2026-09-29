@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigationType } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
-import { duration, ease } from "../lib/motion";
+import { ease } from "../lib/motion";
 import Chapter from "../components/Chapter";
 import MagneticCTA from "../components/MagneticCTA";
 import { CharRevealInView } from "../components/CharReveal";
