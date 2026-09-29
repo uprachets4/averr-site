@@ -276,7 +276,12 @@ function ServicesHeader() {
             delay={0.3}
             segments={[
               { text: "Three services. " },
-              { text: "One studio", accent: true },
+              // NBSP, not a space: CharReveal lays out each WORD as an
+              // inline-block, so a plain space lets the line break between
+              // "One" and "studio" and strands the accent across two lines.
+              // Bound, it stays one token — the composition this hero was
+              // built with. It measures well inside the column at 375.
+              { text: "One\u00A0studio", accent: true },
               { text: " behind them all." },
             ]}
           />
