@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**108 commits ahead of `main`**) |
-| **HEAD** | `4642136` — *"17-fix (1b): keep ILLUSTRATIVE legible on the stacked stills"* |
-| **Tip after this doc** | the `17-fix (2): log Session 17 in the handoff` commit (hash reported in chat) |
+| **HEAD** | `ea20a63` — *"17-fix (2): log Session 17 and the stacked-ambient fix in the handoff"* |
+| **Tip after this doc** | `ea20a63` is the tip; this doc is current as of it. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -95,7 +95,7 @@ Every hash below verified against `git log`.
 
 Prachets's rulings: 20 minutes is the canonical call length (a sweep found /contact and ComingSoon already agreeing — nothing changed); "fixed price" and "up to 15 pages" stay as scope promises, not prices.
 
-**17-fix** `a9ef74a` `4642136` — `StackedPillar` (< 900px, and **any** width under reduced motion) rendered no ambient at all, so reduced-motion readers lost all three visuals instead of getting a real final state, and `AutomatePipeline`'s reduce branch was unreachable. `AmbientVisual` gained `frozen`, and `StaticAmbient` feeds it progress pinned at 1 so every scroll-linked transform resolves to its end value. The stills are **scaled** to the column, not reflowed — the compositions are authored in fixed px and a 0–400 SVG space and do not survive squeezing — and the ILLUSTRATIVE label is printed at full size *outside* the scaled box, because at 375 the still runs ~0.45 and a label inside it landed near 5px.
+**17-fix** `a9ef74a` `4642136` `ea20a63` — `StackedPillar` (< 900px, and **any** width under reduced motion) rendered no ambient at all, so reduced-motion readers lost all three visuals instead of getting a real final state, and `AutomatePipeline`'s reduce branch was unreachable. `AmbientVisual` gained `frozen`, and `StaticAmbient` feeds it progress pinned at 1 so every scroll-linked transform resolves to its end value. The stills are **scaled** to the column, not reflowed — the compositions are authored in fixed px and a 0–400 SVG space and do not survive squeezing — and the ILLUSTRATIVE label is printed at full size *outside* the scaled box, because at 375 the still runs ~0.45 and a label inside it landed near 5px.
 
 ---
 
