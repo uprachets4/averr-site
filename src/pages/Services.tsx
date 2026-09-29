@@ -1203,7 +1203,10 @@ function AmbientVisual({
   /** Render the ambient as a still. The stacked path passes a progress value
    *  pinned at 1 and sets this, so every ambient paints its finished state
    *  with nothing running — the diagram's own reduced-motion branches are
-   *  exactly the stills we want, so `frozen` reuses them. */
+   *  exactly the stills we want, so `frozen` reuses them.
+   *  A frozen ambient also drops its own ILLUSTRATIVE label: the still is
+   *  scaled down to the column, which would shrink the label with it, so
+   *  StaticAmbient prints it at full size outside the scaled box instead. */
   frozen?: boolean;
 }) {
   const reduce = useReducedMotion() || frozen;
@@ -1220,6 +1223,7 @@ function AmbientVisual({
       <AutomateWorkflow
         scrollYProgress={scrollYProgress}
         reduce={!!reduce}
+        frozen={frozen}
       />
     );
   }
@@ -1227,9 +1231,13 @@ function AmbientVisual({
     <GrowDashboard
       scrollYProgress={scrollYProgress}
       reduce={!!reduce}
+      frozen={frozen}
     />
   );
 }
+
+/** Pillars whose ambient shows sample figures and must carry the label. */
+const ILLUSTRATIVE_PILLARS: Array<Pillar["id"]> = ["automate", "grow"];
 
 /** The width every ambient is composed against. The stacked column is
  *  narrower than this on phones, so the still is scaled down to fit rather
@@ -1268,28 +1276,47 @@ function StaticAmbient({ pillar }: { pillar: Pillar["id"] }) {
   }, []);
 
   return (
-    <div
-      ref={hostRef}
-      aria-hidden
-      style={{
-        width: "100%",
-        height: AMBIENT_BASE * scale,
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
+    <div>
+      {/* Outside the scaled box, so it stays readable however far the still
+          is scaled down. At 375 the still runs at ~0.45 and a label inside
+          it would land near 5px, which does not carry rule 12. */}
+      {ILLUSTRATIVE_PILLARS.includes(pillar) ? (
+        <div
+          className="type-eyebrow"
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--color-muted-2)",
+            textAlign: "right",
+            marginBottom: 8,
+          }}
+        >
+          {ILLUSTRATIVE_LABEL}
+        </div>
+      ) : null}
+
       <div
+        ref={hostRef}
+        aria-hidden
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: AMBIENT_BASE,
-          height: AMBIENT_BASE,
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
+          width: "100%",
+          height: AMBIENT_BASE * scale,
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <AmbientVisual pillar={pillar} scrollYProgress={progress} frozen />
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: AMBIENT_BASE,
+            height: AMBIENT_BASE,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+          }}
+        >
+          <AmbientVisual pillar={pillar} scrollYProgress={progress} frozen />
+        </div>
       </div>
     </div>
   );
@@ -1723,9 +1750,12 @@ const WORKFLOW_EDGES: Array<{ from: number; to: number; path: string }> = [
 function AutomateWorkflow({
   scrollYProgress,
   reduce,
+  frozen = false,
 }: {
   scrollYProgress: MotionValue<number>;
   reduce: boolean;
+  /** StaticAmbient prints the label at full size outside the scaled still. */
+  frozen?: boolean;
 }) {
   const parallax = useCursorParallax(reduce, 16);
   const scrollHintOpacity = useTransform(
@@ -1857,18 +1887,20 @@ function AutomateWorkflow({
           place; the chips are labelled for what they are instead. */}
       <AutomatePipeline reduce={reduce} />
 
-      <div
-        className="type-eyebrow"
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          color: "var(--color-muted-2)",
-          pointerEvents: "none",
-        }}
-      >
-        {ILLUSTRATIVE_LABEL}
-      </div>
+      {frozen ? null : (
+        <div
+          className="type-eyebrow"
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            color: "var(--color-muted-2)",
+            pointerEvents: "none",
+          }}
+        >
+          {ILLUSTRATIVE_LABEL}
+        </div>
+      )}
 
       <ScrollHint opacity={scrollHintOpacity} reduce={reduce} />
     </div>
@@ -1977,9 +2009,12 @@ function WorkflowLabel({
 function GrowDashboard({
   scrollYProgress,
   reduce,
+  frozen = false,
 }: {
   scrollYProgress: MotionValue<number>;
   reduce: boolean;
+  /** StaticAmbient prints the label at full size outside the scaled still. */
+  frozen?: boolean;
 }) {
   const parallax = useCursorParallax(reduce, 12);
   const captionOpacity = useTransform(
@@ -2021,20 +2056,22 @@ function GrowDashboard({
       />
 
       {/* these are sample figures, not a client result — say so on the face */}
-      <div
-        className="type-eyebrow"
-        style={{
-          position: "absolute",
-          top: 10,
-          right: 12,
-          zIndex: 3,
-          fontFamily: "var(--font-mono)",
-          color: "var(--color-muted-2)",
-          pointerEvents: "none",
-        }}
-      >
-        {ILLUSTRATIVE_LABEL}
-      </div>
+      {frozen ? null : (
+        <div
+          className="type-eyebrow"
+          style={{
+            position: "absolute",
+            top: 10,
+            right: 12,
+            zIndex: 3,
+            fontFamily: "var(--font-mono)",
+            color: "var(--color-muted-2)",
+            pointerEvents: "none",
+          }}
+        >
+          {ILLUSTRATIVE_LABEL}
+        </div>
+      )}
 
       <motion.div
         style={{
