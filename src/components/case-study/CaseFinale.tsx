@@ -176,83 +176,49 @@ export default function CaseFinale({ slug }: { slug: string }) {
               />
             ) : null}
 
-            {/* a scrim so the CTA never reads as part of the client's own UI */}
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: "35%",
-                background:
-                  "linear-gradient(to bottom, rgba(244,240,230,0) 0%, rgba(244,240,230,0.78) 55%, rgba(244,240,230,0.94) 100%)",
-                pointerEvents: "none",
-              }}
-            />
-
-            {/* the whole image is clickable, but only the CTA takes a tab stop */}
+            {/* the image is a link too, but never a tab stop */}
             <Link
               to={`/work/${next.slug}`}
               aria-hidden="true"
               tabIndex={-1}
               style={{ position: "absolute", inset: 0 }}
             />
-
-            <div
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: "35%",
-                display: "flex",
-                alignItems: "center",
-                pointerEvents: "none",
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  maxWidth: "var(--container-wide)",
-                  // --container-wide already subtracts the gutter; adding
-                  // padding here would inset the CTA twice
-                  margin: "0 auto",
-                  textAlign: "left",
-                }}
-              >
-                <div
-                  className="type-eyebrow"
-                  style={{ color: "var(--color-muted)", marginBottom: 12 }}
-                >
-                  {next.client}
-                </div>
-                <div style={{ pointerEvents: "auto", display: "inline-block" }}>
-                  <MagneticCTA to={`/work/${next.slug}`} variant="primary">
-                    {`Continue to ${next.client}`}
-                  </MagneticCTA>
-                </div>
-              </div>
-            </div>
           </motion.div>
         </div>
       </section>
+
+      {/* the label + CTA sit under the image on clean cream, aligned to the
+          container — over the screenshot they read as the client's own UI */}
+      <div style={{ backgroundColor: "var(--color-bg)", padding: "48px 0 0" }}>
+        <div style={{ maxWidth: "var(--container-wide)", margin: "0 auto" }}>
+          <div
+            className="type-eyebrow"
+            style={{ color: "var(--color-muted)", marginBottom: 16 }}
+          >
+            Next case study · {next.client}
+          </div>
+          <MagneticCTA to={`/work/${next.slug}`} variant="primary">
+            {`Continue to ${next.client}`}
+          </MagneticCTA>
+        </div>
+      </div>
 
       {/* the only booking CTA at the end of a case study */}
       <div
         style={{
           backgroundColor: "var(--color-bg)",
           padding: "40px 0 96px",
-          textAlign: "center",
         }}
       >
-        <Link
-          to="/contact"
-          className="type-small case-finale__skip"
-          style={{ color: "var(--color-muted)" }}
-        >
-          Or skip ahead — book a discovery call
-        </Link>
+        <div style={{ maxWidth: "var(--container-wide)", margin: "0 auto" }}>
+          <Link
+            to="/contact"
+            className="type-small case-finale__skip"
+            style={{ color: "var(--color-muted)" }}
+          >
+            Or skip ahead — book a discovery call
+          </Link>
+        </div>
       </div>
 
       <style>{`
