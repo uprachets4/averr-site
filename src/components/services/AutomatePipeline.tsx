@@ -103,12 +103,25 @@ const CHIP_STYLE: React.CSSProperties = {
   pointerEvents: "none",
 };
 
+/**
+ * Geometry that has to agree with the SVG underneath.
+ *
+ * The nodes are r=20 in a 0–400 viewBox, so they render at 0.1 × the host's
+ * width — 72px across at the 720px ambient. The halo has to sit OUTSIDE
+ * that or it reads as a second outline on the node rather than a pulse.
+ */
+const HOST_REF_W = 720;
+const HALO_SIZE = 104;
+/** Chips ride this far above the path. The node labels sit 32px below each
+ *  node centre, so a chip centred on the path lands right on top of them. */
+const CHIP_LIFT = -26;
+
 const HALO_STYLE: React.CSSProperties = {
   position: "absolute",
   left: 0,
   top: 0,
-  width: 54,
-  height: 54,
+  width: HALO_SIZE,
+  height: HALO_SIZE,
   borderRadius: "50%",
   border: "1px solid var(--color-ink)",
   opacity: 0,
@@ -164,7 +177,8 @@ export default function AutomatePipeline({ reduce }: { reduce: boolean }) {
           if (phase < FADE) opacity = phase / FADE;
           else if (phase > 1 - FADE) opacity = (1 - phase) / FADE;
 
-          el.style.transform = `translate(${u * w}px, ${v * h}px) translate(-50%, -50%)`;
+          const lift = CHIP_LIFT * (w / HOST_REF_W);
+          el.style.transform = `translate(${u * w}px, ${v * h + lift}px) translate(-50%, -50%)`;
           el.style.opacity = String(opacity);
 
           if (labelCache.current[i] !== label) {
@@ -183,8 +197,11 @@ export default function AutomatePipeline({ reduce }: { reduce: boolean }) {
           }
           const lit = nearest < PULSE_RANGE ? 1 - nearest / PULSE_RANGE : 0;
           const { u, v } = NODE_POS[n];
-          halo.style.opacity = String(lit * 0.5);
-          halo.style.transform = `translate(${u * w}px, ${v * h}px) translate(-50%, -50%) scale(${1 + lit * 0.28})`;
+          // The halo is authored at HOST_REF_W and scaled to the real host,
+          // so it keeps its ring-outside-the-node relationship at any width.
+          const s = (w / HOST_REF_W) * (1 + lit * 0.18);
+          halo.style.opacity = String(lit * 0.42);
+          halo.style.transform = `translate(${u * w}px, ${v * h}px) translate(-50%, -50%) scale(${s})`;
         }
 
         raf = requestAnimationFrame(frame);
@@ -233,7 +250,8 @@ export default function AutomatePipeline({ reduce }: { reduce: boolean }) {
                 ...CHIP_STYLE,
                 left: `${u * 100}%`,
                 top: `${v * 100}%`,
-                transform: "translate(-50%, -50%)",
+                // same lift as the moving chips, clearing the node labels
+                transform: `translate(-50%, calc(-50% + ${CHIP_LIFT}px))`,
               }}
             >
               {label}
