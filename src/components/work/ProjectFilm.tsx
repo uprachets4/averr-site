@@ -14,6 +14,25 @@ function rgba(hex: string | undefined, a: number) {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
 }
 
+function useMedia(query: string) {
+  const [matches, setMatches] = useState(false);
+  useEffect(
+    function watch() {
+      const mq = window.matchMedia(query);
+      setMatches(mq.matches);
+      function onChange(e: MediaQueryListEvent) {
+        setMatches(e.matches);
+      }
+      mq.addEventListener("change", onChange);
+      return function cleanup() {
+        mq.removeEventListener("change", onChange);
+      };
+    },
+    [query]
+  );
+  return matches;
+}
+
 /** Segment index under the middle of the viewport, plus travel within it. */
 function useSegment(count: number, enabled: boolean) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -29,9 +48,12 @@ function useSegment(count: number, enabled: boolean) {
         const el = ref.current;
         if (!el) return;
         const r = el.getBoundingClientRect();
-        const seg = r.height / count;
-        // how far the stage has travelled past the top of the wrapper
-        const travelled = Math.min(Math.max(-r.top, 0), r.height - 1);
+        // the stage is pinned for (wrapper - one viewport); dividing the
+        // wrapper itself would end the pin exactly as the last segment
+        // began, so the final project only ever showed on the way out
+        const pinned = Math.max(1, r.height - window.innerHeight);
+        const seg = pinned / count;
+        const travelled = Math.min(Math.max(-r.top, 0), pinned - 1);
         const index = Math.min(count - 1, Math.floor(travelled / seg));
         setState({ index, within: (travelled - index * seg) / seg });
       }
@@ -107,7 +129,7 @@ export default function ProjectFilm({
       const el = ref.current;
       if (!el) return;
       const top = el.getBoundingClientRect().top + window.scrollY;
-      const seg = el.offsetHeight / count;
+      const seg = Math.max(1, el.offsetHeight - window.innerHeight) / count;
       window.scrollTo({
         top: top + i * seg + 8,
         behavior: reduce ? "auto" : "smooth",
@@ -132,7 +154,7 @@ export default function ProjectFilm({
   }
 
   return (
-    <div ref={ref} style={{ position: "relative", height: `${count * 100}vh` }}>
+    <div ref={ref} style={{ position: "relative", height: `${(count + 1) * 100}vh` }}>
       <div
         data-tone="dark"
         className="film-stage"
@@ -210,6 +232,17 @@ function Segment({
   onOpen?: (entry: VaultEntry, rect: DOMRect) => boolean;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
+  // The screen takes ~64% of the container, so the name column is narrow.
+  // CharReveal lays words out as inline-blocks, so a name too wide for the
+  // column puts one word per line: "CG Walls & Floors" ran to four lines and
+  // overflowed the stage. Long names step down a tier (or two) to fit.
+  const bigName = useMedia("(min-width: 1500px)");
+  const nameClass =
+    entry.name.length > 14
+      ? "type-h1"
+      : bigName
+        ? "type-display-xl"
+        : "type-display-l";
   // a slow drift across the segment; the frame never leaves the stage
   const drift = reduce ? 1 : 1 + within * 0.03;
 
@@ -247,9 +280,9 @@ function Segment({
           margin: "0 auto",
           paddingRight: reserve,
           display: "grid",
-          gridTemplateColumns: "minmax(0, 34fr) minmax(0, 66fr)",
+          gridTemplateColumns: "minmax(0, 27fr) minmax(0, 73fr)",
           alignItems: "center",
-          gap: 56,
+          gap: 48,
         }}
         className="film-grid"
       >
@@ -278,7 +311,7 @@ function Segment({
           </div>
 
           <h2
-            className="type-display-xl"
+            className={nameClass}
             style={{
               color: entry.live ? "var(--color-parch)" : "rgba(237,233,226,0.45)",
               margin: "0 0 24px",
@@ -462,14 +495,33 @@ const FilmIndex = forwardRef<HTMLElement, {
   active: number;
   onPick: (i: number) => void;
 }>(function FilmIndex({ entries, active, onPick }, ref) {
-  const tint = entries[active]?.live ? entries[active].tint : undefined;
+  const reduce = useReducedMotion();
+  const [expanded, setExpanded] = useState(false);
+  const activeEntry = entries[active];
+  const tint = activeEntry?.live ? activeEntry.tint : "#8A8377";
   const p = entries.length > 1 ? active / (entries.length - 1) : 1;
+  const open = expanded || !!reduce;
+
+  const ease_ = `cubic-bezier(${ease.outQuart.join(",")})`;
+  const t = reduce ? "none" : `all ${duration.base * 1000}ms ${ease_}`;
 
   return (
     <nav
       ref={ref}
       aria-label="Projects"
       className="film-index"
+      onMouseEnter={function enter() {
+        setExpanded(true);
+      }}
+      onMouseLeave={function leave() {
+        setExpanded(false);
+      }}
+      onFocusCapture={function focus() {
+        setExpanded(true);
+      }}
+      onBlurCapture={function blur(e: React.FocusEvent) {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setExpanded(false);
+      }}
       style={{
         position: "absolute",
         top: "50%",
@@ -477,11 +529,65 @@ const FilmIndex = forwardRef<HTMLElement, {
         transform: "translateY(-50%)",
         zIndex: 5,
         display: "flex",
-        gap: 14,
+        gap: 12,
         alignItems: "stretch",
       }}
     >
+      {/* The names sit OUT of flow, to the left of the dots: in flow they
+          would keep the collapsed column as wide as the longest name, and
+          the lane they cost is exactly what this change is freeing. A soft
+          scrim keeps them readable where they cross the screenshot. */}
       <ol
+        style={{
+          listStyle: "none",
+          margin: 0,
+          padding: 0,
+          position: "absolute",
+          right: "100%",
+          top: "50%",
+          transform: "translateY(-50%)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 14,
+          alignItems: "flex-end",
+          justifyContent: "center",
+          transition: t,
+          pointerEvents: "none",
+        }}
+      >
+        {entries.map(function row(e, i) {
+          const on = i === active;
+          const shown = open || on;
+          return (
+            <li key={e.slug} style={{ display: "flex", alignItems: "center" }}>
+              <span
+                aria-hidden={!shown}
+                className="type-eyebrow"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  color: "var(--color-parch)",
+                  opacity: shown ? (on ? 1 : 0.55) : 0,
+                  transform: shown ? "translateX(0)" : "translateX(10px)",
+                  transition: t,
+                  whiteSpace: "nowrap",
+                  pointerEvents: "none",
+                  // the names cross the screenshot, so they carry their own
+                  // ground — our chrome should never read as the client's UI
+                  background: "rgba(20,20,18,0.72)",
+                  padding: "3px 10px",
+                  borderRadius: 4,
+                }}
+              >
+                {e.name}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+
+      {/* the dots are the controls */}
+      <ol
+        className="film-index__dots"
         style={{
           listStyle: "none",
           margin: 0,
@@ -489,43 +595,30 @@ const FilmIndex = forwardRef<HTMLElement, {
           display: "flex",
           flexDirection: "column",
           gap: 14,
-          alignItems: "flex-end",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {entries.map(function row(e, i) {
+        {entries.map(function dot(e, i) {
           const on = i === active;
           return (
-            <li key={e.slug} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <li key={e.slug} style={{ display: "flex", alignItems: "center", height: 19 }}>
               <button
                 type="button"
+                aria-label={e.name}
+                aria-current={on ? "true" : undefined}
                 onClick={function pick() {
                   onPick(i);
                 }}
-                className="type-eyebrow"
-                aria-current={on ? "true" : undefined}
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  color: "var(--color-parch)",
-                  opacity: on ? 1 : 0.45,
-                  background: "none",
-                  border: "none",
+                  width: 9,
+                  height: 9,
                   padding: 0,
-                  textAlign: "right",
-                  transition: `opacity ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
-                }}
-              >
-                {e.name}
-              </button>
-              <span
-                aria-hidden
-                style={{
-                  width: 6,
-                  height: 6,
                   borderRadius: "50%",
-                  flexShrink: 0,
                   background: on ? rgba(e.live ? e.tint : "#8A8377", 1) : "transparent",
                   border: on ? "none" : "1px solid var(--hair-d-hi)",
-                  transition: `background-color ${duration.base * 1000}ms ease`,
+                  transition: t,
+                  cursor: "pointer",
                 }}
               />
             </li>
@@ -545,9 +638,11 @@ const FilmIndex = forwardRef<HTMLElement, {
             background: rgba(tint, 1),
             transformOrigin: "top",
             transform: `scaleY(${p})`,
-            transition: `transform ${duration.slow * 1000}ms cubic-bezier(${ease.inOut.join(
-              ","
-            )}), background-color ${duration.slow * 1000}ms ease`,
+            transition: reduce
+              ? "none"
+              : `transform ${duration.slow * 1000}ms cubic-bezier(${ease.inOut.join(
+                  ","
+                )}), background-color ${duration.slow * 1000}ms ease`,
           }}
         />
       </div>
