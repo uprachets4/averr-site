@@ -145,20 +145,26 @@ function CalendarGrid({
   const weekTwo = Array.from({ length: 7 }, (_, i) => i + 8);
   const [stepOne, stepTwo, stepThree] = STEPS;
 
+  // Every band is placed on an explicit row. Auto-placement will happily
+  // flow week two's first cells into the columns left empty beside the
+  // week-one cards — which splits week two across two visual rows.
   return (
     <div
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+        gridTemplateRows: "auto auto auto auto auto",
         gap: 12,
       }}
     >
-      {WEEKDAY_HEADERS.map(function header(d) {
+      {WEEKDAY_HEADERS.map(function header(d, i) {
         return (
           <div
             key={d}
             className="type-eyebrow"
             style={{
+              gridRow: 1,
+              gridColumn: i + 1,
               fontFamily: "var(--font-mono)",
               color: "var(--color-muted)",
               paddingBottom: 4,
@@ -171,28 +177,45 @@ function CalendarGrid({
 
       {weekOne.map(function cell(day) {
         return (
-          <DayCell key={day} day={day} progress={progress} reduce={reduce} />
+          <DayCell
+            key={day}
+            day={day}
+            progress={progress}
+            reduce={reduce}
+            row={2}
+            column={day}
+          />
         );
       })}
 
-      {/* Cards for the days that live in week one, each starting in its own
-          column so it sits under the days it actually describes. */}
+      {/* Week-one cards. Each spans exactly its own day range, so the width
+          of a card is the length of the step: one column for the call,
+          three for the proposal window. */}
       <StepCard
         step={stepOne}
         progress={progress}
         reduce={reduce}
-        style={{ gridColumn: `${stepOne.dayStart} / span ${stepOne.dayEnd - stepOne.dayStart + 1}` }}
+        row={3}
+        firstColumn={stepOne.dayStart}
       />
       <StepCard
         step={stepTwo}
         progress={progress}
         reduce={reduce}
-        style={{ gridColumn: `${stepTwo.dayStart} / span ${stepTwo.dayEnd - stepTwo.dayStart + 1}` }}
+        row={3}
+        firstColumn={stepTwo.dayStart}
       />
 
       {weekTwo.map(function cell(day) {
         return (
-          <DayCell key={day} day={day} progress={progress} reduce={reduce} />
+          <DayCell
+            key={day}
+            day={day}
+            progress={progress}
+            reduce={reduce}
+            row={4}
+            column={day - 7}
+          />
         );
       })}
 
@@ -201,9 +224,8 @@ function CalendarGrid({
         step={stepThree}
         progress={progress}
         reduce={reduce}
-        style={{
-          gridColumn: `${stepThree.dayStart - 7} / span ${stepThree.dayEnd - stepThree.dayStart + 1}`,
-        }}
+        row={5}
+        firstColumn={stepThree.dayStart - 7}
       />
     </div>
   );
@@ -213,10 +235,14 @@ function DayCell({
   day,
   progress,
   reduce,
+  row,
+  column,
 }: {
   day: number;
   progress: MotionValue<number>;
   reduce: boolean;
+  row: number;
+  column: number;
 }) {
   const [from, to] = windowFor(day);
   const weekend = WEEKEND_DAYS.includes(day);
@@ -235,6 +261,8 @@ function DayCell({
   return (
     <motion.div
       style={{
+        gridRow: row,
+        gridColumn: column,
         aspectRatio: "1 / 1",
         borderRadius: 8,
         display: "flex",
@@ -258,12 +286,14 @@ function StepCard({
   step,
   progress,
   reduce,
-  style,
+  row,
+  firstColumn,
 }: {
   step: ProcessStep;
   progress: MotionValue<number>;
   reduce: boolean;
-  style?: React.CSSProperties;
+  row: number;
+  firstColumn: number;
 }) {
   // The card arrives as its FIRST day fills, so the reader sees the day
   // light and the explanation land together.
@@ -272,11 +302,13 @@ function StepCard({
   const y = useTransform(progress, [from, from + STEP], [16, 0], {
     ease: [easing.outQuart],
   });
+  const span = step.dayEnd - step.dayStart + 1;
 
   return (
     <motion.div
       style={{
-        ...style,
+        gridRow: row,
+        gridColumn: `${firstColumn} / span ${span}`,
         paddingTop: 20,
         paddingBottom: 32,
         display: "flex",
