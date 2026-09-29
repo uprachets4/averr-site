@@ -176,6 +176,9 @@ export default function ProjectFilm({
               within={i === active ? within : 0}
               reduce={false}
               reserve={reserve}
+              onFocusIn={function focus() {
+                if (i !== active) goTo(i);
+              }}
               onOpen={onOpen}
             />
           );
@@ -195,6 +198,7 @@ function Segment({
   within,
   reduce,
   reserve,
+  onFocusIn,
   onOpen,
 }: {
   entry: VaultEntry;
@@ -202,6 +206,7 @@ function Segment({
   within: number;
   reduce: boolean;
   reserve: number;
+  onFocusIn?: () => void;
   onOpen?: (entry: VaultEntry, rect: DOMRect) => boolean;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
@@ -217,6 +222,9 @@ function Segment({
   return (
     <div
       className="film-segment"
+      // tabbing to an off-stage project brings its segment on stage, so the
+      // keyboard order and what you can see never disagree
+      onFocus={onFocusIn}
       style={{
         position: reduce ? "relative" : "absolute",
         inset: reduce ? undefined : 0,
