@@ -21,6 +21,7 @@ import FinalCTA from "../components/FinalCTA";
 import Chapter from "../components/Chapter";
 import AutomatePipeline from "../components/services/AutomatePipeline";
 import NoList from "../components/services/NoList";
+import KickoffCalendar from "../components/services/KickoffCalendar";
 import { useScrollStyle } from "../lib/useScrollStyle";
 import {
   GROW_METRICS,
@@ -2057,138 +2058,6 @@ function MetricCard({
     </motion.div>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════
-   How to start (unchanged)
-   ═══════════════════════════════════════════════════════════════ */
-
-const STEPS = [
-  {
-    n: "01",
-    title: "Book a discovery call.",
-    body: "20 minutes. No slide deck. We ask questions, you ask questions, both sides decide whether this is a fit.",
-  },
-  {
-    n: "02",
-    title: "Scoped proposal in 3 business days.",
-    body: "Fixed scope, fixed timeline, fixed price. If we can't quote it, we tell you why and refer you to someone who can.",
-  },
-  {
-    n: "03",
-    title: "Kickoff week.",
-    body: "Async by default, one review call a week. You get preview URLs from day one, not deliverables at the end.",
-  },
-];
-
-function HowToStart() {
-  const reduce = useReducedMotion();
-
-  return (
-    <section
-      style={{
-        backgroundColor: "var(--color-bg-warm)",
-        padding: "140px 40px",
-        position: "relative",
-      }}
-    >
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: 24,
-          }}
-        >
-          //_05 · how to start
-        </motion.div>
-
-        <motion.h2
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.1 }}
-          className="type-h2"
-          style={{
-            color: "var(--color-ink)",
-            marginBottom: 72,
-            maxWidth: 900,
-          }}
-        >
-          Three steps. Two weeks{" "}
-          {/* NBSP binds the last two words so "max." can't orphan at 1440 */}
-          <span className="fade-h">to kickoff,&nbsp;max.</span>
-        </motion.h2>
-
-        <div
-          className="steps-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 24,
-          }}
-        >
-          {STEPS.map(function stepCard(step, i) {
-            return (
-              <motion.div
-                key={step.n}
-                initial={{ opacity: 0, y: reduce ? 0 : 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{
-                  duration: reduce ? 0.01 : 0.6,
-                  ease: ease.outQuart,
-                  delay: reduce ? 0 : 0.15 + i * 0.1,
-                }}
-                style={{
-                  padding: "40px 32px",
-                  borderTop: "1px solid rgba(20,20,18,0.15)",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 20,
-                }}
-              >
-                <div
-                  className="type-eyebrow"
-                  style={{ color: "var(--color-muted)" }}
-                >
-                  <span style={{ color: "var(--color-ink)", fontWeight: 500 }}>
-                    {step.n}
-                  </span>
-                  {"  ·  step"}
-                </div>
-                <div
-                  className="type-h3"
-                  style={{ color: "var(--color-ink)" }}
-                >
-                  {step.title}
-                </div>
-                <p
-                  className="type-body"
-                  style={{ color: "var(--color-muted)" }}
-                >
-                  {step.body}
-                </p>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .steps-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
-    </section>
-  );
-}
-
 /* ═══════════════════════════════════════════════════════════════
    Page
    ═══════════════════════════════════════════════════════════════ */
@@ -2206,7 +2075,7 @@ export default function Services() {
         <NoList />
       </Chapter>
       <Chapter tone="cream-warm" from="dark">
-        <HowToStart />
+        <KickoffCalendar />
       </Chapter>
       <FinalCTA markerNumber="06" />
     </>
