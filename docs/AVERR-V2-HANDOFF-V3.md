@@ -12,9 +12,9 @@
 | | |
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
-| **Working branch** | `redesign-v2` (**93 commits ahead of `main`**) |
-| **HEAD** | `3fd88ed` — *"15d (6b): mark the Approach frame's base layer for image audits"* |
-| **Tip after this doc** | the `docs: v3 handoff (replaces compaction)` commit (hash reported in chat) |
+| **Working branch** | `redesign-v2` (**108 commits ahead of `main`**) |
+| **HEAD** | `4642136` — *"17-fix (1b): keep ILLUSTRATIVE legible on the stacked stills"* |
+| **Tip after this doc** | the `17-fix (2): log Session 17 in the handoff` commit (hash reported in chat) |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -24,10 +24,10 @@
 
 ```
 dist/assets/index-BpqLEds-.css   41.14 kB │ gzip:   8.64 kB
-dist/assets/index-DRRP886p.js   650.63 kB │ gzip: 188.67 kB
+dist/assets/index-BD_1sY_e.js   662.69 kB │ gzip: 192.30 kB
 ```
 
-Gate: **flag anything over +12 KB gzip JS in a single session.** Recent per-session deltas have all been under +2 KB gzip.
+Gate: **flag anything over +12 KB gzip JS in a single session.** Session 17 was the largest so far at **+3.63 KB gzip** (188.67 → 192.30) for five items plus the fix; before that, per-session deltas were all under +2 KB. The CSS has not moved in several sessions — the `type-*` system absorbs new work without new rules.
 
 ### Stack
 
@@ -85,6 +85,18 @@ Every hash below verified against `git log`.
 
 **16-fix-2 + 15d** `f3957b0` `01da18e` `46b8f1e` `40219c6` `b2ce349` `3fd88ed` — Film: every project gets a dwell (CapitalCommand fixed), sequenced text transitions, measured name fitting → name moved to its own full-width row, doors became an overlay with project one behind them. Case studies: Approach outline-fill pillar names + statement/support + verbatim emphasis, the blank Approach frame fixed at its real cause, finale CTA moved below the image, and the frame's base layer marked `[data-frame-base]` for audits.
 
+**17** `08965f2` `a70693b` `9ef61fe` `c3c65d6` `eece7b5` `b1994b9` `ed4e054` `cd59093` `ca06bee` `8eba163` — **/services rebuild.** Split out of the 2169-line page into `src/data/servicesProcess.ts` + `src/components/services/{AutomatePipeline,NoList,KickoffCalendar,ServicesCloser}.tsx`.
+
+- *Pillars:* the Automate ambient gained illustrative task chips (New lead → Enriched → Draft ready → Sent → Logged) travelling the existing node path on a 6s loop, 3 in flight, nodes lighting as a chip arrives; hand-written rAF (see §5.15). The unsourced caption **"System average: 12h/week returned" was cut** (§7.11). Mood-board cards re-cut to each image's natural aspect — they were ~1.8:1 screenshots in a fixed 1.40 box under `object-fit: cover`, cropping ~23% off every one — and the stack fans ±6° on hover. "What's included" became chips that assemble, latched once, on both paths. The pillar rail meets the container edge at ≥1680, measured off a probe.
+- *The "no" list:* each line's refusal is struck as you read — a 2px parch rule drawn across a **verbatim** substring held in data, with `splitRefusal()` throwing in dev if it ever stops being one. The rule is a background with `box-decoration-break: clone`, not a positioned bar, so it draws correctly across phrases that wrap (§5.16).
+- *The calendar:* the three-column steps became 14 cells filling one at a time, each step card arriving as its own first day fills. Day 01 = Monday (what makes "3 business days" land on day 04 without crossing a weekend); step 03 spans days 08–12; 06/07 and 13/14 are quiet weekend cells; stamp reads `WITHIN 14 DAYS · KICKOFF` at day 12. Prachets ruled the mapping, and ruled **out** labelling day 05 "your decision" — only the steps' own copy appears.
+- *Closer:* a /services-specific dark closer replaced the shared `FinalCTA`; page end tone now `dark`. With ComingSoon's slab swapped for the Cormorant accent, **`PillHl` is now exactly home hero + home `FinalCTA` + the 404** (verified live: home 2, /nope 1, all other routes 0).
+- *Hero:* headline moved onto one `CharReveal` stagger with "One studio" as an accent segment, plus the home scroll cue.
+
+Prachets's rulings: 20 minutes is the canonical call length (a sweep found /contact and ComingSoon already agreeing — nothing changed); "fixed price" and "up to 15 pages" stay as scope promises, not prices.
+
+**17-fix** `a9ef74a` `4642136` — `StackedPillar` (< 900px, and **any** width under reduced motion) rendered no ambient at all, so reduced-motion readers lost all three visuals instead of getting a real final state, and `AutomatePipeline`'s reduce branch was unreachable. `AmbientVisual` gained `frozen`, and `StaticAmbient` feeds it progress pinned at 1 so every scroll-linked transform resolves to its end value. The stills are **scaled** to the column, not reflowed — the compositions are authored in fixed px and a 0–400 SVG space and do not survive squeezing — and the ILLUSTRATIVE label is printed at full size *outside* the scaled box, because at 375 the still runs ~0.45 and a label inside it landed near 5px.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -136,9 +148,25 @@ Order, each wrapped in `SectionBoundary`:
 
 `status: "draft"` routes to `ComingSoon`. **Never linked from the finale cycle.** Appears in the /work film as the final segment: muted name, `IN PROGRESS`, no image, no figure, no link, neutral (non-tint) light.
 
-### `/services`, `/about`, `/contact`, `*` (404)
+### `/services` — the kickoff calendar (`src/pages/Services.tsx`)
 
-`/services` — sticky-scroll pillar sequence (Design / Automate / Grow), each with stages and an ambient right column; content on the gutter at all widths; Timeline + "Book a call" (**no Investment block**); Grow dashboard carries ILLUSTRATIVE. `/about` — monogram hero, 4 principles with distinct numeral choreography, 5-step process timeline, founder card. `/contact` — 7-band editorial scroll with the designed form, Cal.com band. `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist"). All three are **Session 17/18/19 targets** and are the weakest pages now.
+Rebuilt in Session 17. Signature mechanic: **the 14-day calendar.**
+
+| Order | Component | Signature mechanic |
+|---|---|---|
+| 1 | `ServicesHeader` | h1 `display-l` on one `CharReveal` stagger, "One studio" an accent segment bound with an NBSP; home's scroll cue |
+| 2 | `PillarSequence` | Sticky-scroll Design / Automate / Grow, three stages each, ambient right column. Design = mood board at natural aspect, fanning ±6° on hover. Automate = node path with illustrative task chips looping it, nodes lighting on arrival. Grow = dashboard counting to its sample figures. Both Automate and Grow carry ILLUSTRATIVE. "What's included" assembles as chips. Rail meets the container edge at ≥1680. |
+| 3 | `Chapter dark from cream` → `NoList` | Each refusal struck as you read, across a verbatim substring |
+| 4 | `Chapter cream-warm from dark` → `KickoffCalendar` | **The signature.** 14 cells fill in order as the section scrolls past (normal flow, never pinned); each step card arrives as its own first day fills and spans exactly its day range, so a card's width is the length of the step. `WITHIN 14 DAYS · KICKOFF` at day 12. |
+| 5 | `Chapter dark from cream-warm` → `ServicesCloser` | /services-specific. `useDeclarePageEndTone("dark")`. |
+
+Below 900px — **and at any width under reduced motion** — `PillarSequence` renders `StackedPillar`, which shows each ambient as a scaled still via `StaticAmbient` (see §2, 17-fix). No `FinalCTA`, no `PillHl`.
+
+Data: `src/data/servicePillars.ts` (timelines, Grow metrics), `src/data/servicesProcess.ts` (steps + day ranges, refusals + struck phrases, pipeline chip labels).
+
+### `/about`, `/contact`, `*` (404)
+
+`/about` — monogram hero, 4 principles with distinct numeral choreography, 5-step process timeline, founder card. `/contact` — 7-band editorial scroll with the designed form, Cal.com band. `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist"). `/about` and `/contact` are **Session 18/19 targets** and are the weakest pages now.
 
 ### Image-usage map (rendered)
 
@@ -222,7 +250,23 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **13 · Timer-vs-scroll desync.** A CSS/`animate` crossfade on a 300ms timer, driven by an index that flips instantly at a scroll boundary, means the index and the visible content disagree for the whole transition — and on a fast scroll the entire dwell is consumed by the fade. CapitalCommand appeared to never render because of this. *Fix:* derive visibility from a **continuous scroll position**, and move the index's switch point to the middle of the hand-over.
 
-**14 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
+**15 · A continuous loop inside a sticky frame wants a hand-written rAF, not motion.** *Cause:* gotcha 1 again, from the other direction — an ambient loop inside a pin has no meaningful `useScroll` progress to hang off, and handing its opacity to motion invites the same WAAPI/ViewTimeline capture. *Fix:* the Automate pipeline writes `style.transform` and `style.opacity` itself in a rAF, so nothing else ever owns those properties, and suspends the loop entirely on an `IntersectionObserver`. `useScrollStyle` does not apply — there is no MotionValue to subscribe to.
+
+**16 · `transform: translate(%)` resolves against the element, not its container.** *Cause:* a CSS transform percentage is a percentage of the transformed element's own border box. `translate(55%)` on a 90px chip moves it 49px, not 55% of the 720px diagram. *Fix:* measure the host (`ResizeObserver`) and translate in px. Same class of bug as 3: percentages and `calc()` both look like they mean what you want and do not.
+
+**17 · A strike that must survive wrapping is a background, not a bar.** *Cause:* an absolutely-positioned 2px bar draws exactly one line; "projects we can't ship in 90 days" takes three at 375. *Fix:* paint the rule as a `linear-gradient` background on the inline phrase with `box-decoration-break: clone`, which gives every wrapped fragment its own full-width rule, and animate `background-size`. It costs a paint property instead of a transform — the right trade against being visibly wrong on mobile.
+
+**18 · CSS grid auto-placement will backfill the holes you left.** *Cause:* cells and cards shared one 7-column grid; the week-one cards occupied columns 1–4 of their row, so week two's first three cells flowed into columns 5–7 *beside them* and the rest wrapped below. Week two was split across two visual rows. *Fix:* name `gridRow` and `gridColumn` on every item in a grid that mixes item sizes. Nothing in the DOM sweep caught this — only looking at the screenshot did.
+
+**19 · `getBoundingClientRect()` is inflated by rotation.** *Cause:* it returns the axis-aligned bounding box, so a rotated card reports a larger, differently-proportioned box than its layout. Measuring the mood cards this way made correct natural-aspect boxes look wrong (1.63 vs 1.80). *Fix:* use `offsetWidth`/`offsetHeight` for layout questions and reserve the client rect for on-screen position. Listed in §4.23 as a recurring source of false bugs; this is the second time it has bitten.
+
+**20 · Scaling a still shrinks its labels with it.** *Cause:* `StaticAmbient` scales a 720px composition to a 327px column, so every label inside scales too — the ILLUSTRATIVE label landed near 5px, small enough to stop discharging rule 12. *Fix:* lift compliance-critical text *outside* the scaled box and print it at full size. Measure effective on-screen font size as `fontSize × (clientRect.width / offsetWidth)`, not `fontSize`, when anything above the element is scaled.
+
+**21 · Vercel silently drops builds after rapid pushes.** *Cause:* nine pushes in ~15 minutes; the ninth commit reached `origin` and Vercel created **no deployment at all** — not queued, not building, not errored, nothing in the deployments list. *Diagnosis:* compare `git rev-parse origin/redesign-v2` against the newest deployment's `githubCommitSha` (the Vercel MCP `list_deployments` is faster than the dashboard here). *Fix:* push an empty commit to refire the webhook (`git commit --allow-empty`); it built immediately. **Never assume a green local build plus a successful push means the alias will update.**
+
+**22 · The preview alias serves a 403 Security Checkpoint under automated polling.** *Cause:* polling the alias every 5s for a new bundle hash trips Vercel's bot protection; the alias then returns `403` with a "Vercel Security Checkpoint" HTML page to *every* automated request, including Playwright. It clears on its own after a few minutes and never affects a real browser. *Fix:* **poll at 60s intervals or slower.** A tight `until` loop on the bundle hash is the exact shape that trips it.
+
+**23 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
 
 ---
 
@@ -287,14 +331,16 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 6. **Contact-form budget bands** — Under $5K / $5K–$10K / $10K–$25K / $25K+. Deliberately kept under the no-prices rule; confirm the bands.
 7. **`og-image.svg` → PNG** — several platforms won't render SVG OG images.
 8. **"sales at Google" wording on /about** — flagged earlier, never resolved.
-9. **Full mobile review** — automated checks confirm zero overflow, but no human pass has been done on a real device.
+9. **Full mobile review** — automated checks confirm zero overflow, but no human pass has been done on a real device. Session 17 added a new thing to look at here: the stacked pillar stills are scaled to ~0.45 at 375, so their internal labels sit near 6px. The compliance-critical ILLUSTRATIVE label was lifted out to full size, but the node names and chip labels inside the still are decorative-small by design — **worth a human eye on a real phone to confirm that reads as a thumbnail and not as a mistake.**
 10. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
+11. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
+12. **Commit-message convention.** Session 17's brief supplied one session-summary commit message; the work shipped as ten per-item commits instead, following standing rule 18 (commit + push after each verified item, so a usage limit loses nothing). The two conventions conflict — worth settling which wins before Session 18.
 
 ---
 
 ## 8. ROADMAP REMAINING
 
-- **Session 17 — /services.** Spec pending; **Prachets will paste it.** Currently the weakest strong page: the sticky pillar sequence works but has no signature mechanic of its own.
+- ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
 - **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **Needs the photo.**
 - **Session 19 — /contact.** After the recording.
 - **Session 20 — site-wide.** Page transitions using the slab wipe, footer redesign, home polish (richer door previews, reel hover, 404 pill).
