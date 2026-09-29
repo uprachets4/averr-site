@@ -22,6 +22,7 @@ import AutomatePipeline from "../components/services/AutomatePipeline";
 import NoList from "../components/services/NoList";
 import KickoffCalendar from "../components/services/KickoffCalendar";
 import ServicesCloser from "../components/services/ServicesCloser";
+import { CharReveal } from "../components/CharReveal";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useScrollStyle } from "../lib/useScrollStyle";
 import {
@@ -148,6 +149,68 @@ const PILLARS: Pillar[] = [
    Header (unchanged from prior session)
    ═══════════════════════════════════════════════════════════════ */
 
+/** The home hero's cue, on this page's timing. Same two parts: a standing
+ *  SCROLL label and a 1px rule that wipes down its own track on a loop. */
+function ServicesScrollCue({ reduce }: { reduce: boolean }) {
+  return (
+    <motion.div
+      aria-hidden
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{
+        duration: reduce ? 0 : duration.base,
+        delay: reduce ? 0 : 1.6,
+      }}
+      style={{
+        position: "absolute",
+        left: "var(--gutter)",
+        bottom: 28,
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        pointerEvents: "none",
+        zIndex: 2,
+      }}
+    >
+      <span className="type-eyebrow" style={{ color: "var(--color-muted)" }}>
+        SCROLL
+      </span>
+      <span
+        style={{
+          display: "block",
+          width: 1,
+          height: 40,
+          overflow: "hidden",
+          background: "rgba(20,20,18,0.12)",
+        }}
+      >
+        <motion.span
+          style={{
+            display: "block",
+            width: 1,
+            height: "100%",
+            background: "var(--color-ink)",
+            transformOrigin: "top",
+          }}
+          initial={{ scaleY: 0 }}
+          animate={reduce ? { scaleY: 1 } : { scaleY: [0, 1, 1, 0] }}
+          transition={
+            reduce
+              ? { duration: 0 }
+              : {
+                  duration: 2.4,
+                  times: [0, 0.4, 0.75, 1],
+                  repeat: Infinity,
+                  ease: ease.inOut,
+                  delay: 1.6,
+                }
+          }
+        />
+      </span>
+    </motion.div>
+  );
+}
+
 function ServicesHeader() {
   const reduce = useReducedMotion();
 
@@ -195,33 +258,29 @@ function ServicesHeader() {
           <span style={{ height: 1, width: 20, background: "currentColor", opacity: 0.6 }} />
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.3 }}
-          // display-l, not -xl: this title lives in a 900px measure, and the v2
-          // display-xl (144px at 1440) wraps it to six lines. display-l lands at
-          // 100.8px — the size this composition was built against.
+        {/* display-l, not -xl: this title lives in a 900px measure, and the v2
+            display-xl (144px at 1440) wraps it to six lines. display-l lands at
+            100.8px — the size this composition was built against.
+            The accent no longer pops in on its own timer: CharReveal carries
+            the whole line on one stagger, and the accent words ride the same
+            index rather than resetting at the segment boundary. */}
+        <h1
           className="type-display-l"
           style={{
             color: "var(--color-ink)",
-            marginBottom: 32,
             maxWidth: 900,
             margin: "0 auto 32px",
           }}
         >
-          Three services.{" "}
-          <motion.span
-            initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.bounce, delay: 0.8 }}
-            className="type-accent"
-            style={{ display: "inline-block" }}
-          >
-            One studio
-          </motion.span>{" "}
-          behind them all.
-        </motion.h1>
+          <CharReveal
+            delay={0.3}
+            segments={[
+              { text: "Three services. " },
+              { text: "One studio", accent: true },
+              { text: " behind them all." },
+            ]}
+          />
+        </h1>
 
         <motion.p
           initial={{ opacity: 0, y: reduce ? 0 : 14 }}
@@ -238,6 +297,8 @@ function ServicesHeader() {
           and grows the audiences of businesses that refuse to look templated.
         </motion.p>
       </div>
+
+      <ServicesScrollCue reduce={reduce ?? false} />
     </section>
   );
 }
