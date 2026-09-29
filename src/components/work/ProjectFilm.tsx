@@ -1,7 +1,15 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { animate, motion, useReducedMotion } from "motion/react";
-import { duration, ease } from "../../lib/motion";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+  type MotionValue,
+} from "motion/react";
+import { duration, ease, easing } from "../../lib/motion";
+import { useScrollStyle } from "../../lib/useScrollStyle";
 import ImageFrame from "../case-study/ImageFrame";
 import MagneticCTA from "../MagneticCTA";
 import { CharRevealInView } from "../CharReveal";
@@ -14,29 +22,22 @@ function rgba(hex: string | undefined, a: number) {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
 }
 
-function useMedia(query: string) {
-  const [matches, setMatches] = useState(false);
-  useEffect(
-    function watch() {
-      const mq = window.matchMedia(query);
-      setMatches(mq.matches);
-      function onChange(e: MediaQueryListEvent) {
-        setMatches(e.matches);
-      }
-      mq.addEventListener("change", onChange);
-      return function cleanup() {
-        mq.removeEventListener("change", onChange);
-      };
-    },
-    [query]
-  );
-  return matches;
-}
 
-/** Segment index under the middle of the viewport, plus travel within it. */
-function useSegment(count: number, enabled: boolean) {
+/**
+ * Where the film is, as a continuous position (0 .. count).
+ *
+ * A float, not an index: every fade is derived from it, so what you see is
+ * a function of scroll rather than of a CSS timer. On a fast scroll a
+ * time-based crossfade eats the whole dwell — which is why CapitalCommand
+ * looked skipped while the index had already moved on.
+ *
+ * `lead` is scroll spent on the doors before the first project starts; the
+ * stage is pinned across it, so project 0 is already in place behind them.
+ */
+function useFilmPosition(count: number, enabled: boolean, lead: number) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [state, setState] = useState({ index: 0, within: 0 });
+  const pos = useMotionValue(0);
+  const [display, setDisplay] = useState(0);
 
   useEffect(
     function track() {
@@ -48,14 +49,15 @@ function useSegment(count: number, enabled: boolean) {
         const el = ref.current;
         if (!el) return;
         const r = el.getBoundingClientRect();
-        // the stage is pinned for (wrapper - one viewport); dividing the
-        // wrapper itself would end the pin exactly as the last segment
-        // began, so the final project only ever showed on the way out
         const pinned = Math.max(1, r.height - window.innerHeight);
-        const seg = pinned / count;
+        const leadPx = lead * window.innerHeight;
+        const seg = Math.max(1, (pinned - leadPx) / count);
         const travelled = Math.min(Math.max(-r.top, 0), pinned - 1);
-        const index = Math.min(count - 1, Math.floor(travelled / seg));
-        setState({ index, within: (travelled - index * seg) / seg });
+        const p = Math.min(count - 0.001, Math.max(0, (travelled - leadPx) / seg));
+        pos.set(p);
+        // the index follows the middle of the hand-over, so the highlight
+        // and the visible project are never out of step
+        setDisplay(Math.min(count - 1, Math.floor(p + 0.125)));
       }
 
       function onScroll() {
@@ -72,10 +74,10 @@ function useSegment(count: number, enabled: boolean) {
         window.removeEventListener("resize", onScroll);
       };
     },
-    [count, enabled]
+    [count, enabled, lead, pos]
   );
 
-  return { ref, ...state };
+  return { ref, pos, display };
 }
 
 /**
@@ -86,14 +88,17 @@ function useSegment(count: number, enabled: boolean) {
  * one rAF-throttled reader above — no per-project scroll listeners.
  */
 export default function ProjectFilm({
+  lead = 0,
   onOpen,
 }: {
+  /** Screens of scroll before project 0 starts (the doors sit over these). */
+  lead?: number;
   onOpen?: (entry: VaultEntry, rect: DOMRect) => boolean;
 }) {
   const reduce = useReducedMotion();
   const count = vault.length;
-  const { ref, index, within } = useSegment(count, !reduce);
-  const active = reduce ? 0 : index;
+  const { ref, pos, display } = useFilmPosition(count, !reduce, lead);
+  const active = reduce ? 0 : display;
 
   // The index sits over the stage, so the content leaves it a lane — but
   // only as much as it actually intrudes. Past ~1700 the 1440-capped
@@ -129,13 +134,16 @@ export default function ProjectFilm({
       const el = ref.current;
       if (!el) return;
       const top = el.getBoundingClientRect().top + window.scrollY;
-      const seg = Math.max(1, el.offsetHeight - window.innerHeight) / count;
+      const pinned = Math.max(1, el.offsetHeight - window.innerHeight);
+      const leadPx = lead * window.innerHeight;
+      const seg = Math.max(1, (pinned - leadPx) / count);
+      // land a little past the start so the project is in full dwell
       window.scrollTo({
-        top: top + i * seg + 8,
+        top: top + leadPx + i * seg + seg * 0.25,
         behavior: reduce ? "auto" : "smooth",
       });
     },
-    [count, reduce, ref]
+    [count, reduce, ref, lead]
   );
 
   // reduced motion drops the pin entirely: plain stacked sections
@@ -145,7 +153,7 @@ export default function ProjectFilm({
         {vault.map(function still(entry) {
           return (
             <div key={entry.slug} style={{ padding: "96px 0", position: "relative" }}>
-              <Segment entry={entry} active reduce within={0} reserve={0} onOpen={onOpen} />
+              <Segment entry={entry} index={0} active reduce reserve={0} onOpen={onOpen} />
             </div>
           );
         })}
@@ -154,7 +162,10 @@ export default function ProjectFilm({
   }
 
   return (
-    <div ref={ref} style={{ position: "relative", height: `${(count + 1) * 100}vh` }}>
+    <div
+      ref={ref}
+      style={{ position: "relative", height: `${(count + 1 + lead) * 100}vh` }}
+    >
       <div
         data-tone="dark"
         className="film-stage"
@@ -194,8 +205,9 @@ export default function ProjectFilm({
             <Segment
               key={entry.slug}
               entry={entry}
+              index={i}
+              pos={pos}
               active={i === active}
-              within={i === active ? within : 0}
               reduce={false}
               reserve={reserve}
               onFocusIn={function focus() {
@@ -214,37 +226,147 @@ export default function ProjectFilm({
 
 /* ── one project ────────────────────────────────────────────────────── */
 
+const NAME_TIERS = [
+  "type-display-xl",
+  "type-display-l",
+  "type-h1",
+  "type-h2",
+  "type-h3",
+] as const;
+
+/**
+ * The largest type tier at which a name actually fits its column.
+ *
+ * Measured, not guessed from length: "CadenceStack" is only 12 characters
+ * but still ran past its column and sat on top of the screenshot. The test
+ * that matters is the WIDEST SINGLE WORD — CharReveal lays words out as
+ * inline-blocks and nothing breaks mid-word, so a word wider than the
+ * column overflows silently while still reporting one line. Line count
+ * alone misses it, which is how this shipped.
+ *
+ * The ladder runs past the three display tiers into h2 and h3. With the
+ * screen at ~64% of the container the text column is ~27%, and a single
+ * 14-character word like "CapitalCommand" fits none of the display tiers
+ * there — the alternative is letting it sit on the screenshot, which is
+ * the defect this replaces.
+ */
+function useFittedTier(name: string, columnRef: React.RefObject<HTMLElement | null>) {
+  const [tier, setTier] = useState(NAME_TIERS.length - 1);
+
+  useEffect(
+    function fit() {
+      let cancelled = false;
+
+      function measure() {
+        const col = columnRef.current;
+        if (cancelled || !col) return;
+        const width = col.clientWidth;
+        if (!width) return;
+
+        const box = document.createElement("div");
+        box.style.cssText = `position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;width:${width}px`;
+        const word = document.createElement("span");
+        word.style.whiteSpace = "nowrap";
+        document.body.appendChild(box);
+        document.body.appendChild(word);
+
+        const words = name.split(" ");
+        let chosen = NAME_TIERS.length - 1;
+
+        for (let t = 0; t < NAME_TIERS.length; t++) {
+          box.className = NAME_TIERS[t];
+          word.className = NAME_TIERS[t];
+
+          let widest = 0;
+          for (const w of words) {
+            word.textContent = w;
+            widest = Math.max(widest, word.getBoundingClientRect().width);
+          }
+          if (widest > width) continue;
+
+          box.textContent = name;
+          const cs = getComputedStyle(box);
+          const lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.1;
+          const lines = Math.round(box.getBoundingClientRect().height / lh);
+          if (lines <= 2) {
+            chosen = t;
+            break;
+          }
+        }
+
+        box.remove();
+        word.remove();
+        setTier(chosen);
+      }
+
+      measure();
+      if (document.fonts) document.fonts.ready.then(measure);
+
+      // the column narrows again once the index reserve lands, so watch the
+      // element itself: measuring only on window resize picked a tier for a
+      // column that no longer existed by the time it rendered
+      const ro = new ResizeObserver(measure);
+      if (columnRef.current) ro.observe(columnRef.current);
+      window.addEventListener("resize", measure);
+      return function cleanup() {
+        cancelled = true;
+        ro.disconnect();
+        window.removeEventListener("resize", measure);
+      };
+    },
+    [name, columnRef]
+  );
+
+  return NAME_TIERS[tier];
+}
+
+/* Hand-over timing, in fractions of one segment.
+   Text leaves in the first part of the band and arrives in the last, with a
+   gap between, so two projects' words are never on screen together. Images
+   may overlap — only text may not. */
+const TEXT_OUT = 0.75;
+const TEXT_GONE = 0.85;
+const TEXT_IN = 0.1; // before its own start
+
 function Segment({
   entry,
+  index,
+  pos,
   active,
-  within,
   reduce,
   reserve,
   onFocusIn,
   onOpen,
 }: {
   entry: VaultEntry;
+  index: number;
+  pos?: MotionValue<number>;
   active: boolean;
-  within: number;
   reduce: boolean;
   reserve: number;
   onFocusIn?: () => void;
   onOpen?: (entry: VaultEntry, rect: DOMRect) => boolean;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
-  // The screen takes ~64% of the container, so the name column is narrow.
-  // CharReveal lays words out as inline-blocks, so a name too wide for the
-  // column puts one word per line: "CG Walls & Floors" ran to four lines and
-  // overflowed the stage. Long names step down a tier (or two) to fit.
-  const bigName = useMedia("(min-width: 1500px)");
-  const nameClass =
-    entry.name.length > 14
-      ? "type-h1"
-      : bigName
-        ? "type-display-xl"
-        : "type-display-l";
+  const textColRef = useRef<HTMLDivElement | null>(null);
+  const i = index;
+  const nameClass = useFittedTier(entry.name, textColRef);
+  // every fade is derived from scroll position, not a timer
+  const zero = useMotionValue(0);
+  const p = pos ?? zero;
+  const textOpacity = useTransform(
+    p,
+    [i - TEXT_IN, i, i + TEXT_OUT, i + TEXT_GONE],
+    [0, 1, 1, 0]
+  );
+  const imageOpacity = useTransform(p, [i - 0.25, i - 0.05, i + 0.8, i + 1], [0, 1, 1, 0]);
+  const textRef = useScrollStyle<HTMLDivElement>(textOpacity);
+  const imageRef = useScrollStyle<HTMLDivElement>(imageOpacity);
   // a slow drift across the segment; the frame never leaves the stage
-  const drift = reduce ? 1 : 1 + within * 0.03;
+  const scale = useTransform(p, [i - 0.25, i, i + 1], [0.94, 1, 1.03], {
+    ease: [easing.inOut, easing.inOut],
+  });
+  const y = useTransform(p, [i - 0.25, i], [90, 0], { ease: [easing.inOut] });
 
   // MagneticCTA's onClick hands the event as optional, so guard it: with no
   // event there is nothing to preventDefault and the Link should just run.
@@ -265,125 +387,120 @@ function Segment({
         inset: reduce ? undefined : 0,
         display: "flex",
         alignItems: "center",
-        opacity: active ? 1 : 0,
+        // the block now carries a full-width name and is tall enough to
+        // centre into the nav's band, so reserve it
+        paddingTop: reduce ? 0 : 88,
         pointerEvents: active ? "auto" : "none",
-        transition: reduce
-          ? "none"
-          : `opacity ${duration.base * 1000}ms cubic-bezier(${ease.inOut.join(",")})`,
         zIndex: active ? 2 : 1,
       }}
     >
       <div
+        ref={function keepText(node: HTMLDivElement | null) {
+          textColRef.current = node;
+          if (!reduce) textRef(node);
+        }}
         style={{
           width: "100%",
           maxWidth: "var(--container-wide)",
           margin: "0 auto",
           paddingRight: reserve,
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 27fr) minmax(0, 73fr)",
-          alignItems: "center",
-          gap: 48,
+          opacity: reduce ? 1 : 0,
+          position: "relative",
+          zIndex: 2,
         }}
-        className="film-grid"
       >
-        {/* left: the facts */}
-        <motion.div
-          initial={false}
-          animate={{
-            opacity: active ? 1 : 0,
-            y: active ? 0 : reduce ? 0 : 18,
-          }}
-          transition={{
-            duration: reduce ? 0 : duration.slow,
-            ease: ease.inOut,
+        <div
+          className="type-eyebrow"
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--color-muted-l)",
+            marginBottom: 14,
           }}
         >
-          <div
-            className="type-eyebrow"
-            style={{
-              fontFamily: "var(--font-mono)",
-              color: "var(--color-muted-l)",
-              marginBottom: 20,
-            }}
-          >
-            {entry.sector}
-            {entry.year ? ` · ${entry.year}` : ""}
+          {entry.sector}
+          {entry.year ? ` · ${entry.year}` : ""}
+        </div>
+
+        {/* the name gets the full row: in a 27% column even a 14-character
+            word had to shrink below its own status line to fit */}
+        <h2
+          className={nameClass}
+          style={{
+            color: entry.live ? "var(--color-parch)" : "rgba(237,233,226,0.45)",
+            margin: "0 0 28px",
+          }}
+        >
+          {active ? (
+            <CharRevealInView text={entry.name} style={{ color: "inherit" }} />
+          ) : (
+            entry.name
+          )}
+        </h2>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "minmax(0, 30fr) minmax(0, 70fr)",
+            alignItems: "center",
+            gap: 48,
+          }}
+          className="film-grid"
+        >
+          <div>
+            <Figure entry={entry} active={active} reduce={reduce} />
+
+            <div
+              className="type-eyebrow"
+              style={{
+                fontFamily: "var(--font-mono)",
+                color: "var(--color-muted-l)",
+                margin: "20px 0 28px",
+              }}
+            >
+              {entry.live ? entry.pillars.join(" · ") : "IN PROGRESS"}
+            </div>
+
+            {entry.live ? (
+              <MagneticCTA
+                to={`/work/${entry.slug}`}
+                variant="primary"
+                tone="dark"
+                onClick={open}
+              >
+                Open case study
+              </MagneticCTA>
+            ) : null}
           </div>
 
-          <h2
-            className={nameClass}
-            style={{
-              color: entry.live ? "var(--color-parch)" : "rgba(237,233,226,0.45)",
-              margin: "0 0 24px",
-            }}
-          >
-            {active ? (
-              <CharRevealInView
-                text={entry.name}
-                style={{ color: "inherit" }}
-              />
-            ) : (
-              entry.name
-            )}
-          </h2>
-
-          <Figure entry={entry} active={active} reduce={reduce} />
-
-          <div
-            className="type-eyebrow"
-            style={{
-              fontFamily: "var(--font-mono)",
-              color: "var(--color-muted-l)",
-              margin: "24px 0 32px",
-            }}
-          >
-            {entry.live ? entry.pillars.join(" · ") : "IN PROGRESS"}
-          </div>
-
-          {entry.live ? (
-            <MagneticCTA
-              to={`/work/${entry.slug}`}
-              variant="primary"
-              tone="dark"
-              onClick={open}
-            >
-              Open case study
-            </MagneticCTA>
-          ) : null}
-        </motion.div>
-
-        {/* right: the screen */}
-        <div>
-          {entry.preview ? (
-            <motion.div
-              ref={frameRef}
-              initial={false}
-              animate={{
-                opacity: active ? 1 : 0,
-                scale: active ? drift : 0.94,
-                y: active ? 0 : reduce ? 0 : "10vh",
-              }}
-              transition={{
-                duration: reduce ? 0 : duration.slow,
-                ease: ease.inOut,
-              }}
-              style={{ transformOrigin: "center" }}
-            >
-              {entry.live ? (
-                <Link
-                  to={`/work/${entry.slug}`}
-                  aria-hidden="true"
-                  tabIndex={-1}
-                  onClick={open}
-                  style={{ display: "block" }}
-                >
+          <div>
+            {entry.preview ? (
+              <motion.div
+                ref={function keep(node: HTMLDivElement | null) {
+                  frameRef.current = node;
+                  if (!reduce) imageRef(node);
+                }}
+                style={
+                  reduce
+                    ? { transformOrigin: "center" }
+                    : { transformOrigin: "center", opacity: 0, scale, y }
+                }
+              >
+                {entry.live ? (
+                  <Link
+                    to={`/work/${entry.slug}`}
+                    aria-hidden="true"
+                    tabIndex={-1}
+                    onClick={open}
+                    style={{ display: "block" }}
+                  >
+                    <FilmImage entry={entry} />
+                  </Link>
+                ) : (
                   <FilmImage entry={entry} />
-                </Link>
-              ) : (
-                <FilmImage entry={entry} />
-              )}
-            </motion.div>
-          ) : null}
+                )}
+              </motion.div>
+            ) : null}
+          </div>
         </div>
       </div>
 
