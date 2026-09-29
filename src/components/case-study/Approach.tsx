@@ -472,8 +472,16 @@ function StickyFrame({
     >
       <ImageFrame variant="gallery">
         <div style={{ position: "relative", width: "100%", aspectRatio: String(aspect) }}>
-          {/* what you were looking at, still there */}
-          <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
+          {/* What you were looking at, still there. It stays mounted even
+              once the wipe has settled: dropping it at rest reintroduced a
+              blank first paint. At rest it holds the same image as the top
+              layer, so an image-usage audit must exclude [data-frame-base]
+              rather than counting it as a second use. */}
+          <div
+            data-frame-base
+            aria-hidden
+            style={{ position: "absolute", inset: 0, zIndex: 1 }}
+          >
             <Shot entry={under} />
           </div>
 
