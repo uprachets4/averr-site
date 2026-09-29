@@ -19,6 +19,7 @@ import { duration, ease, spring } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import FinalCTA from "../components/FinalCTA";
 import Chapter from "../components/Chapter";
+import AutomatePipeline from "../components/services/AutomatePipeline";
 import { useScrollStyle } from "../lib/useScrollStyle";
 import {
   GROW_METRICS,
@@ -322,8 +323,23 @@ function PillarSequence() {
     });
   }, []);
 
+  const { probeRef, edge } = useContainerEdgeRight(sticky);
+
   return (
     <div ref={containerRef} style={{ position: "relative" }}>
+      {/* Zero-height stand-in for a pillar's content container. It inherits
+          the same width rules, so its right edge is the content edge the
+          rail has to line up with. */}
+      <div
+        aria-hidden
+        ref={probeRef}
+        style={{
+          width: "100%",
+          maxWidth: "var(--container-wide)",
+          margin: "0 auto",
+          height: 0,
+        }}
+      />
       {PILLARS.map(function renderPillar(pillar, index) {
         return (
           <PillarSection
@@ -339,6 +355,7 @@ function PillarSequence() {
         <SequenceProgressIndicator
           activeIndex={activeIndex}
           visible={indicatorVisible}
+          edge={edge}
         />
       ) : null}
     </div>
@@ -389,6 +406,13 @@ function PillarSection({
   );
   const stage3Y = useTransform(scrollYProgress, [0.68, 0.73, 1], [20, 0, 0]);
   const headlineY = useTransform(scrollYProgress, [0, 1], [0, -32]);
+
+  // The "what's included" chips assemble once, as this pillar's second stage
+  // comes up, and stay assembled — scrolling back up must not replay them.
+  const [includedAssembled, setIncludedAssembled] = useState(false);
+  useMotionValueEvent(scrollYProgress, "change", function latch(p) {
+    if (p >= 0.35) setIncludedAssembled(true);
+  });
 
   useEffect(
     function forwardRef() {
@@ -541,38 +565,11 @@ function PillarSection({
               >
                 What's included
               </div>
-              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                {pillar.included.map(function bullet(item, i) {
-                  return (
-                    <li
-                      key={item}
-                      className="type-body-lg"
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "28px 1fr",
-                        gap: 14,
-                        padding: "14px 0",
-                        borderTop:
-                          i === 0
-                            ? "none"
-                            : "1px solid rgba(20,20,18,0.08)",
-                        color: "var(--color-ink)",
-                      }}
-                    >
-                      <span
-                        className="type-eyebrow"
-                        style={{
-                          color: "#B18544",
-                          paddingTop: 6,
-                        }}
-                      >
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <span>{item}</span>
-                    </li>
-                  );
-                })}
-              </ul>
+              <IncludedChips
+                items={pillar.included}
+                assembled={includedAssembled}
+                reduce={reduce ?? false}
+              />
             </StageBody>
 
             <StageBody
@@ -749,6 +746,69 @@ function ChipTooltip({ text }: { text: string }) {
   );
 }
 
+/**
+ * "What's included" as chips that assemble.
+ *
+ * `assembled` is a latch, not a live flag: the chips settle once when the
+ * pillar first becomes active and stay settled, so scrolling back up does
+ * not replay them. The opacity here is state-driven and time-based, not
+ * scroll-linked, so it is not subject to the ViewTimeline acceleration bug
+ * that `useScrollStyle` exists to work around.
+ *
+ * The item text is printed verbatim — chips changed the shape of this list,
+ * not a word of its content.
+ */
+function IncludedChips({
+  items,
+  assembled,
+  reduce,
+}: {
+  items: string[];
+  assembled: boolean;
+  reduce: boolean;
+}) {
+  return (
+    <ul
+      style={{
+        listStyle: "none",
+        padding: 0,
+        margin: 0,
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 8,
+      }}
+    >
+      {items.map(function chip(item, i) {
+        return (
+          <motion.li
+            key={item}
+            initial={false}
+            animate={{
+              opacity: assembled || reduce ? 1 : 0,
+              y: assembled || reduce ? 0 : 8,
+            }}
+            transition={{
+              duration: reduce ? 0 : duration.base,
+              ease: ease.outQuart,
+              delay: reduce || !assembled ? 0 : i * 0.04,
+            }}
+            className="type-small"
+            style={{
+              padding: "9px 14px",
+              borderRadius: 999,
+              border: "1px solid rgba(20,20,18,0.16)",
+              background: "var(--color-bg)",
+              color: "var(--color-ink)",
+            }}
+          >
+            {item}
+          </motion.li>
+        );
+      })}
+    </ul>
+  );
+}
+
 function StageBody({
   opacity,
   y,
@@ -812,6 +872,9 @@ function StageThree({ timeline }: { timeline: string }) {
 
 function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
   const reduce = useReducedMotion();
+  // Same latch as the pinned path, driven by the list entering the viewport
+  // rather than by a stage window.
+  const [includedAssembled, setIncludedAssembled] = useState(false);
   const bg = index % 2 === 1 ? "var(--color-bg-alt)" : "var(--color-bg)";
   return (
     <section
@@ -879,38 +942,18 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
           >
             What's included
           </div>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-            {pillar.included.map(function bullet(item, i) {
-              return (
-                <li
-                  key={item}
-                  className="type-body-lg"
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "28px 1fr",
-                    gap: 14,
-                    padding: "16px 0",
-                    borderTop:
-                      i === 0
-                        ? "none"
-                        : "1px solid rgba(20,20,18,0.08)",
-                    color: "var(--color-ink)",
-                  }}
-                >
-                  <span
-                    className="type-eyebrow"
-                    style={{
-                      color: "#B18544",
-                      paddingTop: 6,
-                    }}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span>{item}</span>
-                </li>
-              );
-            })}
-          </ul>
+          <motion.div
+            onViewportEnter={function assemble() {
+              setIncludedAssembled(true);
+            }}
+            viewport={{ once: true, amount: 0.3 }}
+          >
+            <IncludedChips
+              items={pillar.included}
+              assembled={includedAssembled}
+              reduce={reduce ?? false}
+            />
+          </motion.div>
         </div>
 
         <div style={{ marginBottom: 40 }}>
@@ -939,12 +982,58 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
    Progress indicator — fixed right edge, active pillar highlighted
    ═══════════════════════════════════════════════════════════════ */
 
+/**
+ * Where the rail sits, in px from the viewport's right content edge.
+ *
+ * Below 1680 the container is still gutter-bound, so the gutter *is* the
+ * page's own edge and nothing needs measuring. At and above 1680 the
+ * container has hit its 1440 cap and the gutter no longer marks its edge —
+ * the rail has to line up with the content, not with the window.
+ *
+ * Measured rather than `calc((100vw - var(--container-wide)) / 2)`: `100vw`
+ * includes the scrollbar but the centred container does not, so the calc
+ * would sit a scrollbar's width off on every platform that reserves one.
+ */
+function useContainerEdgeRight(active: boolean) {
+  const probeRef = useRef<HTMLDivElement | null>(null);
+  const [edge, setEdge] = useState<number | null>(null);
+
+  useLayoutEffect(
+    function measureEdge() {
+      if (!active) {
+        setEdge(null);
+        return;
+      }
+      function measure() {
+        const el = probeRef.current;
+        if (!el) return;
+        if (window.innerWidth < 1680) {
+          setEdge(null);
+          return;
+        }
+        const r = el.getBoundingClientRect();
+        setEdge(document.documentElement.clientWidth - r.right);
+      }
+      measure();
+      window.addEventListener("resize", measure);
+      return function cleanup() {
+        window.removeEventListener("resize", measure);
+      };
+    },
+    [active]
+  );
+
+  return { probeRef, edge };
+}
+
 function SequenceProgressIndicator({
   activeIndex,
   visible,
+  edge,
 }: {
   activeIndex: number;
   visible: boolean;
+  edge: number | null;
 }) {
   return (
     <motion.aside
@@ -954,8 +1043,9 @@ function SequenceProgressIndicator({
       style={{
         position: "fixed",
         top: "50%",
-        // the gutter, so the rail lines up with the page's own edge
-        right: "var(--gutter)",
+        // ≥1680: the measured container edge. Below that the container is
+        // still gutter-bound, so the gutter is the page's own edge.
+        right: edge === null ? "var(--gutter)" : edge,
         transform: "translateY(-50%)",
         display: "flex",
         flexDirection: "column",
@@ -1079,24 +1169,39 @@ function useCursorParallax(reduce: boolean, magnitude = 12) {
 
 /* ── design mood board ──────────────────────────────────────── */
 
+/** Natural pixel sizes are carried alongside each source so the card box can
+ *  be cut to the image's own aspect. The box used to be a fixed 560×400
+ *  (1.40) with `object-fit: cover`, which cropped ~23% off every one of these
+ *  ~1.8:1 screenshots — locked rule 7 says natural aspect, never cropped. */
 const MOOD_CARDS = [
   {
     src: "/work/cgwalls/hero.jpg",
     label: "CG Walls & Floors",
+    w: 1400,
+    h: 776,
   },
   {
     src: "/work/capitalcommand/01-overview.jpg",
     label: "CapitalCommand",
+    w: 1680,
+    h: 930,
   },
   {
     src: "/work/cadencestack/01-command-center.jpg",
     label: "CadenceStack",
+    w: 1680,
+    h: 889,
   },
   {
     src: "/work/sift/01-command-overview.jpg",
     label: "SIFT",
+    w: 1680,
+    h: 926,
   },
 ];
+
+/** Card width in the ambient; height follows each image's own aspect. */
+const MOOD_CARD_W = 560;
 
 function DesignMoodBoard({
   scrollYProgress,
@@ -1106,6 +1211,7 @@ function DesignMoodBoard({
   reduce: boolean;
 }) {
   const parallax = useCursorParallax(reduce, 16);
+  const [fanned, setFanned] = useState(false);
   const scrollHintOpacity = useTransform(
     scrollYProgress,
     [0.25, 0.35],
@@ -1116,7 +1222,13 @@ function DesignMoodBoard({
     <div
       ref={parallax.ref}
       onMouseMove={parallax.onMove}
-      onMouseLeave={parallax.onLeave}
+      onMouseEnter={function fanOut() {
+        setFanned(true);
+      }}
+      onMouseLeave={function fanIn() {
+        setFanned(false);
+        parallax.onLeave();
+      }}
       style={{
         position: "relative",
         width: "100%",
@@ -1181,6 +1293,9 @@ function DesignMoodBoard({
             index={i}
             src={c.src}
             label={c.label}
+            naturalW={c.w}
+            naturalH={c.h}
+            fanned={fanned}
             scrollYProgress={scrollYProgress}
             parallaxX={parallax.x}
             parallaxY={parallax.y}
@@ -1286,11 +1401,17 @@ const MOOD_END_OFFSETS: Array<[number, number]> = [
   [40, 25],
 ];
 const MOOD_PARALLAX_WEIGHTS = [0.3, 0.6, 0.85, 1.0];
+/** Extra rotation each card takes on while the stack is hovered — ±6°,
+ *  added to whatever the scroll rotation is at that moment. */
+const MOOD_FAN_ROTS = [-6, -2, 2, 6];
 
 function MoodCard({
   index,
   src,
   label,
+  naturalW,
+  naturalH,
+  fanned,
   scrollYProgress,
   parallaxX,
   parallaxY,
@@ -1299,6 +1420,9 @@ function MoodCard({
   index: number;
   src: string;
   label: string;
+  naturalW: number;
+  naturalH: number;
+  fanned: boolean;
   scrollYProgress: MotionValue<number>;
   parallaxX: MotionValue<number>;
   parallaxY: MotionValue<number>;
@@ -1334,8 +1458,31 @@ function MoodCard({
     }
   );
 
+  // The fan rides on top of the scroll rotation rather than replacing it:
+  // both write `rotate`, so they have to be summed into one value. A spring
+  // on the 0→1 hover flag gives the soft settle; rotation is a transform, so
+  // the ViewTimeline acceleration bug does not apply here.
+  const fanTarget = useMotionValue(0);
+  useEffect(
+    function trackHover() {
+      fanTarget.set(fanned && !reduce ? 1 : 0);
+    },
+    [fanned, reduce, fanTarget]
+  );
+  const fanSpring = useSpring(fanTarget, spring.soft);
+  const fanRot = MOOD_FAN_ROTS[index];
+  const rotate = useTransform(
+    [rot, fanSpring] as MotionValue<number>[],
+    function combine([r, f]) {
+      const base = reduce ? endRot : (r as number);
+      return base + (f as number) * fanRot;
+    }
+  );
+
   // Higher index = more toward foreground
   const zIndex = index + 1;
+  // Natural aspect — the box is cut to the image, so nothing is cropped.
+  const cardH = Math.round(MOOD_CARD_W * (naturalH / naturalW));
 
   return (
     <motion.figure
@@ -1343,17 +1490,17 @@ function MoodCard({
         position: "absolute",
         top: "50%",
         left: "50%",
-        width: 560,
-        height: 400,
+        width: MOOD_CARD_W,
+        height: cardH,
         margin: 0,
-        marginTop: -200,
-        marginLeft: -280,
+        marginTop: -cardH / 2,
+        marginLeft: -MOOD_CARD_W / 2,
         borderRadius: 10,
         overflow: "hidden",
         background: "var(--color-bg)",
         boxShadow: "0 18px 48px rgba(20,20,18,0.18)",
         border: "1px solid rgba(20,20,18,0.08)",
-        rotate: reduce ? endRot : rot,
+        rotate,
         x: totalX,
         y: totalY,
         zIndex,
@@ -1362,6 +1509,8 @@ function MoodCard({
       <img
         src={src}
         alt=""
+        width={naturalW}
+        height={naturalH}
         loading="lazy"
         decoding="async"
         draggable={false}
@@ -1369,7 +1518,10 @@ function MoodCard({
           display: "block",
           width: "100%",
           height: "100%",
-          objectFit: "cover",
+          // the box is already cut to this image's aspect, so `contain`
+          // changes nothing visually — it is the guarantee that a future
+          // asset with a different aspect letterboxes instead of cropping
+          objectFit: "contain",
           pointerEvents: "none",
         }}
       />
@@ -1422,12 +1574,6 @@ function AutomateWorkflow({
   reduce: boolean;
 }) {
   const parallax = useCursorParallax(reduce, 16);
-  // Fade in caption at stage 3
-  const captionOpacity = useTransform(
-    scrollYProgress,
-    [0.68, 0.78],
-    [0, 1]
-  );
   const scrollHintOpacity = useTransform(
     scrollYProgress,
     [0.25, 0.35],
@@ -1551,22 +1697,24 @@ function AutomateWorkflow({
         );
       })}
 
-      {/* Stage 3 caption */}
-      <CaptionLine opacity={captionOpacity}
-        className="type-small"
+      {/* Illustrative task chips travelling the path. Session 17 replaced the
+          "System average: 12h/week returned" caption that used to sit here —
+          an unsourced result claim with nothing behind it. Nothing takes its
+          place; the chips are labelled for what they are instead. */}
+      <AutomatePipeline reduce={reduce} />
+
+      <div
+        className="type-eyebrow"
         style={{
           position: "absolute",
-          left: 0,
+          top: 0,
           right: 0,
-          bottom: 60,
-          textAlign: "center",
-          color: "var(--color-ink-soft)",
-          
+          color: "var(--color-muted-2)",
           pointerEvents: "none",
         }}
       >
-        System average: 12h/week returned
-      </CaptionLine>
+        {ILLUSTRATIVE_LABEL}
+      </div>
 
       <ScrollHint opacity={scrollHintOpacity} reduce={reduce} />
     </div>
