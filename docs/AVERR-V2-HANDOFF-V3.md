@@ -12,9 +12,9 @@
 | | |
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
-| **Working branch** | `redesign-v2` (**108 commits ahead of `main`**) |
-| **HEAD** | `ea20a63` — *"17-fix (2): log Session 17 and the stacked-ambient fix in the handoff"* |
-| **Tip after this doc** | `ea20a63` is the tip; this doc is current as of it. |
+| **Working branch** | `redesign-v2` (**111 commits ahead of `main`** at the end of Session 17-fix) |
+| **HEAD** | `4642136` — *"17-fix (1b): keep ILLUSTRATIVE legible on the stacked stills"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
+| **Doc currency** | Written at the end of Session 17-fix. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
