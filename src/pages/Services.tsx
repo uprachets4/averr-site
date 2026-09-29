@@ -17,11 +17,12 @@ import {
 } from "motion/react";
 import { duration, ease, spring } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
-import FinalCTA from "../components/FinalCTA";
 import Chapter from "../components/Chapter";
 import AutomatePipeline from "../components/services/AutomatePipeline";
 import NoList from "../components/services/NoList";
 import KickoffCalendar from "../components/services/KickoffCalendar";
+import ServicesCloser from "../components/services/ServicesCloser";
+import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useScrollStyle } from "../lib/useScrollStyle";
 import {
   GROW_METRICS,
@@ -2067,6 +2068,9 @@ export default function Services() {
     window.scrollTo(0, 0);
   }, []);
 
+  // The closer is dark, so the footer has to reveal over dark.
+  useDeclarePageEndTone("dark");
+
   return (
     <>
       <ServicesHeader />
@@ -2077,7 +2081,9 @@ export default function Services() {
       <Chapter tone="cream-warm" from="dark">
         <KickoffCalendar />
       </Chapter>
-      <FinalCTA markerNumber="06" />
+      <Chapter tone="dark" from="cream-warm">
+        <ServicesCloser />
+      </Chapter>
     </>
   );
 }

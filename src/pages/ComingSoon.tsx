@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
-import PillHl from "../components/PillHl";
 
 const EMAIL_ADDR = "prachets@averrstudios.com";
 
@@ -80,13 +79,16 @@ export default function ComingSoon() {
           }}
         >
           This case study{" "}
+          {/* Cormorant accent, not PillHl: locked rule 9 confines the slab to
+              the home hero, home's FinalCTA and the 404. */}
           <motion.span
             initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.bounce, delay: 0.9 }}
+            className="type-accent"
             style={{ display: "inline-block" }}
           >
-            <PillHl>isn't live</PillHl>
+            isn't live
           </motion.span>{" "}
           yet.
         </motion.h1>
