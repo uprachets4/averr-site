@@ -997,6 +997,21 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
           {pillar.intro}
         </motion.p>
 
+        {/* The ambient as a still. The pinned path earns these through
+            scroll; here they simply arrive finished. */}
+        <motion.div
+          initial={{ opacity: reduce ? 1 : 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{
+            duration: reduce ? 0.01 : 0.6,
+            ease: ease.outQuart,
+          }}
+          style={{ marginBottom: 40 }}
+        >
+          <StaticAmbient pillar={pillar.id} />
+        </motion.div>
+
         <div style={{ marginBottom: 48 }}>
           <ServiceChips chips={pillar.chips} reduce={reduce ?? false} />
         </div>
@@ -1181,11 +1196,17 @@ function SequenceProgressIndicator({
 function AmbientVisual({
   pillar,
   scrollYProgress,
+  frozen = false,
 }: {
   pillar: Pillar["id"];
   scrollYProgress: MotionValue<number>;
+  /** Render the ambient as a still. The stacked path passes a progress value
+   *  pinned at 1 and sets this, so every ambient paints its finished state
+   *  with nothing running — the diagram's own reduced-motion branches are
+   *  exactly the stills we want, so `frozen` reuses them. */
+  frozen?: boolean;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotion() || frozen;
   if (pillar === "design") {
     return (
       <DesignMoodBoard
@@ -1207,6 +1228,70 @@ function AmbientVisual({
       scrollYProgress={scrollYProgress}
       reduce={!!reduce}
     />
+  );
+}
+
+/** The width every ambient is composed against. The stacked column is
+ *  narrower than this on phones, so the still is scaled down to fit rather
+ *  than reflowed — the compositions are built in fixed px (card offsets, a
+ *  0–400 SVG space) and do not survive being squeezed. */
+const AMBIENT_BASE = 720;
+
+/**
+ * A pillar's ambient as a still, scaled to whatever column it is given.
+ *
+ * Used by the stacked path (< 900px, and any width under reduced motion),
+ * which until now rendered no ambient at all — so reduced-motion readers
+ * lost all three visuals instead of getting a real final state.
+ */
+function StaticAmbient({ pillar }: { pillar: Pillar["id"] }) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
+  // Pinned at 1: every scroll-linked transform in the ambients resolves to
+  // its end value, which is the finished composition.
+  const progress = useMotionValue(1);
+
+  useLayoutEffect(function measureColumn() {
+    function run() {
+      const el = hostRef.current;
+      if (!el) return;
+      setScale(Math.min(1, el.clientWidth / AMBIENT_BASE));
+    }
+    run();
+    const ro = new ResizeObserver(run);
+    if (hostRef.current) ro.observe(hostRef.current);
+    window.addEventListener("resize", run);
+    return function cleanup() {
+      ro.disconnect();
+      window.removeEventListener("resize", run);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={hostRef}
+      aria-hidden
+      style={{
+        width: "100%",
+        height: AMBIENT_BASE * scale,
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: AMBIENT_BASE,
+          height: AMBIENT_BASE,
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+        }}
+      >
+        <AmbientVisual pillar={pillar} scrollYProgress={progress} frozen />
+      </div>
+    </div>
   );
 }
 
