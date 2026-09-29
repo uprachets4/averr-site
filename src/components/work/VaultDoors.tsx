@@ -50,6 +50,30 @@ export default function VaultDoors() {
     return reduce ? 0 : v;
   };
 
+  // pixels, not percentages: the inset has to land on 0 exactly
+    // the 150vh wrapper pins the 100vh frame for only its first third, so the
+  // doors have to be fully open by then — otherwise they finish opening
+  // after the stage has already started scrolling away
+  const inset = useTransform(scrollYProgress, [0.05, 0.3], [vw / 2, 0], {
+    ease: [easing.inOut],
+  });
+
+  // The nav's tone detector collects its targets once per route and cannot
+  // see through a clip-path, so the marker it watches lives OUTSIDE the
+  // clipped stage and is parked above the viewport until the stage has
+  // actually opened across the nav.
+  const [covers, setCovers] = useState(false);
+  useEffect(
+    function watchCoverage() {
+      function check(v: number) {
+        setCovers(vw > 0 && v < vw * 0.22);
+      }
+      check(inset.get());
+      return inset.on("change", check);
+    },
+    [inset, vw]
+  );
+
   return (
     <div
       ref={ref}
@@ -81,7 +105,7 @@ export default function VaultDoors() {
             padding: "0 var(--gutter)",
           }}
         >
-          <Fading progress={scrollYProgress} reduce={!!reduce} range={[0, 0.3]}>
+          <Fading progress={scrollYProgress} reduce={!!reduce} range={[0, 0.17]}>
             <motion.div
               initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -118,7 +142,7 @@ export default function VaultDoors() {
             </Half>
           </h1>
 
-          <Fading progress={scrollYProgress} reduce={!!reduce} range={[0, 0.26]}>
+          <Fading progress={scrollYProgress} reduce={!!reduce} range={[0, 0.15]}>
             <motion.p
               initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -133,7 +157,26 @@ export default function VaultDoors() {
         </div>
 
         {/* the stage opening from the centre slit */}
-        <Stage progress={scrollYProgress} reduce={!!reduce} vw={vw} />
+        <Stage inset={inset} reduce={!!reduce} />
+
+        <div
+          aria-hidden
+          data-tone="dark"
+          className="vault-doors__tone"
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            // once open it spans the whole frame, so the nav stays dark for
+            // as long as the stage is actually under it — a short marker
+            // falls above the nav's band as the frame scrolls away
+            top: reduce || covers ? 0 : -600,
+            bottom: reduce || covers ? 0 : undefined,
+            height: reduce || covers ? undefined : 140,
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        />
       </div>
     </div>
   );
@@ -153,10 +196,10 @@ function Half({
   side: 1 | -1;
   children: React.ReactNode;
 }) {
-  const x = useTransform(progress, [0, 0.55], [0, side * vw * 0.32], {
+  const x = useTransform(progress, [0, 0.3], [0, side * vw * 0.32], {
     ease: [easing.inOut],
   });
-  const opacity = useTransform(progress, [0.1, 0.42], [1, 0]);
+  const opacity = useTransform(progress, [0.06, 0.24], [1, 0]);
   const ref = useScrollStyle<HTMLSpanElement>(opacity);
 
   if (reduce) return <span style={{ display: "inline-block" }}>{children}</span>;
@@ -194,18 +237,12 @@ function Fading({
 
 /** The dark stage, opening from a vertical slit to the full viewport. */
 function Stage({
-  progress,
+  inset,
   reduce,
-  vw,
 }: {
-  progress: MotionValue<number>;
+  inset: MotionValue<number>;
   reduce: boolean;
-  vw: number;
 }) {
-  // pixels, not percentages: the inset has to land on 0 exactly
-  const inset = useTransform(progress, [0.18, 0.78], [vw / 2, 0], {
-    ease: [easing.inOut],
-  });
   const clip = useTransform(inset, function toClip(v: number) {
     return `inset(0px ${v}px 0px ${v}px)`;
   });
@@ -213,7 +250,6 @@ function Stage({
   return (
     <motion.div
       aria-hidden
-      data-tone="dark"
       className="vault-doors__stage"
       style={{
         position: "absolute",
