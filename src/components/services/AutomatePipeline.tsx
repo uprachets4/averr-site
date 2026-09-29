@@ -45,6 +45,17 @@ const CYCLE_MS = 6000;
 const CHIP_COUNT = 3;
 /** Fraction of the cycle a chip spends fading in / out at the ends. */
 const FADE = 0.07;
+/**
+ * Fraction of the cycle spent travelling; the remainder is a dwell at the
+ * final node.
+ *
+ * Without it the last label is unreachable: the label is what the task is
+ * called having cleared `floor(p)` nodes, so "Logged" only applies at
+ * exactly p === 4 — the last instant of the cycle, by which point the chip
+ * is already fading out. The dwell gives the chip time to sit at Measure
+ * actually reading "Logged" before it goes.
+ */
+const TRAVEL = 0.85;
 /** How close (in segments) a chip must be for a node to be lit at all. */
 const PULSE_RANGE = 0.3;
 
@@ -139,7 +150,9 @@ export default function AutomatePipeline({ reduce }: { reduce: boolean }) {
         for (let i = 0; i < CHIP_COUNT; i++) {
           // Stagger the chips evenly around the cycle.
           const phase = (base + i / CHIP_COUNT) % 1;
-          const p = phase * SEGMENTS.length;
+          // Travel over the first TRAVEL of the cycle, then dwell at the
+          // final node so the last label is readable.
+          const p = Math.min(1, phase / TRAVEL) * SEGMENTS.length;
           positions.push(p);
 
           const el = chipRefs.current[i];
