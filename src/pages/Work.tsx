@@ -13,6 +13,8 @@ import { useOpenTransition } from "../components/work/OpenTransition";
 
 const MOBILE_QUERY = "(max-width: 767px)";
 const SCROLL_KEY = "averr:work-scroll";
+/** Screens of scroll the doors occupy before project one begins. */
+const DOORS_LEAD = 1.5;
 
 function useMedia(query: string) {
   const [matches, setMatches] = useState(false);
@@ -153,14 +155,16 @@ export default function Work() {
           <WorkMobile />
         </SectionBoundary>
       ) : (
-        <>
-          <SectionBoundary name="vault-doors">
-            <VaultDoors />
-          </SectionBoundary>
+        <div style={{ position: "relative" }}>
           <SectionBoundary name="project-film">
-            <ProjectFilm onOpen={open} />
+            <ProjectFilm lead={DOORS_LEAD} onOpen={open} />
           </SectionBoundary>
-        </>
+          {/* the doors sit over the film's first screens, so project one is
+              already behind them as they part */}
+          <SectionBoundary name="vault-doors">
+            <VaultDoors lead={DOORS_LEAD} />
+          </SectionBoundary>
+        </div>
       )}
 
       <Chapter tone="cream" from="dark">

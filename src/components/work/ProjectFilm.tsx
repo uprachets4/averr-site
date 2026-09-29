@@ -38,6 +38,7 @@ function useFilmPosition(count: number, enabled: boolean, lead: number) {
   const ref = useRef<HTMLDivElement | null>(null);
   const pos = useMotionValue(0);
   const [display, setDisplay] = useState(0);
+  const [lead01, setLead01] = useState(lead > 0 ? 0 : 1);
 
   useEffect(
     function track() {
@@ -55,6 +56,7 @@ function useFilmPosition(count: number, enabled: boolean, lead: number) {
         const travelled = Math.min(Math.max(-r.top, 0), pinned - 1);
         const p = Math.min(count - 0.001, Math.max(0, (travelled - leadPx) / seg));
         pos.set(p);
+        setLead01(leadPx > 0 ? Math.min(1, travelled / leadPx) : 1);
         // the index follows the middle of the hand-over, so the highlight
         // and the visible project are never out of step
         setDisplay(Math.min(count - 1, Math.floor(p + 0.125)));
@@ -77,7 +79,7 @@ function useFilmPosition(count: number, enabled: boolean, lead: number) {
     [count, enabled, lead, pos]
   );
 
-  return { ref, pos, display };
+  return { ref, pos, display, lead01 };
 }
 
 /**
@@ -97,7 +99,7 @@ export default function ProjectFilm({
 }) {
   const reduce = useReducedMotion();
   const count = vault.length;
-  const { ref, pos, display } = useFilmPosition(count, !reduce, lead);
+  const { ref, pos, display, lead01 } = useFilmPosition(count, !reduce, lead);
   const active = reduce ? 0 : display;
 
   // The index sits over the stage, so the content leaves it a lane — but
@@ -167,7 +169,6 @@ export default function ProjectFilm({
       style={{ position: "relative", height: `${(count + 1 + lead) * 100}vh` }}
     >
       <div
-        data-tone="dark"
         className="film-stage"
         style={{
           position: "sticky",
@@ -178,6 +179,26 @@ export default function ProjectFilm({
         }}
       >
         <div className="grain-dark" aria-hidden="true" />
+
+        {/* The nav's tone detector collects its targets once per route, so
+            this marker is always in the DOM and simply parks above the
+            viewport until the doors have opened across the nav — 0.28 of
+            the lead, which is where the panels finish parting. */}
+        <div
+          aria-hidden
+          data-tone="dark"
+          className="film-stage__tone"
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: reduce || lead01 > 0.28 ? 0 : -600,
+            bottom: reduce || lead01 > 0.28 ? 0 : undefined,
+            height: reduce || lead01 > 0.28 ? undefined : 140,
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        />
 
         {/* the room, lit in the client's colour */}
         {vault.map(function light(entry, i) {
