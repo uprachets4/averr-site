@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { duration, ease } from "../../lib/motion";
 import type { ApproachLayout, Pillar } from "../../data/caseStudies";
@@ -327,7 +327,22 @@ function StickyFrame({
     .filter(Boolean) as string[];
   const sizes = useImageSizes(srcs);
 
+  // The outgoing image stays mounted underneath until the incoming one has
+  // finished wiping over it. AnimatePresence used to drop it the moment
+  // `active` changed — with no exit animation that is immediate — while the
+  // incoming layer mounted at inset(100%), i.e. fully clipped. For the
+  // length of the wipe there was nothing to draw. Preloading never helped
+  // because the gap was structural, not a decode delay.
+  const [base, setBase] = useState(active);
+  useEffect(
+    function settleWhenIdle() {
+      if (reduce) setBase(active);
+    },
+    [active, reduce]
+  );
+
   const entry = entries[active];
+  const under = entries[Math.min(base, entries.length - 1)] ?? entry;
   if (!entry) return null;
 
   const size = entry.image ? sizes[entry.image] : undefined;
@@ -344,42 +359,41 @@ function StickyFrame({
     >
       <ImageFrame variant="gallery">
         <div style={{ position: "relative", width: "100%", aspectRatio: String(aspect) }}>
-          <AnimatePresence initial={false}>
-            <motion.div
-              key={active}
-              initial={
-                reduce
-                  ? { clipPath: "inset(0% 0 0% 0)" }
-                  : { clipPath: "inset(100% 0 0% 0)" }
-              }
-              animate={{ clipPath: "inset(0% 0 0% 0)" }}
-              transition={
-                reduce
-                  ? { duration: 0 }
-                  : { duration: duration.slow, ease: ease.inOut }
-              }
-              style={{ position: "absolute", inset: 0 }}
-            >
-              {entry.image ? (
-                <img
-                  src={entry.image}
-                  alt={`${entry.pillar} approach visual`}
-                  decoding="async"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    display: "block",
-                  }}
-                />
-              ) : (
-                <GeometricAnchor pillar={entry.pillar} />
-              )}
-            </motion.div>
-          </AnimatePresence>
+          {/* what you were looking at, still there */}
+          <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
+            <Shot entry={under} />
+          </div>
+
+          {/* what is arriving, wiping up over it */}
+          <motion.div
+            key={active}
+            initial={{ clipPath: reduce ? "inset(0% 0 0% 0)" : "inset(100% 0 0% 0)" }}
+            animate={{ clipPath: "inset(0% 0 0% 0)" }}
+            transition={
+              reduce ? { duration: 0 } : { duration: duration.slow, ease: ease.inOut }
+            }
+            onAnimationComplete={function done() {
+              setBase(active);
+            }}
+            style={{ position: "absolute", inset: 0, zIndex: 2 }}
+          >
+            <Shot entry={entry} />
+          </motion.div>
         </div>
       </ImageFrame>
     </div>
+  );
+}
+
+function Shot({ entry }: { entry: Entry }) {
+  if (!entry.image) return <GeometricAnchor pillar={entry.pillar} />;
+  return (
+    <img
+      src={entry.image}
+      alt={`${entry.pillar} approach visual`}
+      decoding="async"
+      style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+    />
   );
 }
 
