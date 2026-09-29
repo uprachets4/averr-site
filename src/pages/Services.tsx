@@ -23,6 +23,7 @@ import NoList from "../components/services/NoList";
 import KickoffCalendar from "../components/services/KickoffCalendar";
 import ServicesCloser from "../components/services/ServicesCloser";
 import { CharReveal } from "../components/CharReveal";
+import { PIPELINE_CHIPS } from "../data/servicesProcess";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useScrollStyle } from "../lib/useScrollStyle";
 import {
@@ -1252,9 +1253,112 @@ const AMBIENT_BASE = 720;
  * which until now rendered no ambient at all — so reduced-motion readers
  * lost all three visuals instead of getting a real final state.
  */
+/** True below the stacked breakpoint, where a scaled still gets too small
+ *  to read. Matches the 900px boundary `useIsDesktop` uses. */
+function useNarrowColumn() {
+  const [narrow, setNarrow] = useState(false);
+  useEffect(function watch() {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 900px)");
+    setNarrow(mq.matches);
+    function onChange(e: MediaQueryListEvent) {
+      setNarrow(e.matches);
+    }
+    mq.addEventListener("change", onChange);
+    return function cleanup() {
+      mq.removeEventListener("change", onChange);
+    };
+  }, []);
+  return narrow;
+}
+
+/**
+ * The Automate still, composed vertically for a phone column.
+ *
+ * The desktop diagram is a wide diagonal path; scaling it into a 327px
+ * column put its labels near 6px, which read as texture rather than words.
+ * This is not that composition shrunk — it is the same five nodes and the
+ * same five resting chips re-laid on a straight vertical line, so every
+ * label can stay at its real `type-eyebrow` size.
+ */
+function AutomateVerticalStill() {
+  return (
+    <ol
+      aria-hidden
+      style={{
+        listStyle: "none",
+        margin: 0,
+        padding: 0,
+        position: "relative",
+      }}
+    >
+      {/* the path the nodes sit on */}
+      <span
+        style={{
+          position: "absolute",
+          left: 7,
+          top: 12,
+          bottom: 12,
+          width: 1,
+          background: "var(--color-ink-soft)",
+          opacity: 0.55,
+        }}
+      />
+      {WORKFLOW_NODES.map(function row(node, i) {
+        return (
+          <li
+            key={node.id}
+            style={{
+              position: "relative",
+              display: "grid",
+              gridTemplateColumns: "16px minmax(0, 1fr) auto",
+              alignItems: "center",
+              gap: 12,
+              padding: "14px 0",
+            }}
+          >
+            <span
+              style={{
+                width: 15,
+                height: 15,
+                borderRadius: "50%",
+                border: "1px solid var(--color-ink)",
+                background: "var(--color-bg)",
+              }}
+            />
+            <span
+              className="type-eyebrow"
+              style={{
+                fontFamily: "var(--font-mono)",
+                color: "var(--color-ink)",
+              }}
+            >
+              {node.label}
+            </span>
+            <span
+              className="type-eyebrow"
+              style={{
+                fontFamily: "var(--font-mono)",
+                padding: "5px 10px",
+                borderRadius: 100,
+                background: "var(--color-dark)",
+                color: "var(--color-parch)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {PIPELINE_CHIPS[i]}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 function StaticAmbient({ pillar }: { pillar: Pillar["id"] }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
+  const narrow = useNarrowColumn();
   // Pinned at 1: every scroll-linked transform in the ambients resolves to
   // its end value, which is the finished composition.
   const progress = useMotionValue(1);
@@ -1294,6 +1398,14 @@ function StaticAmbient({ pillar }: { pillar: Pillar["id"] }) {
         </div>
       ) : null}
 
+      {/* Automate gets a purpose-built vertical composition on phones rather
+          than the desktop diagram shrunk to ~0.45, which put its labels near
+          6px. The other two still scale: the mood board reads fine as a
+          thumbnail, and the dashboard's figures are set large enough to
+          survive it. */}
+      {narrow && pillar === "automate" ? (
+        <AutomateVerticalStill />
+      ) : (
       <div
         ref={hostRef}
         aria-hidden
@@ -1318,6 +1430,7 @@ function StaticAmbient({ pillar }: { pillar: Pillar["id"] }) {
           <AmbientVisual pillar={pillar} scrollYProgress={progress} frozen />
         </div>
       </div>
+      )}
     </div>
   );
 }

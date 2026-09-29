@@ -97,6 +97,8 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 
 **17-fix** `a9ef74a` `4642136` `ea20a63` — `StackedPillar` (< 900px, and **any** width under reduced motion) rendered no ambient at all, so reduced-motion readers lost all three visuals instead of getting a real final state, and `AutomatePipeline`'s reduce branch was unreachable. `AmbientVisual` gained `frozen`, and `StaticAmbient` feeds it progress pinned at 1 so every scroll-linked transform resolves to its end value. The stills are **scaled** to the column, not reflowed — the compositions are authored in fixed px and a 0–400 SVG space and do not survive squeezing — and the ILLUSTRATIVE label is printed at full size *outside* the scaled box, because at 375 the still runs ~0.45 and a label inside it landed near 5px.
 
+**17-fix-2** — Two rulings from Prachets. (a) **Standing rule 18 is absolute** — commit + push per verified item; a brief's `Commit:` line is the report summary, not a squash target. Recorded in §4.18, §7.12 closed. (b) The scaled Automate still's ~6px labels at 375 were **a defect, not an acceptable thumbnail**. Below 900px that still is now a purpose-built **vertical** composition — the five nodes on a straight vertical line, each with its label at real `type-eyebrow` size and its resting chip beside it, ILLUSTRATIVE above. Not the desktop diagram shrunk. Design and Grow continue to scale.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -211,7 +213,7 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 ### Standing (process)
 16. **`npm run build` UNFILTERED, exit code 0, before every push — and report the exit code.** Never pipe it through `grep`: that is how two broken commits were pushed (`64e8bcd` fixed them). `npx vite build` skips `tsc` and will happily produce a bundle from code that does not typecheck.
 17. **Visually review every screenshot you take and describe what you see.** Measurements alone have repeatedly passed while the page looked wrong.
-18. **Commit + push after each verified item**, so a usage limit mid-session loses nothing.
+18. **Commit + push after each verified item**, so a usage limit mid-session loses nothing. **This outranks the `Commit:` line at the foot of a brief** — that line is the session *summary for the final report*, not one commit message to squash the work onto. Ruled by Prachets in 17-fix after Session 17 shipped as ten commits against a brief that supplied one message.
 19. **Verification protocol:** build exit 0 → push → confirm remote hash matches local → wait for Vercel → poll the alias until it serves the new bundle hash → DOM sweep **on the alias** → screenshots → hand back the preview URL.
 20. **Zero horizontal overflow at 375** on all routes, every session.
 21. **Zero ViewTimeline/ScrollTimeline on sticky descendants**, every session.
@@ -331,10 +333,10 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 6. **Contact-form budget bands** — Under $5K / $5K–$10K / $10K–$25K / $25K+. Deliberately kept under the no-prices rule; confirm the bands.
 7. **`og-image.svg` → PNG** — several platforms won't render SVG OG images.
 8. **"sales at Google" wording on /about** — flagged earlier, never resolved.
-9. **Full mobile review** — automated checks confirm zero overflow, but no human pass has been done on a real device. Session 17 added a new thing to look at here: the stacked pillar stills are scaled to ~0.45 at 375, so their internal labels sit near 6px. The compliance-critical ILLUSTRATIVE label was lifted out to full size, but the node names and chip labels inside the still are decorative-small by design — **worth a human eye on a real phone to confirm that reads as a thumbnail and not as a mistake.**
+9. **Full mobile review** — automated checks confirm zero overflow, but no human pass has been done on a real device. The Session 17 stacked stills are no longer a concern here: **Prachets ruled the ~6px Automate labels a defect, and 17-fix-2 replaced that still below 900px with a purpose-built vertical composition** — five nodes on a straight vertical path, every label at real `type-eyebrow` size. Design and Grow still scale, and both were checked as readable at 375.
 10. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
 11. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
-12. **Commit-message convention.** Session 17's brief supplied one session-summary commit message; the work shipped as ten per-item commits instead, following standing rule 18 (commit + push after each verified item, so a usage limit loses nothing). The two conventions conflict — worth settling which wins before Session 18.
+12. ~~**Commit-message convention.**~~ **CLOSED — Prachets ruled in 17-fix: standing rule 18 wins, always.** Commit + push per verified item. The `Commit:` line at the foot of a brief is the **summary for the final report**, not a single commit message to squash onto. See §4.18.
 
 ---
 
