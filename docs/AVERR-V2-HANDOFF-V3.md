@@ -24,10 +24,10 @@
 
 ```
 dist/assets/index-BpqLEds-.css   41.14 kB │ gzip:   8.64 kB
-dist/assets/index-BD_1sY_e.js   662.69 kB │ gzip: 192.30 kB
+dist/assets/index-B6pieH7b.js   673.86 kB │ gzip: 194.96 kB
 ```
 
-Gate: **flag anything over +12 KB gzip JS in a single session.** Session 17 was the largest so far at **+3.63 KB gzip** (188.67 → 192.30) for five items plus the fix; before that, per-session deltas were all under +2 KB. The CSS has not moved in several sessions — the `type-*` system absorbs new work without new rules.
+Gate: **flag anything over +12 KB gzip JS in a single session.** Sessions 17 → 17b total **+6.29 KB gzip** (188.67 → 194.96) across five items, two fixes and the /services inversion; before that, per-session deltas were all under +2 KB. The CSS has not moved in several sessions — the `type-*` system absorbs new work without new rules.
 
 ### Stack
 
@@ -99,6 +99,16 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 
 **17-fix-2** — Two rulings from Prachets. (a) **Standing rule 18 is absolute** — commit + push per verified item; a brief's `Commit:` line is the report summary, not a squash target. Recorded in §4.18, §7.12 closed. (b) The scaled Automate still's ~6px labels at 375 were **a defect, not an acceptable thumbnail**. Below 900px that still is now a purpose-built **vertical** composition — the five nodes on a straight vertical line, each with its label at real `type-eyebrow` size and its resting chip beside it, ILLUSTRATIVE above. Not the desktop diagram shrunk. Design and Grow continue to scale.
 
+**17b** `10cd235` `9cf8ec5` — **/services leads with what we do.** Owner feedback: the page opened on three enormous pillar words with the services people actually buy reduced to chips, so a visitor could not tell what the studio sells. The hierarchy is inverted — services are the page, pillars are the labels they group under.
+
+- **`servicePillars.ts` is now the single source for /services *and* home.** `PILLAR_SERVICES` holds 16 services, each with `name`, `outcome`, `proof: string[]`, and `from` — the original "what's included" string it renders in plain language, kept unrendered so every line on the page traces to the claim it came from. `SERVICE_COUNT` is derived, so the hero's "16 WAYS WE HELP" cannot drift from the list.
+- **Grow went from 4 services to 6.** The four offered services described work the portfolio does not show; the work it *does* show had no line. Prachets ruled: keep all four, add **Local search** and **Outreach campaigns**, both traced to CG Walls' own copy (*"Google Business Profile optimization"*, *"Google Business Profile seeded with an authentic Brampton homeowner review"*, *"Realtor lead-gen infrastructure: scrapers that watch posting activity, AI email generator that references the specific listing"*, *"door-to-door playbook … tier-ranked by home era and density"*). **Reporting** also regained "Attribution".
+- **Proof links only where a study's own copy shows the service was delivered — 9 of 16.** Prachets tightened two of my pairings in review: **Workflow audit** lost its CG link (a reduced-hours figure is an outcome, not evidence an audit was delivered) and **Human review built in** lost CapitalCommand (product philosophy, not a review layer built for a team). A row with no verified pair renders **no chip and reserves no space** — the absence is intended.
+- **`ServiceIndex.tsx`** — grouped rows at `--container-wide`, pillar label + timeline per group, name `type-h2` left, outcome `type-body-lg` right, proof chips beneath. Hover/focus shifts the name +8px, lifts the outcome to full ink, and fades a 240px proof thumbnail into a third grid track that the copy can never reach (measured: 24–60px clear at every width). A sticky pillar switcher tracks the active group by IntersectionObserver, jumps on click, and fades out after the index; on mobile it becomes a scroll-snap chip row and the thumbnails are dropped.
+- **Hero:** "Here's *exactly* what we do." (Cormorant on "exactly"), GTA subhead, scroll cue kept.
+- **The pillar sequence became "How each one works."** — pillar word down from `display-xl` to `display-l`, and stage 2 now names the same services the index sells instead of the old internal phrasing. Stacked path mirrors it.
+- **Home doors** print their pillar's first four service names in mono under the promise, read from the same record. The preview clamp is unaffected — its 24px clearance is measured against the promise column's left edge, which the added lines do not move.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -108,7 +118,7 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 | Order | Component | Signature mechanic |
 |---|---|---|
 | 1 | `Hero` | **The "serious." takeover.** Split h1 at `display-2xl`; a slab pill on the word "serious." expands via scroll-linked `clip-path` from the measured pill rect into a full dark frame carrying a 4-case-study reel that pans. Publishes a nav-dark override. **This is the quality floor for every other page.** |
-| 2 | `Chapter tone="cream" from="dark"` → `ThreeScenes` + `ThreeDoors` | Three unpinned scenes (template sameness → client specificity → full-bleed result); then three service doors with live hover previews clamped against both the name and the promise, Grow showing a mini dashboard labelled ILLUSTRATIVE |
+| 2 | `Chapter tone="cream" from="dark"` → `ThreeScenes` + `ThreeDoors` | Three unpinned scenes (template sameness → client specificity → full-bleed result); then three service doors with live hover previews clamped against both the name and the promise, Grow showing a mini dashboard labelled ILLUSTRATIVE; each door prints its pillar's first four service names in mono under the promise, read from `PILLAR_SERVICES` |
 | 3 | `Chapter tone="dark" from="cream-alt"` → `ProofLedger` + `Manifesto` | Ledger rows count up, hairline draws left→right; `FeaturedCard` above carries the 85% |
 | 4 | `Chapter tone="cream" from="dark"` → `FinalCTA markerNumber="06"` | Contains the only remaining home `PillHl` ("actually") |
 
@@ -150,21 +160,24 @@ Order, each wrapped in `SectionBoundary`:
 
 `status: "draft"` routes to `ComingSoon`. **Never linked from the finale cycle.** Appears in the /work film as the final segment: muted name, `IN PROGRESS`, no image, no figure, no link, neutral (non-tint) light.
 
-### `/services` — the kickoff calendar (`src/pages/Services.tsx`)
+### `/services` — the service index + the kickoff calendar (`src/pages/Services.tsx`)
 
-Rebuilt in Session 17. Signature mechanic: **the 14-day calendar.**
+Rebuilt in Session 17, re-ordered in 17b. **The page leads with what the studio sells**; the pillars are labels those services group under, not the headline. Signature mechanic: **the 14-day calendar**; primary content: **the Service Index**.
 
 | Order | Component | Signature mechanic |
 |---|---|---|
-| 1 | `ServicesHeader` | h1 `display-l` on one `CharReveal` stagger, "One studio" an accent segment bound with an NBSP; home's scroll cue |
-| 2 | `PillarSequence` | Sticky-scroll Design / Automate / Grow, three stages each, ambient right column. Design = mood board at natural aspect, fanning ±6° on hover. Automate = node path with illustrative task chips looping it, nodes lighting on arrival. Grow = dashboard counting to its sample figures. Both Automate and Grow carry ILLUSTRATIVE. "What's included" assembles as chips. Rail meets the container edge at ≥1680. |
+| 1 | `ServicesHeader` | Eyebrow "SERVICES · {SERVICE_COUNT} WAYS WE HELP" counted from data; h1 "Here's *exactly* what we do." on one `CharReveal` stagger with the Cormorant accent on "exactly"; home's scroll cue |
+| 1b | **`ServiceIndex`** | **The page's primary content.** 16 services grouped by pillar, name `type-h2` / outcome `type-body-lg` / proof chips, a 240px proof thumbnail on hover in its own grid track, and a sticky pillar switcher that tracks by scroll and fades after the index |
+| 2 | `PillarSequenceHeader` + `PillarSequence` | "How each one works." Sticky-scroll Design / Automate / Grow, three stages each, ambient right column. Design = mood board at natural aspect, fanning ±6° on hover. Automate = node path with illustrative task chips looping it, nodes lighting on arrival. Grow = dashboard counting to its sample figures. Both Automate and Grow carry ILLUSTRATIVE. "What's included" assembles as chips. Rail meets the container edge at ≥1680. |
 | 3 | `Chapter dark from cream` → `NoList` | Each refusal struck as you read, across a verbatim substring |
 | 4 | `Chapter cream-warm from dark` → `KickoffCalendar` | **The signature.** 14 cells fill in order as the section scrolls past (normal flow, never pinned); each step card arrives as its own first day fills and spans exactly its day range, so a card's width is the length of the step. `WITHIN 14 DAYS · KICKOFF` at day 12. |
 | 5 | `Chapter dark from cream-warm` → `ServicesCloser` | /services-specific. `useDeclarePageEndTone("dark")`. |
 
-Below 900px — **and at any width under reduced motion** — `PillarSequence` renders `StackedPillar`, which shows each ambient as a scaled still via `StaticAmbient` (see §2, 17-fix). No `FinalCTA`, no `PillHl`.
+Below 900px — **and at any width under reduced motion** — `PillarSequence` renders `StackedPillar`, which shows each ambient as a still via `StaticAmbient`: Design and Grow scale, **Automate switches to a purpose-built vertical composition** so its labels stay at real size (§2, 17-fix / 17-fix-2). No `FinalCTA`, no `PillHl`.
 
-Data: `src/data/servicePillars.ts` (timelines, Grow metrics), `src/data/servicesProcess.ts` (steps + day ranges, refusals + struck phrases, pipeline chip labels).
+Data: **`src/data/servicePillars.ts` is the single source for /services and home** — `PILLAR_SERVICES` (16 services: name, outcome, verified proof slugs, and the original "what's included" string kept unrendered for traceability), `SERVICE_COUNT`, `PILLAR_TIMELINE`, `GROW_METRICS`. Also `src/data/servicesProcess.ts` (steps + day ranges, refusals + struck phrases, pipeline chip labels).
+
+**Proof rule:** a service links to a case study only where that study's own copy shows the service was delivered. Nine of sixteen qualify. A service with none renders no chip and reserves no space — do not fill the gap with a weaker link.
 
 ### `/about`, `/contact`, `*` (404)
 
