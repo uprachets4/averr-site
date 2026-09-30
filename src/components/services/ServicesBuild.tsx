@@ -17,6 +17,7 @@ import {
   PILLAR_ORDER,
   PILLAR_SERVICES,
   PILLAR_TIMELINE,
+  ILLUSTRATIVE_LABEL,
   type PillarId,
   type Service,
 } from "../../data/servicePillars";
@@ -182,6 +183,22 @@ export default function ServicesBuild() {
           />
 
           <div style={{ position: "relative", height: "84vh", maxHeight: 880 }}>
+            {/* one label for the stage. Rendering it per layer meant two
+                overlapping copies during every switch. */}
+            <div
+              className="type-eyebrow"
+              style={{
+                position: "absolute",
+                top: -25,
+                right: 2,
+                fontFamily: "var(--font-mono)",
+                color: "var(--color-muted-2)",
+                pointerEvents: "none",
+                zIndex: 30,
+              }}
+            >
+              {ILLUSTRATIVE_LABEL}
+            </div>
             <ScreenStack position={position} activeBeat={activeBeat} reduce={!!reduce} />
           </div>
         </div>
@@ -505,9 +522,15 @@ function ScreenLayer({
   // slides in at full opacity ON TOP of it and occludes it, the way one
   // application window covers another. Nothing is ever semi-transparent
   // over the page, so there is no washed frame.
+  // Near-hard cut, not a ramp. Sliding the incoming window in while it is
+  // still semi-transparent let both windows read at once — the outgoing
+  // one showed straight through it, offset, which is what made the switch
+  // look like two broken frames. It now becomes opaque almost immediately
+  // and slides in OVER the outgoing one, occluding it the way a real
+  // window does.
   const opacity = useTransform(
     position,
-    [index - 0.1, index, index + 0.999, index + 1],
+    [index - 0.1, index - 0.088, index + 0.999, index + 1],
     [0, 1, 1, 0]
   );
   const x = useTransform(
@@ -528,7 +551,12 @@ function ScreenLayer({
       style={{ position: "absolute", inset: 0, zIndex: index }}
     >
       <motion.div style={{ x, height: "100%" }}>
-        <WindowChrome tone={spec.tone} url={spec.url} title={spec.title}>
+        <WindowChrome
+          tone={spec.tone}
+          url={spec.url}
+          title={spec.title}
+          showIllustrative={false}
+        >
           {/* the focus move scales the CONTENT; the chrome never moves */}
           <motion.div
             style={{
