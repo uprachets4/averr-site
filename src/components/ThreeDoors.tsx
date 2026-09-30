@@ -13,6 +13,7 @@ import { DESIGN_PREVIEW_SHOTS } from "../data/homeScenes";
 import {
   GROW_METRICS,
   ILLUSTRATIVE_LABEL,
+  PILLAR_SERVICES,
   PILLAR_TIMELINE,
 } from "../data/servicePillars";
 
@@ -52,6 +53,10 @@ const PANEL_W = "clamp(260px, 39.0625vw - 140px, 360px)";
 const PANEL_MAX_H = 225;
 /** Clear space the panel must leave on either side — the row's name to its
  *  left, the promise copy to its right. */
+/** How many service names each door prints. Four fits the right column at
+ *  1440 without pushing the preview's clearance; the brief's range is 3-4. */
+const DOOR_SERVICE_COUNT = 4;
+
 const EDGE_CLEARANCE = 24;
 const DRIFT = 40;
 
@@ -421,6 +426,22 @@ function Door({
             style={{ color: "var(--color-muted)", marginBottom: 8 }}
           >
             {door.promise}
+          </div>
+          {/* The services themselves, always visible — the promise says what
+              the pillar is for, this says what you actually buy. Read from
+              the shared record, so home and /services cannot disagree. */}
+          <div
+            className="type-eyebrow"
+            style={{
+              fontFamily: "var(--font-mono)",
+              color: "var(--color-muted-2)",
+              marginBottom: 8,
+            }}
+          >
+            {PILLAR_SERVICES[door.id]
+              .slice(0, DOOR_SERVICE_COUNT)
+              .map((x) => x.name)
+              .join(" · ")}
           </div>
           <div
             className="type-eyebrow"
