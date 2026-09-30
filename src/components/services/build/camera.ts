@@ -2,68 +2,75 @@ import { useTransform, type MotionValue } from "motion/react";
 import { easing } from "../../../lib/motion";
 
 /**
- * Per-beat push-ins.
+ * Per-beat focus moves.
  *
- * The camera frames the moment that matters: it scales the window's
- * CONTENT toward a focal point and comes back out, so the reader is
- * looking at the KPI that changed rather than hunting for it. The chrome
- * is deliberately outside this transform — scaling the window edges is
- * what makes a mockup look like a zoomed screenshot instead of a camera
- * move.
+ * 17c-2's first pass pushed in hard (1.5–1.6) toward a point, which read
+ * as a broken layout: text cropped mid-word at the window edge and a lot
+ * of empty frame. A camera does not work that way. This is a *focus*
+ * move — a gentle push (1.35 max) plus a spotlight that dims and blurs
+ * everything outside the focus rect, so the cropped surroundings read as
+ * out-of-focus background rather than as damage.
  *
- * Transforms only, per the locked rules: scale and translate, never
- * width/height, and never an animated `calc()` (§5.3).
+ * The focal point is the transform origin, so the focused element stays
+ * exactly where it is on screen by construction and can never be pushed
+ * out of view. The chrome sits outside this transform: scaling the
+ * window edges is what makes a mockup look like a zoomed screenshot.
+ *
+ * Transforms only — no animated width/height, no animated calc() (§5.3).
  */
 
-export type CameraMove = {
-  /** Local beat progress where the push-in starts. */
+/** The hardest push that still reads as focus rather than a zoom. */
+export const MAX_FOCUS_SCALE = 1.35;
+
+export type FocusMove = {
+  /** Local beat progress where the move starts. */
   from: number;
-  /** Where it is fully in. */
+  /** Fully in. */
   hold: number;
-  /** Where it has returned to 1. */
+  /** Released. */
   to: number;
-  /** Focal point as a percentage of the content box. */
-  x: number;
-  y: number;
-  /** 1.4–1.8 reads as a push-in; beyond that the content softens. */
-  scale: number;
+  /**
+   * The rect to focus, in percent of the content box. The spotlight
+   * keeps this fully visible; the transform origin is its centre.
+   */
+  rect: { x: number; y: number; w: number; h: number };
+  /** Clamped to MAX_FOCUS_SCALE. */
+  scale?: number;
 };
 
-export type Camera = {
+export type Focus = {
   scale: MotionValue<number>;
-  x: MotionValue<string>;
-  y: MotionValue<string>;
+  /** 0 → 1 as the spotlight comes up. */
+  dim: MotionValue<number>;
   origin: string;
+  rect: FocusMove["rect"] | null;
 };
 
-/**
- * Scaling about a focal point is done with `transformOrigin` rather than
- * a translate, so the maths stays honest at any window size: the origin
- * is the focal point, and the content grows around it.
- */
-export function useCamera(
+export function useFocus(
   local: MotionValue<number>,
-  move: CameraMove | null
-): Camera {
-  const scale = useTransform(local, function pushIn(t) {
-    if (!move) return 1;
-    if (t <= move.from || t >= move.to) return 1;
+  move: FocusMove | null
+): Focus {
+  const target = move
+    ? Math.min(MAX_FOCUS_SCALE, move.scale ?? MAX_FOCUS_SCALE)
+    : 1;
+
+  const amount = useTransform(local, function ramp(t) {
+    if (!move) return 0;
+    if (t <= move.from || t >= move.to) return 0;
     if (t < move.hold) {
-      const r = (t - move.from) / (move.hold - move.from || 1);
-      return 1 + (move.scale - 1) * easing.outQuart(r);
+      return easing.outQuart((t - move.from) / (move.hold - move.from || 1));
     }
-    const r = (t - move.hold) / (move.to - move.hold || 1);
-    return move.scale + (1 - move.scale) * easing.inOut(r);
+    return 1 - easing.inOut((t - move.hold) / (move.to - move.hold || 1));
   });
 
-  // kept as MotionValues so a caller can compose further if it needs to
-  const x = useTransform(scale, () => "0%");
-  const y = useTransform(scale, () => "0%");
+  const scale = useTransform(amount, (a) => 1 + (target - 1) * a);
 
   return {
     scale,
-    x,
-    y,
-    origin: move ? `${move.x}% ${move.y}%` : "50% 50%",
+    dim: amount,
+    origin: move
+      ? `${move.rect.x + move.rect.w / 2}% ${move.rect.y + move.rect.h / 2}%`
+      : "50% 50%",
+    rect: move ? move.rect : null,
   };
 }

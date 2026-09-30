@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   motion,
@@ -22,7 +22,8 @@ import {
 } from "../../data/servicePillars";
 import WindowChrome from "./build/WindowChrome";
 import GhostCursor from "./build/GhostCursor";
-import { useCamera } from "./build/camera";
+import { useFocus } from "./build/camera";
+import FocusSpotlight from "./build/FocusSpotlight";
 import { DESIGN_SPECS } from "./build/BuildScreens";
 
 /** Phase map inside one beat: caption in 0-0.15, canvas build 0.05-0.40,
@@ -165,8 +166,8 @@ export default function ServicesBuild() {
             maxWidth: "var(--container-wide)",
             margin: "0 auto",
             display: "grid",
-            gridTemplateColumns: "32% 62%",
-            gap: "6%",
+            gridTemplateColumns: "30% 66%",
+            gap: "4%",
             alignItems: "center",
             paddingBottom: 40,
           }}
@@ -180,7 +181,7 @@ export default function ServicesBuild() {
             position={position}
           />
 
-          <div style={{ position: "relative", height: "82vh", maxHeight: 820 }}>
+          <div style={{ position: "relative", height: "84vh", maxHeight: 880 }}>
             <ScreenStack position={position} activeBeat={activeBeat} reduce={!!reduce} />
           </div>
         </div>
@@ -230,12 +231,7 @@ function BuildCaption({
         <span>{PILLAR_TIMELINE[beat.pillar]}</span>
       </div>
 
-      <h2
-        className="type-display-l"
-        style={{ color: "var(--color-ink)", marginBottom: 20 }}
-      >
-        <CharReveal text={beat.service.name} />
-      </h2>
+      <FittedName name={beat.service.name} />
 
       <motion.p
         initial={{ opacity: 0, y: 10 }}
@@ -275,6 +271,58 @@ function BuildCaption({
         </motion.div>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * The service name, fitted to its column by MEASURING the widest word.
+ *
+ * CharReveal lays each word out as an inline-block, so a word wider than
+ * the column overflows silently while still reporting one line (§5.5) —
+ * which is exactly how "Post-launch" ended up 101px past its column and
+ * inside the window at 1680. Line-count checks cannot see it; only
+ * measuring the word can.
+ */
+function FittedName({ name }: { name: string }) {
+  const hostRef = useRef<HTMLHeadingElement | null>(null);
+  const [scale, setScale] = useState(1);
+
+  useLayoutEffect(
+    function fit() {
+      function run() {
+        const el = hostRef.current;
+        if (!el) return;
+        const col = el.clientWidth;
+        if (!col) return;
+        let widest = 0;
+        el.querySelectorAll<HTMLElement>(":scope > span > span").forEach((w) => {
+          if (w.querySelector("span")) {
+            widest = Math.max(widest, w.getBoundingClientRect().width / scale);
+          }
+        });
+        setScale(widest > col ? Math.max(0.62, col / widest) : 1);
+      }
+      run();
+      window.addEventListener("resize", run);
+      return function cleanup() {
+        window.removeEventListener("resize", run);
+      };
+    },
+    [name, scale]
+  );
+
+  return (
+    <h2
+      ref={hostRef}
+      className="type-h1"
+      style={{
+        color: "var(--color-ink)",
+        marginBottom: 20,
+        fontSize: scale === 1 ? undefined : `calc(var(--type-h1-size) * ${scale})`,
+      }}
+    >
+      <CharReveal text={name} />
+    </h2>
   );
 }
 
@@ -449,48 +497,51 @@ function ScreenLayer({
   // App-switch transition: the outgoing window slides and dissolves as
   // the next one comes up under it. Never a blank frame — both layers
   // are mounted through the whole hand-off.
-  // The hand-off window is deliberately narrow. A wide crossfade left the
-  // NEXT screen sitting at ~12% opacity right through the current beat's
-  // dwell, so the brand board had a whole website ghosted through it.
-  // A layer is now fully opaque for its own beat and only shares the
-  // frame during the last tenth, which is the app-switch itself.
+  // App-switch, not a crossfade.
+  //
+  // Two windows both sitting at ~50% opacity over the cream page let the
+  // page show through BOTH, which is what made the switch look grey and
+  // disabled. Here the outgoing window never fades: the incoming one
+  // slides in at full opacity ON TOP of it and occludes it, the way one
+  // application window covers another. Nothing is ever semi-transparent
+  // over the page, so there is no washed frame.
   const opacity = useTransform(
     position,
-    [index - 0.1, index, index + 0.9, index + 1],
+    [index - 0.1, index, index + 0.999, index + 1],
     [0, 1, 1, 0]
   );
-  const y = useTransform(
+  const x = useTransform(
     position,
     [index - 0.1, index, index + 0.9, index + 1],
-    [22, 0, 0, -14]
-  );
-  const scale = useTransform(
-    position,
-    [index - 0.1, index, index + 0.9, index + 1],
-    [0.972, 1, 1, 0.992]
+    ["6%", "0%", "0%", "-6%"]
   );
 
-  const camera = useCamera(local, reduce ? null : spec.camera);
+  const focus = useFocus(local, reduce ? null : spec.camera);
   const ref = useScrollStyle<HTMLDivElement>(opacity);
   const Screen = spec.Screen;
 
   return (
     <div
       ref={ref}
-      style={{ position: "absolute", inset: 0 }}
+      // later beats sit above earlier ones, so the incoming window covers
+      // the outgoing one instead of blending with it
+      style={{ position: "absolute", inset: 0, zIndex: index }}
     >
-      <motion.div style={{ y, scale, height: "100%" }}>
+      <motion.div style={{ x, height: "100%" }}>
         <WindowChrome tone={spec.tone} url={spec.url} title={spec.title}>
-          {/* the camera scales the CONTENT; the chrome above never moves */}
+          {/* the focus move scales the CONTENT; the chrome never moves */}
           <motion.div
             style={{
               position: "absolute",
               inset: 0,
-              scale: camera.scale,
-              transformOrigin: camera.origin,
+              scale: focus.scale,
+              transformOrigin: focus.origin,
             }}
           >
             <Screen local={local} />
+            {focus.rect ? (
+              <FocusSpotlight rect={focus.rect} amount={focus.dim} />
+            ) : null}
           </motion.div>
           <GhostCursor local={local} keys={spec.cursor} hidden={reduce} />
         </WindowChrome>

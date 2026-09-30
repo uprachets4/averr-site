@@ -3,6 +3,11 @@ import { motion, useReducedMotion } from "motion/react";
 import { duration, ease } from "../lib/motion";
 import { CharReveal } from "../components/CharReveal";
 import ServicesBuild from "../components/services/ServicesBuild";
+import Chapter from "../components/Chapter";
+import KickoffCalendar from "../components/services/KickoffCalendar";
+import NoList from "../components/services/NoList";
+import ServicesCloser from "../components/services/ServicesCloser";
+import { useDeclarePageEndTone } from "../lib/pageTone";
 import { SERVICE_COUNT } from "../data/servicePillars";
 
 /**
@@ -199,10 +204,25 @@ export default function ServicesNext() {
     window.scrollTo(0, 0);
   }, []);
 
+  // The closer is dark, so the footer reveals over dark.
+  useDeclarePageEndTone("dark");
+
   return (
     <>
       <BuildHero />
       <ServicesBuild />
+      {/* The same components /services renders, in the same order — the
+          pin releases into real content rather than dead space, exactly
+          as the finished page will. Reused, never duplicated. */}
+      <Chapter tone="dark" from="cream">
+        <NoList />
+      </Chapter>
+      <Chapter tone="cream-warm" from="dark">
+        <KickoffCalendar />
+      </Chapter>
+      <Chapter tone="dark" from="cream-warm">
+        <ServicesCloser />
+      </Chapter>
     </>
   );
 }

@@ -7,7 +7,7 @@ import {
 } from "motion/react";
 import { useScrollStyle } from "../../../lib/useScrollStyle";
 import type { CursorKey } from "./GhostCursor";
-import type { CameraMove } from "./camera";
+import type { FocusMove } from "./camera";
 import type { ChromeTone } from "./WindowChrome";
 
 /**
@@ -1185,12 +1185,28 @@ function VariantRow({
    B5 · Release / performance
    ═══════════════════════════════════════════════════════════════ */
 
-const CHANGELOG: Array<[string, string, string]> = [
-  ["v1.3", "12 Mar", "Booking widget on every service page"],
-  ["v1.2", "26 Feb", "Compressed gallery images, lazy below the fold"],
-  ["v1.1", "09 Feb", "Added Whitby and Oshawa service areas"],
-  ["v1.0", "22 Jan", "Launch"],
+const CHANGELOG: Array<[string, string, string, string]> = [
+  ["v1.3", "12 Mar", "Booking widget on every service page", "feature"],
+  ["v1.2", "26 Feb", "Compressed gallery images, lazy below the fold", "perf"],
+  ["v1.1", "09 Feb", "Added Whitby and Oshawa service areas", "content"],
+  ["v1.0.4", "02 Feb", "Fixed quote form validation on iOS Safari", "fix"],
+  ["v1.0.3", "28 Jan", "Schema markup for local business + reviews", "seo"],
+  ["v1.0.2", "26 Jan", "Phone number click-to-call on mobile", "fix"],
+  ["v1.0.1", "24 Jan", "Swapped hero image, trimmed 340 KB", "perf"],
+  ["v1.0", "22 Jan", "Launch", "release"],
 ];
+
+const TAG_TINT: Record<string, [string, string]> = {
+  feature: ["rgba(31,93,76,0.12)", "#1F5D4C"],
+  perf: ["rgba(62,124,166,0.14)", "#31627F"],
+  content: ["rgba(200,118,60,0.14)", "#9A5526"],
+  fix: ["rgba(27,31,29,0.08)", "rgba(27,31,29,0.6)"],
+  seo: ["rgba(111,125,120,0.16)", "#55635E"],
+  release: ["rgba(63,160,107,0.16)", "#2E7A50"],
+};
+
+/** Deploys per week — the small history chart under the vitals. */
+const DEPLOYS = [2, 4, 3, 6, 5, 8, 6, 9, 7, 11];
 
 const VITALS: Array<[string, string, string]> = [
   ["LCP", "1.4 s", "Good"],
@@ -1247,40 +1263,53 @@ export function ScreenRelease({ local }: ScreenProps) {
         </div>
 
         <Fade opacity={entries} style={{ flex: 1, minHeight: 0 }}>
-          {CHANGELOG.map(([v, date, note], i) => (
-            <div
-              key={v}
-              style={{
-                display: "flex",
-                gap: 11,
-                padding: "9px 0",
-                borderTop: i === 0 ? "none" : "1px solid rgba(27,31,29,0.08)",
-                opacity: i === 0 && !published ? 0.42 : 1,
-                transition: "opacity 300ms ease",
-              }}
-            >
-              <span
+          {CHANGELOG.map(([v, date, note, tag], i) => {
+            const [tbg, tfg] = TAG_TINT[tag];
+            return (
+              <div
+                key={v}
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 9,
-                  fontWeight: 600,
-                  background: i === 0 ? "#1F5D4C" : "rgba(27,31,29,0.08)",
-                  color: i === 0 ? "#fff" : "rgba(27,31,29,0.66)",
-                  borderRadius: 5,
-                  padding: "3px 7px",
-                  height: "fit-content",
+                  display: "flex",
+                  gap: 11,
+                  alignItems: "flex-start",
+                  padding: "7px 0",
+                  borderTop: i === 0 ? "none" : "1px solid rgba(27,31,29,0.07)",
+                  opacity: i === 0 && !published ? 0.42 : 1,
+                  transition: "opacity 300ms ease",
                 }}
               >
-                {v}
-              </span>
-              <span style={{ flex: 1 }}>
-                <span style={{ display: "block", fontSize: 10.5 }}>{note}</span>
-                <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,31,29,0.45)", marginTop: 2 }}>
-                  {date} · deployed in 42 s
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 9,
+                    fontWeight: 600,
+                    background: i === 0 ? "#1F5D4C" : "rgba(27,31,29,0.07)",
+                    color: i === 0 ? "#fff" : "rgba(27,31,29,0.62)",
+                    borderRadius: 5,
+                    padding: "3px 7px",
+                    height: "fit-content",
+                    minWidth: 44,
+                    textAlign: "center",
+                  }}
+                >
+                  {v}
                 </span>
-              </span>
-            </div>
-          ))}
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ display: "block", fontSize: 10.5, lineHeight: 1.35 }}>
+                    {note}
+                  </span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 3 }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,31,29,0.45)" }}>
+                      {date} · deployed in {28 + i * 4} s
+                    </span>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 8, background: tbg, color: tfg, borderRadius: 999, padding: "1.5px 7px" }}>
+                      {tag}
+                    </span>
+                  </span>
+                </span>
+              </div>
+            );
+          })}
         </Fade>
 
         {/* diff card */}
@@ -1386,6 +1415,32 @@ export function ScreenRelease({ local }: ScreenProps) {
             </div>
           ))}
         </div>
+
+        <div style={{ background: "#fff", border: "1px solid rgba(27,31,29,0.09)", borderRadius: 10, padding: 13, flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,31,29,0.45)" }}>
+              Deploys
+            </span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,31,29,0.4)" }}>
+              last 10 weeks
+            </span>
+            <span style={{ flex: 1 }} />
+            <span style={{ fontSize: 12, fontWeight: 600 }}>61</span>
+          </div>
+          <div style={{ flex: 1, display: "flex", alignItems: "flex-end", gap: 6, minHeight: 54 }}>
+            {DEPLOYS.map((d, i) => (
+              <span
+                key={i}
+                style={{
+                  flex: 1,
+                  height: `${(d / 11) * 100}%`,
+                  borderRadius: 3,
+                  background: i === DEPLOYS.length - 1 ? "#3FA06B" : "rgba(31,93,76,0.22)",
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1400,7 +1455,7 @@ export type BeatSpec = {
   url?: string;
   title?: string;
   cursor: CursorKey[];
-  camera: CameraMove | null;
+  camera: FocusMove | null;
   Screen: (p: ScreenProps) => React.ReactElement;
 };
 
@@ -1416,12 +1471,13 @@ export const DESIGN_SPECS: BeatSpec[] = [
       { at: 0.55, x: 92, y: 12, press: true },
       { at: 0.72, x: 74, y: 70 },
     ],
-    camera: { from: 0.1, hold: 0.26, to: 0.46, x: 16, y: 14, scale: 1.55 },
+    // the lockup, top-left
+    camera: { from: 0.44, hold: 0.56, to: 0.74, rect: { x: 4, y: 4, w: 54, h: 20 }, scale: 1.3 },
     Screen: ScreenBrandBoard,
   },
   {
     tone: "light",
-    url: "yourbusiness.ca",
+    url: "northgate.ca",
     // fills the postal field, presses Get a quote
     cursor: [
       { at: 0.16, x: 30, y: 30 },
@@ -1431,7 +1487,8 @@ export const DESIGN_SPECS: BeatSpec[] = [
       { at: 0.65, x: 78, y: 52, press: true },
       { at: 0.86, x: 60, y: 74 },
     ],
-    camera: { from: 0.3, hold: 0.46, to: 0.72, x: 78, y: 44, scale: 1.5 },
+    // the booking widget the cursor is filling
+    camera: { from: 0.44, hold: 0.58, to: 0.8, rect: { x: 60, y: 6, w: 38, h: 40 }, scale: 1.3 },
     Screen: ScreenLocalSite,
   },
   {
@@ -1446,7 +1503,8 @@ export const DESIGN_SPECS: BeatSpec[] = [
       { at: 0.73, x: 94, y: 12, press: true },
       { at: 0.9, x: 60, y: 70 },
     ],
-    camera: { from: 0.46, hold: 0.6, to: 0.78, x: 24, y: 32, scale: 1.55 },
+    // the KPI row that changes when the range switches
+    camera: { from: 0.52, hold: 0.64, to: 0.82, rect: { x: 7, y: 12, w: 90, h: 24 }, scale: 1.28 },
     Screen: ScreenAnalytics,
   },
   {
@@ -1459,7 +1517,8 @@ export const DESIGN_SPECS: BeatSpec[] = [
       { at: 0.57, x: 88, y: 12, press: true },
       { at: 0.78, x: 76, y: 76 },
     ],
-    camera: { from: 0.62, hold: 0.76, to: 0.95, x: 78, y: 78, scale: 1.6 },
+    // the token table
+    camera: { from: 0.62, hold: 0.74, to: 0.9, rect: { x: 58, y: 44, w: 40, h: 34 }, scale: 1.3 },
     Screen: ScreenLibrary,
   },
   {
@@ -1472,7 +1531,8 @@ export const DESIGN_SPECS: BeatSpec[] = [
       { at: 0.49, x: 44, y: 11, press: true },
       { at: 0.74, x: 74, y: 28 },
     ],
-    camera: { from: 0.52, hold: 0.68, to: 0.9, x: 74, y: 26, scale: 1.6 },
+    // the score ring counting up
+    camera: { from: 0.56, hold: 0.7, to: 0.88, rect: { x: 56, y: 4, w: 42, h: 26 }, scale: 1.3 },
     Screen: ScreenRelease,
   },
 ];
