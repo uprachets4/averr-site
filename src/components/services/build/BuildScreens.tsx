@@ -50,6 +50,14 @@ function Fade({
   );
 }
 
+/*
+ * Timing convention: a screen's LAYOUT finishes assembling by local 0.40,
+ * which is where the dwell starts. Everything after that is the cursor's
+ * interaction and the screen's response to it — a field filling, a range
+ * switching, a theme flipping. A screen still building during its own
+ * dwell reads as unfinished rather than as software being used.
+ */
+
 /* ── the brand the demo business ends up with ─────────────────── */
 
 const BRAND = {
@@ -83,10 +91,10 @@ export function ScreenBrandBoard({ local }: ScreenProps) {
     setAccent(t > 0.545 ? BRAND.accentB : BRAND.accentA);
   });
 
-  const draw = useTransform(local, (t) => at(t, 0.1, 0.42));
-  const chips = useTransform(local, (t) => at(t, 0.3, 0.5));
-  const spec = useTransform(local, (t) => at(t, 0.4, 0.6));
-  const apps = useTransform(local, (t) => at(t, 0.58, 0.8));
+  const draw = useTransform(local, (t) => at(t, 0.08, 0.28));
+  const chips = useTransform(local, (t) => at(t, 0.14, 0.3));
+  const spec = useTransform(local, (t) => at(t, 0.2, 0.34));
+  const apps = useTransform(local, (t) => at(t, 0.26, 0.4));
 
   return (
     <div
@@ -680,7 +688,7 @@ export function ScreenAnalytics({ local }: ScreenProps) {
     setNotif(t > 0.72 && t < 0.95);
   });
   const kpis = range === "30d" ? KPI_30D : KPI_7D;
-  const chartDraw = useTransform(local, (t) => at(t, 0.14, 0.46));
+  const chartDraw = useTransform(local, (t) => at(t, 0.1, 0.38));
 
   return (
     <div
@@ -1202,7 +1210,7 @@ export function ScreenRelease({ local }: ScreenProps) {
     setScore(Math.round(72 + (98 - 72) * v));
   });
   const ringLen = useTransform(scoreT, (v) => 0.72 + (0.98 - 0.72) * v);
-  const entries = useTransform(local, (t) => at(t, 0.12, 0.44));
+  const entries = useTransform(local, (t) => at(t, 0.08, 0.36));
 
   return (
     <div
