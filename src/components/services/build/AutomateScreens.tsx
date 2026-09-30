@@ -223,7 +223,7 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
         </div>
         {STEPS.map(([n, d], i) => (
           <div key={n} style={{ display: "flex", alignItems: "center", gap: 9, padding: "8px 0", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-            <span style={{ width: 15, height: 15, borderRadius: "50%", background: i <= step ? "#3FD08A" : "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: NAVY }}>
+            <span style={{ width: 17, height: 17, borderRadius: "50%", background: i <= step ? "#3FD08A" : "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: MIN, lineHeight: 1, color: NAVY }}>
               {i <= step ? "✓" : ""}
             </span>
             <span style={{ flex: 1, fontSize: 12 }}>{n}</span>
