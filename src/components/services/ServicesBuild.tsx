@@ -225,7 +225,7 @@ export default function ServicesBuild() {
               The outgoing caption has already faded to 0 by the time the
               index changes, so they never overlap (the /work film rule). */}
           {inTransition ? (
-            <ChapterCard />
+            <ChapterCard position={position} />
           ) : (
             <BuildCaption
               key={activeBeat}
@@ -653,10 +653,21 @@ function ScreenLayer({
   );
 }
 
-/** The caption column during the Design to Automate hand-off. */
-function ChapterCard() {
+/** The caption column during the Design to Automate hand-off.
+ *
+ *  It lands only once the outgoing site window has slid clear. The
+ *  pulled-aside window travels far enough left to cross the caption
+ *  column, so showing the card from the start of the transition left it
+ *  half-covered by a moving window. */
+function ChapterCard({ position }: { position: MotionValue<number> }) {
+  const opacity = useTransform(
+    position,
+    [TRANSITION_SLOT + 0.62, TRANSITION_SLOT + 0.78],
+    [0, 1]
+  );
+  const ref = useScrollStyle<HTMLDivElement>(opacity);
   return (
-    <div>
+    <div ref={ref}>
       <div
         className="type-eyebrow"
         style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)", marginBottom: 22 }}
