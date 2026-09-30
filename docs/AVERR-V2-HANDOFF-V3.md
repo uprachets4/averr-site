@@ -24,10 +24,10 @@
 
 ```
 dist/assets/index-DS0F-gPc.css    41.71 kB │ gzip:  8.65 kB
-dist/assets/index-BZtB-bR9.js    477.90 kB │ gzip: 151.65 kB  ← home + shell + motion
+dist/assets/index-DwqKGxVB.js    477.90 kB │ gzip: 151.65 kB  ← home + shell + motion
 dist/assets/Services-*.js         38.57 kB │ gzip: 10.80 kB
 dist/assets/CaseStudy-*.js        51.42 kB │ gzip: 12.74 kB
-dist/assets/ServicesNext-*.js     51.53 kB │ gzip: 13.40 kB
+dist/assets/ServicesNext-*.js     81.60 kB │ gzip: 19.46 kB  ← 10 beats of product screens
 dist/assets/ServicesCloser-*.js   10.96 kB │ gzip:  3.32 kB  ← shared by both services routes
 dist/assets/Contact-*.js          44.73 kB │ gzip: 11.16 kB
 dist/assets/Work-*.js             22.22 kB │ gzip:  6.66 kB
@@ -153,6 +153,20 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 
 *Probe errors, mine:* the gap check first measured the **leftmost** frame rather than the active one — during a dwell the outgoing layer sits translated −6%, so it reported 4–5px gaps that did not exist. And the automated "empty area" heuristic scored the dense website screen at 66% empty by counting hits on large containers; fill was judged visually instead.
 
+**17c-3** `64fe34a` … `d5b675e` + the chapter-card fix — **Automate chapter, plus two rulings.**
+
+- **R1 · the scale push-in is gone.** At 1.6, 1.35 and 1.22 it cropped the frame's edges — arithmetic, not tuning: scaling content inside a fixed window always pushes some out. Focus is now carried entirely by the spotlight veil. Verified: **0 scaled content layers** at every beat, spotlight bands present on all ten.
+- **R2 · the build stage may exceed the 1440 container on /services/next only**, capped at 1680 with the normal gutter; columns 29/67. Measured window: **61.7% / 61.9% / 58.6% of viewport** at 1440 / 1680 / 1920 — the 1920 target of ≥58% is met. Caption gaps 151 / 226 / 268px. Every other surface keeps `--container-wide`.
+- **Slot space.** Beats are no longer evenly spaced, so scroll maps onto SLOTS: five Design beats at 65vh, an 80vh transition, five Automate beats at 65vh. **Travel 730vh, wrapper 830vh** (measured 8.30× viewport).
+- **T1 · the back-office reveal.** The Releases window slides left and shrinks to 0.86, revealing the time-audit app already behind it, then exits while the back office settles to centre. The pulled-aside window holds z-index 20 so it reads as the front window moving away. The chapter card ("CHAPTER 2 / Automate / What runs *behind* the site.") lands in the **back half** of the transition — shown from the start it was half-covered by the sliding window, which crosses the caption column.
+- **Five Automate screens**, each a different application: a time-audit heatmap with an automatable toggle and a ticking hours total; a navy agent console with a resolving run timeline, a streaming reply and a fit gauge; a dotted-grid workflow canvas with packets and a run log; an email-client approval inbox with a tracked-change diff; a serif docs runbook. Rail: 10 ticks enabled, Automate segment active.
+- **Mobile.** Every Automate screen ships a restructured `compact` variant — **all five measure exactly 11px minimum, 0 nodes under**. The five Design screens remain **7–8px** and have no compact variant; that is the gate on the swap session, unchanged.
+
+*Three bugs, and one of them was mine from a session earlier:*
+- **React #185, maximum update depth**, crashing the whole route at the last Design beat — no windows, no caption, the noindex meta gone with the unmounted tree. The caption fitter added in **17c-2-fix** kept its scale in state, measured the rendered word and divided by the current scale to recover the base width, with `scale` in its own deps; width does not scale perfectly linearly with font-size, so it oscillated forever. **It only fires when a word actually overflows, so a 30% column never tripped it and 17c-3's 29% column did immediately — it shipped latent for a session.** Rewritten with no state and no dependency on its own output.
+- **`tsc` exhausted its heap** (2GB, FATAL) on nested ternaries inside `useTransform` — TypeScript reconciling a union of tuple types across three transforms. Keyframes are now built as plain typed arrays first. Builds pass on the default heap.
+- **A 4.3-million-line file.** A python edit sliced `s[s.index(A):s.index(B)]` where B occurred *before* A, producing an empty string; `str.replace("", new)` inserts between every character. **Guard: assert the slice is non-empty and the indices are ordered before replacing.**
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -227,7 +241,7 @@ Data: **`src/data/servicePillars.ts` is the single source for /services and home
 
 **Temporary.** `src/pages/ServicesNext.tsx`, `components/services/ServicesBuild.tsx`, and `components/services/build/{WindowChrome,GhostCursor,camera,BuildScreens}.tsx`. The "Watch us build your business" scene (§2, 17c-1 and 17c-2). **Deleted in 17c-3**, when it replaces `/services`.
 
-Five Design beats are built; Automate and Grow show in the rail as "soon" with disabled ticks. Beat = 65vh, wrapper = beats × 65vh + 100vh (measured 4.25× viewport for five beats). Phases: caption in 0–0.15, **layout complete by 0.40**, dwell 0.40–0.85 where the ghost cursor acts, caption out 0.85–1.00.
+Design and Automate are built (10 beats); Grow shows in the rail as "soon" with disabled ticks. Beat = 65vh, wrapper = beats × 65vh + 100vh (measured 4.25× viewport for five beats). Phases: caption in 0–0.15, **layout complete by 0.40**, dwell 0.40–0.85 where the ghost cursor acts, caption out 0.85–1.00.
 
 **On hiding it — Prachets ruled against a `robots.txt` Disallow**, on the grounds that a Disallow line publishes the path to anyone who reads the file. What protects it instead:
 - a client-side `<meta name="robots" content="noindex, nofollow">` injected on mount (this codebase has no head manager, so it is JS-only and the served HTML does not carry it);
