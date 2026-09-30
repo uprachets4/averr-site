@@ -579,20 +579,9 @@ function TableRow({ build, i }: { build: MotionValue<number>; i: number }) {
   );
 }
 
-export function SceneDashboard({
-  build,
-  separate,
-}: SceneProps & { separate: MotionValue<number> }) {
-  const enterX = useTransform(build, (p) => -110 * (1 - sub(p, 0, 0.3)));
+export function SceneDashboard({ build }: SceneProps) {
+  const sideX = useTransform(build, (p) => -110 * (1 - sub(p, 0, 0.3)));
   const chart = useTransform(build, (p) => sub(p, 0.5, 1));
-
-  const sideX = useTransform(
-    [enterX, separate] as MotionValue<number>[],
-    ([a, s]) => (a as number) + (s as number) * -120
-  );
-  const statsX = useTransform(separate, [0, 1], [0, 8]);
-  const tableX = useTransform(separate, [0, 1], [0, 128]);
-  const labelIn = useTransform(separate, (p) => sub(p, 0.55, 1));
 
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex" }}>
@@ -632,7 +621,7 @@ export function SceneDashboard({
       </motion.div>
 
       <div style={{ flex: 1, padding: 16, position: "relative" }}>
-        <motion.div style={{ display: "flex", gap: 10, marginBottom: 12, x: statsX }}>
+        <motion.div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
           {[0, 1, 2].map((i) => (
             <StatCard key={i} build={build} i={i} />
           ))}
@@ -664,103 +653,191 @@ export function SceneDashboard({
           </svg>
         </div>
 
-        <motion.div style={{ x: tableX }}>
+        <div>
           {[0, 1, 2].map((i) => (
             <TableRow key={i} build={build} i={i} />
           ))}
-        </motion.div>
-
-        <Fade
-          opacity={labelIn}
-          style={{ position: "absolute", inset: 16, pointerEvents: "none" }}
-        >
-          <SystemLabels />
-        </Fade>
+        </div>
       </div>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   4 · Design systems — labels + tokens, shown while pulled apart
+   4 · Design systems — a labelled specimen grid
    ═══════════════════════════════════════════════════════════════ */
 
-const SYSTEM_LABELS: Array<[string, string]> = [
-  ["Button", "2%"],
-  ["Card", "30%"],
-  ["Input", "56%"],
-];
+/**
+ * The first pass pulled the dashboard apart with x-offsets and floated
+ * three labels over it. On screen that read as a broken layout with stray
+ * tags, not as a system: the sidebar slid out leaving a dead gutter, the
+ * table ran past the frame, and each label sat beside something it did
+ * not name. This is the thing the brief actually asked for — the
+ * components lifted out as labelled specimens.
+ */
+const SPECIMENS = ["Button", "Card", "Input", "Tokens", "Spacing"] as const;
 
-function SystemLabels() {
+function Specimen({
+  build,
+  name,
+  i,
+}: {
+  build: MotionValue<number>;
+  name: (typeof SPECIMENS)[number];
+  i: number;
+}) {
+  const inAt = useTransform(build, (p) => sub(p, 0.12 + i * 0.12, 0.42 + i * 0.12));
+  const y = useTransform(inAt, [0, 1], [14, 0]);
+
   return (
-    <>
-      {SYSTEM_LABELS.map(function label([text, top]) {
-        return (
-          <span
-            key={text}
-            style={{
-              position: "absolute",
-              left: 0,
-              top,
-              fontFamily: "var(--font-mono)",
-              fontSize: 9,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "var(--color-muted-2)",
-              background: "var(--color-bg)",
-              padding: "2px 6px",
-              borderRadius: 4,
-              border: `1px solid ${SOFT}`,
-            }}
-          >
-            {text}
-          </span>
-        );
-      })}
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          bottom: 0,
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-        }}
-      >
-        <span style={{ display: "flex", gap: 4 }}>
-          {SWATCHES.map((c) => (
-            <span
-              key={c}
-              style={{ width: 13, height: 13, borderRadius: 3, background: c }}
-            />
-          ))}
-        </span>
-        <span style={{ display: "flex", alignItems: "flex-end", gap: 3 }}>
-          {[4, 7, 11, 16, 22].map((h) => (
-            <span
-              key={h}
-              style={{
-                width: 5,
-                height: h,
-                borderRadius: 1,
-                background: "rgba(20,20,18,0.18)",
-              }}
-            />
-          ))}
-        </span>
+    <Fade opacity={inAt}>
+      <motion.div style={{ y }}>
         <span
           style={{
+            display: "block",
             fontFamily: "var(--font-mono)",
             fontSize: 9,
-            letterSpacing: "0.1em",
+            letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: "var(--color-muted-2)",
+            marginBottom: 7,
           }}
         >
-          Tokens · Spacing
+          {name}
         </span>
-      </div>
-    </>
+        <div
+          style={{
+            border: `1px solid ${SOFT}`,
+            borderRadius: 7,
+            background: "var(--color-bg)",
+            padding: 12,
+            minHeight: 62,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {name === "Button" ? (
+            <span
+              style={{
+                padding: "7px 16px",
+                borderRadius: 999,
+                background: SWATCHES[0],
+                color: "var(--color-parch)",
+                fontSize: 11,
+                fontWeight: 500,
+              }}
+            >
+              Get a quote
+            </span>
+          ) : null}
+
+          {name === "Card" ? (
+            <div style={{ width: "100%" }}>
+              <span
+                style={{
+                  display: "block",
+                  width: 24,
+                  height: 5,
+                  borderRadius: 3,
+                  background: SWATCHES[1],
+                  marginBottom: 7,
+                }}
+              />
+              <span
+                style={{
+                  display: "block",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 14,
+                  color: INK,
+                }}
+              >
+                1,284
+              </span>
+            </div>
+          ) : null}
+
+          {name === "Input" ? (
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+                height: 26,
+                borderRadius: 5,
+                border: `1px solid ${HAIR}`,
+                background: "var(--color-bg-alt)",
+                padding: "0 9px",
+                gap: 2,
+              }}
+            >
+              <span
+                style={{
+                  width: 42,
+                  height: 4,
+                  borderRadius: 2,
+                  background: "rgba(20,20,18,0.2)",
+                }}
+              />
+              <span style={{ width: 1, height: 12, background: SWATCHES[0] }} />
+            </span>
+          ) : null}
+
+          {name === "Tokens" ? (
+            <span style={{ display: "flex", gap: 5 }}>
+              {SWATCHES.map((c) => (
+                <span
+                  key={c}
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: 4,
+                    background: c,
+                  }}
+                />
+              ))}
+            </span>
+          ) : null}
+
+          {name === "Spacing" ? (
+            <span style={{ display: "flex", alignItems: "flex-end", gap: 5 }}>
+              {[5, 9, 14, 20, 27].map((h) => (
+                <span
+                  key={h}
+                  style={{
+                    width: 7,
+                    height: h,
+                    borderRadius: 2,
+                    background: "rgba(20,20,18,0.2)",
+                  }}
+                />
+              ))}
+            </span>
+          ) : null}
+        </div>
+      </motion.div>
+    </Fade>
+  );
+}
+
+export function SceneSystem({ build }: SceneProps) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        padding: 18,
+        display: "grid",
+        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+        gridTemplateRows: "auto auto",
+        gap: 14,
+        alignContent: "center",
+      }}
+    >
+      {SPECIMENS.map((name, i) => (
+        <Specimen key={name} build={build} name={name} i={i} />
+      ))}
+    </div>
   );
 }
 
@@ -885,28 +962,17 @@ function SceneLayer({
   );
   // Beats 4 and 5 stand on a finished dashboard rather than rebuilding it.
   const complete = useTransform(position, () => 1);
-  const none = useTransform(position, () => 0);
-  // Design systems pulls the dashboard apart, holds it apart through the
-  // dwell, then lets it back together as it hands off to beat 5.
-  const separate = useTransform(position, (p) => {
-    const local = p - index;
-    return (
-      sub(local, PHASE.buildFrom, PHASE.buildTo) * (1 - sub(local, PHASE.dwellTo, 1))
-    );
-  });
-
   const ref = useScrollStyle<HTMLDivElement>(opacity);
 
   let scene: React.ReactNode = null;
   if (index === 0) scene = <SceneBrand build={build} />;
   else if (index === 1) scene = <SceneWebsite build={build} />;
-  else if (index === 2) scene = <SceneDashboard build={build} separate={none} />;
-  else if (index === 3)
-    scene = <SceneDashboard build={complete} separate={separate} />;
+  else if (index === 2) scene = <SceneDashboard build={build} />;
+  else if (index === 3) scene = <SceneSystem build={build} />;
   else if (index === 4)
     scene = (
       <>
-        <SceneDashboard build={complete} separate={none} />
+        <SceneDashboard build={complete} />
         <SceneRefine build={build} />
       </>
     );
