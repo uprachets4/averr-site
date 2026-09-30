@@ -24,18 +24,18 @@
 
 ```
 dist/assets/index-DS0F-gPc.css    41.71 kB │ gzip:  8.65 kB
-dist/assets/index-CrD3fltX.js    308.38 kB │ gzip: 96.80 kB   ← home + shell
-dist/assets/motion-DUoUsERd.js   170.46 kB │ gzip: 56.66 kB   ← shared
-dist/assets/Services-*.js         49.39 kB │ gzip: 13.10 kB
+dist/assets/index-BZtB-bR9.js    477.90 kB │ gzip: 151.65 kB  ← home + shell + motion
+dist/assets/Services-*.js         38.57 kB │ gzip: 10.80 kB
 dist/assets/CaseStudy-*.js        51.42 kB │ gzip: 12.74 kB
-dist/assets/ServicesNext-*.js     48.16 kB │ gzip: 12.42 kB
+dist/assets/ServicesNext-*.js     51.53 kB │ gzip: 13.40 kB
+dist/assets/ServicesCloser-*.js   10.96 kB │ gzip:  3.32 kB  ← shared by both services routes
 dist/assets/Contact-*.js          44.73 kB │ gzip: 11.16 kB
 dist/assets/Work-*.js             22.22 kB │ gzip:  6.66 kB
 dist/assets/About-*.js            22.33 kB │ gzip:  5.92 kB
 dist/assets/NotFound-*.js          4.33 kB │ gzip:  1.69 kB
 ```
 
-Gate: **flag anything over +12 KB gzip JS in a single session.** **17c-2 changed how this is measured**: routes are code-split, so the number that matters is now **home's initial JS = index + motion = 153.46 kB gzip**, down from a single 199.70 kB bundle — **−46 kB on the landing route**. Total across all chunks is higher than the old single bundle (splitting has overhead), but no visitor downloads all of it. Judge future sessions on the initial figure for the route they touch, and on that route's own chunk.
+Gate: **flag anything over +12 KB gzip JS in a single session.** **17c-2 changed how this is measured**: routes are code-split, so the number that matters is now **home's initial JS = 151.65 kB gzip** (the motion chunk folded back into index in 17c-2-fix once /services/next began sharing components with /services; one fewer boundary, marginally smaller), down from a single 199.70 kB bundle — **−46 kB on the landing route**. Total across all chunks is higher than the old single bundle (splitting has overhead), but no visitor downloads all of it. Judge future sessions on the initial figure for the route they touch, and on that route's own chunk.
 
 ### Stack
 
@@ -141,6 +141,17 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 *Three fixes inside the session, all caught by looking rather than by the sweep:* the window **collapsed to its 38px title bar** (an auto-height wrapper; the absolutely-positioned screens contributed no height and `overflow:hidden` clipped everything — the DOM sweep read all five screens' text correctly the whole time); the **next screen ghosted through the current beat** at ~12% (crossfade began 0.42 of a beat early, now the last tenth); and screens were **still assembling during their own dwell** (layout now completes by local 0.40, leaving the dwell for the cursor's interaction).
 
 **Outstanding, not done:** mobile type. 176 text nodes inside the screens render below 11px at 375 — the fine print (mono labels at 8px, card descriptions at 9px). The headline content is legible, but this misses the brief's ≥11px requirement. The fix is mobile-specific simplified variants of the dense panels, not a uniform font bump, which would break the desktop density the screens depend on. **Carry into 17c-3.**
+
+**17c-2-fix** `6818f1e` `…` — audit of Prachets's screen recording at ~1680. Six items, all fixed and measured on the alias.
+
+1. **Caption collided with the window.** Measured: "Post-launch" rendered **562px inside a 461px column at 1680** — 101px of silent overflow, its right edge 682 against a window starting at 671; at 1920 it was 11px *inside* the window. My 17c-2 report of "gap 90px, no collision" had measured the h2's block box, which reports the column width no matter how far an inline-block word spills past it (§5.5). The name is now `type-h1` in a 30% column, **fitted by measuring the widest word**. After: worst gap **51 / 57 / 96 / 96px** at 1280 / 1440 / 1680 / 1920, zero overflow.
+2. **Window 62% → 66% of `--container-wide`**, 82vh → 84vh. Measured **66.0% of the container at every width**; as a share of *viewport* that is 60.7 / 60.7 / 56.5 / 49.5% — it falls on wide screens because the container caps at 1440, which is why the recording read it as small. The Releases screen was also filled out: eight changelog entries with tags and per-deploy timings, plus a ten-week deploy-history chart.
+3. **Camera → focus move.** Scale capped at **1.22** (from 1.5–1.6), transform origin at the focus rect's centre so the focused element cannot leave frame, and a four-band spotlight veils the surroundings at 0.66. Four bands rather than one masked overlay because `backdrop-filter` applies to what is *behind* an element — a single rect would blur the thing meant to stay sharp. **Any scale above 1 crops the frame edges; the veil is what makes the cropping read as background rather than damage.** It is mitigation, not elimination.
+4. **Transitions went grey.** Two causes, both found by looking: the incoming window was ramping up *semi-transparent* so the outgoing one read straight through it, offset; and the ILLUSTRATIVE label was rendered per layer, so two overlapped on every switch. The incoming window now becomes opaque almost immediately and **occludes** the outgoing one; the label moved to the stage.
+5. **Pin released into an empty viewport.** Scroll progress hits 1 exactly where the sticky unsticks, so the final beat's fade ran the window to zero while the stage was still pinned. The last beat's window and caption now **hold** to the end. `/services/next` continues into `NoList` → `KickoffCalendar` → `ServicesCloser`, the same components in the same order `/services` uses. Verified: **0 blank samples** at four offsets across the release.
+6. **"Northgate" vs the specified "Your Business".** 17c-2 used Northgate for realism and **did not report the substitution** — a deviation that should have been flagged. Prachets accepted it; it is now consistent (the URL bar had still read `yourbusiness.ca` while every window title said Northgate). **Standing instruction from this session: report every deviation from a brief, however small.**
+
+*Probe errors, mine:* the gap check first measured the **leftmost** frame rather than the active one — during a dwell the outgoing layer sits translated −6%, so it reported 4–5px gaps that did not exist. And the automated "empty area" heuristic scored the dense website screen at 66% empty by counting hits on large containers; fill was judged visually instead.
 
 ---
 
