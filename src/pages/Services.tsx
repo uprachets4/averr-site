@@ -22,6 +22,7 @@ import AutomatePipeline from "../components/services/AutomatePipeline";
 import NoList from "../components/services/NoList";
 import KickoffCalendar from "../components/services/KickoffCalendar";
 import ServicesCloser from "../components/services/ServicesCloser";
+import ServiceIndex from "../components/services/ServiceIndex";
 import { CharReveal } from "../components/CharReveal";
 import { PIPELINE_CHIPS } from "../data/servicesProcess";
 import { useDeclarePageEndTone } from "../lib/pageTone";
@@ -29,7 +30,9 @@ import { useScrollStyle } from "../lib/useScrollStyle";
 import {
   GROW_METRICS,
   ILLUSTRATIVE_LABEL,
+  PILLAR_SERVICES,
   PILLAR_TIMELINE,
+  SERVICE_COUNT,
   type GrowMetric,
 } from "../data/servicePillars";
 
@@ -255,7 +258,8 @@ function ServicesHeader() {
           }}
         >
           <span style={{ height: 1, width: 20, background: "currentColor", opacity: 0.6 }} />
-          Services
+          {/* counted from the data, so it can never drift from the index */}
+          {`Services · ${SERVICE_COUNT} ways we help`}
           <span style={{ height: 1, width: 20, background: "currentColor", opacity: 0.6 }} />
         </motion.div>
 
@@ -276,14 +280,11 @@ function ServicesHeader() {
           <CharReveal
             delay={0.3}
             segments={[
-              { text: "Three services. " },
-              // NBSP, not a space: CharReveal lays out each WORD as an
-              // inline-block, so a plain space lets the line break between
-              // "One" and "studio" and strands the accent across two lines.
-              // Bound, it stays one token — the composition this hero was
-              // built with. It measures well inside the column at 375.
-              { text: "One\u00A0studio", accent: true },
-              { text: " behind them all." },
+              { text: "Here's " },
+              // No NBSP needed: "exactly" is one word, so CharReveal's
+              // per-word inline-blocks cannot split it.
+              { text: "exactly", accent: true },
+              { text: " what we do." },
             ]}
           />
         </h1>
@@ -299,8 +300,8 @@ function ServicesHeader() {
             margin: "0 auto",
           }}
         >
-          Averr Studios designs the websites, engineers the SaaS products and AI systems,
-          and grows the audiences of businesses that refuse to look templated.
+          Websites, AI automation and growth marketing for small and mid-sized
+          businesses across the GTA.
         </motion.p>
       </div>
 
@@ -336,6 +337,53 @@ function useIsDesktop() {
     };
   }, []);
   return isDesktop;
+}
+
+/** The deep dive's own heading. The index above it sells the services;
+ *  this section is where each pillar's method gets shown. */
+function PillarSequenceHeader() {
+  const reduce = useReducedMotion();
+  return (
+    <div
+      style={{
+        backgroundColor: "var(--color-bg)",
+        paddingTop: 120,
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "var(--container-wide)",
+          margin: "0 auto",
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart }}
+          className="type-eyebrow"
+          style={{ color: "var(--color-muted)", marginBottom: 24 }}
+        >
+          //_02 · the work itself
+        </motion.div>
+        <motion.h2
+          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{
+            duration: reduce ? 0.01 : 0.7,
+            ease: ease.outQuart,
+            delay: 0.1,
+          }}
+          className="type-h2"
+          style={{ color: "var(--color-ink)", maxWidth: 900 }}
+        >
+          How each one works.
+        </motion.h2>
+      </div>
+    </div>
+  );
 }
 
 function PillarSequence() {
@@ -584,7 +632,7 @@ function PillarSection({
             {pillar.serviceLabel}
           </div>
           <motion.h2
-            className="type-display-xl"
+            className="type-display-l"
             style={{
               color: "var(--color-ink)",
               marginBottom: 32,
@@ -636,7 +684,7 @@ function PillarSection({
                 What's included
               </div>
               <IncludedChips
-                items={pillar.included}
+                items={PILLAR_SERVICES[pillar.id].map((x) => x.name)}
                 assembled={includedAssembled}
                 reduce={reduce ?? false}
               />
@@ -817,7 +865,7 @@ function ChipTooltip({ text }: { text: string }) {
 }
 
 /**
- * "What's included" as chips that assemble.
+ * The pillar's services, assembling as the stage arrives.
  *
  * `assembled` is a latch, not a live flag: the chips settle once when the
  * pillar first becomes active and stay settled, so scrolling back up does
@@ -825,8 +873,9 @@ function ChipTooltip({ text }: { text: string }) {
  * scroll-linked, so it is not subject to the ViewTimeline acceleration bug
  * that `useScrollStyle` exists to work around.
  *
- * The item text is printed verbatim — chips changed the shape of this list,
- * not a word of its content.
+ * Session 17b pointed these at PILLAR_SERVICES so the deep dive names the
+ * same services the index sells, rather than the old internal
+ * "what's included" phrasing.
  */
 function IncludedChips({
   items,
@@ -844,11 +893,11 @@ function IncludedChips({
         padding: 0,
         margin: 0,
         display: "flex",
-        flexWrap: "wrap",
-        gap: 8,
+        flexDirection: "column",
+        gap: 2,
       }}
     >
-      {items.map(function chip(item, i) {
+      {items.map(function serviceRow(item, i) {
         return (
           <motion.li
             key={item}
@@ -862,12 +911,11 @@ function IncludedChips({
               ease: ease.outQuart,
               delay: reduce || !assembled ? 0 : i * 0.04,
             }}
-            className="type-small"
+            className="type-h3"
             style={{
-              padding: "9px 14px",
-              borderRadius: 999,
-              border: "1px solid rgba(20,20,18,0.16)",
-              background: "var(--color-bg)",
+              padding: "10px 0",
+              borderTop:
+                i === 0 ? "none" : "1px solid rgba(20,20,18,0.1)",
               color: "var(--color-ink)",
             }}
           >
@@ -977,7 +1025,7 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
             ease: ease.outQuart,
             delay: reduce ? 0 : 0.05,
           }}
-          className="type-display-xl"
+          className="type-display-l"
           style={{ color: "var(--color-ink)", marginBottom: 32 }}
         >
           {pillar.name}
@@ -1034,7 +1082,7 @@ function StackedPillar({ pillar, index }: { pillar: Pillar; index: number }) {
             viewport={{ once: true, amount: 0.3 }}
           >
             <IncludedChips
-              items={pillar.included}
+              items={PILLAR_SERVICES[pillar.id].map((x) => x.name)}
               assembled={includedAssembled}
               reduce={reduce ?? false}
             />
@@ -2375,6 +2423,8 @@ export default function Services() {
   return (
     <>
       <ServicesHeader />
+      <ServiceIndex />
+      <PillarSequenceHeader />
       <PillarSequence />
       <Chapter tone="dark" from="cream">
         <NoList />
