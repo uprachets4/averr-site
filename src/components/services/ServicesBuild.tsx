@@ -449,20 +449,25 @@ function ScreenLayer({
   // App-switch transition: the outgoing window slides and dissolves as
   // the next one comes up under it. Never a blank frame — both layers
   // are mounted through the whole hand-off.
+  // The hand-off window is deliberately narrow. A wide crossfade left the
+  // NEXT screen sitting at ~12% opacity right through the current beat's
+  // dwell, so the brand board had a whole website ghosted through it.
+  // A layer is now fully opaque for its own beat and only shares the
+  // frame during the last tenth, which is the app-switch itself.
   const opacity = useTransform(
     position,
-    [index - 0.42, index - 0.04, index + 0.92, index + 1.12],
+    [index - 0.1, index, index + 0.9, index + 1],
     [0, 1, 1, 0]
   );
   const y = useTransform(
     position,
-    [index - 0.42, index, index + 1, index + 1.12],
-    [26, 0, 0, -18]
+    [index - 0.1, index, index + 0.9, index + 1],
+    [22, 0, 0, -14]
   );
   const scale = useTransform(
     position,
-    [index - 0.42, index, index + 1, index + 1.12],
-    [0.965, 1, 1, 0.99]
+    [index - 0.1, index, index + 0.9, index + 1],
+    [0.972, 1, 1, 0.992]
   );
 
   const camera = useCamera(local, reduce ? null : spec.camera);

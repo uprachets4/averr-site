@@ -80,7 +80,7 @@ export default function WindowChrome({
           className="type-eyebrow"
           style={{
             position: "absolute",
-            top: -28,
+            top: -25,
             right: 2,
             fontFamily: "var(--font-mono)",
             color: "var(--color-muted-2)",
