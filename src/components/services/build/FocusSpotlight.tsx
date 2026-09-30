@@ -18,9 +18,16 @@ import type { FocusMove } from "./camera";
  */
 
 const OUT = "-300%";
-const TINT = "rgba(16,18,21,0.55)";
+/** 0.66 leaves the surroundings at roughly a third of their brightness —
+ *  the "dims to 0.35" the brief asks for. At 0.55 the veil barely
+ *  registered on the dark dashboard and the cropped edges still read as
+ *  damage rather than as background. */
+const TINT = "rgba(11,12,14,0.66)";
 const BAND: React.CSSProperties = {
   position: "absolute",
+  // backdrop-filter is unreliable inside a transformed ancestor, which
+  // this is — it is kept because it costs nothing where it works, but the
+  // veil is what actually does the job and does not depend on it.
   backdropFilter: "blur(2px)",
   WebkitBackdropFilter: "blur(2px)",
   background: TINT,

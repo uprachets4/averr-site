@@ -19,8 +19,15 @@ import { easing } from "../../../lib/motion";
  * Transforms only — no animated width/height, no animated calc() (§5.3).
  */
 
-/** The hardest push that still reads as focus rather than a zoom. */
-export const MAX_FOCUS_SCALE = 1.35;
+/**
+ * The hardest push that still reads as focus rather than a zoom.
+ *
+ * Any scale above 1 crops the frame's edges, and at 1.35 the cropped text
+ * was landing mid-word and reading as a broken layout even with the
+ * spotlight up. 1.22 keeps the move legible while leaving far less cut
+ * content at the edge for the veil to have to explain away.
+ */
+export const MAX_FOCUS_SCALE = 1.22;
 
 export type FocusMove = {
   /** Local beat progress where the move starts. */
