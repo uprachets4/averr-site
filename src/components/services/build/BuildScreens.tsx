@@ -1472,7 +1472,7 @@ export const DESIGN_SPECS: BeatSpec[] = [
       { at: 0.72, x: 74, y: 70 },
     ],
     // the lockup, top-left
-    camera: { from: 0.44, hold: 0.56, to: 0.74, rect: { x: 4, y: 4, w: 54, h: 20 }, scale: 1.3 },
+    camera: { from: 0.44, hold: 0.56, to: 0.74, rect: { x: 4, y: 4, w: 54, h: 20 } },
     Screen: ScreenBrandBoard,
   },
   {
@@ -1488,7 +1488,7 @@ export const DESIGN_SPECS: BeatSpec[] = [
       { at: 0.86, x: 60, y: 74 },
     ],
     // the booking widget the cursor is filling
-    camera: { from: 0.44, hold: 0.58, to: 0.8, rect: { x: 60, y: 6, w: 38, h: 40 }, scale: 1.3 },
+    camera: { from: 0.44, hold: 0.58, to: 0.8, rect: { x: 60, y: 6, w: 38, h: 40 } },
     Screen: ScreenLocalSite,
   },
   {
@@ -1504,7 +1504,7 @@ export const DESIGN_SPECS: BeatSpec[] = [
       { at: 0.9, x: 60, y: 70 },
     ],
     // the KPI row that changes when the range switches
-    camera: { from: 0.52, hold: 0.64, to: 0.82, rect: { x: 7, y: 12, w: 90, h: 24 }, scale: 1.28 },
+    camera: { from: 0.52, hold: 0.64, to: 0.82, rect: { x: 7, y: 12, w: 90, h: 24 } },
     Screen: ScreenAnalytics,
   },
   {
@@ -1518,7 +1518,7 @@ export const DESIGN_SPECS: BeatSpec[] = [
       { at: 0.78, x: 76, y: 76 },
     ],
     // the token table
-    camera: { from: 0.62, hold: 0.74, to: 0.9, rect: { x: 58, y: 44, w: 40, h: 34 }, scale: 1.3 },
+    camera: { from: 0.62, hold: 0.74, to: 0.9, rect: { x: 58, y: 44, w: 40, h: 34 } },
     Screen: ScreenLibrary,
   },
   {
@@ -1532,7 +1532,7 @@ export const DESIGN_SPECS: BeatSpec[] = [
       { at: 0.74, x: 74, y: 28 },
     ],
     // the score ring counting up
-    camera: { from: 0.56, hold: 0.7, to: 0.88, rect: { x: 56, y: 4, w: 42, h: 26 }, scale: 1.3 },
+    camera: { from: 0.56, hold: 0.7, to: 0.88, rect: { x: 56, y: 4, w: 42, h: 26 } },
     Screen: ScreenRelease,
   },
 ];

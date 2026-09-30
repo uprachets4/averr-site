@@ -164,10 +164,14 @@ export default function ServicesBuild() {
           style={{
             flex: 1,
             width: "100%",
-            maxWidth: "var(--container-wide)",
+            // /services/next only: the build stage is allowed past the
+            // site's 1440 container so the product window does not shrink
+            // to half the screen on a wide display. Every other surface
+            // keeps --container-wide.
+            maxWidth: "min(1680px, calc(100vw - 2 * var(--gutter)))",
             margin: "0 auto",
             display: "grid",
-            gridTemplateColumns: "30% 66%",
+            gridTemplateColumns: "29% 67%",
             gap: "4%",
             alignItems: "center",
             paddingBottom: 40,
@@ -363,7 +367,7 @@ function BuildRail({
     <div
       style={{
         width: "100%",
-        maxWidth: "var(--container-wide)",
+        maxWidth: "min(1680px, calc(100vw - 2 * var(--gutter)))",
         margin: "0 auto",
         paddingTop: 96,
         paddingBottom: 18,
@@ -567,20 +571,13 @@ function ScreenLayer({
           title={spec.title}
           showIllustrative={false}
         >
-          {/* the focus move scales the CONTENT; the chrome never moves */}
-          <motion.div
-            style={{
-              position: "absolute",
-              inset: 0,
-              scale: focus.scale,
-              transformOrigin: focus.origin,
-            }}
-          >
+          {/* no transform on the content at all — the focus is the veil */}
+          <div style={{ position: "absolute", inset: 0 }}>
             <Screen local={local} />
             {focus.rect ? (
               <FocusSpotlight rect={focus.rect} amount={focus.dim} />
             ) : null}
-          </motion.div>
+          </div>
           <GhostCursor local={local} keys={spec.cursor} hidden={reduce} />
         </WindowChrome>
       </motion.div>

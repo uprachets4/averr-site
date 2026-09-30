@@ -20,36 +20,31 @@ import { easing } from "../../../lib/motion";
  */
 
 /**
- * The hardest push that still reads as focus rather than a zoom.
+ * There is no scale any more.
  *
- * Any scale above 1 crops the frame's edges, and at 1.35 the cropped text
- * was landing mid-word and reading as a broken layout even with the
- * spotlight up. 1.22 keeps the move legible while leaving far less cut
- * content at the edge for the veil to have to explain away.
+ * Every push-in, at every value tried (1.6, 1.35, 1.22), cropped the
+ * frame's edges — that is arithmetic, not tuning: scaling content inside
+ * a fixed window always pushes some of it out. The veil made the cut
+ * edges *excusable* but never made them right, and text was still being
+ * sliced mid-word behind it. Ruled out in 17c-3: the focus is carried
+ * entirely by the spotlight. The focused element stays sharp at its
+ * natural size, everything else dims, and nothing is ever cropped.
  */
-export const MAX_FOCUS_SCALE = 1.22;
 
 export type FocusMove = {
-  /** Local beat progress where the move starts. */
+  /** Local beat progress where the veil starts coming up. */
   from: number;
-  /** Fully in. */
+  /** Fully up. */
   hold: number;
   /** Released. */
   to: number;
-  /**
-   * The rect to focus, in percent of the content box. The spotlight
-   * keeps this fully visible; the transform origin is its centre.
-   */
+  /** The rect to keep sharp, in percent of the content box. */
   rect: { x: number; y: number; w: number; h: number };
-  /** Clamped to MAX_FOCUS_SCALE. */
-  scale?: number;
 };
 
 export type Focus = {
-  scale: MotionValue<number>;
   /** 0 → 1 as the spotlight comes up. */
   dim: MotionValue<number>;
-  origin: string;
   rect: FocusMove["rect"] | null;
 };
 
@@ -57,10 +52,6 @@ export function useFocus(
   local: MotionValue<number>,
   move: FocusMove | null
 ): Focus {
-  const target = move
-    ? Math.min(MAX_FOCUS_SCALE, move.scale ?? MAX_FOCUS_SCALE)
-    : 1;
-
   const amount = useTransform(local, function ramp(t) {
     if (!move) return 0;
     if (t <= move.from || t >= move.to) return 0;
@@ -70,14 +61,5 @@ export function useFocus(
     return 1 - easing.inOut((t - move.hold) / (move.to - move.hold || 1));
   });
 
-  const scale = useTransform(amount, (a) => 1 + (target - 1) * a);
-
-  return {
-    scale,
-    dim: amount,
-    origin: move
-      ? `${move.rect.x + move.rect.w / 2}% ${move.rect.y + move.rect.h / 2}%`
-      : "50% 50%",
-    rect: move ? move.rect : null,
-  };
+  return { dim: amount, rect: move ? move.rect : null };
 }
