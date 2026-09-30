@@ -23,11 +23,19 @@
 ### Last verified bundle (build exit 0, unfiltered)
 
 ```
-dist/assets/index-BpqLEds-.css   41.14 kB │ gzip:   8.64 kB
-dist/assets/index-C8xc6KKC.js   695.90 kB │ gzip: 199.70 kB
+dist/assets/index-DS0F-gPc.css    41.71 kB │ gzip:  8.65 kB
+dist/assets/index-CrD3fltX.js    308.38 kB │ gzip: 96.80 kB   ← home + shell
+dist/assets/motion-DUoUsERd.js   170.46 kB │ gzip: 56.66 kB   ← shared
+dist/assets/Services-*.js         49.39 kB │ gzip: 13.10 kB
+dist/assets/CaseStudy-*.js        51.42 kB │ gzip: 12.74 kB
+dist/assets/ServicesNext-*.js     48.16 kB │ gzip: 12.42 kB
+dist/assets/Contact-*.js          44.73 kB │ gzip: 11.16 kB
+dist/assets/Work-*.js             22.22 kB │ gzip:  6.66 kB
+dist/assets/About-*.js            22.33 kB │ gzip:  5.92 kB
+dist/assets/NotFound-*.js          4.33 kB │ gzip:  1.69 kB
 ```
 
-Gate: **flag anything over +12 KB gzip JS in a single session.** Sessions 17 → 17c-1 total **+11.03 KB gzip** (188.67 → 199.70) — **close to the gate**, and 17c-2/3 still have eleven beats of canvas to add. 17c-3 deletes /services/next and the old /services together, which should hand a chunk of that back; if it does not, the bundle needs a look before the ship pass. 17 → 17b alone was +6.29 KB across five items, two fixes and the /services inversion; before that, per-session deltas were all under +2 KB. The CSS has not moved in several sessions — the `type-*` system absorbs new work without new rules.
+Gate: **flag anything over +12 KB gzip JS in a single session.** **17c-2 changed how this is measured**: routes are code-split, so the number that matters is now **home's initial JS = index + motion = 153.46 kB gzip**, down from a single 199.70 kB bundle — **−46 kB on the landing route**. Total across all chunks is higher than the old single bundle (splitting has overhead), but no visitor downloads all of it. Judge future sessions on the initial figure for the route they touch, and on that route's own chunk.
 
 ### Stack
 
@@ -121,6 +129,19 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 
 *A fix inside the session:* beat 4 first pulled the dashboard apart with x-offsets and floated three labels over it. On screen that read as a broken layout — sidebar slid out leaving a dead gutter, table past the frame edge, each label beside something it did not name. Rebuilt as real labelled specimens (button, card, input, tokens, spacing). **The DOM sweep passed it both times; only looking at the screenshot caught it.**
 
+**17c-2** `076af86` `b0abe23` `dd0f8ab` `9a1f3c4` `5e390f5` — **/services/next rebuilt at product fidelity.** Prachets rated 17c-1 **3–4/10**: the concept was right but the canvas read as a small pastel wireframe and every beat was the same toy window.
+
+- **A1 · route code-splitting.** Every route but home behind `React.lazy`; home stays eager as the LCP surface. Home's initial JS **199.70 → 153.46 kB gzip**. The Suspense fallback paints the page ground at a full viewport — a zero-height `main` is what makes the footer jump and the scroll lurch on a route change.
+- **A2 · `WindowChrome`** — a real application window at 62% of the container and up to 82vh (measured 821×738 at 1440, 886×813 at 1920): traffic lights, title/URL bar, a four-layer tinted shadow, a diagonal reflection. Hairlines are inset shadows, not 1px borders, so they stay hairlines at 2dppx.
+- **A3 · `GhostCursor`** — a pointer choreographed from the same scroll value as everything else, eased hops, a slow wobble, a press ripple. **Each screen reads the same local progress the cursor is keyed against**, so a click and its response cannot drift.
+- **A4 · `camera`** — per-beat push-ins scaling the window CONTENT toward a focal point via `transform-origin`. The chrome is outside the transform; scaling the window edges is what makes a mockup look like a zoomed screenshot rather than a camera move.
+- **A5** — only the active beat ±1 is mounted. **Zero long tasks >50ms** across a full scroll of the chapter, measured with a PerformanceObserver on the alias.
+- **B1–B5 · five genuinely different pieces of software**: a brand board (SVG logo, palette with hex, type specimen, business card and van decal that recolour when the cursor picks an accent); a local-business homepage that scrolls inside its own window (booking widget the cursor fills and submits, success toast); a **dark** analytics dashboard (date range switched 7d→30d with KPIs and chart responding, status pills, notifications); a component library (4 variants × 4 states, input states, token tables, a dark-mode toggle that re-themes in place); a release dashboard (changelog, score ring 72→98, Core Web Vitals turning green). All content invented and plausible for the GTA; ILLUSTRATIVE throughout.
+
+*Three fixes inside the session, all caught by looking rather than by the sweep:* the window **collapsed to its 38px title bar** (an auto-height wrapper; the absolutely-positioned screens contributed no height and `overflow:hidden` clipped everything — the DOM sweep read all five screens' text correctly the whole time); the **next screen ghosted through the current beat** at ~12% (crossfade began 0.42 of a beat early, now the last tenth); and screens were **still assembling during their own dwell** (layout now completes by local 0.40, leaving the dwell for the cursor's interaction).
+
+**Outstanding, not done:** mobile type. 176 text nodes inside the screens render below 11px at 375 — the fine print (mono labels at 8px, card descriptions at 9px). The headline content is legible, but this misses the brief's ≥11px requirement. The fix is mobile-specific simplified variants of the dense panels, not a uniform font bump, which would break the desktop density the screens depend on. **Carry into 17c-3.**
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -193,7 +214,9 @@ Data: **`src/data/servicePillars.ts` is the single source for /services and home
 
 ### `/services/next` — the 17c rebuild, in progress
 
-**Temporary.** `src/pages/ServicesNext.tsx` + `components/services/{ServicesBuild,BuildCanvas}.tsx`. The "Watch us build your business" scene (see §2, 17c-1). **Deleted in 17c-3**, when it replaces `/services`.
+**Temporary.** `src/pages/ServicesNext.tsx`, `components/services/ServicesBuild.tsx`, and `components/services/build/{WindowChrome,GhostCursor,camera,BuildScreens}.tsx`. The "Watch us build your business" scene (§2, 17c-1 and 17c-2). **Deleted in 17c-3**, when it replaces `/services`.
+
+Five Design beats are built; Automate and Grow show in the rail as "soon" with disabled ticks. Beat = 65vh, wrapper = beats × 65vh + 100vh (measured 4.25× viewport for five beats). Phases: caption in 0–0.15, **layout complete by 0.40**, dwell 0.40–0.85 where the ghost cursor acts, caption out 0.85–1.00.
 
 **On hiding it — Prachets ruled against a `robots.txt` Disallow**, on the grounds that a Disallow line publishes the path to anyone who reads the file. What protects it instead:
 - a client-side `<meta name="robots" content="noindex, nofollow">` injected on mount (this codebase has no head manager, so it is JS-only and the served HTML does not carry it);
