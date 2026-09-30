@@ -71,7 +71,10 @@ export default function WindowChrome({
   const t = TONES[tone];
 
   return (
-    <div style={{ position: "relative", width: "100%" }}>
+    // height:100% matters — the screens inside are absolutely positioned
+    // and contribute no height, so without it the frame collapses to its
+    // title bar and `overflow: hidden` clips the entire screen away.
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
       {showIllustrative ? (
         <div
           className="type-eyebrow"
