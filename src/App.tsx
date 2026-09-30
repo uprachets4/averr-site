@@ -7,6 +7,7 @@ import { NavToneProvider } from "./lib/navTone";
 import AmbientEnvironment from "./components/AmbientEnvironment";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
+import ServicesNext from "./pages/ServicesNext";
 import Work from "./pages/Work";
 import CaseStudy from "./pages/CaseStudy";
 import About from "./pages/About";
@@ -36,6 +37,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
+          {/* 17c work-in-progress. noindex, linked from nowhere, deleted in
+              17c-3 when it replaces /services. */}
+          <Route path="/services/next" element={<ServicesNext />} />
           <Route path="/work" element={<Work />} />
           <Route path="/work/:slug" element={<CaseStudy />} />
           <Route path="/about" element={<About />} />
