@@ -24,10 +24,10 @@
 
 ```
 dist/assets/index-BpqLEds-.css   41.14 kB │ gzip:   8.64 kB
-dist/assets/index-B6pieH7b.js   673.86 kB │ gzip: 194.96 kB
+dist/assets/index-C8xc6KKC.js   695.90 kB │ gzip: 199.70 kB
 ```
 
-Gate: **flag anything over +12 KB gzip JS in a single session.** Sessions 17 → 17b total **+6.29 KB gzip** (188.67 → 194.96) across five items, two fixes and the /services inversion; before that, per-session deltas were all under +2 KB. The CSS has not moved in several sessions — the `type-*` system absorbs new work without new rules.
+Gate: **flag anything over +12 KB gzip JS in a single session.** Sessions 17 → 17c-1 total **+11.03 KB gzip** (188.67 → 199.70) — **close to the gate**, and 17c-2/3 still have eleven beats of canvas to add. 17c-3 deletes /services/next and the old /services together, which should hand a chunk of that back; if it does not, the bundle needs a look before the ship pass. 17 → 17b alone was +6.29 KB across five items, two fixes and the /services inversion; before that, per-session deltas were all under +2 KB. The CSS has not moved in several sessions — the `type-*` system absorbs new work without new rules.
 
 ### Stack
 
@@ -109,6 +109,18 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 - **The pillar sequence became "How each one works."** — pillar word down from `display-xl` to `display-l`, and stage 2 now names the same services the index sells instead of the old internal phrasing. Stacked path mirrors it.
 - **Home doors** print their pillar's first four service names in mono under the promise, read from the same record. The preview clamp is unaffected — its 24px clearance is measured against the promise column's left edge, which the added lines do not move.
 
+**17c-1** `2902d5b` `35383eb` — **/services rebuild, part 1 of 3, on a hidden route.** Prachets rated 17b **1–2/10**: a flat list, then the same services repeated in the pinned section, and not cinematic. New concept: ONE continuous pinned scene where a generic business's site is visibly built as you scroll, each of the 16 services being the caption of the step happening on the canvas. **The story is the list** — no service is named twice on the page.
+
+- **Built on `/services/next`**, noindex and linked from nowhere. `/services` is untouched until 17c-3 swaps them; nothing half-built is ever visible on the live route. Only `App.tsx` changed outside the three new files.
+- **Pin math.** Beat = 65vh. Wrapper = `beats × 65vh + 100vh` per the n+1 rule (§5.4). Design's five beats: travel **325vh**, wrapper **425vh** (measured 3825px at 900vh viewport = 4.25×, sticky child exactly 1.00×). The 16-beat target with two 80vh chapter transitions is **1200vh travel / 1300vh wrapper**.
+- **Per-beat phases:** caption in 0–0.15, canvas build 0.05–0.40, **dwell 0.40–0.85** (29.25vh of hold, ruled up from 45% of a 55vh beat), caption out 0.85–1.00. Dwell midpoints at progress 0.125 / 0.325 / 0.525 / 0.725 / 0.925 — those are the screenshot positions.
+- **One continuous float drives caption, canvas and rail.** Nothing on a timer, nothing keyed on an index that flips independently (§5.13). The caption remounts only at a beat boundary, by which point the previous one has faded to 0 — sequenced, never overlapping. Every canvas scene stays mounted and crossfades, so there is never a frame with nothing to draw (§5.6).
+- **The rail is the index:** three chapters, sixteen ticks, hover shows the service name, click lands in that beat's dwell. Automate and Grow read "soon" with disabled ticks until 17c-2 (verified: 16 ticks, 5 enabled).
+- **Canvas** is CSS and inline SVG only — no screenshots, no brand marks, a non-Averr palette so it reads as someone else's business, and ILLUSTRATIVE on the surface throughout. A browser frame on `yourbusiness.ca`: wireframe recoloured by a dropped-in palette with the mark drawing itself → sections assembling top-down → the site becoming a dashboard → **a labelled specimen grid** → a version tag ticking with pulsing "+" marks.
+- Mobile and reduced motion drop the pin: one section per service, each canvas playing its beat once on entry or resting at its finished state.
+
+*A fix inside the session:* beat 4 first pulled the dashboard apart with x-offsets and floated three labels over it. On screen that read as a broken layout — sidebar slid out leaving a dead gutter, table past the frame edge, each label beside something it did not name. Rebuilt as real labelled specimens (button, card, input, tokens, spacing). **The DOM sweep passed it both times; only looking at the screenshot caught it.**
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -178,6 +190,18 @@ Below 900px — **and at any width under reduced motion** — `PillarSequence` r
 Data: **`src/data/servicePillars.ts` is the single source for /services and home** — `PILLAR_SERVICES` (16 services: name, outcome, verified proof slugs, and the original "what's included" string kept unrendered for traceability), `SERVICE_COUNT`, `PILLAR_TIMELINE`, `GROW_METRICS`. Also `src/data/servicesProcess.ts` (steps + day ranges, refusals + struck phrases, pipeline chip labels).
 
 **Proof rule:** a service links to a case study only where that study's own copy shows the service was delivered. Nine of sixteen qualify. A service with none renders no chip and reserves no space — do not fill the gap with a weaker link.
+
+### `/services/next` — the 17c rebuild, in progress
+
+**Temporary.** `src/pages/ServicesNext.tsx` + `components/services/{ServicesBuild,BuildCanvas}.tsx`. The "Watch us build your business" scene (see §2, 17c-1). **Deleted in 17c-3**, when it replaces `/services`.
+
+**On hiding it — Prachets ruled against a `robots.txt` Disallow**, on the grounds that a Disallow line publishes the path to anyone who reads the file. What protects it instead:
+- a client-side `<meta name="robots" content="noindex, nofollow">` injected on mount (this codebase has no head manager, so it is JS-only and the served HTML does not carry it);
+- Vercel already sends `X-Robots-Tag: noindex` on preview deployments, and this route only ever lives on one;
+- Nav's `LINKS` and Footer's `STUDIO_LINKS` are hardcoded arrays that do not include it, and the project ships **no sitemap.xml and no robots.txt** at all;
+- the route is removed before any production merge.
+
+**Do not merge `redesign-v2` to `main` while this route exists.**
 
 ### `/about`, `/contact`, `*` (404)
 
