@@ -26,6 +26,7 @@ import GhostCursor from "./build/GhostCursor";
 import { useFocus } from "./build/camera";
 import FocusSpotlight from "./build/FocusSpotlight";
 import { DESIGN_SPECS } from "./build/BuildScreens";
+import { AUTOMATE_SPECS } from "./build/AutomateScreens";
 
 /** Phase map inside one beat: caption in 0-0.15, canvas build 0.05-0.40,
  *  dwell 0.40-0.85 (29.25vh of a 65vh beat), caption out 0.85-1.00. */
@@ -45,7 +46,7 @@ const PHASE = { captionIn: 0.15, buildFrom: 0.05, buildTo: 0.4, dwellTo: 0.85 };
  */
 
 /** Beats currently rendered on the canvas. The rail still shows all 16. */
-const LIVE_PILLARS: PillarId[] = ["design"];
+const LIVE_PILLARS: PillarId[] = ["design", "automate"];
 
 export type Beat = { pillar: PillarId; service: Service; index: number };
 
@@ -75,6 +76,41 @@ const ALL_BEATS = buildBeats(PILLAR_ORDER);
  *   wrapper = 1300vh
  */
 const BEAT_VH = 65;
+const TRANSITION_VH = 80;
+
+/**
+ * Slot space.
+ *
+ * Beats are no longer evenly spaced: a chapter transition sits between
+ * Design and Automate and is taller than a beat. So scroll maps onto
+ * SLOTS, not beats — slot 5 is the transition and Automate's beats live
+ * at slots 6-10. `position` is a continuous float in slot space, and
+ * everything still derives from that one value.
+ */
+const DESIGN_COUNT = PILLAR_SERVICES.design.length;
+const AUTOMATE_COUNT = PILLAR_SERVICES.automate.length;
+export const TRANSITION_SLOT = DESIGN_COUNT;
+
+function slotForBeat(i: number) {
+  return i < DESIGN_COUNT ? i : i + 1;
+}
+
+const SLOT_VH: number[] = [];
+for (let i = 0; i < DESIGN_COUNT; i++) SLOT_VH.push(BEAT_VH);
+SLOT_VH.push(TRANSITION_VH);
+for (let i = 0; i < AUTOMATE_COUNT; i++) SLOT_VH.push(BEAT_VH);
+const TOTAL_VH = SLOT_VH.reduce((a, b) => a + b, 0);
+
+/** progress 0-1 across the travel -> continuous slot position. */
+function progressToSlot(p: number) {
+  const target = Math.max(0, Math.min(1, p)) * TOTAL_VH;
+  let acc = 0;
+  for (let i = 0; i < SLOT_VH.length; i++) {
+    if (target < acc + SLOT_VH[i]) return i + (target - acc) / SLOT_VH[i];
+    acc += SLOT_VH[i];
+  }
+  return SLOT_VH.length;
+}
 
 function resolveProof(slug: string) {
   const study = caseStudies[slug];
@@ -111,23 +147,31 @@ export default function ServicesBuild() {
   });
 
   const count = LIVE_BEATS.length;
-  // Continuous float across the beats — never an index that flips on its
-  // own timer (§5.13). Everything downstream derives from this one value.
-  const position = useTransform(scrollYProgress, [0, 1], [0, count]);
+  // Continuous float in SLOT space — never an index that flips on its own
+  // timer (§5.13).
+  const position = useTransform(scrollYProgress, progressToSlot);
 
-  const [activeBeat, setActiveBeat] = useState(0);
+  const [activeSlot, setActiveSlot] = useState(0);
   useMotionValueEvent(position, "change", function track(p) {
-    const i = Math.min(count - 1, Math.max(0, Math.floor(p)));
-    setActiveBeat(i);
+    setActiveSlot(Math.min(SLOT_VH.length - 1, Math.max(0, Math.floor(p))));
   });
+  const inTransition = activeSlot === TRANSITION_SLOT;
+  const activeBeat = inTransition
+    ? DESIGN_COUNT
+    : activeSlot < TRANSITION_SLOT
+    ? activeSlot
+    : activeSlot - 1;
 
   function jumpToBeat(i: number) {
     const el = wrapperRef.current;
     if (!el) return;
     // Land in the beat's dwell, not on its boundary.
+    const slot = slotForBeat(i);
+    let acc = 0;
+    for (let k = 0; k < slot; k++) acc += SLOT_VH[k];
+    const into = acc + SLOT_VH[slot] * ((PHASE.buildTo + PHASE.dwellTo) / 2);
     const top =
-      el.offsetTop + ((i + (PHASE.buildTo + PHASE.dwellTo) / 2) / count) *
-        (el.offsetHeight - window.innerHeight);
+      el.offsetTop + (into / TOTAL_VH) * (el.offsetHeight - window.innerHeight);
     window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
   }
 
@@ -140,7 +184,7 @@ export default function ServicesBuild() {
       ref={wrapperRef}
       style={{
         position: "relative",
-        height: `${count * BEAT_VH + 100}vh`,
+        height: `${TOTAL_VH + 100}vh`,
         backgroundColor: "var(--color-bg)",
       }}
     >
@@ -180,11 +224,15 @@ export default function ServicesBuild() {
           {/* caption — remounted per beat so CharReveal plays on arrival.
               The outgoing caption has already faded to 0 by the time the
               index changes, so they never overlap (the /work film rule). */}
-          <BuildCaption
-            key={activeBeat}
-            beat={LIVE_BEATS[activeBeat]}
-            position={position}
-          />
+          {inTransition ? (
+            <ChapterCard />
+          ) : (
+            <BuildCaption
+              key={activeBeat}
+              beat={LIVE_BEATS[activeBeat]}
+              position={position}
+            />
+          )}
 
           <div style={{ position: "relative", height: "84vh", maxHeight: 880 }}>
             {/* one label for the stage. Rendering it per layer meant two
@@ -203,7 +251,7 @@ export default function ServicesBuild() {
             >
               {ILLUSTRATIVE_LABEL}
             </div>
-            <ScreenStack position={position} activeBeat={activeBeat} reduce={!!reduce} />
+            <ScreenStack position={position} activeSlot={activeSlot} reduce={!!reduce} />
           </div>
         </div>
       </div>
@@ -467,34 +515,29 @@ function BuildRail({
 
 /* ── the screen stack ───────────────────────────────────────────── */
 
+const ALL_SPECS = [...DESIGN_SPECS, ...AUTOMATE_SPECS];
+
 /**
- * Only the active beat and its immediate neighbours are mounted. Five
- * dense product screens all live at once is a lot of DOM to keep
- * animating for no reason, and the ones two beats away are never visible
- * through the crossfade. Neighbours stay so a transition always has both
- * sides to draw.
+ * Only the active slot and its neighbours are mounted — which during the
+ * chapter transition keeps both the outgoing site and the back office
+ * behind it alive, so the reveal always has both windows to draw.
  */
 function ScreenStack({
   position,
-  activeBeat,
+  activeSlot,
   reduce,
 }: {
   position: MotionValue<number>;
-  activeBeat: number;
+  activeSlot: number;
   reduce: boolean;
 }) {
   return (
     <>
-      {DESIGN_SPECS.map(function layer(spec, i) {
-        if (Math.abs(i - activeBeat) > 1) return null;
+      {ALL_SPECS.map(function layer(spec, i) {
+        const slot = slotForBeat(i);
+        if (Math.abs(slot - activeSlot) > 1) return null;
         return (
-          <ScreenLayer
-            key={i}
-            index={i}
-            spec={spec}
-            position={position}
-            reduce={reduce}
-          />
+          <ScreenLayer key={i} slot={slot} spec={spec} position={position} reduce={reduce} />
         );
       })}
     </>
@@ -502,56 +545,77 @@ function ScreenStack({
 }
 
 function ScreenLayer({
-  index,
+  slot,
   spec,
   position,
   reduce,
 }: {
-  index: number;
-  spec: (typeof DESIGN_SPECS)[number];
+  slot: number;
+  spec: (typeof ALL_SPECS)[number];
   position: MotionValue<number>;
   reduce: boolean;
 }) {
-  // local progress inside this beat
   const local = useTransform(position, (p) => {
-    const t = p - index;
+    const t = p - slot;
     return t < 0 ? 0 : t > 1 ? 1 : t;
   });
 
-  // App-switch transition: the outgoing window slides and dissolves as
-  // the next one comes up under it. Never a blank frame — both layers
-  // are mounted through the whole hand-off.
-  // App-switch, not a crossfade.
-  //
-  // Two windows both sitting at ~50% opacity over the cream page let the
-  // page show through BOTH, which is what made the switch look grey and
-  // disabled. Here the outgoing window never fades: the incoming one
-  // slides in at full opacity ON TOP of it and occludes it, the way one
-  // application window covers another. Nothing is ever semi-transparent
-  // over the page, so there is no washed frame.
-  // Near-hard cut, not a ramp. Sliding the incoming window in while it is
-  // still semi-transparent let both windows read at once — the outgoing
-  // one showed straight through it, offset, which is what made the switch
-  // look like two broken frames. It now becomes opaque almost immediately
-  // and slides in OVER the outgoing one, occluding it the way a real
-  // window does.
-  // The last beat never fades. Scroll progress reaches 1 at the wrapper's
-  // end, which is also where the pin releases — so a final fade-out left
-  // a whole empty viewport of pinned stage with no window in it before
-  // the next section arrived.
-  const isLast = index === LIVE_BEATS.length - 1;
-  const opacity = useTransform(
-    position,
-    isLast
-      ? [index - 0.1, index - 0.088, index + 1, index + 1.001]
-      : [index - 0.1, index - 0.088, index + 0.999, index + 1],
-    isLast ? [0, 1, 1, 1] : [0, 1, 1, 0]
-  );
-  const x = useTransform(
-    position,
-    [index - 0.1, index, index + 0.9, index + 1],
-    ["6%", "0%", "0%", isLast ? "0%" : "-6%"]
-  );
+  const isLast = slot === SLOT_VH.length - 1;
+  // The last Design window is the one pulled aside during the chapter
+  // transition; the first Automate window is revealed behind it.
+  const isPulledAside = slot === TRANSITION_SLOT - 1;
+  const isRevealed = slot === TRANSITION_SLOT + 1;
+
+  // Keyframes are built as plain arrays rather than ternaries inside
+  // useTransform: nesting conditionals there made TypeScript reconcile a
+  // union of tuple types across three transforms and exhaust its heap.
+  let stops: number[];
+  let fades: number[];
+  if (isLast) {
+    stops = [slot - 0.1, slot - 0.088, slot + 1, slot + 1.001];
+    fades = [0, 1, 1, 1];
+  } else if (isPulledAside) {
+    stops = [slot - 0.1, slot - 0.088, slot + 1.72, slot + 1.95];
+    fades = [0, 1, 1, 0];
+  } else if (isRevealed) {
+    stops = [slot - 1, slot - 0.96, slot + 0.999, slot + 1];
+    fades = [0, 1, 1, 0];
+  } else {
+    stops = [slot - 0.1, slot - 0.088, slot + 0.999, slot + 1];
+    fades = [0, 1, 1, 0];
+  }
+  const opacity = useTransform(position, stops, fades);
+
+  // The site slides left and shrinks to reveal what is behind it, then
+  // exits; the back office starts small and off to the right and settles
+  // into the centre. Otherwise: the ordinary app-switch.
+  let xStops: number[];
+  let xVals: string[];
+  if (isPulledAside) {
+    xStops = [slot, slot + 1, slot + 1.7, slot + 1.95];
+    xVals = ["0%", "0%", "-46%", "-112%"];
+  } else if (isRevealed) {
+    xStops = [slot - 1, slot - 0.35, slot, slot + 0.9];
+    xVals = ["20%", "14%", "0%", "0%"];
+  } else {
+    xStops = [slot - 0.1, slot, slot + 0.9, slot + 1];
+    xVals = ["6%", "0%", "0%", isLast ? "0%" : "-6%"];
+  }
+  const x = useTransform(position, xStops, xVals);
+
+  let sStops: number[];
+  let sVals: number[];
+  if (isPulledAside) {
+    sStops = [slot, slot + 1, slot + 1.7];
+    sVals = [1, 1, 0.86];
+  } else if (isRevealed) {
+    sStops = [slot - 1, slot - 0.1, slot];
+    sVals = [0.9, 0.94, 1];
+  } else {
+    sStops = [slot, slot + 1];
+    sVals = [1, 1];
+  }
+  const scale = useTransform(position, sStops, sVals);
 
   const focus = useFocus(local, reduce ? null : spec.camera);
   const ref = useScrollStyle<HTMLDivElement>(opacity);
@@ -560,27 +624,46 @@ function ScreenLayer({
   return (
     <div
       ref={ref}
-      // later beats sit above earlier ones, so the incoming window covers
-      // the outgoing one instead of blending with it
-      style={{ position: "absolute", inset: 0, zIndex: index }}
+      // the window being pulled aside stays on top through the
+      // transition, so it reads as the front window moving away
+      style={{ position: "absolute", inset: 0, zIndex: isPulledAside ? 20 : slot }}
     >
-      <motion.div style={{ x, height: "100%" }}>
-        <WindowChrome
-          tone={spec.tone}
-          url={spec.url}
-          title={spec.title}
-          showIllustrative={false}
-        >
+      <motion.div style={{ x, scale, height: "100%" }}>
+        <WindowChrome tone={spec.tone} url={spec.url} title={spec.title} showIllustrative={false}>
           {/* no transform on the content at all — the focus is the veil */}
           <div style={{ position: "absolute", inset: 0 }}>
             <Screen local={local} />
-            {focus.rect ? (
-              <FocusSpotlight rect={focus.rect} amount={focus.dim} />
-            ) : null}
+            {focus.rect ? <FocusSpotlight rect={focus.rect} amount={focus.dim} /> : null}
           </div>
           <GhostCursor local={local} keys={spec.cursor} hidden={reduce} />
         </WindowChrome>
       </motion.div>
+    </div>
+  );
+}
+
+/** The caption column during the Design to Automate hand-off. */
+function ChapterCard() {
+  return (
+    <div>
+      <div
+        className="type-eyebrow"
+        style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)", marginBottom: 22 }}
+      >
+        Chapter 2
+      </div>
+      <h2 className="type-h1" style={{ color: "var(--color-ink)", marginBottom: 20 }}>
+        <CharReveal text="Automate" />
+      </h2>
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: ease.outQuart, delay: 0.25 }}
+        className="type-body-lg"
+        style={{ color: "var(--color-muted)", margin: 0, maxWidth: 440 }}
+      >
+        What runs <span className="type-accent">behind</span> the site.
+      </motion.p>
     </div>
   );
 }
@@ -631,12 +714,14 @@ function BuildStacked({ reduce }: { reduce: boolean }) {
 function ScreenForBeat({
   spec,
   local,
+  compact,
 }: {
-  spec: (typeof DESIGN_SPECS)[number];
+  spec: (typeof ALL_SPECS)[number];
   local: MotionValue<number>;
+  compact?: boolean;
 }) {
   const Screen = spec.Screen;
-  return <Screen local={local} />;
+  return <Screen local={local} compact={compact} />;
 }
 
 function StackedBeat({ beat, reduce }: { beat: Beat; reduce: boolean }) {
@@ -656,7 +741,7 @@ function StackedBeat({ beat, reduce }: { beat: Beat; reduce: boolean }) {
     const c = t < 0 ? 0 : t > 1 ? 1 : t;
     return PHASE.buildFrom + c * (PHASE.dwellTo - PHASE.buildFrom);
   });
-  const spec = DESIGN_SPECS[beat.index];
+  const spec = ALL_SPECS[beat.index];
 
   const proofs = beat.service.proof
     .map(resolveProof)
@@ -720,7 +805,7 @@ function StackedBeat({ beat, reduce }: { beat: Beat; reduce: boolean }) {
           url={spec.url}
           title={spec.title}
         >
-          <ScreenForBeat spec={spec} local={local} />
+          <ScreenForBeat spec={spec} local={local} compact />
         </WindowChrome>
       </div>
     </div>

@@ -71,7 +71,10 @@ const BRAND = {
   paper: "#FBF9F4",
 };
 
-export type ScreenProps = { local: MotionValue<number> };
+/** `compact` renders a restructured mobile layout rather than the
+ *  desktop one shrunk — see AutomateScreens for why that distinction
+ *  matters (the scaled-stills gotcha). */
+export type ScreenProps = { local: MotionValue<number>; compact?: boolean };
 
 /* ═══════════════════════════════════════════════════════════════
    B1 · Brand board
