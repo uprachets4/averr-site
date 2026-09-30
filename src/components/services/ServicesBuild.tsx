@@ -357,22 +357,37 @@ function BuildCaption({
  */
 function FittedName({ name }: { name: string }) {
   const hostRef = useRef<HTMLHeadingElement | null>(null);
-  const [scale, setScale] = useState(1);
 
+  // No state, and no dependency on its own output.
+  //
+  // The first version stored the scale in state, measured the rendered
+  // word and divided by the current scale to recover the base width.
+  // Width does not scale perfectly linearly with font-size, so the
+  // recovered value drifted, the effect recomputed a slightly different
+  // scale, and it re-ran forever — React error #185. It only fired when
+  // a word genuinely overflowed, which is why a 30% column never tripped
+  // it and a 29% one did.
+  //
+  // This resets to the base tier, measures there, and writes the result
+  // straight to the element. One pass, no feedback loop.
   useLayoutEffect(
     function fit() {
       function run() {
         const el = hostRef.current;
         if (!el) return;
+        el.style.fontSize = "";
         const col = el.clientWidth;
         if (!col) return;
         let widest = 0;
         el.querySelectorAll<HTMLElement>(":scope > span > span").forEach((w) => {
           if (w.querySelector("span")) {
-            widest = Math.max(widest, w.getBoundingClientRect().width / scale);
+            widest = Math.max(widest, w.getBoundingClientRect().width);
           }
         });
-        setScale(widest > col ? Math.max(0.62, col / widest) : 1);
+        if (widest > col) {
+          const s = Math.max(0.62, col / widest);
+          el.style.fontSize = `calc(var(--type-h1-size) * ${s})`;
+        }
       }
       run();
       window.addEventListener("resize", run);
@@ -380,18 +395,14 @@ function FittedName({ name }: { name: string }) {
         window.removeEventListener("resize", run);
       };
     },
-    [name, scale]
+    [name]
   );
 
   return (
     <h2
       ref={hostRef}
       className="type-h1"
-      style={{
-        color: "var(--color-ink)",
-        marginBottom: 20,
-        fontSize: scale === 1 ? undefined : `calc(var(--type-h1-size) * ${scale})`,
-      }}
+      style={{ color: "var(--color-ink)", marginBottom: 20 }}
     >
       <CharReveal text={name} />
     </h2>
