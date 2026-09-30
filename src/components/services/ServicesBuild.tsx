@@ -218,10 +218,13 @@ function BuildCaption({
 }) {
   const i = beat.index;
   // Fades out across the beat's last 15%; the next caption mounts after.
+  // The last caption holds, for the same reason the last window does:
+  // its beat ends exactly where the pin releases.
+  const isLast = i === LIVE_BEATS.length - 1;
   const opacity = useTransform(
     position,
     [i + PHASE.dwellTo, i + 1],
-    [1, 0]
+    [1, isLast ? 1 : 0]
   );
   const ref = useScrollStyle<HTMLDivElement>(opacity);
   const proofs = beat.service.proof
@@ -528,15 +531,22 @@ function ScreenLayer({
   // look like two broken frames. It now becomes opaque almost immediately
   // and slides in OVER the outgoing one, occluding it the way a real
   // window does.
+  // The last beat never fades. Scroll progress reaches 1 at the wrapper's
+  // end, which is also where the pin releases — so a final fade-out left
+  // a whole empty viewport of pinned stage with no window in it before
+  // the next section arrived.
+  const isLast = index === LIVE_BEATS.length - 1;
   const opacity = useTransform(
     position,
-    [index - 0.1, index - 0.088, index + 0.999, index + 1],
-    [0, 1, 1, 0]
+    isLast
+      ? [index - 0.1, index - 0.088, index + 1, index + 1.001]
+      : [index - 0.1, index - 0.088, index + 0.999, index + 1],
+    isLast ? [0, 1, 1, 1] : [0, 1, 1, 0]
   );
   const x = useTransform(
     position,
     [index - 0.1, index, index + 0.9, index + 1],
-    ["6%", "0%", "0%", "-6%"]
+    ["6%", "0%", "0%", isLast ? "0%" : "-6%"]
   );
 
   const focus = useFocus(local, reduce ? null : spec.camera);
