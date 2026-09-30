@@ -20,7 +20,14 @@ import {
   type PillarId,
   type Service,
 } from "../../data/servicePillars";
-import { BrowserFrame, PHASE, SceneStack } from "./BuildCanvas";
+import WindowChrome from "./build/WindowChrome";
+import GhostCursor from "./build/GhostCursor";
+import { useCamera } from "./build/camera";
+import { DESIGN_SPECS } from "./build/BuildScreens";
+
+/** Phase map inside one beat: caption in 0-0.15, canvas build 0.05-0.40,
+ *  dwell 0.40-0.85 (29.25vh of a 65vh beat), caption out 0.85-1.00. */
+const PHASE = { captionIn: 0.15, buildFrom: 0.05, buildTo: 0.4, dwellTo: 0.85 };
 
 /**
  * "Watch us build your business" — the pinned stage.
@@ -158,8 +165,8 @@ export default function ServicesBuild() {
             maxWidth: "var(--container-wide)",
             margin: "0 auto",
             display: "grid",
-            gridTemplateColumns: "38% 58%",
-            gap: "4%",
+            gridTemplateColumns: "32% 62%",
+            gap: "6%",
             alignItems: "center",
             paddingBottom: 40,
           }}
@@ -173,10 +180,8 @@ export default function ServicesBuild() {
             position={position}
           />
 
-          <div style={{ position: "relative" }}>
-            <BrowserFrame>
-              <SceneStack position={position} beatCount={count} />
-            </BrowserFrame>
+          <div style={{ position: "relative", height: "82vh", maxHeight: 820 }}>
+            <ScreenStack position={position} activeBeat={activeBeat} reduce={!!reduce} />
           </div>
         </div>
       </div>
@@ -388,6 +393,107 @@ function BuildRail({
   );
 }
 
+/* ── the screen stack ───────────────────────────────────────────── */
+
+/**
+ * Only the active beat and its immediate neighbours are mounted. Five
+ * dense product screens all live at once is a lot of DOM to keep
+ * animating for no reason, and the ones two beats away are never visible
+ * through the crossfade. Neighbours stay so a transition always has both
+ * sides to draw.
+ */
+function ScreenStack({
+  position,
+  activeBeat,
+  reduce,
+}: {
+  position: MotionValue<number>;
+  activeBeat: number;
+  reduce: boolean;
+}) {
+  return (
+    <>
+      {DESIGN_SPECS.map(function layer(spec, i) {
+        if (Math.abs(i - activeBeat) > 1) return null;
+        return (
+          <ScreenLayer
+            key={i}
+            index={i}
+            spec={spec}
+            position={position}
+            reduce={reduce}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+function ScreenLayer({
+  index,
+  spec,
+  position,
+  reduce,
+}: {
+  index: number;
+  spec: (typeof DESIGN_SPECS)[number];
+  position: MotionValue<number>;
+  reduce: boolean;
+}) {
+  // local progress inside this beat
+  const local = useTransform(position, (p) => {
+    const t = p - index;
+    return t < 0 ? 0 : t > 1 ? 1 : t;
+  });
+
+  // App-switch transition: the outgoing window slides and dissolves as
+  // the next one comes up under it. Never a blank frame — both layers
+  // are mounted through the whole hand-off.
+  const opacity = useTransform(
+    position,
+    [index - 0.42, index - 0.04, index + 0.92, index + 1.12],
+    [0, 1, 1, 0]
+  );
+  const y = useTransform(
+    position,
+    [index - 0.42, index, index + 1, index + 1.12],
+    [26, 0, 0, -18]
+  );
+  const scale = useTransform(
+    position,
+    [index - 0.42, index, index + 1, index + 1.12],
+    [0.965, 1, 1, 0.99]
+  );
+
+  const camera = useCamera(local, reduce ? null : spec.camera);
+  const ref = useScrollStyle<HTMLDivElement>(opacity);
+  const Screen = spec.Screen;
+
+  return (
+    <div
+      ref={ref}
+      style={{ position: "absolute", inset: 0 }}
+    >
+      <motion.div style={{ y, scale, height: "100%" }}>
+        <WindowChrome tone={spec.tone} url={spec.url} title={spec.title}>
+          {/* the camera scales the CONTENT; the chrome above never moves */}
+          <motion.div
+            style={{
+              position: "absolute",
+              inset: 0,
+              scale: camera.scale,
+              transformOrigin: camera.origin,
+            }}
+          >
+            <Screen local={local} />
+          </motion.div>
+          <GhostCursor local={local} keys={spec.cursor} hidden={reduce} />
+        </WindowChrome>
+      </motion.div>
+    </div>
+  );
+}
+
 /* ── mobile / reduced motion ────────────────────────────────────── */
 
 function BuildStacked({ reduce }: { reduce: boolean }) {
@@ -431,6 +537,17 @@ function BuildStacked({ reduce }: { reduce: boolean }) {
   );
 }
 
+function ScreenForBeat({
+  spec,
+  local,
+}: {
+  spec: (typeof DESIGN_SPECS)[number];
+  local: MotionValue<number>;
+}) {
+  const Screen = spec.Screen;
+  return <Screen local={local} />;
+}
+
 function StackedBeat({ beat, reduce }: { beat: Beat; reduce: boolean }) {
   const ref = useRef<HTMLDivElement | null>(null);
   // Each card plays its own beat once on entry. The canvas reads the same
@@ -440,11 +557,15 @@ function StackedBeat({ beat, reduce }: { beat: Beat; reduce: boolean }) {
     target: ref,
     offset: ["start 0.85", "start 0.35"],
   });
-  const local = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const position = useTransform(local, function toPosition(t) {
-    if (reduce) return beat.index + PHASE.dwellTo;
-    return beat.index + PHASE.buildFrom + t * (PHASE.dwellTo - PHASE.buildFrom);
+  // The card plays its own beat once on entry and rests at the dwell —
+  // the state the pinned stage holds. Under reduced motion it starts
+  // there and never moves.
+  const local = useTransform(scrollYProgress, function toLocal(t) {
+    if (reduce) return PHASE.dwellTo;
+    const c = t < 0 ? 0 : t > 1 ? 1 : t;
+    return PHASE.buildFrom + c * (PHASE.dwellTo - PHASE.buildFrom);
   });
+  const spec = DESIGN_SPECS[beat.index];
 
   const proofs = beat.service.proof
     .map(resolveProof)
@@ -502,10 +623,14 @@ function StackedBeat({ beat, reduce }: { beat: Beat; reduce: boolean }) {
         </div>
       ) : null}
 
-      <div style={{ marginTop: 26 }}>
-        <BrowserFrame>
-          <SceneStack position={position} beatCount={LIVE_BEATS.length} />
-        </BrowserFrame>
+      <div style={{ marginTop: 26, height: 420 }}>
+        <WindowChrome
+          tone={spec.tone}
+          url={spec.url}
+          title={spec.title}
+        >
+          <ScreenForBeat spec={spec} local={local} />
+        </WindowChrome>
       </div>
     </div>
   );
