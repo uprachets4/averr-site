@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValueEvent,
@@ -359,6 +359,47 @@ export function ScreenCanvas({ local, compact }: AutoScreenProps) {
   });
   const flow = useTransform(local, (t) => at(t, 0.46, 1));
 
+  // Connector geometry is MEASURED, not guessed in percentages.
+  //
+  // The first version drew cubic curves between percentage points with
+  // both control points on the source's y, which produced wide S-arcs
+  // that swung away from the boxes and never visibly met them. Ports are
+  // now real: each node reports its own rect, the path leaves the right
+  // edge and arrives at the left edge, and the packets travel that exact
+  // polyline rather than a decorative curve of their own.
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const nodeRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const [geo, setGeo] = useState<{ w: number; h: number; ports: Array<{ inX: number; inY: number; outX: number; outY: number }> } | null>(null);
+
+  useLayoutEffect(function measure() {
+    if (compact) return;
+    function run() {
+      const host = hostRef.current;
+      if (!host) return;
+      const hr = host.getBoundingClientRect();
+      if (!hr.width) return;
+      const ports = nodeRefs.current.map((el) => {
+        if (!el) return { inX: 0, inY: 0, outX: 0, outY: 0 };
+        const r = el.getBoundingClientRect();
+        return {
+          inX: r.left - hr.left,
+          inY: r.top - hr.top + r.height / 2,
+          outX: r.right - hr.left,
+          outY: r.top - hr.top + r.height / 2,
+        };
+      });
+      setGeo({ w: hr.width, h: hr.height, ports });
+    }
+    run();
+    const ro = new ResizeObserver(run);
+    if (hostRef.current) ro.observe(hostRef.current);
+    window.addEventListener("resize", run);
+    return function cleanup() {
+      ro.disconnect();
+      window.removeEventListener("resize", run);
+    };
+  }, [compact]);
+
   if (compact) {
     return (
       <div style={{ position: "absolute", inset: 0, background: "#F7F7F4", padding: 16, overflow: "hidden", color: "#1D2220" }}>
@@ -401,30 +442,58 @@ export function ScreenCanvas({ local, compact }: AutoScreenProps) {
         <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 600, color: active ? "#2E7A50" : "rgba(29,34,32,0.5)" }}>Active</span>
       </div>
 
-      <div style={{ position: "relative", flex: 1, minHeight: 0 }}>
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
-          {NODES.slice(0, -1).map(([, x1, y1], i) => {
-            const [, x2, y2] = NODES[i + 1];
-            return (
-              <path key={i} d={`M ${x1 + 5} ${y1 + 3} C ${(x1 + x2) / 2} ${y1 + 3}, ${(x1 + x2) / 2} ${y2 + 3}, ${x2 - 1} ${y2 + 3}`} fill="none" stroke={active ? "rgba(63,160,107,0.6)" : "rgba(29,34,32,0.22)"} strokeWidth="0.5" style={{ transition: "stroke 320ms ease" }} />
-            );
-          })}
-        </svg>
+      <div ref={hostRef} style={{ position: "relative", flex: 1, minHeight: 0 }}>
+        {geo ? (
+          <svg
+            width={geo.w}
+            height={geo.h}
+            viewBox={`0 0 ${geo.w} ${geo.h}`}
+            style={{ position: "absolute", inset: 0 }}
+          >
+            {NODES.slice(0, -1).map((_, i) => (
+              <path
+                key={i}
+                d={orthPath(geo.ports[i], geo.ports[i + 1])}
+                fill="none"
+                stroke={active ? "rgba(63,160,107,0.75)" : "rgba(29,34,32,0.26)"}
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ transition: "stroke 320ms ease" }}
+              />
+            ))}
+            {/* ports, so a connector visibly attaches rather than floating */}
+            {geo.ports.map((p, i) => (
+              <g key={i}>
+                {i > 0 ? <circle cx={p.inX} cy={p.inY} r="3" fill={active ? "#3FA06B" : "rgba(29,34,32,0.3)"} /> : null}
+                {i < geo.ports.length - 1 ? <circle cx={p.outX} cy={p.outY} r="3" fill={active ? "#3FA06B" : "rgba(29,34,32,0.3)"} /> : null}
+              </g>
+            ))}
+          </svg>
+        ) : null}
 
-        {NODES.slice(0, -1).map(([, x1, y1], i) => {
-          const [, x2, y2] = NODES[i + 1];
-          return <Packet key={i} flow={flow} i={i} x1={x1 + 5} y1={y1 + 3} x2={x2 - 1} y2={y2 + 3} on={active} />;
-        })}
+        {geo && active
+          ? NODES.slice(0, -1).map((_, i) => (
+              <Packet key={i} flow={flow} i={i} from={geo.ports[i]} to={geo.ports[i + 1]} />
+            ))
+          : null}
 
         {NODES.map(([n, x, y], i) => (
-          <div key={n} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)", background: "#fff", border: "1px solid rgba(29,34,32,0.14)", borderRadius: 9, padding: "9px 12px", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 3px 10px rgba(29,34,32,0.07)", whiteSpace: "nowrap" }}>
+          <div
+            key={n}
+            ref={function set(el) {
+              nodeRefs.current[i] = el;
+            }}
+            style={{ position: "absolute", left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)", background: "#fff", border: "1px solid rgba(29,34,32,0.14)", borderRadius: 9, padding: "9px 12px", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 3px 10px rgba(29,34,32,0.07)", whiteSpace: "nowrap", zIndex: 2 }}
+          >
             <NodeIcon i={i} />
             <span style={{ fontSize: 10.5, fontWeight: 500 }}>{n}</span>
           </div>
         ))}
 
-        {/* run log */}
-        <div style={{ position: "absolute", right: 14, bottom: 14, width: 236, background: "#fff", border: "1px solid rgba(29,34,32,0.12)", borderRadius: 9, padding: 11, boxShadow: "0 8px 22px rgba(29,34,32,0.1)" }}>
+        {/* run log — positioned in percentages so the spotlight rect can
+            name the same box without a second measurement */}
+        <div style={{ position: "absolute", right: "3%", bottom: "4%", width: "31%", background: "#fff", border: "1px solid rgba(29,34,32,0.12)", borderRadius: 9, padding: 11, boxShadow: "0 8px 22px rgba(29,34,32,0.1)", zIndex: 3 }}>
           <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(29,34,32,0.42)", marginBottom: 8 }}>
             Run log
           </div>
@@ -440,13 +509,56 @@ export function ScreenCanvas({ local, compact }: AutoScreenProps) {
   );
 }
 
-function Packet({ flow, i, x1, y1, x2, y2, on }: { flow: MotionValue<number>; i: number; x1: number; y1: number; x2: number; y2: number; on: boolean }) {
-  const p = useTransform(flow, (t) => ((t * 1.6 + i * 0.2) % 1));
-  const left = useTransform(p, (v) => `${x1 + (x2 - x1) * v}%`);
-  const top = useTransform(p, (v) => `${y1 + (y2 - y1) * v}%`);
-  if (!on) return null;
+type Port = { inX: number; inY: number; outX: number; outY: number };
+
+/** A gentle orthogonal route: out of the source's right port, across to a
+ *  midpoint, down or up to the target's row, then into its left port.
+ *  Corners are rounded by a few px so it reads as wiring, not a staircase. */
+function orthPath(a: Port, b: Port) {
+  const x1 = a.outX;
+  const y1 = a.outY;
+  const x2 = b.inX;
+  const y2 = b.inY;
+  const mid = x1 + (x2 - x1) / 2;
+  const r = Math.min(10, Math.abs(y2 - y1) / 2, Math.abs(mid - x1));
+  if (r < 2 || Math.abs(y2 - y1) < 2) return `M ${x1} ${y1} L ${x2} ${y2}`;
+  const dir = y2 > y1 ? 1 : -1;
+  return [
+    `M ${x1} ${y1}`,
+    `L ${mid - r} ${y1}`,
+    `Q ${mid} ${y1} ${mid} ${y1 + r * dir}`,
+    `L ${mid} ${y2 - r * dir}`,
+    `Q ${mid} ${y2} ${mid + r} ${y2}`,
+    `L ${x2} ${y2}`,
+  ].join(" ");
+}
+
+/** Points along that same polyline, so a packet never leaves the wire. */
+function pointAt(a: Port, b: Port, t: number) {
+  const x1 = a.outX;
+  const y1 = a.outY;
+  const x2 = b.inX;
+  const y2 = b.inY;
+  const mid = x1 + (x2 - x1) / 2;
+  const l1 = Math.abs(mid - x1);
+  const l2 = Math.abs(y2 - y1);
+  const l3 = Math.abs(x2 - mid);
+  const total = l1 + l2 + l3 || 1;
+  const d = t * total;
+  if (d <= l1) return { x: x1 + (mid - x1) * (d / (l1 || 1)), y: y1 };
+  if (d <= l1 + l2) return { x: mid, y: y1 + (y2 - y1) * ((d - l1) / (l2 || 1)) };
+  return { x: mid + (x2 - mid) * ((d - l1 - l2) / (l3 || 1)), y: y2 };
+}
+
+function Packet({ flow, i, from, to }: { flow: MotionValue<number>; i: number; from: Port; to: Port }) {
+  const p = useTransform(flow, (t) => (t * 1.6 + i * 0.2) % 1);
+  const left = useTransform(p, (v) => `${pointAt(from, to, v).x}px`);
+  const top = useTransform(p, (v) => `${pointAt(from, to, v).y}px`);
   return (
-    <motion.span aria-hidden style={{ position: "absolute", left, top, width: 7, height: 7, borderRadius: "50%", background: "#3FA06B", transform: "translate(-50%,-50%)", boxShadow: "0 0 0 3px rgba(63,160,107,0.18)" }} />
+    <motion.span
+      aria-hidden
+      style={{ position: "absolute", left, top, width: 7, height: 7, borderRadius: "50%", background: "#3FA06B", transform: "translate(-50%,-50%)", boxShadow: "0 0 0 3px rgba(63,160,107,0.18)", zIndex: 1 }}
+    />
   );
 }
 
@@ -717,7 +829,9 @@ export const AUTOMATE_SPECS: BeatSpec[] = [
       { at: 0.45, x: 84, y: 7, press: true },
       { at: 0.74, x: 80, y: 80 },
     ],
-    camera: { from: 0.6, hold: 0.72, to: 0.9, rect: { x: 60, y: 62, w: 38, h: 34 } },
+    // the run log: right 3% / bottom 4% / width 31% of the canvas,
+    // which sits below a ~46px toolbar inside the screen box
+    camera: { from: 0.6, hold: 0.72, to: 0.9, rect: { x: 64, y: 68, w: 34, h: 28 } },
     Screen: ScreenCanvas,
   },
   {

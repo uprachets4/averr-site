@@ -303,7 +303,8 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 20. **Zero horizontal overflow at 375** on all routes, every session.
 21. **Zero ViewTimeline/ScrollTimeline on sticky descendants**, every session.
 22. **Bundle gate:** report the delta; flag anything over **+12 KB gzip JS**.
-23. **Report your own probe errors.** Several "bugs" were bad measurements (the 234px sliver, a rotation inflating `getBoundingClientRect`, reading `strokeDashoffset` when motion animates `stroke-dasharray`, sampling a segment before its count-up finished). Re-probe before changing working code.
+23. **Crash-scroll before reporting.** Before reporting ANY session, scroll every touched route top → bottom at three speeds — slow wheel, normal, fast/large steps — and back up again, with **zero console errors and zero React errors**. A route that crashes anywhere means the session is not verified, whatever the DOM sweep says. Added in 17c-4 after 17c-3 shipped a React #185 that a position-sampling probe never hit: the probe jumped straight to each dwell midpoint and the crash lived in the travel between them.
+24. **Report your own probe errors.** Several "bugs" were bad measurements (the 234px sliver, a rotation inflating `getBoundingClientRect`, reading `strokeDashoffset` when motion animates `stroke-dasharray`, sampling a segment before its count-up finished). Re-probe before changing working code.
 
 ---
 
