@@ -214,18 +214,21 @@ export default function ServicesBuild() {
       };
       if (!(id in first) || !pinned) return;
 
-      let last = -1;
       let cancelled = false;
       function attempt() {
-        if (cancelled) return;
-        // if the reader has moved since our last jump, stop interfering
-        if (last >= 0 && Math.abs(window.scrollY - last) > 4) {
-          cancelled = true;
-          return;
-        }
-        jumpToBeat(first[id], true);
-        last = window.scrollY;
+        if (!cancelled) jumpToBeat(first[id], true);
       }
+      // Cancel on a real gesture, never on a scrollY delta. Guarding by
+      // "has the position moved since my last jump" looked right and was
+      // wrong: the layout shift these retries exist to outlast moves the
+      // position too, so the first reflow cancelled the remaining
+      // attempts and the anchor stayed on beat one.
+      function stop() {
+        cancelled = true;
+      }
+      const gestures = ["wheel", "touchstart", "keydown"] as const;
+      gestures.forEach((g) => window.addEventListener(g, stop, { passive: true }));
+
       const timers = [60, 300, 800, 1500].map((d) => window.setTimeout(attempt, d));
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(attempt).catch(() => {});
@@ -233,6 +236,7 @@ export default function ServicesBuild() {
       return function cleanup() {
         cancelled = true;
         timers.forEach(window.clearTimeout);
+        gestures.forEach((g) => window.removeEventListener(g, stop));
       };
     },
     [pinned]
