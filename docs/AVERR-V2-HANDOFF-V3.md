@@ -24,10 +24,9 @@
 
 ```
 dist/assets/index-DS0F-gPc.css    41.71 kB │ gzip:  8.65 kB
-dist/assets/index-DXyKFowj.js    477.90 kB │ gzip: 151.66 kB  ← home + shell + motion
-dist/assets/Services-*.js         38.57 kB │ gzip: 10.80 kB
+dist/assets/index-DdqwrOZz.js    477.62 kB │ gzip: 151.55 kB  ← home + shell + motion
+dist/assets/Services-*.js        163.84 kB │ gzip: 40.50 kB  ← the 16-beat build page
 dist/assets/CaseStudy-*.js        51.42 kB │ gzip: 12.74 kB
-dist/assets/ServicesNext-*.js    119.13 kB │ gzip: 26.56 kB  ← 16 beats of product screens
 dist/assets/ServicesCloser-*.js   10.96 kB │ gzip:  3.32 kB  ← shared by both services routes
 dist/assets/Contact-*.js          44.73 kB │ gzip: 11.16 kB
 dist/assets/Work-*.js             22.22 kB │ gzip:  6.66 kB
@@ -183,6 +182,25 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 
 *Honest limit:* the map is the weakest of the six. It now reads as a map — white streets, tinted blocks, an amber arterial, legible labels — but it is a stylised one, sparser than the report or the workflow canvas, both of which genuinely look like software.
 
+**17c-5** `…` — **the finale: the build page is now `/services`.**
+
+- **Design mobile variants** — the last five screens at 7–8px now have restructured single-column variants. **All sixteen screens measure 11px minimum, 0 nodes under, at 375.** The gate is closed.
+- **The map is real streets.** `src/data/osmOshawa.ts` — a committed Overpass extract over central Oshawa/Whitby, projected flat and simplified, **880 ways at 9.4 kB gzip** against a 60 kB budget. No tiles, no runtime API, no map library. **OpenStreetMap data is ODbL; "© OpenStreetMap contributors" renders inside the map window at 11px and must not be removed.** Styled in our palette with road weights by class — not a look-alike of any provider.
+- **The swap.** `/services` renders the build page; `/services/next`, its route, its lazy import and the client-side noindex are gone. Deleted with zero importers: `ServicesNext.tsx`, `ServiceIndex.tsx`, `AutomatePipeline.tsx`, and the old `Services.tsx` in full. Title and meta description updated and restored on unmount.
+- **Verified on the alias:** all 16 captions correct · **all 16 rail jumps correct** · both chapter cards · 3-speed crash-scroll at 1440/1920/375 both directions with **0 console and 0 React errors** · 0 long tasks on a full scroll · 0 ViewTimeline on sticky descendants · no `$` strings · PillHl home 2 / 404 1 / services 0 · 375: 16 frames, **0 nodes under 11px**, zero overflow · all three chapter anchors on cold loads · a real door click from home.
+
+**Mobile lab numbers (390×844, 4× CPU throttle, ~1.6 Mbps) — one of these is bad:**
+
+| | |
+|---|---|
+| CLS | **0.001** |
+| TBT proxy | **174 ms** over 4 long tasks |
+| **LCP** | **4884 ms** — element `P.type-body-lg`, the hero subhead |
+
+**The LCP element is gated behind its own entrance delay.** The hero subhead animates in at `delay: 1.1`, so it cannot paint before 1.1s, and under throttle the whole chain stretches. The route also costs a lazy-load round trip. **This pattern is on every page hero, not just this one** — it is a ship-pass item, and the cheapest fix is to let the LCP text paint immediately and animate something else.
+
+*Four wrong guesses in a row on one bug, worth recording as method:* the chapter anchors appeared to fail on `#automate` and `#grow`. I changed the scroll to instant, then added retries, then fixed a guard that was cancelling those retries — all without evidence. **Instrumenting the scroll position took one run and showed the anchors had worked the whole time**: final y 4653, caption "Workflow audit". The probe was reusing one page across `#design → #automate → #grow`, and a hash-only change is a same-document navigation, so React never remounted. It did surface one real edge — clicking `/services#grow` while already on `/services` did nothing — now fixed by taking the hash from `useLocation`. **Instrument before the second guess.**
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -234,38 +252,33 @@ Order, each wrapped in `SectionBoundary`:
 
 `status: "draft"` routes to `ComingSoon`. **Never linked from the finale cycle.** Appears in the /work film as the final segment: muted name, `IN PROGRESS`, no image, no figure, no link, neutral (non-tint) light.
 
-### `/services` — the service index + the kickoff calendar (`src/pages/Services.tsx`)
+### `/services` — "Watch us build your business" (`src/pages/Services.tsx`)
 
-Rebuilt in Session 17, re-ordered in 17b. **The page leads with what the studio sells**; the pillars are labels those services group under, not the headline. Signature mechanic: **the 14-day calendar**; primary content: **the Service Index**.
+**Rebuilt across 17c-1 … 17c-5 and swapped in here in 17c-5**, replacing the flat 16-row service index. Signature mechanic: **the build**.
 
-| Order | Component | Signature mechanic |
+One continuous pinned scene. A generic GTA home-services business (**Northgate**, `northgate.ca`) is built as you scroll, and each of the sixteen services is the caption of the step happening on screen. **The story is the list — no service is named twice on the page.**
+
+| Order | Component | What it is |
 |---|---|---|
-| 1 | `ServicesHeader` | Eyebrow "SERVICES · {SERVICE_COUNT} WAYS WE HELP" counted from data; h1 "Here's *exactly* what we do." on one `CharReveal` stagger with the Cormorant accent on "exactly"; home's scroll cue |
-| 1b | **`ServiceIndex`** | **The page's primary content.** 16 services grouped by pillar, name `type-h2` / outcome `type-body-lg` / proof chips, a 240px proof thumbnail on hover in its own grid track, and a sticky pillar switcher that tracks by scroll and fades after the index |
-| 2 | `PillarSequenceHeader` + `PillarSequence` | "How each one works." Sticky-scroll Design / Automate / Grow, three stages each, ambient right column. Design = mood board at natural aspect, fanning ±6° on hover. Automate = node path with illustrative task chips looping it, nodes lighting on arrival. Grow = dashboard counting to its sample figures. Both Automate and Grow carry ILLUSTRATIVE. "What's included" assembles as chips. Rail meets the container edge at ≥1680. |
-| 3 | `Chapter dark from cream` → `NoList` | Each refusal struck as you read, across a verbatim substring |
-| 4 | `Chapter cream-warm from dark` → `KickoffCalendar` | **The signature.** 14 cells fill in order as the section scrolls past (normal flow, never pinned); each step card arrives as its own first day fills and spans exactly its day range, so a card's width is the length of the step. `WITHIN 14 DAYS · KICKOFF` at day 12. |
-| 5 | `Chapter dark from cream-warm` → `ServicesCloser` | /services-specific. `useDeclarePageEndTone("dark")`. |
+| 1 | `BuildHero` | Eyebrow counts `SERVICE_COUNT`; h1 "Watch us build *your* business." on one `CharReveal`; scroll cue |
+| 2 | `ServicesBuild` | **The stage.** 16 beats + 2 chapter transitions on one pin |
+| 3 | `Chapter dark from cream` → `NoList` | unchanged |
+| 4 | `Chapter cream-warm from dark` → `KickoffCalendar` | unchanged |
+| 5 | `Chapter dark from cream-warm` → `ServicesCloser` | `useDeclarePageEndTone("dark")` |
 
-Below 900px — **and at any width under reduced motion** — `PillarSequence` renders `StackedPillar`, which shows each ambient as a still via `StaticAmbient`: Design and Grow scale, **Automate switches to a purpose-built vertical composition** so its labels stay at real size (§2, 17-fix / 17-fix-2). No `FinalCTA`, no `PillHl`.
+**Slot model.** Beats are not evenly spaced, so scroll maps onto SLOTS, not beats: 5 Design beats at 65vh, an 80vh transition, 5 Automate beats, an 80vh transition, 6 Grow beats. **Travel 1200vh, wrapper 1300vh** (the n+1 rule, §5.4). Per beat: caption in 0–0.15, screen builds 0.05–0.40, **dwell 0.40–0.85**, caption out 0.85–1.00. One continuous float drives caption, canvas and rail.
 
-Data: **`src/data/servicePillars.ts` is the single source for /services and home** — `PILLAR_SERVICES` (16 services: name, outcome, verified proof slugs, and the original "what's included" string kept unrendered for traceability), `SERVICE_COUNT`, `PILLAR_TIMELINE`, `GROW_METRICS`. Also `src/data/servicesProcess.ts` (steps + day ranges, refusals + struck phrases, pipeline chip labels).
+**The sixteen screens** live in `components/services/build/`: `BuildScreens.tsx` (Design), `AutomateScreens.tsx`, `GrowScreens.tsx`. Each is a different piece of software, each has a `compact` mobile variant — **restructured, never scaled — with 11px the floor for every text node across all sixteen.**
 
-**Proof rule:** a service links to a case study only where that study's own copy shows the service was delivered. Nine of sixteen qualify. A service with none renders no chip and reserves no space — do not fill the gap with a weaker link.
+**Systems:** `WindowChrome` (the window, 67% of a stage capped at 1680 on this route only), `GhostCursor` (choreographed from the same scroll value, so a click and its response cannot drift), `camera.ts` + `FocusSpotlight` (**spotlight only — there is no scale; every push-in value tried cropped the frame, which is arithmetic, not tuning**), and `ALL_SPECS`, which mounts only the active slot ±1.
 
-### `/services/next` — the 17c rebuild, in progress
+**Chapter anchors.** Home's doors link to `/services#design|#automate|#grow`. Those ids are no longer sections — the chapters are scroll positions inside one pin — so `ServicesBuild` reads the hash (from `useLocation`, so it reacts to a same-document hash change too) and jumps to that chapter's first beat, retrying until layout settles and cancelling on a real gesture.
 
-**Temporary.** `src/pages/ServicesNext.tsx`, `components/services/ServicesBuild.tsx`, and `components/services/build/{WindowChrome,GhostCursor,camera,BuildScreens}.tsx`. The "Watch us build your business" scene (§2, 17c-1 and 17c-2). **Deleted in 17c-3**, when it replaces `/services`.
+**Map data.** `src/data/osmOshawa.ts` is a committed static extract of real streets over central Oshawa and Whitby: **OpenStreetMap, © OpenStreetMap contributors, licensed ODbL.** Pulled once from Overpass, projected flat and Douglas-Peucker simplified — 880 ways, 9.4 kB gzip. **No tiles, no API call at runtime, no map library.** The attribution renders inside the map window at 11px and must stay there.
 
-Design and Automate are built (10 beats); Grow shows in the rail as "soon" with disabled ticks. Beat = 65vh, wrapper = beats × 65vh + 100vh (measured 4.25× viewport for five beats). Phases: caption in 0–0.15, **layout complete by 0.40**, dwell 0.40–0.85 where the ghost cursor acts, caption out 0.85–1.00.
+**Mobile / reduced motion** drop the pin: one section per service, each screen at its finished state.
 
-**On hiding it — Prachets ruled against a `robots.txt` Disallow**, on the grounds that a Disallow line publishes the path to anyone who reads the file. What protects it instead:
-- a client-side `<meta name="robots" content="noindex, nofollow">` injected on mount (this codebase has no head manager, so it is JS-only and the served HTML does not carry it);
-- Vercel already sends `X-Robots-Tag: noindex` on preview deployments, and this route only ever lives on one;
-- Nav's `LINKS` and Footer's `STUDIO_LINKS` are hardcoded arrays that do not include it, and the project ships **no sitemap.xml and no robots.txt** at all;
-- the route is removed before any production merge.
-
-**Do not merge `redesign-v2` to `main` while this route exists.**
+**Deleted in the swap** (zero importers each, verified): `pages/ServicesNext.tsx`, `components/services/ServiceIndex.tsx`, `components/services/AutomatePipeline.tsx`, and the whole of the old `Services.tsx` (`ServicesHeader`, `PillarSequence`, `PillarSection`, `StackedPillar`, `StaticAmbient`, the three pillar ambients).
 
 ### `/about`, `/contact`, `*` (404)
 
@@ -445,6 +458,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 ## 8. ROADMAP REMAINING
 
 - ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
+- ~~**Session 17 — /services.**~~ **COMPLETE** (17 → 17c-5). The page is the build scene; see §3.
 - **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **Needs the photo.**
 - **Session 19 — /contact.** After the recording.
 - **Session 20 — site-wide.** Page transitions using the slab wipe, footer redesign, home polish (richer door previews, reel hover, 404 pill).
