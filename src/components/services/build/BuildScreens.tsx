@@ -76,6 +76,45 @@ const BRAND = {
  *  matters (the scaled-stills gotcha). */
 export type ScreenProps = { local: MotionValue<number>; compact?: boolean };
 
+
+/* ── mobile variants ─────────────────────────────────────────────
+ *
+ * Restructured, never scaled. The desktop compositions are dense
+ * two-pane layouts whose 8-10px type is fine at 880px and illegible at
+ * 327px; shrinking them is the scaled-stills gotcha. Each of these
+ * rebuilds the same idea as a single column at real sizes, with 11px as
+ * the floor for every text node.
+ */
+
+const MIN = 11;
+
+function MRow({
+  label,
+  value,
+  tint,
+}: {
+  label: React.ReactNode;
+  value?: React.ReactNode;
+  tint?: string;
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderTop: "1px solid rgba(27,31,29,0.08)" }}>
+      <span style={{ flex: 1, fontSize: 12, color: "#1B1F1D" }}>{label}</span>
+      {value != null ? (
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: MIN, color: tint || "rgba(27,31,29,0.6)" }}>{value}</span>
+      ) : null}
+    </div>
+  );
+}
+
+function MShell({ bg, children }: { bg: string; children: React.ReactNode }) {
+  return (
+    <div style={{ position: "absolute", inset: 0, background: bg, padding: 16, overflow: "hidden" }}>
+      {children}
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════
    B1 · Brand board
    ═══════════════════════════════════════════════════════════════ */
@@ -87,7 +126,7 @@ const PALETTE: Array<[string, string]> = [
   ["Slate", "#6F7D78"],
 ];
 
-export function ScreenBrandBoard({ local }: ScreenProps) {
+export function ScreenBrandBoard({ local, compact }: ScreenProps) {
   // the cursor picks the accent at 0.54; everything downstream re-tints
   const [accent, setAccent] = useState(BRAND.accentA);
   useMotionValueEvent(local, "change", function pick(t) {
@@ -98,6 +137,35 @@ export function ScreenBrandBoard({ local }: ScreenProps) {
   const chips = useTransform(local, (t) => at(t, 0.14, 0.3));
   const spec = useTransform(local, (t) => at(t, 0.2, 0.34));
   const apps = useTransform(local, (t) => at(t, 0.26, 0.4));
+
+
+  if (compact) {
+    return (
+      <MShell bg={BRAND.paper}>
+        <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 14 }}>
+          <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
+            <path d="M8 38 L8 14 L24 24 L40 14 L40 38" stroke={BRAND.primary} strokeWidth="3.6" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="24" cy="36" r="3.1" fill={accent} />
+          </svg>
+          <span>
+            <span style={{ display: "block", fontSize: 15, fontWeight: 600, letterSpacing: "0.14em", color: BRAND.ink }}>{BRAND.name}</span>
+            <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: MIN, letterSpacing: "0.2em", color: "rgba(22,33,29,0.5)", marginTop: 3 }}>{BRAND.sub}</span>
+          </span>
+        </div>
+        <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+          {[...PALETTE, ["Accent", accent] as [string, string]].map(([n, c]) => (
+            <div key={n} style={{ flex: 1 }}>
+              <div style={{ height: 34, borderRadius: 6, background: c, boxShadow: "inset 0 0 0 1px rgba(22,33,29,0.08)" }} />
+              <div style={{ fontSize: MIN, marginTop: 5, color: "rgba(22,33,29,0.6)" }}>{n}</div>
+            </div>
+          ))}
+        </div>
+        <MRow label="Display" value="Söhne 600" />
+        <MRow label="Body" value="16 / 24" />
+        <MRow label="Applications" value="Card · van" />
+      </MShell>
+    );
+  }
 
   return (
     <div
@@ -358,7 +426,7 @@ const REVIEWS = [
   ["Dan M.", "Ajax", "Clean crew, no surprises on the invoice. Would hire again."],
 ];
 
-export function ScreenLocalSite({ local }: ScreenProps) {
+export function ScreenLocalSite({ local, compact }: ScreenProps) {
   const [postal, setPostal] = useState("");
   const [toast, setToast] = useState(false);
   useMotionValueEvent(local, "change", function type(t) {
@@ -370,6 +438,33 @@ export function ScreenLocalSite({ local }: ScreenProps) {
 
   // the page scrolls inside its own window
   const pageY = useTransform(local, (t) => -at(t, 0.62, 0.98) * 300);
+
+
+  if (compact) {
+    return (
+      <MShell bg="#fff">
+        <div style={{ height: 34, borderRadius: 6, background: BRAND.ink, display: "flex", alignItems: "center", padding: "0 11px", marginBottom: 13 }}>
+          <span style={{ fontSize: MIN + 1, fontWeight: 600, letterSpacing: "0.1em", color: "#fff" }}>{BRAND.name}</span>
+        </div>
+        <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.2, color: BRAND.ink, marginBottom: 8 }}>
+          Basement renovations across Durham Region.
+        </div>
+        <div style={{ fontSize: MIN + 1, color: "rgba(22,33,29,0.62)", marginBottom: 13 }}>
+          4.9★ · 212 reviews · Licensed &amp; insured
+        </div>
+        <div style={{ background: "#FAF8F4", border: "1px solid rgba(22,33,29,0.12)", borderRadius: 9, padding: 12, marginBottom: 12 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: BRAND.ink }}>Get a free quote</div>
+          <div style={{ height: 30, borderRadius: 6, border: "1px solid rgba(22,33,29,0.16)", background: "#fff", display: "flex", alignItems: "center", padding: "0 10px", fontSize: MIN + 1, color: "rgba(22,33,29,0.75)", marginBottom: 8 }}>
+            {postal || "Postal code"}
+          </div>
+          <div style={{ height: 32, borderRadius: 6, background: BRAND.primary, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: MIN + 1, fontWeight: 600 }}>
+            {toast ? "Sent ✓" : "Get a quote"}
+          </div>
+        </div>
+        {SERVICES_GRID.slice(0, 3).map(([t, d]) => <MRow key={t} label={t} value={d} />)}
+      </MShell>
+    );
+  }
 
   return (
     <div style={{ position: "absolute", inset: 0, background: "#fff", overflow: "hidden" }}>
@@ -683,7 +778,7 @@ const STATUS_TINT: Record<string, [string, string]> = {
   Complete: ["rgba(90,200,140,0.16)", "#7FD3A3"],
 };
 
-export function ScreenAnalytics({ local }: ScreenProps) {
+export function ScreenAnalytics({ local, compact }: ScreenProps) {
   const [range, setRange] = useState<"7d" | "30d">("7d");
   const [notif, setNotif] = useState(false);
   useMotionValueEvent(local, "change", function drive(t) {
@@ -692,6 +787,35 @@ export function ScreenAnalytics({ local }: ScreenProps) {
   });
   const kpis = range === "30d" ? KPI_30D : KPI_7D;
   const chartDraw = useTransform(local, (t) => at(t, 0.1, 0.38));
+
+
+  if (compact) {
+    return (
+      <div style={{ position: "absolute", inset: 0, background: "#101215", padding: 16, overflow: "hidden", color: "#EDE7DA" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 13 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, flex: 1 }}>Operations</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: MIN, background: "rgba(255,255,255,0.1)", borderRadius: 6, padding: "3px 9px" }}>{range}</span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9, marginBottom: 13 }}>
+          {kpis.map(([label, value, delta]) => (
+            <div key={label} style={{ background: "rgba(255,255,255,0.05)", borderRadius: 9, padding: 11 }}>
+              <div style={{ fontSize: MIN, color: "rgba(237,231,218,0.55)" }}>{label}</div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 4 }}>
+                <span style={{ fontSize: 19, fontWeight: 600 }}>{value}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: MIN, color: delta.startsWith("−") ? "#E08C7F" : "#7FD3A3" }}>{delta}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        {JOBS.slice(0, 3).map(([job, , status]) => (
+          <div key={job} style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 0", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+            <span style={{ flex: 1, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{job}</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: MIN, background: STATUS_TINT[status][0], color: STATUS_TINT[status][1], borderRadius: 999, padding: "2px 8px" }}>{status}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -965,7 +1089,7 @@ const TREE = [
   ["Components", ["Button", "Input", "Card", "Badge", "Table"]],
 ] as const;
 
-export function ScreenLibrary({ local }: ScreenProps) {
+export function ScreenLibrary({ local, compact }: ScreenProps) {
   const [dark, setDark] = useState(false);
   useMotionValueEvent(local, "change", function toggle(t) {
     setDark(t > 0.56);
@@ -976,6 +1100,36 @@ export function ScreenLibrary({ local }: ScreenProps) {
   const ink = dark ? "#EDE7DA" : "#1B1F1D";
   const muted = dark ? "rgba(237,231,218,0.5)" : "rgba(27,31,29,0.52)";
   const line = dark ? "rgba(255,255,255,0.09)" : "rgba(27,31,29,0.1)";
+
+
+  if (compact) {
+    return (
+      <div style={{ position: "absolute", inset: 0, background: dark ? "#16181C" : "#fff", color: dark ? "#EDE7DA" : "#1B1F1D", padding: 16, overflow: "hidden", transition: "background 320ms ease, color 320ms ease" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, flex: 1 }}>Button</span>
+          <span style={{ fontSize: MIN, color: dark ? "rgba(237,231,218,0.5)" : "rgba(27,31,29,0.52)" }}>Dark mode</span>
+          <span style={{ width: 32, height: 18, borderRadius: 999, background: dark ? "#3FA06B" : "rgba(27,31,29,0.18)", position: "relative", transition: "background 260ms ease" }}>
+            <span style={{ position: "absolute", top: 2, left: dark ? 16 : 2, width: 14, height: 14, borderRadius: "50%", background: "#fff", transition: "left 260ms cubic-bezier(0.25,1,0.5,1)" }} />
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
+          {(["Primary", "Secondary", "Ghost", "Danger"] as const).map((v) => (
+            <span key={v} style={{ height: 32, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: MIN + 1, fontWeight: 500,
+              background: v === "Primary" ? "#1F5D4C" : v === "Danger" ? "#B4432F" : v === "Secondary" ? (dark ? "rgba(255,255,255,0.09)" : "#EFEBE1") : "transparent",
+              color: v === "Primary" || v === "Danger" ? "#fff" : dark ? "#EDE7DA" : "#1B1F1D",
+              border: v === "Ghost" ? `1px solid ${dark ? "rgba(255,255,255,0.18)" : "rgba(27,31,29,0.16)"}` : "none" }}>
+              {v}
+            </span>
+          ))}
+        </div>
+        {[["color/primary", "#1F5D4C"], ["space/3", "12px"], ["radius/md", "8px"]].map(([k, v]) => (
+          <div key={k} style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-mono)", fontSize: MIN, padding: "7px 0", borderTop: `1px solid ${dark ? "rgba(255,255,255,0.09)" : "rgba(27,31,29,0.1)"}`, color: dark ? "rgba(237,231,218,0.5)" : "rgba(27,31,29,0.52)" }}>
+            <span>{k}</span><span style={{ color: dark ? "#EDE7DA" : "#1B1F1D" }}>{v}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -1217,7 +1371,7 @@ const VITALS: Array<[string, string, string]> = [
   ["CLS", "0.02", "Good"],
 ];
 
-export function ScreenRelease({ local }: ScreenProps) {
+export function ScreenRelease({ local, compact }: ScreenProps) {
   const [published, setPublished] = useState(false);
   useMotionValueEvent(local, "change", function publish(t) {
     setPublished(t > 0.48);
@@ -1230,6 +1384,32 @@ export function ScreenRelease({ local }: ScreenProps) {
   });
   const ringLen = useTransform(scoreT, (v) => 0.72 + (0.98 - 0.72) * v);
   const entries = useTransform(local, (t) => at(t, 0.08, 0.36));
+
+
+  if (compact) {
+    return (
+      <MShell bg="#F7F6F2">
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 13 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, flex: 1 }}>Releases</span>
+          <span style={{ fontSize: MIN, fontWeight: 600, color: "#fff", background: published ? "#3FA06B" : "#1F5D4C", borderRadius: 7, padding: "5px 11px" }}>
+            {published ? "Published ✓" : "Publish v1.3"}
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 13, background: "#fff", border: "1px solid rgba(27,31,29,0.09)", borderRadius: 10, padding: 13, marginBottom: 13 }}>
+          <span style={{ width: 52, height: 52, borderRadius: "50%", border: "6px solid #3FA06B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, fontWeight: 600, flex: "0 0 52px" }}>
+            {score}
+          </span>
+          <span>
+            <span style={{ display: "block", fontSize: 12, fontWeight: 600 }}>Performance</span>
+            <span style={{ display: "block", fontSize: MIN, color: "rgba(27,31,29,0.58)", marginTop: 2 }}>Mobile, after each deploy</span>
+          </span>
+        </div>
+        {CHANGELOG.slice(0, 4).map(([v, date, note]) => (
+          <MRow key={v} label={note} value={`${v} · ${date}`} />
+        ))}
+      </MShell>
+    );
+  }
 
   return (
     <div
