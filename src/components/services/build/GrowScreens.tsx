@@ -731,7 +731,10 @@ export function ScreenReport({ local, compact }: P) {
               </div>
             ))}
           </div>
-          <svg viewBox="0 0 200 120" preserveAspectRatio="none" style={{ flex: 1, height: "100%" }}>
+          {/* the two column labels are HTML, not <text> in a stretched
+              viewBox — the same 3x blow-up that broke the map's labels */}
+          <div style={{ position: "relative", flex: 1, minWidth: 0 }}>
+          <svg viewBox="0 0 200 120" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
             {CHANNELS.map(([, v, c], i) => {
               const y1 = 10 + i * 25;
               const h = Math.max(4, v * 0.52);
@@ -747,9 +750,10 @@ export function ScreenReport({ local, compact }: P) {
             })}
             <rect x="128" y="18" width="13" height="84" rx="3" fill="rgba(27,34,32,0.72)" />
             <motion.rect x="168" y="40" width="13" height="40" rx="3" fill={GREEN} style={{ scaleY: draw, originY: 1 }} />
-            <text x="134" y="112" fontSize="7" fill="rgba(27,34,32,0.5)" fontFamily="var(--font-mono)">Leads</text>
-            <text x="166" y="112" fontSize="7" fill="rgba(27,34,32,0.5)" fontFamily="var(--font-mono)">Booked</text>
           </svg>
+            <span style={{ position: "absolute", left: "64%", bottom: 0, fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.5)" }}>Leads</span>
+            <span style={{ position: "absolute", left: "83%", bottom: 0, fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.5)" }}>Booked</span>
+          </div>
         </div>
       </div>
 
