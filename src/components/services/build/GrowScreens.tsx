@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, useMotionValueEvent, useTransform } from "motion/react";
 import type { BeatSpec, ScreenProps } from "./BuildScreens";
+import { MAP_PATHS, MAP_VIEWBOX } from "../../../data/osmOshawa";
 
 /**
  * The six Grow-chapter screens.
@@ -127,51 +128,52 @@ export function ScreenMap({ local, compact }: P) {
         </div>
       </div>
 
-      {/* map
-          Drawn with positioned elements, not a scaled SVG. A 300x220
-          viewBox with preserveAspectRatio="slice" was being blown up
-          about 3x in this panel, which turned 8px labels into 26px type
-          and the roads into grey slabs. Percentages and fixed font sizes
-          cannot do that. */}
-      <div style={{ flex: 1, position: "relative", minWidth: 0, background: "#EFEDE6", overflow: "hidden" }}>
-        {/* Blocks before roads: an even grid of lines on a flat ground
-            read as a wireframe table rather than a map. Irregular block
-            sizes, a couple of diagonals and slightly varied ground tints
-            are what make it scan as streets. */}
-        {([[0,0,17,26],[17,0,21,26],[38,0,24,18],[62,0,19,26],[81,0,19,18],
-           [0,26,17,22],[17,26,21,22],[38,18,24,30],[62,26,19,22],[81,18,19,30],
-           [0,48,17,24],[17,48,21,24],[62,48,19,24],[81,48,19,24]] as Array<[number,number,number,number]>)
-          .map(([x,y,w,h],i)=>(
-          <span key={i} style={{ position:"absolute", left:`${x}%`, top:`${y}%`, width:`${w}%`, height:`${h}%`, background: i%3===0 ? "#DFDDD1" : i%3===1 ? "#E4E2D7" : "#D9D7CA" }} />
-        ))}
-        {/* lake */}
-        <div style={{ position: "absolute", left: "-6%", right: "-6%", bottom: "-10%", height: "34%", background: "#C3D4DA", borderRadius: "50% 50% 0 0 / 70% 60% 0 0" }} />
-        {/* arterial + side streets */}
-        {[26, 48, 72].map((t) => (
-          <span key={`h${t}`} style={{ position: "absolute", left: 0, right: 0, top: `${t}%`, height: 7, background: "#FFFFFF" }} />
-        ))}
-        {[18, 30].map((t) => (
-          <span key={`hs${t}`} style={{ position: "absolute", left: 0, right: 0, top: `${t}%`, height: 4, background: "rgba(255,255,255,0.95)" }} />
-        ))}
-        <span style={{ position: "absolute", left: 0, right: 0, top: "40%", height: 10, background: "#F6DFA8" }} />
-        {[17, 38, 62, 81].map((l) => (
-          <span key={`v${l}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${l}%`, width: 6, background: "#FFFFFF" }} />
-        ))}
-        {[9, 52].map((l) => (
-          <span key={`vs${l}`} style={{ position: "absolute", top: 0, bottom: "24%", left: `${l}%`, width: 3.5, background: "rgba(255,255,255,0.9)" }} />
-        ))}
-        {/* a diagonal, because nothing real is all right angles */}
-        <span style={{ position: "absolute", left: "-10%", top: "58%", width: "70%", height: 6, background: "#FFFFFF", transform: "rotate(-11deg)", transformOrigin: "left center" }} />
-        {/* neighbourhood labels, at real sizes */}
-        {([["Pickering", 4, 8], ["Ajax", 22, 52], ["Whitby", 52, 30], ["Oshawa", 84, 62]] as Array<[string, number, number]>).map(([t, x, y]) => (
-          <span key={t} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.12em", color: "rgba(27,34,32,0.62)" }}>
+      {/* map — real street geometry, drawn once from a committed
+          OpenStreetMap extract. No tiles, no API call, no map library.
+          Styled in our own palette rather than imitating any provider.
+          Labels and attribution are HTML at real sizes: <text> inside a
+          stretched viewBox scales with the box (the gotcha that put 8px
+          labels at 26px here two sessions running). */}
+      <div style={{ flex: 1, position: "relative", minWidth: 0, background: "#E7E4DA", overflow: "hidden" }}>
+        <svg
+          viewBox={`120 60 ${MAP_VIEWBOX.w - 300} ${MAP_VIEWBOX.h - 180}`}
+          preserveAspectRatio="xMidYMid slice"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+        >
+          {MAP_PATHS.w.map((d, i) => (
+            <path key={`w${i}`} d={d} fill="#C3D4DA" stroke="#C3D4DA" strokeWidth="3" />
+          ))}
+          {MAP_PATHS.d.map((d, i) => (
+            <path key={`d${i}`} d={d} fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" />
+          ))}
+          {MAP_PATHS.c.map((d, i) => (
+            <path key={`c${i}`} d={d} fill="none" stroke="#FFFFFF" strokeWidth="3.2" strokeLinecap="round" />
+          ))}
+          {MAP_PATHS.b.map((d, i) => (
+            <path key={`b${i}`} d={d} fill="none" stroke="#FFFFFF" strokeWidth="5" strokeLinecap="round" />
+          ))}
+          {MAP_PATHS.a.map((d, i) => (
+            <path key={`a${i}`} d={d} fill="none" stroke="#F3D79A" strokeWidth="6.5" strokeLinecap="round" />
+          ))}
+        </svg>
+
+        {/* neighbourhood labels */}
+        {([["Whitby", 10, 22], ["Oshawa", 62, 30], ["Lakeview", 34, 74]] as Array<[string, number, number]>).map(([t, x, y]) => (
+          <span key={t} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.14em", color: "rgba(27,34,32,0.6)", textShadow: "0 1px 2px rgba(255,255,255,0.8)" }}>
             {t}
           </span>
         ))}
+
         {/* competitor pins */}
-        {([[28, 22], [66, 18], [44, 64], [86, 42], [12, 68]] as Array<[number, number]>).map(([x, y], i) => (
-          <span key={i} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, width: 9, height: 9, borderRadius: "50%", background: "rgba(27,34,32,0.3)", border: "1.5px solid rgba(255,255,255,0.85)", transform: "translate(-50%,-50%)" }} />
+        {([[26, 30], [68, 24], [44, 58], [82, 48], [16, 62]] as Array<[number, number]>).map(([x, y], i) => (
+          <span key={i} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, width: 9, height: 9, borderRadius: "50%", background: "rgba(27,34,32,0.34)", border: "1.5px solid #fff", transform: "translate(-50%,-50%)" }} />
         ))}
+
+        {/* ODbL attribution — required, and legible */}
+        <span style={{ position: "absolute", right: 7, bottom: 5, fontSize: 11, color: "rgba(27,34,32,0.62)", background: "rgba(255,255,255,0.82)", borderRadius: 4, padding: "2px 7px" }}>
+          © OpenStreetMap contributors
+        </span>
+
         {/* Northgate */}
         <motion.div
           animate={{ scale: climbed ? 1 : 0.84 }}
