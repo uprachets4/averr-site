@@ -24,10 +24,10 @@
 
 ```
 dist/assets/index-DS0F-gPc.css    41.71 kB │ gzip:  8.65 kB
-dist/assets/index-DwqKGxVB.js    477.90 kB │ gzip: 151.65 kB  ← home + shell + motion
+dist/assets/index-DXyKFowj.js    477.90 kB │ gzip: 151.66 kB  ← home + shell + motion
 dist/assets/Services-*.js         38.57 kB │ gzip: 10.80 kB
 dist/assets/CaseStudy-*.js        51.42 kB │ gzip: 12.74 kB
-dist/assets/ServicesNext-*.js     81.60 kB │ gzip: 19.46 kB  ← 10 beats of product screens
+dist/assets/ServicesNext-*.js    119.13 kB │ gzip: 26.56 kB  ← 16 beats of product screens
 dist/assets/ServicesCloser-*.js   10.96 kB │ gzip:  3.32 kB  ← shared by both services routes
 dist/assets/Contact-*.js          44.73 kB │ gzip: 11.16 kB
 dist/assets/Work-*.js             22.22 kB │ gzip:  6.66 kB
@@ -166,6 +166,22 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 - **React #185, maximum update depth**, crashing the whole route at the last Design beat — no windows, no caption, the noindex meta gone with the unmounted tree. The caption fitter added in **17c-2-fix** kept its scale in state, measured the rendered word and divided by the current scale to recover the base width, with `scale` in its own deps; width does not scale perfectly linearly with font-size, so it oscillated forever. **It only fires when a word actually overflows, so a 30% column never tripped it and 17c-3's 29% column did immediately — it shipped latent for a session.** Rewritten with no state and no dependency on its own output.
 - **`tsc` exhausted its heap** (2GB, FATAL) on nested ternaries inside `useTransform` — TypeScript reconciling a union of tuple types across three transforms. Keyframes are now built as plain typed arrays first. Builds pass on the default heap.
 - **A 4.3-million-line file.** A python edit sliced `s[s.index(A):s.index(B)]` where B occurred *before* A, producing an empty string; `str.replace("", new)` inserts between every character. **Guard: assert the slice is non-empty and the indices are ordered before replacing.**
+
+**17c-4** `c3154e9` … — **Grow chapter, carry-over fixes, and a new standing rule.**
+
+- **All three chapters now run on one pinned stage: 16 beats, two 80vh transitions. Travel 1200vh, wrapper 1300vh** — exactly the figure the pin plan projected in 17c-1. Measured 13.00× viewport (1300vh *is* 13 viewports; an earlier probe expecting 14 was wrong arithmetic, not a wrong wrapper).
+- **C1 · the workflow canvas connectors are measured, not guessed.** They were cubic curves between percentage points with both control points on the source's y, which swung wide and never met the boxes. Each node now reports its own rect, the path leaves a real port on the right edge and arrives at one on the left, routed orthogonally with rounded corners, and the packets travel that exact polyline.
+- **C2 · the run-log spotlight is aligned** — the log is positioned in percentages so the rect names the same box. Verified sharp inside its own veil.
+- **Six Grow screens:** a Durham map with a results panel where Northgate climbs #7 → #2 on a layout spring while its review count ticks 38 → 212; an outreach sequence with merge-filled previews and replies landing; an ads manager with impressions/clicks/CTR/leads and two ad previews; an A/B test where B wins and expands; a content calendar with a draft dragged onto Thursday; and a monthly report with an SVG attribution flow from five channels into leads and booked jobs.
+- **No currency anywhere**, illustrative data included — which also removed the agent console's "$15–25K" budget band that 17c-3 had introduced in breach of the same rule.
+- **Mobile:** all six Grow screens measure exactly **11px minimum, 0 nodes under**. The five Design screens remain 7–8px and are still the swap-session gate.
+- **New standing rule §4.23 — crash-scroll.** See below; added after 17c-3.
+
+*A bug class worth naming, because it bit three times in one session:* **an SVG with a small viewBox stretched across a large panel scales its `<text>` with everything else.** The map's 8px labels rendered near 26px in a 300×220 viewBox under `preserveAspectRatio="slice"`, and the report's flow labels did the same at 7px in a 200-wide box. **Draw type as HTML at a real font size, or size the viewBox to the panel.** The map was rebuilt in positioned CSS; the report's two labels became spans.
+
+*Also mine:* the C2 screenshot first captured the approval inbox rather than the workflow canvas — slot-vs-beat indexing in the probe, the third time that specific confusion has produced a wrong reading. It did surface a real defect by accident (A4's focus rect was framing empty space below the diff), but the carry-over it was meant to verify went unverified until a second pass.
+
+*Honest limit:* the map is the weakest of the six. It now reads as a map — white streets, tinted blocks, an amber arterial, legible labels — but it is a stylised one, sparser than the report or the workflow canvas, both of which genuinely look like software.
 
 ---
 
