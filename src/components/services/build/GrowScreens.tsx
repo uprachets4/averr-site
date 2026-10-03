@@ -134,25 +134,43 @@ export function ScreenMap({ local, compact }: P) {
           and the roads into grey slabs. Percentages and fixed font sizes
           cannot do that. */}
       <div style={{ flex: 1, position: "relative", minWidth: 0, background: "#EFEDE6", overflow: "hidden" }}>
+        {/* Blocks before roads: an even grid of lines on a flat ground
+            read as a wireframe table rather than a map. Irregular block
+            sizes, a couple of diagonals and slightly varied ground tints
+            are what make it scan as streets. */}
+        {([[0,0,17,26],[17,0,21,26],[38,0,24,18],[62,0,19,26],[81,0,19,18],
+           [0,26,17,22],[17,26,21,22],[38,18,24,30],[62,26,19,22],[81,18,19,30],
+           [0,48,17,24],[17,48,21,24],[62,48,19,24],[81,48,19,24]] as Array<[number,number,number,number]>)
+          .map(([x,y,w,h],i)=>(
+          <span key={i} style={{ position:"absolute", left:`${x}%`, top:`${y}%`, width:`${w}%`, height:`${h}%`, background: i%3===0 ? "#E9E6DD" : i%3===1 ? "#EDEAE1" : "#E6E3D9" }} />
+        ))}
         {/* lake */}
-        <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "22%", background: "#CBD9DD", borderTopLeftRadius: "60% 70%", borderTopRightRadius: "40% 55%" }} />
-        {/* roads */}
-        {[18, 42, 66].map((t) => (
-          <span key={`h${t}`} style={{ position: "absolute", left: 0, right: 0, top: `${t}%`, height: 5, background: "#fff" }} />
+        <div style={{ position: "absolute", left: "-6%", right: "-6%", bottom: "-10%", height: "34%", background: "#C3D4DA", borderRadius: "50% 50% 0 0 / 70% 60% 0 0" }} />
+        {/* arterial + side streets */}
+        {[26, 48, 72].map((t) => (
+          <span key={`h${t}`} style={{ position: "absolute", left: 0, right: 0, top: `${t}%`, height: 6, background: "#FBFAF7" }} />
         ))}
-        <span style={{ position: "absolute", left: 0, right: 0, top: "30%", height: 8, background: "#F3E4C4" }} />
-        {[16, 38, 60, 82].map((l) => (
-          <span key={`v${l}`} style={{ position: "absolute", top: 0, bottom: "20%", left: `${l}%`, width: 4, background: "#fff" }} />
+        {[18, 30].map((t) => (
+          <span key={`hs${t}`} style={{ position: "absolute", left: 0, right: 0, top: `${t}%`, height: 3, background: "rgba(255,255,255,0.8)" }} />
         ))}
+        <span style={{ position: "absolute", left: 0, right: 0, top: "40%", height: 9, background: "#F2E3C2" }} />
+        {[17, 38, 62, 81].map((l) => (
+          <span key={`v${l}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${l}%`, width: 5, background: "#FBFAF7" }} />
+        ))}
+        {[9, 52].map((l) => (
+          <span key={`vs${l}`} style={{ position: "absolute", top: 0, bottom: "24%", left: `${l}%`, width: 2.5, background: "rgba(255,255,255,0.75)" }} />
+        ))}
+        {/* a diagonal, because nothing real is all right angles */}
+        <span style={{ position: "absolute", left: "-10%", top: "58%", width: "70%", height: 5, background: "#FBFAF7", transform: "rotate(-11deg)", transformOrigin: "left center" }} />
         {/* neighbourhood labels, at real sizes */}
-        {([["Pickering", 4, 10], ["Ajax", 24, 54], ["Whitby", 50, 34], ["Oshawa", 76, 60]] as Array<[string, number, number]>).map(([t, x, y]) => (
-          <span key={t} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.1em", color: "rgba(27,34,32,0.42)" }}>
+        {([["Pickering", 4, 8], ["Ajax", 22, 52], ["Whitby", 52, 30], ["Oshawa", 84, 62]] as Array<[string, number, number]>).map(([t, x, y]) => (
+          <span key={t} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.12em", color: "rgba(27,34,32,0.46)" }}>
             {t}
           </span>
         ))}
         {/* competitor pins */}
-        {([[28, 24], [64, 20], [46, 62], [84, 44], [14, 70]] as Array<[number, number]>).map(([x, y], i) => (
-          <span key={i} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, width: 9, height: 9, borderRadius: "50%", background: "rgba(27,34,32,0.26)", transform: "translate(-50%,-50%)" }} />
+        {([[28, 22], [66, 18], [44, 64], [86, 42], [12, 68]] as Array<[number, number]>).map(([x, y], i) => (
+          <span key={i} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, width: 9, height: 9, borderRadius: "50%", background: "rgba(27,34,32,0.3)", border: "1.5px solid rgba(255,255,255,0.85)", transform: "translate(-50%,-50%)" }} />
         ))}
         {/* Northgate */}
         <motion.div
