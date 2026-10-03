@@ -193,6 +193,28 @@ export default function ServicesBuild() {
     window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
   }
 
+  // Home's doors link to /services#design|#automate|#grow. Each lands on
+  // that chapter's first beat rather than on a section anchor, because
+  // the chapters are scroll positions inside one pinned stage now, not
+  // separate sections with ids.
+  useEffect(
+    function jumpToHash() {
+      const id = window.location.hash.replace("#", "");
+      const first: Record<string, number> = {
+        design: 0,
+        automate: DESIGN_COUNT,
+        grow: DESIGN_COUNT + AUTOMATE_COUNT,
+      };
+      if (!(id in first) || !pinned) return;
+      // after layout, so offsetTop/offsetHeight are real
+      const t = window.setTimeout(() => jumpToBeat(first[id]), 120);
+      return function cleanup() {
+        window.clearTimeout(t);
+      };
+    },
+    [pinned]
+  );
+
   if (!pinned) {
     return <BuildStacked reduce={!!reduce} />;
   }

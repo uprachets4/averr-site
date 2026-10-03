@@ -13,7 +13,6 @@ import Home from "./pages/Home";
  * page that matters most. Everything else splits.
  */
 const Services = lazy(() => import("./pages/Services"));
-const ServicesNext = lazy(() => import("./pages/ServicesNext"));
 const Work = lazy(() => import("./pages/Work"));
 const CaseStudy = lazy(() => import("./pages/CaseStudy"));
 const About = lazy(() => import("./pages/About"));
@@ -62,9 +61,6 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/services" element={<Services />} />
-              {/* 17c work-in-progress. noindex, linked from nowhere,
-                  deleted in 17c-3 when it replaces /services. */}
-              <Route path="/services/next" element={<ServicesNext />} />
               <Route path="/work" element={<Work />} />
               <Route path="/work/:slug" element={<CaseStudy />} />
               <Route path="/about" element={<About />} />
