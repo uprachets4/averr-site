@@ -197,6 +197,13 @@ export default function ServicesBuild() {
   // that chapter's first beat rather than on a section anchor, because
   // the chapters are scroll positions inside one pinned stage now, not
   // separate sections with ids.
+  //
+  // Re-applied a few times rather than once: on a client-side navigation
+  // one jump is enough, but on a COLD load the measurement is not settled
+  // when the effect first runs — the route chunk has only just mounted
+  // and the hero above is still sizing — and #automate and #grow both
+  // came to rest back on beat one. Each attempt is abandoned the moment
+  // the reader scrolls for themselves.
   useEffect(
     function jumpToHash() {
       const id = window.location.hash.replace("#", "");
@@ -206,13 +213,26 @@ export default function ServicesBuild() {
         grow: DESIGN_COUNT + AUTOMATE_COUNT,
       };
       if (!(id in first) || !pinned) return;
-      // Instant, not smooth: this is an arrival, not an in-page move, and
-      // a smooth scroll of several thousand pixels was being overtaken by
-      // the next render — #automate and #grow both ended up back at beat
-      // one. Delayed a frame or two so offsetTop/offsetHeight are real.
-      const t = window.setTimeout(() => jumpToBeat(first[id], true), 160);
+
+      let last = -1;
+      let cancelled = false;
+      function attempt() {
+        if (cancelled) return;
+        // if the reader has moved since our last jump, stop interfering
+        if (last >= 0 && Math.abs(window.scrollY - last) > 4) {
+          cancelled = true;
+          return;
+        }
+        jumpToBeat(first[id], true);
+        last = window.scrollY;
+      }
+      const timers = [60, 300, 800, 1500].map((d) => window.setTimeout(attempt, d));
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(attempt).catch(() => {});
+      }
       return function cleanup() {
-        window.clearTimeout(t);
+        cancelled = true;
+        timers.forEach(window.clearTimeout);
       };
     },
     [pinned]
