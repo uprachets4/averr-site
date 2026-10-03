@@ -127,32 +127,40 @@ export function ScreenMap({ local, compact }: P) {
         </div>
       </div>
 
-      {/* map */}
-      <div style={{ flex: 1, position: "relative", minWidth: 0 }}>
-        <svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid slice" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
-          <rect width="300" height="220" fill="#EFEDE6" />
-          {/* lake */}
-          <path d="M0 186 Q 70 176 130 190 T 300 180 L300 220 L0 220 Z" fill="#CBD9DD" />
-          {/* roads */}
-          {[["M0 40 H300"], ["M0 92 H300"], ["M0 140 H300"], ["M52 0 V186"], ["M118 0 V190"], ["M186 0 V188"], ["M248 0 V182"]].map(([d], i) => (
-            <path key={i} d={d} stroke="#fff" strokeWidth={i < 3 ? 5 : 4} fill="none" />
-          ))}
-          <path d="M0 66 H300" stroke="#F6E7C8" strokeWidth="7" fill="none" />
-          {[["Ajax", 70, 118], ["Pickering", 24, 60], ["Whitby", 150, 76], ["Oshawa", 222, 120]].map(([t, x, y]) => (
-            <text key={t as string} x={x as number} y={y as number} fontSize="8" fill="rgba(27,34,32,0.45)" fontFamily="var(--font-mono)" letterSpacing="0.5">{t as string}</text>
-          ))}
-          {/* competitor pins */}
-          {[[88, 54], [196, 48], [142, 132], [252, 92], [44, 150]].map(([x, y], i) => (
-            <circle key={i} cx={x} cy={y} r="4" fill="rgba(27,34,32,0.28)" />
-          ))}
-        </svg>
-        {/* Northgate pin */}
+      {/* map
+          Drawn with positioned elements, not a scaled SVG. A 300x220
+          viewBox with preserveAspectRatio="slice" was being blown up
+          about 3x in this panel, which turned 8px labels into 26px type
+          and the roads into grey slabs. Percentages and fixed font sizes
+          cannot do that. */}
+      <div style={{ flex: 1, position: "relative", minWidth: 0, background: "#EFEDE6", overflow: "hidden" }}>
+        {/* lake */}
+        <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "22%", background: "#CBD9DD", borderTopLeftRadius: "60% 70%", borderTopRightRadius: "40% 55%" }} />
+        {/* roads */}
+        {[18, 42, 66].map((t) => (
+          <span key={`h${t}`} style={{ position: "absolute", left: 0, right: 0, top: `${t}%`, height: 5, background: "#fff" }} />
+        ))}
+        <span style={{ position: "absolute", left: 0, right: 0, top: "30%", height: 8, background: "#F3E4C4" }} />
+        {[16, 38, 60, 82].map((l) => (
+          <span key={`v${l}`} style={{ position: "absolute", top: 0, bottom: "20%", left: `${l}%`, width: 4, background: "#fff" }} />
+        ))}
+        {/* neighbourhood labels, at real sizes */}
+        {([["Pickering", 4, 10], ["Ajax", 24, 54], ["Whitby", 50, 34], ["Oshawa", 76, 60]] as Array<[string, number, number]>).map(([t, x, y]) => (
+          <span key={t} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.1em", color: "rgba(27,34,32,0.42)" }}>
+            {t}
+          </span>
+        ))}
+        {/* competitor pins */}
+        {([[28, 24], [64, 20], [46, 62], [84, 44], [14, 70]] as Array<[number, number]>).map(([x, y], i) => (
+          <span key={i} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, width: 9, height: 9, borderRadius: "50%", background: "rgba(27,34,32,0.26)", transform: "translate(-50%,-50%)" }} />
+        ))}
+        {/* Northgate */}
         <motion.div
-          animate={{ scale: climbed ? 1 : 0.86 }}
+          animate={{ scale: climbed ? 1 : 0.84 }}
           transition={{ type: "spring", stiffness: 240, damping: 18 }}
-          style={{ position: "absolute", left: "54%", top: "46%", transform: "translate(-50%,-100%)" }}
+          style={{ position: "absolute", left: "52%", top: "48%", transform: "translate(-50%,-100%)" }}
         >
-          <svg width="30" height="38" viewBox="0 0 30 38" fill="none">
+          <svg width="28" height="36" viewBox="0 0 30 38" fill="none">
             <path d="M15 37 C15 37 28 22 28 14 A13 13 0 1 0 2 14 C2 22 15 37 15 37 Z" fill={GREEN} />
             <circle cx="15" cy="14" r="5" fill="#fff" />
           </svg>
@@ -759,7 +767,8 @@ export const GROW_SPECS: BeatSpec[] = [
       { at: 0.47, x: 18, y: 88, press: true },
       { at: 0.74, x: 20, y: 30 },
     ],
-    camera: { from: 0.56, hold: 0.68, to: 0.86, rect: { x: 2, y: 14, w: 36, h: 32 } },
+    // the top three results
+    camera: { from: 0.56, hold: 0.68, to: 0.86, rect: { x: 2, y: 16, w: 36, h: 24 } },
     Screen: ScreenMap,
   },
   {

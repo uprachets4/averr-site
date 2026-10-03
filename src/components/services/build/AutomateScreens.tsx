@@ -845,7 +845,8 @@ export const AUTOMATE_SPECS: BeatSpec[] = [
       { at: 0.68, x: 42, y: 86, press: true },
       { at: 0.84, x: 60, y: 60 },
     ],
-    camera: { from: 0.52, hold: 0.62, to: 0.8, rect: { x: 24, y: 32, w: 72, h: 20 } },
+    // the tracked-change diff, which sits in the first lines of the body
+    camera: { from: 0.52, hold: 0.62, to: 0.8, rect: { x: 26, y: 20, w: 70, h: 16 } },
     Screen: ScreenInbox,
   },
   {
