@@ -142,29 +142,29 @@ export function ScreenMap({ local, compact }: P) {
            [0,26,17,22],[17,26,21,22],[38,18,24,30],[62,26,19,22],[81,18,19,30],
            [0,48,17,24],[17,48,21,24],[62,48,19,24],[81,48,19,24]] as Array<[number,number,number,number]>)
           .map(([x,y,w,h],i)=>(
-          <span key={i} style={{ position:"absolute", left:`${x}%`, top:`${y}%`, width:`${w}%`, height:`${h}%`, background: i%3===0 ? "#E9E6DD" : i%3===1 ? "#EDEAE1" : "#E6E3D9" }} />
+          <span key={i} style={{ position:"absolute", left:`${x}%`, top:`${y}%`, width:`${w}%`, height:`${h}%`, background: i%3===0 ? "#DFDDD1" : i%3===1 ? "#E4E2D7" : "#D9D7CA" }} />
         ))}
         {/* lake */}
         <div style={{ position: "absolute", left: "-6%", right: "-6%", bottom: "-10%", height: "34%", background: "#C3D4DA", borderRadius: "50% 50% 0 0 / 70% 60% 0 0" }} />
         {/* arterial + side streets */}
         {[26, 48, 72].map((t) => (
-          <span key={`h${t}`} style={{ position: "absolute", left: 0, right: 0, top: `${t}%`, height: 6, background: "#FBFAF7" }} />
+          <span key={`h${t}`} style={{ position: "absolute", left: 0, right: 0, top: `${t}%`, height: 7, background: "#FFFFFF" }} />
         ))}
         {[18, 30].map((t) => (
-          <span key={`hs${t}`} style={{ position: "absolute", left: 0, right: 0, top: `${t}%`, height: 3, background: "rgba(255,255,255,0.8)" }} />
+          <span key={`hs${t}`} style={{ position: "absolute", left: 0, right: 0, top: `${t}%`, height: 4, background: "rgba(255,255,255,0.95)" }} />
         ))}
-        <span style={{ position: "absolute", left: 0, right: 0, top: "40%", height: 9, background: "#F2E3C2" }} />
+        <span style={{ position: "absolute", left: 0, right: 0, top: "40%", height: 10, background: "#F6DFA8" }} />
         {[17, 38, 62, 81].map((l) => (
-          <span key={`v${l}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${l}%`, width: 5, background: "#FBFAF7" }} />
+          <span key={`v${l}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${l}%`, width: 6, background: "#FFFFFF" }} />
         ))}
         {[9, 52].map((l) => (
-          <span key={`vs${l}`} style={{ position: "absolute", top: 0, bottom: "24%", left: `${l}%`, width: 2.5, background: "rgba(255,255,255,0.75)" }} />
+          <span key={`vs${l}`} style={{ position: "absolute", top: 0, bottom: "24%", left: `${l}%`, width: 3.5, background: "rgba(255,255,255,0.9)" }} />
         ))}
         {/* a diagonal, because nothing real is all right angles */}
-        <span style={{ position: "absolute", left: "-10%", top: "58%", width: "70%", height: 5, background: "#FBFAF7", transform: "rotate(-11deg)", transformOrigin: "left center" }} />
+        <span style={{ position: "absolute", left: "-10%", top: "58%", width: "70%", height: 6, background: "#FFFFFF", transform: "rotate(-11deg)", transformOrigin: "left center" }} />
         {/* neighbourhood labels, at real sizes */}
         {([["Pickering", 4, 8], ["Ajax", 22, 52], ["Whitby", 52, 30], ["Oshawa", 84, 62]] as Array<[string, number, number]>).map(([t, x, y]) => (
-          <span key={t} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.12em", color: "rgba(27,34,32,0.46)" }}>
+          <span key={t} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.12em", color: "rgba(27,34,32,0.62)" }}>
             {t}
           </span>
         ))}
