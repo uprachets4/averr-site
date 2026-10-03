@@ -218,7 +218,7 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
         <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 9, padding: 12, marginBottom: 12 }}>
           <div style={{ fontSize: 12, fontWeight: 600 }}>Priya Raghunathan</div>
           <div style={{ fontSize: MIN, color: "rgba(220,230,245,0.6)", marginTop: 3 }}>
-            Oshawa L1J 2K8 · Basement finishing · $15–25K
+            Oshawa L1J 2K8 · Basement finishing · Full basement
           </div>
         </div>
         {STEPS.map(([n, d], i) => (
@@ -257,7 +257,7 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
             </span>
           </div>
           <div style={{ display: "flex", gap: 7, marginTop: 10 }}>
-            {["Basement finishing", "$15–25K", "This month"].map((t) => (
+            {["Basement finishing", "Full basement", "This month"].map((t) => (
               <span key={t} style={{ fontFamily: "var(--font-mono)", fontSize: 8, background: "rgba(255,255,255,0.07)", borderRadius: 999, padding: "3px 8px", color: "rgba(220,230,245,0.75)" }}>
                 {t}
               </span>

@@ -27,6 +27,7 @@ import { useFocus } from "./build/camera";
 import FocusSpotlight from "./build/FocusSpotlight";
 import { DESIGN_SPECS } from "./build/BuildScreens";
 import { AUTOMATE_SPECS } from "./build/AutomateScreens";
+import { GROW_SPECS } from "./build/GrowScreens";
 
 /** Phase map inside one beat: caption in 0-0.15, canvas build 0.05-0.40,
  *  dwell 0.40-0.85 (29.25vh of a 65vh beat), caption out 0.85-1.00. */
@@ -46,7 +47,7 @@ const PHASE = { captionIn: 0.15, buildFrom: 0.05, buildTo: 0.4, dwellTo: 0.85 };
  */
 
 /** Beats currently rendered on the canvas. The rail still shows all 16. */
-const LIVE_PILLARS: PillarId[] = ["design", "automate"];
+const LIVE_PILLARS: PillarId[] = ["design", "automate", "grow"];
 
 export type Beat = { pillar: PillarId; service: Service; index: number };
 
@@ -89,16 +90,36 @@ const TRANSITION_VH = 80;
  */
 const DESIGN_COUNT = PILLAR_SERVICES.design.length;
 const AUTOMATE_COUNT = PILLAR_SERVICES.automate.length;
-export const TRANSITION_SLOT = DESIGN_COUNT;
+const GROW_COUNT = PILLAR_SERVICES.grow.length;
 
+/** Two chapter transitions: Design → Automate, Automate → Grow. */
+export const T1_SLOT = DESIGN_COUNT;
+export const T2_SLOT = DESIGN_COUNT + 1 + AUTOMATE_COUNT;
+const TRANSITION_SLOTS = [T1_SLOT, T2_SLOT];
+
+/** The beat a slot shows. On a transition slot this is the beat about to
+ *  arrive, so the rail and the caption stay sensible mid-hand-off. */
+function beatForSlot(slot: number) {
+  if (slot < T1_SLOT) return slot;
+  if (slot === T1_SLOT) return DESIGN_COUNT;
+  if (slot < T2_SLOT) return slot - 1;
+  if (slot === T2_SLOT) return DESIGN_COUNT + AUTOMATE_COUNT;
+  return slot - 2;
+}
+
+/** A beat's slot: each transition before it displaces it by one. */
 function slotForBeat(i: number) {
-  return i < DESIGN_COUNT ? i : i + 1;
+  if (i < DESIGN_COUNT) return i;
+  if (i < DESIGN_COUNT + AUTOMATE_COUNT) return i + 1;
+  return i + 2;
 }
 
 const SLOT_VH: number[] = [];
 for (let i = 0; i < DESIGN_COUNT; i++) SLOT_VH.push(BEAT_VH);
 SLOT_VH.push(TRANSITION_VH);
 for (let i = 0; i < AUTOMATE_COUNT; i++) SLOT_VH.push(BEAT_VH);
+SLOT_VH.push(TRANSITION_VH);
+for (let i = 0; i < GROW_COUNT; i++) SLOT_VH.push(BEAT_VH);
 const TOTAL_VH = SLOT_VH.reduce((a, b) => a + b, 0);
 
 /** progress 0-1 across the travel -> continuous slot position. */
@@ -155,12 +176,9 @@ export default function ServicesBuild() {
   useMotionValueEvent(position, "change", function track(p) {
     setActiveSlot(Math.min(SLOT_VH.length - 1, Math.max(0, Math.floor(p))));
   });
-  const inTransition = activeSlot === TRANSITION_SLOT;
-  const activeBeat = inTransition
-    ? DESIGN_COUNT
-    : activeSlot < TRANSITION_SLOT
-    ? activeSlot
-    : activeSlot - 1;
+  const inTransition = TRANSITION_SLOTS.includes(activeSlot);
+  const chapter: "automate" | "grow" = activeSlot === T2_SLOT ? "grow" : "automate";
+  const activeBeat = beatForSlot(activeSlot);
 
   function jumpToBeat(i: number) {
     const el = wrapperRef.current;
@@ -225,7 +243,7 @@ export default function ServicesBuild() {
               The outgoing caption has already faded to 0 by the time the
               index changes, so they never overlap (the /work film rule). */}
           {inTransition ? (
-            <ChapterCard position={position} />
+            <ChapterCard position={position} slot={activeSlot} chapter={chapter} />
           ) : (
             <BuildCaption
               key={activeBeat}
@@ -526,7 +544,7 @@ function BuildRail({
 
 /* ── the screen stack ───────────────────────────────────────────── */
 
-const ALL_SPECS = [...DESIGN_SPECS, ...AUTOMATE_SPECS];
+const ALL_SPECS = [...DESIGN_SPECS, ...AUTOMATE_SPECS, ...GROW_SPECS];
 
 /**
  * Only the active slot and its neighbours are mounted — which during the
@@ -572,10 +590,14 @@ function ScreenLayer({
   });
 
   const isLast = slot === SLOT_VH.length - 1;
-  // The last Design window is the one pulled aside during the chapter
-  // transition; the first Automate window is revealed behind it.
-  const isPulledAside = slot === TRANSITION_SLOT - 1;
-  const isRevealed = slot === TRANSITION_SLOT + 1;
+  // T1: the last Design window is pulled aside to reveal the first
+  // Automate window behind it.
+  const isPulledAside = slot === T1_SLOT - 1;
+  const isRevealed = slot === T1_SLOT + 1;
+  // T2: the last Automate window (the runbook) shrinks into a card that
+  // becomes Northgate's pin, and the map opens out from where it landed.
+  const isShrinking = slot === T2_SLOT - 1;
+  const isMapOpening = slot === T2_SLOT + 1;
 
   // Keyframes are built as plain arrays rather than ternaries inside
   // useTransform: nesting conditionals there made TypeScript reconcile a
@@ -585,6 +607,12 @@ function ScreenLayer({
   if (isLast) {
     stops = [slot - 0.1, slot - 0.088, slot + 1, slot + 1.001];
     fades = [0, 1, 1, 1];
+  } else if (isShrinking) {
+    stops = [slot - 0.1, slot - 0.088, slot + 1.6, slot + 1.78];
+    fades = [0, 1, 1, 0];
+  } else if (isMapOpening) {
+    stops = [slot - 0.62, slot - 0.44, slot + 0.999, slot + 1];
+    fades = [0, 1, 1, 0];
   } else if (isPulledAside) {
     stops = [slot - 0.1, slot - 0.088, slot + 1.72, slot + 1.95];
     fades = [0, 1, 1, 0];
@@ -608,6 +636,10 @@ function ScreenLayer({
   } else if (isRevealed) {
     xStops = [slot - 1, slot - 0.35, slot, slot + 0.9];
     xVals = ["20%", "14%", "0%", "0%"];
+  } else if (isShrinking || isMapOpening) {
+    // T2 shrinks and opens in place; nothing travels sideways
+    xStops = [slot - 1, slot, slot + 1];
+    xVals = ["0%", "0%", "0%"];
   } else {
     xStops = [slot - 0.1, slot, slot + 0.9, slot + 1];
     xVals = ["6%", "0%", "0%", isLast ? "0%" : "-6%"];
@@ -616,7 +648,13 @@ function ScreenLayer({
 
   let sStops: number[];
   let sVals: number[];
-  if (isPulledAside) {
+  if (isShrinking) {
+    sStops = [slot, slot + 1, slot + 1.6];
+    sVals = [1, 1, 0.12];
+  } else if (isMapOpening) {
+    sStops = [slot - 0.62, slot - 0.1, slot];
+    sVals = [0.14, 0.92, 1];
+  } else if (isPulledAside) {
     sStops = [slot, slot + 1, slot + 1.7];
     sVals = [1, 1, 0.86];
   } else if (isRevealed) {
@@ -637,7 +675,14 @@ function ScreenLayer({
       ref={ref}
       // the window being pulled aside stays on top through the
       // transition, so it reads as the front window moving away
-      style={{ position: "absolute", inset: 0, zIndex: isPulledAside ? 20 : slot }}
+      style={{
+        position: "absolute",
+        inset: 0,
+        // T1's outgoing window sits on top so it reads as moving away;
+        // T2's shrinking card does too, so it stays visible as the map
+        // opens underneath it
+        zIndex: isPulledAside || isShrinking ? 20 : slot,
+      }}
     >
       <motion.div style={{ x, scale, height: "100%" }}>
         <WindowChrome tone={spec.tone} url={spec.url} title={spec.title} showIllustrative={false}>
@@ -659,23 +704,28 @@ function ScreenLayer({
  *  pulled-aside window travels far enough left to cross the caption
  *  column, so showing the card from the start of the transition left it
  *  half-covered by a moving window. */
-function ChapterCard({ position }: { position: MotionValue<number> }) {
-  const opacity = useTransform(
-    position,
-    [TRANSITION_SLOT + 0.62, TRANSITION_SLOT + 0.78],
-    [0, 1]
-  );
+function ChapterCard({
+  position,
+  slot,
+  chapter,
+}: {
+  position: MotionValue<number>;
+  slot: number;
+  chapter: "automate" | "grow";
+}) {
+  const opacity = useTransform(position, [slot + 0.62, slot + 0.78], [0, 1]);
   const ref = useScrollStyle<HTMLDivElement>(opacity);
+  const grow = chapter === "grow";
   return (
     <div ref={ref}>
       <div
         className="type-eyebrow"
         style={{ fontFamily: "var(--font-mono)", color: "var(--color-muted)", marginBottom: 22 }}
       >
-        Chapter 2
+        {grow ? "Chapter 3" : "Chapter 2"}
       </div>
       <h2 className="type-h1" style={{ color: "var(--color-ink)", marginBottom: 20 }}>
-        <CharReveal text="Automate" />
+        <CharReveal text={grow ? "Grow" : "Automate"} />
       </h2>
       <motion.p
         initial={{ opacity: 0, y: 10 }}
@@ -684,7 +734,15 @@ function ChapterCard({ position }: { position: MotionValue<number> }) {
         className="type-body-lg"
         style={{ color: "var(--color-muted)", margin: 0, maxWidth: 440 }}
       >
-        What runs <span className="type-accent">behind</span> the site.
+        {grow ? (
+          <>
+            Where customers <span className="type-accent">find</span> you.
+          </>
+        ) : (
+          <>
+            What runs <span className="type-accent">behind</span> the site.
+          </>
+        )}
       </motion.p>
     </div>
   );
