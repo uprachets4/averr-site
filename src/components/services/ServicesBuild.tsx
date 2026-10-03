@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   motion,
   useMotionValueEvent,
@@ -146,6 +146,11 @@ function resolveProof(slug: string) {
 
 export default function ServicesBuild() {
   const reduce = useReducedMotion();
+  // A hash-only change is a same-document navigation: React does not
+  // remount, so the jump has to react to the hash itself, not just to
+  // mounting. Clicking /services#grow while already on /services would
+  // otherwise do nothing.
+  const { hash } = useLocation();
   const [isDesktop, setIsDesktop] = useState(true);
   useEffect(function detect() {
     const mq = window.matchMedia("(min-width: 901px)");
@@ -206,7 +211,7 @@ export default function ServicesBuild() {
   // the reader scrolls for themselves.
   useEffect(
     function jumpToHash() {
-      const id = window.location.hash.replace("#", "");
+      const id = hash.replace("#", "");
       const first: Record<string, number> = {
         design: 0,
         automate: DESIGN_COUNT,
@@ -239,7 +244,7 @@ export default function ServicesBuild() {
         gestures.forEach((g) => window.removeEventListener(g, stop));
       };
     },
-    [pinned]
+    [pinned, hash]
   );
 
   if (!pinned) {
