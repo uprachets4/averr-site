@@ -180,7 +180,7 @@ export default function ServicesBuild() {
   const chapter: "automate" | "grow" = activeSlot === T2_SLOT ? "grow" : "automate";
   const activeBeat = beatForSlot(activeSlot);
 
-  function jumpToBeat(i: number) {
+  function jumpToBeat(i: number, instant = false) {
     const el = wrapperRef.current;
     if (!el) return;
     // Land in the beat's dwell, not on its boundary.
@@ -190,7 +190,7 @@ export default function ServicesBuild() {
     const into = acc + SLOT_VH[slot] * ((PHASE.buildTo + PHASE.dwellTo) / 2);
     const top =
       el.offsetTop + (into / TOTAL_VH) * (el.offsetHeight - window.innerHeight);
-    window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
+    window.scrollTo({ top, behavior: reduce || instant ? "auto" : "smooth" });
   }
 
   // Home's doors link to /services#design|#automate|#grow. Each lands on
@@ -206,8 +206,11 @@ export default function ServicesBuild() {
         grow: DESIGN_COUNT + AUTOMATE_COUNT,
       };
       if (!(id in first) || !pinned) return;
-      // after layout, so offsetTop/offsetHeight are real
-      const t = window.setTimeout(() => jumpToBeat(first[id]), 120);
+      // Instant, not smooth: this is an arrival, not an in-page move, and
+      // a smooth scroll of several thousand pixels was being overtaken by
+      // the next render — #automate and #grow both ended up back at beat
+      // one. Delayed a frame or two so offsetTop/offsetHeight are real.
+      const t = window.setTimeout(() => jumpToBeat(first[id], true), 160);
       return function cleanup() {
         window.clearTimeout(t);
       };
