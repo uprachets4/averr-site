@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~110 commits ahead of `main`** at the end of Session 17-fix — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `4642136` — *"17-fix (1b): keep ILLUSTRATIVE legible on the stacked stills"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
-| **Doc currency** | Written at the end of Session 17-fix. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **HEAD** | `341a231` — *"19-pre: preload Cormorant as well"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
+| **Doc currency** | Written at the end of Session 19-pre. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -23,15 +23,29 @@
 ### Last verified bundle (build exit 0, unfiltered)
 
 ```
-dist/assets/index-DS0F-gPc.css    41.71 kB │ gzip:  8.65 kB
-dist/assets/index-DdqwrOZz.js    477.62 kB │ gzip: 151.55 kB  ← home + shell + motion
-dist/assets/Services-*.js        163.84 kB │ gzip: 40.50 kB  ← the 16-beat build page
-dist/assets/CaseStudy-*.js        51.42 kB │ gzip: 12.74 kB
-dist/assets/ServicesCloser-*.js   10.96 kB │ gzip:  3.32 kB  ← shared by both services routes
-dist/assets/Contact-*.js          44.73 kB │ gzip: 11.16 kB
-dist/assets/Work-*.js             22.22 kB │ gzip:  6.66 kB
-dist/assets/About-*.js            22.33 kB │ gzip:  5.92 kB
-dist/assets/NotFound-*.js          4.33 kB │ gzip:  1.69 kB
+dist/index.html                    2.43 kB │ gzip:   1.01 kB
+dist/assets/index-DvDWWPgn.css    41.98 kB │ gzip:   8.74 kB
+dist/assets/index-DKikw7dQ.js    477.67 kB │ gzip: 151.59 kB  ← home + shell + motion
+dist/assets/Services-*.js        164.14 kB │ gzip:  40.60 kB  ← the 16-beat build page
+dist/assets/CaseStudy-*.js        51.34 kB │ gzip:  12.71 kB
+dist/assets/Contact-*.js          44.67 kB │ gzip:  11.14 kB
+dist/assets/Work-*.js             22.49 kB │ gzip:   6.80 kB
+dist/assets/About-*.js            22.30 kB │ gzip:   5.93 kB
+dist/assets/NotFound-*.js          4.28 kB │ gzip:   1.69 kB
+dist/assets/MonogramMark-*.js      3.85 kB │ gzip:   1.81 kB
+dist/assets/SectionBoundary-*.js   0.44 kB │ gzip:   0.29 kB
+```
+
+**Fonts are now part of the budget too** — they are preloaded, so they
+share the critical pipe with the entry chunk. `public/fonts` is **248 kB
+total**, down from 816 kB:
+
+```
+InterVariable.woff2          77 kB   (was 344)  not preloaded
+InterVariable-Italic.woff2   85 kB   (was 379)  not preloaded
+geist-latin-wght-normal      29 kB              PRELOADED
+cormorant-garamond-600-ital  23 kB              PRELOADED
+geist-mono-latin-wght        23 kB              not preloaded
 ```
 
 Gate: **flag anything over +12 KB gzip JS in a single session.** **17c-2 changed how this is measured**: routes are code-split, so the number that matters is now **home's initial JS = 151.65 kB gzip** (the motion chunk folded back into index in 17c-2-fix once /services/next began sharing components with /services; one fewer boundary, marginally smaller), down from a single 199.70 kB bundle — **−46 kB on the landing route**. Total across all chunks is higher than the old single bundle (splitting has overhead), but no visitor downloads all of it. Judge future sessions on the initial figure for the route they touch, and on that route's own chunk.
@@ -200,6 +214,62 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 **The LCP element is gated behind its own entrance delay.** The hero subhead animates in at `delay: 1.1`, so it cannot paint before 1.1s, and under throttle the whole chain stretches. The route also costs a lazy-load round trip. **This pattern is on every page hero, not just this one** — it is a ship-pass item, and the cheapest fix is to let the LCP text paint immediately and animate something else.
 
 *Four wrong guesses in a row on one bug, worth recording as method:* the chapter anchors appeared to fail on `#automate` and `#grow`. I changed the scroll to instant, then added retries, then fixed a guard that was cancelling those retries — all without evidence. **Instrumenting the scroll position took one run and showed the anchors had worked the whole time**: final y 4653, caption "Workflow audit". The probe was reusing one page across `#design → #automate → #grow`, and a hash-only change is a same-document navigation, so React never remounted. It did surface one real edge — clicking `/services#grow` while already on `/services` did nothing — now fixed by taking the hash from `useLocation`. **Instrument before the second guess.**
+
+**19-pre** `f47c12d` … `341a231` — **Site-wide LCP. Every hero's LCP element now paints at first render, and the font loading was rebuilt around it.** Nine commits.
+
+*The ruling (Prachets):* **the LCP element must PAINT at first render.** Its entrance becomes transform-only — y 8px → 0, `duration.base`, `ease.outQuart`, from 0ms. Every other hero element keeps its choreography. Target: **mobile lab LCP < 2.5 s on every route.**
+
+**The LCP element per route** (390×844, 4× CPU, ~1.6 Mbps), and what it was hiding behind:
+
+| Route | LCP element | Was | Now |
+|---|---|---|---|
+| `/` | `P.type-body-lg` hero kicker | delay 0.675 (mobile film) | painted |
+| `/work` | `IMG` first preview | `loading="lazy"`, faded `whileInView` | eager, `fetchPriority=high`, painted |
+| 4 case studies | `P.type-body-lg` subhead | delay 0.75 | painted |
+| careerclarity-ai | `P` body copy | delay 1.2 | painted |
+| `/services` | `P.type-body-lg` subhead | **delay 1.1** | painted |
+| `/about` | `SPAN.type-display-l` CharReveal | **delay 2.2** + per-char fade | painted (`paint` prop) |
+| `/contact` | `P.type-body-lg` subhead | **delay 1.6** | painted |
+| 404 | `H1.type-display-l` | delay 0.3 | painted (its pill keeps delay 0.9) |
+
+**`CharReveal` gained a `paint` prop.** It keeps every character at opacity 1 from the first frame, drops the per-char stagger, and animates y only. Reserved for an LCP element — do not sprinkle it; the stagger is the component's reason to exist.
+
+**Retiming alone did not reach the target, and the measurement said why.** After the choreography fixes every route still sat at 2.5–3.4 s, with first contentful paint pinned at ~2.2 s. The waterfall: **the 344 kB `InterVariable.woff2` preload was racing the 151 kB entry chunk for the pipe.** The JS took 1826 ms to arrive instead of the ~760 ms it needs alone. Three changes followed, each measured:
+
+1. **Subset the Inter variable fonts** — 344 → 77 kB and 379 → 85 kB, both axes kept, every codepoint the original covered from our source charset still covered. `tools/subset-inter.py` records the range and is idempotent.
+2. **Preload Geist only, not Inter.** A preload is a *high-priority* request; preloading 106 kB of fonts alongside the JS cost ~370 ms of FCP to save a swap on body copy. Geist carries every display headline and is 29 kB, so it keeps its preload.
+3. **A metric-matched fallback for Inter** (`'Inter Fallback'`, `size-adjust: 97.22%` measured from the site's own body copy, vertical overrides from Inter's hhea), so the swap cannot reflow.
+
+**`/work` was mounting the desktop film on phones.** `useMedia` started at `false` and only read `matchMedia` in an effect, so every phone visit rendered the whole `ProjectFilm` first — its four preview images have no `loading` attribute, so **431 kB was requested on the critical path and then thrown away**. `/work`'s own LCP image finished behind three images no one would ever see. Fixed by reading `matchMedia` in the `useState` initialiser, the way `Nav.tsx` already did.
+
+**Results — mobile lab, 390×844, 4× CPU, ~1.6 Mbps/150 ms:**
+
+| Route | LCP before | LCP after | CLS before → after |
+|---|---|---|---|
+| `/` | 4060 | **2264** | 0 → 0 |
+| `/work` | 4908 | **3384** ✗ | **0.054 → 0.016** |
+| cg-walls | 3804 | **2304** | 0.004 → 0 |
+| capitalcommand | 3876 | **2344** | 0 → 0 |
+| sift | 3824 | **2356** | 0.004 → 0 |
+| cadencestack | 3892 | **2368** | 0.005 → 0 |
+| careerclarity-ai | 4440 | **2244** | 0 → 0 |
+| `/services` | 5052 | **2792** ✗ | 0.001 → 0.001 |
+| `/about` | 2680 | **2252** | 0 → 0 |
+| `/contact` | 4940 | **2284** | 0 → 0 |
+| 404 | 3548 | **2184** | 0 → 0 |
+
+**9 of 11 routes under 2.5 s. Two are not, and neither can be fixed by choreography:**
+
+- **`/work` 3384.** The LCP element is an `<img>` that React has to render before the browser can even request it — it cannot paint at first render by construction. It is requested at ~2.3 s and is 86 kB. The fixes are a smaller preview (it renders ~358 px wide from a 1400 px source) or prerendering. **Both are owner calls — see §7.**
+- **`/services` 2792.** FCP is 1928; the gap is the lazy route chunk, a second round trip after the entry chunk plus the heaviest first render on the site. A build-time path→chunk map injecting `modulepreload` would recover most of it. **Not attempted — it is a build-pipeline change, not hero choreography.**
+
+**The real floor is first contentful paint at ~1.9 s**, and it is the SPA boot: HTML round trip (~330 ms) + 151 kB entry chunk (~1100 ms) + React mount at 4× CPU (~450 ms). Nothing in the hero can paint before that. **Prerendering the shell is the only lever left** — logged in §8.
+
+**Reduced motion:** unchanged, verified — character opacity 1 and no transform at every sampled instant on `/`, `/about`, `/services`.
+
+**Verified on the alias:** build exit **0** unfiltered · frames at 0/300/800/1500 ms on all eight hero types, visually reviewed · opacity census of every hero text node at each frame · CLS attributed to its source node, not just totalled · **zero horizontal overflow at 375 on all 11 routes** (`scrollWidth` 375 everywhere) · **3-speed crash-scroll at 1440/1920/375, both directions — 33 route-runs, 0 console errors, 0 React errors, every route alive.**
+
+*Two probe notes.* **A crash-scroll piped through `tail` shows nothing until it ends** — I lost 45 minutes watching an empty file before rewriting it to log per route. It is a ~25-minute run; log every route as it finishes. And **`1920 /work` recorded 946 s against 38 s at 1440** — not reproducible: a fresh pass is 5.8 s with one 59 ms long task, and the per-step cost is identical at both widths. Recorded as an unexplained outlier, not diagnosed.
 
 ---
 
@@ -383,7 +453,15 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **22 · The preview alias serves a 403 Security Checkpoint under automated polling.** *Cause:* polling the alias every 5s for a new bundle hash trips Vercel's bot protection; the alias then returns `403` with a "Vercel Security Checkpoint" HTML page to *every* automated request, including Playwright. It clears on its own after a few minutes and never affects a real browser. *Fix:* **poll at 60s intervals or slower.** A tight `until` loop on the bundle hash is the exact shape that trips it.
 
-**23 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
+**23 · A `<link rel="preload">` is a *priority* decision, not a free win.** *Cause:* the hero fonts were preloaded on the reasoning that the hero needs them. A preload is a high-priority fetch, so 344 kB of Inter sat in front of the 151 kB entry chunk and more than doubled its download time on a 1.6 Mbps link — first contentful paint 2992 ms. *Fix:* preload only what is both small and visually load-bearing (Geist 29 kB, Cormorant 23 kB). Everything else loads behind the JS with `font-display: swap`. **Measure the waterfall before adding a preload; `performance.getEntriesByType("resource")` with `startTime`/`responseEnd` shows the contention immediately.**
+
+**24 · A swapped font reflows the text above the LCP element.** *Cause:* `/work/sift` and `/work/cadencestack` carried 0.035–0.049 CLS at ~2.4 s. It looked like the Inter swap; it was **Cormorant**, which sets the accent words *inside* the headline at `1.12em`. When it arrived the headline relaid and pushed the subhead down. *Fix:* preload Cormorant (23 kB) — CLS went to **0.000** on both. *Method note:* the first two attempts (metric-matched Inter fallback, then re-checking the preload) were guesses. **Attributing the shift to its source node took one run** — `PerformanceObserver` on `layout-shift` with `entry.sources[].node` — and named the timestamp and the element. Same lesson as the chapter anchors: instrument before the second guess.
+
+**25 · `useState(false)` + `matchMedia` in an effect renders the wrong branch first.** *Cause:* `/work`'s `useMedia` initialised to `false`, so every phone visit mounted the entire desktop `ProjectFilm` for one commit before the effect flipped it — four eager images, 431 kB, fetched on the critical path and discarded. *Fix:* read `window.matchMedia(q).matches` in the `useState` initialiser (`Nav.tsx` already did). **Any media hook that gates which subtree mounts must be initialised synchronously, not in an effect.** One that only gates behaviour can stay in an effect.
+
+**26 · An `<img>` can never be the LCP element and paint at first render.** React has to render it before the browser can request it, so the fetch starts after mount no matter what `fetchPriority` says. Give it `width`/`height` so it does not shift (that alone took `/work` from 0.054 to 0.016), keep it eager, and accept that the only real fixes are a smaller file or prerendered markup.
+
+**27 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
 
 ---
 
@@ -449,9 +527,11 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 7. **`og-image.svg` → PNG** — several platforms won't render SVG OG images.
 8. **"sales at Google" wording on /about** — flagged earlier, never resolved.
 9. **Full mobile review** — automated checks confirm zero overflow, but no human pass has been done on a real device. The Session 17 stacked stills are no longer a concern here: **Prachets ruled the ~6px Automate labels a defect, and 17-fix-2 replaced that still below 900px with a purpose-built vertical composition** — five nodes on a straight vertical path, every label at real `type-eyebrow` size. Design and Grow still scale, and both were checked as readable at 375.
-10. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
-11. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
-12. ~~**Commit-message convention.**~~ **CLOSED — Prachets ruled in 17-fix: standing rule 18 wins, always.** Commit + push per verified item. The `Commit:` line at the foot of a brief is the **summary for the final report**, not a single commit message to squash onto. See §4.18.
+10. **`/work`'s LCP image — pick one (blocks the last two routes under 2.5 s).** `/work/cgwalls/hero.jpg` is 1400×776 / 86 kB and renders ~358 px wide on a phone. A 2×-for-mobile version (~716 px, ~30 kB) would take `/work` from 3384 ms to roughly 2.6 s. **This creates a new asset, which locked rule 11 (ASSET RULE) says to flag rather than ship.** Alternative: leave it and accept 3.4 s on one route. Prachets' call.
+11. **Prerendering the shell — the only remaining LCP lever.** Every route's first contentful paint is pinned at ~1.9 s because nothing paints until 151 kB of JS downloads and React mounts. Static-rendering each route's hero into its HTML would put LCP near first byte. It is a build-pipeline decision (prerender plugin, or a move to a framework that does it), not a page change, and it is the difference between "good" and "excellent" on every route at once.
+12. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
+13. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
+14. ~~**Commit-message convention.**~~ **CLOSED — Prachets ruled in 17-fix: standing rule 18 wins, always.** Commit + push per verified item. The `Commit:` line at the foot of a brief is the **summary for the final report**, not a single commit message to squash onto. See §4.18.
 
 ---
 
@@ -460,6 +540,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
 - ~~**Session 17 — /services.**~~ **COMPLETE** (17 → 17c-5). The page is the build scene; see §3.
 - **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **Needs the photo.**
+- ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`). 9 of 11 routes under 2.5 s; `/work` and `/services` remain, with named causes — see §2 and §7.10–11.
 - **Session 19 — /contact.** After the recording.
 - **Session 20 — site-wide.** Page transitions using the slab wipe, footer redesign, home polish (richer door previews, reel hover, 404 pill).
 - **Ship pass.** The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
