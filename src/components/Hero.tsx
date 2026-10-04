@@ -45,16 +45,17 @@ const T_DESKTOP = {
   big: 0.65,
   pillWord: 0.8,
   slab: 1.15,
-  kicker: 1.35,
   ctaPrimary: 1.43,
   ctaSecondary: 1.51,
   scrollCue: 1.5,
   scale: 1,
 };
 
-/** Below 768 the film runs at half speed (≈1.0s). The kicker is pulled further
- *  forward than a flat ×0.5 would put it (0.675s) because it is the LCP element
- *  on mobile — it is the largest text block at the display-2xl floor. */
+/** Below 768 the film runs at half speed (≈1.0s).
+ *
+ *  The kicker used to have an entry here, pulled forward because it is the
+ *  mobile LCP element. It no longer has a timing at all: 19-pre paints it at
+ *  mount and animates the transform only, so there is nothing left to delay. */
 const T_MOBILE: Film = {
   topRow: 0.12,
   lead1: 0.18,
@@ -62,7 +63,6 @@ const T_MOBILE: Film = {
   big: 0.32,
   pillWord: 0.4,
   slab: 0.58,
-  kicker: 0.55,
   ctaPrimary: 0.63,
   ctaSecondary: 0.71,
   scrollCue: 0.75,
