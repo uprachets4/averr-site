@@ -55,6 +55,31 @@
   font-display: swap;
 }
 
+/* Metric-matched stand-in for Inter.
+ *
+ * Inter is not preloaded (a preload races the entry chunk for the pipe and
+ * cost ~370ms of first contentful paint), so body copy paints in a system
+ * face and swaps. Without this the swap reflowed the hero subhead and put
+ * 0.05 of layout shift on two case studies at ~2.5s.
+ *
+ * size-adjust is measured, not guessed: the site's own body copy rendered
+ * at 400/100px is 10317px in Inter and 10612px in Helvetica/Arial, so the
+ * stand-in is drawn at 97.22% and occupies the same width. The overrides
+ * are Inter's own hhea metrics (1984 / -494 / 0 over a 2048 em).
+ *
+ * Helvetica Neue, Helvetica and Arial cover macOS, iOS and Windows. Where
+ * none of the three exists (most Android) the face fails to load and the
+ * stack falls through to the unadjusted generic, as it did before.
+ */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Helvetica Neue'), local('Helvetica'), local('Arial');
+  size-adjust: 97.22%;
+  ascent-override: 96.88%;
+  descent-override: 24.12%;
+  line-gap-override: 0%;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    AVERR STUDIOS — Design Tokens v2 (Nolana-anchored)
    ═══════════════════════════════════════════════════════════════ */
@@ -82,7 +107,7 @@
 
   /* Fonts */
   --font-display: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-body:    "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono:    "Geist Mono", ui-monospace, monospace;
 }
 
