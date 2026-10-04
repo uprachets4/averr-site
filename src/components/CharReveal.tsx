@@ -23,6 +23,16 @@ const PER_CHAR = 0.35;
 
 export type Segment = { text: string; accent?: boolean };
 
+/**
+ * `paint` keeps every character at opacity 1 from the first frame and
+ * animates the transform only.
+ *
+ * Reserved for an LCP element. The browser cannot measure a largest
+ * contentful paint it cannot see, so a reveal that starts at opacity 0
+ * pushes LCP out by its own delay plus duration — which is how /about
+ * ended up at 2.7s behind a 2.2s delay.
+ */
+
 type Token = { chars: string[]; accent: boolean };
 
 /** Flatten segments into per-word tokens, carrying the accent flag. */
@@ -47,6 +57,8 @@ type SharedProps = {
   segments?: Segment[];
   className?: string;
   style?: React.CSSProperties;
+  /** LCP element: paint immediately, animate transform only. */
+  paint?: boolean;
 };
 
 /** Render the word/char tree. `mode` picks mount-driven vs viewport-driven. */
@@ -55,11 +67,13 @@ function Words({
   reduce,
   mode,
   delay,
+  paint,
 }: {
   tokens: Token[];
   reduce: boolean;
   mode: "mount" | "inView";
   delay: number;
+  paint?: boolean;
 }) {
   let globalIdx = -1;
   return (
@@ -75,19 +89,19 @@ function Words({
                 globalIdx++;
                 const idx = globalIdx;
                 const transition = {
-                  duration: reduce ? 0 : PER_CHAR,
+                  duration: reduce ? 0 : paint ? 0.3 : PER_CHAR,
                   ease: ease.outQuart,
-                  delay: reduce ? 0 : delay + idx * STAGGER,
+                  delay: reduce || paint ? 0 : delay + idx * STAGGER,
                 };
                 const initial = {
-                  opacity: reduce ? 1 : 0,
-                  y: reduce ? 0 : 20,
+                  opacity: reduce || paint ? 1 : 0,
+                  y: reduce ? 0 : paint ? 8 : 20,
                 };
                 return mode === "mount" ? (
                   <motion.span
                     key={ci}
                     initial={initial}
-                    animate={{ opacity: 1, y: 0 }}
+                    animate={paint ? { y: 0 } : { opacity: 1, y: 0 }}
                     transition={transition}
                     style={{ display: "inline-block" }}
                   >
@@ -121,12 +135,13 @@ export function CharRevealInView({
   segments,
   className,
   style,
+  paint,
 }: SharedProps) {
   const reduce = useReducedMotion();
   const tokens = tokenize(toSegments(text, segments));
   return (
     <span className={className} style={style}>
-      <Words tokens={tokens} reduce={!!reduce} mode="inView" delay={0} />
+      <Words tokens={tokens} reduce={!!reduce} mode="inView" delay={0} paint={paint} />
     </span>
   );
 }
@@ -138,12 +153,13 @@ export function CharReveal({
   delay = 0,
   className,
   style,
+  paint,
 }: SharedProps & { delay?: number }) {
   const reduce = useReducedMotion();
   const tokens = tokenize(toSegments(text, segments));
   return (
     <span className={className} style={style}>
-      <Words tokens={tokens} reduce={!!reduce} mode="mount" delay={delay} />
+      <Words tokens={tokens} reduce={!!reduce} mode="mount" delay={delay} paint={paint} />
     </span>
   );
 }

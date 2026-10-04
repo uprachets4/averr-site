@@ -236,9 +236,12 @@ function MonogramHero() {
           </div>
         </motion.div>
 
+        {/* LCP element on mobile — painted at first render. It sat behind
+            a 2.2s delay, which was the whole of that route's LCP. */}
         <CharReveal
           text="The studio for founders who care how they show up."
-          delay={2.2}
+          paint
+          delay={0}
           className="type-display-l"
           style={{
             color: "var(--color-ink)",
