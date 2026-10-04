@@ -19,8 +19,15 @@
 
     <title>Averr Studios — Design. Automate. Grow.</title>
 
-    <!-- All fonts are self-hosted. No third-party font origins. -->
-    <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- All fonts are self-hosted. No third-party font origins.
+
+         Only Geist is preloaded. On the 1.6 Mbps lab profile a preload is a
+         high-priority request that shares the pipe with the entry chunk, so
+         preloading Inter as well pushed first contentful paint out by about
+         300ms to save a swap on body copy. Geist carries every display
+         headline — two routes LCP on one — and is 29 kB, so it keeps its
+         preload. Inter loads at normal priority behind the JS and swaps in;
+         every face is font-display: swap. -->
     <link rel="preload" href="/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   </head>
   <body>
