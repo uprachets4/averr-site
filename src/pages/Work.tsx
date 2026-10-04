@@ -16,8 +16,20 @@ const SCROLL_KEY = "averr:work-scroll";
 /** Screens of scroll the doors occupy before project one begins. */
 const DOORS_LEAD = 1.5;
 
+/**
+ * Read on the FIRST render, not in an effect.
+ *
+ * Starting at `false` meant every phone visit to /work mounted the whole
+ * desktop film before the effect flipped it — four eager preview images,
+ * 431 kB, requested on the critical path and then thrown away. That was
+ * /work's LCP: its own mobile preview finished behind three images no one
+ * would ever see. Nav.tsx already reads it this way.
+ */
 function useMedia(query: string) {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(function initial() {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(query).matches;
+  });
   useEffect(
     function watch() {
       const mq = window.matchMedia(query);

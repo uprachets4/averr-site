@@ -541,6 +541,8 @@ function FilmImage({ entry }: { entry: VaultEntry }) {
       <img
         src={entry.preview!.src}
         alt={entry.preview!.alt}
+        width={entry.preview!.w}
+        height={entry.preview!.h}
         decoding="async"
         style={{ display: "block", width: "100%", height: "auto" }}
       />
