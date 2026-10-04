@@ -29,6 +29,10 @@
          preload. Inter loads at normal priority behind the JS and swaps in;
          every face is font-display: swap. -->
     <link rel="preload" href="/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Cormorant too: it is only 23 kB, it sets the accent words inside
+         headlines, and swapping it in at ~2.4s reflowed the headline and
+         pushed the subhead down — 0.05 of layout shift on two case studies. -->
+    <link rel="preload" href="/fonts/cormorant-garamond-latin-600-italic.woff2" as="font" type="font/woff2" crossorigin>
   </head>
   <body>
     <div id="root"></div>
