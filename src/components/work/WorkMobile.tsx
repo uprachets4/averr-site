@@ -133,19 +133,31 @@ export default function WorkMobile() {
                 }}
               >
                 {entry.preview ? (
+                  /* The first preview is the mobile LCP element: it loads
+                     eagerly and is painted from the first frame, transform
+                     only. The rest keep the lazy, faded entrance. */
                   <motion.div
-                    initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{
+                      opacity: reduce || i === 0 ? 1 : 0,
+                      y: reduce ? 0 : i === 0 ? 8 : 20,
+                    }}
+                    whileInView={i === 0 ? { y: 0 } : { opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-15%" }}
-                    transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart }}
+                    transition={{
+                      duration: reduce ? 0 : i === 0 ? duration.base : duration.slow,
+                      ease: ease.outQuart,
+                    }}
                     style={{ marginBottom: 28 }}
                   >
                     <ImageFrame variant="gallery" tone="dark">
                       <img
                         src={entry.preview.src}
                         alt={entry.preview.alt}
-                        loading="lazy"
-                        decoding="async"
+                        width={entry.preview.w}
+                        height={entry.preview.h}
+                        loading={i === 0 ? "eager" : "lazy"}
+                        fetchPriority={i === 0 ? "high" : undefined}
+                        decoding={i === 0 ? "sync" : "async"}
                         style={{ display: "block", width: "100%", height: "auto" }}
                       />
                     </ImageFrame>
