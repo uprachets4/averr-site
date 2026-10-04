@@ -14,7 +14,7 @@ import {
   InstagramLogo,
   LinkedinLogo,
 } from "@phosphor-icons/react";
-import { ease } from "../lib/motion";
+import { duration, ease } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import MonogramMark from "../components/MonogramMark";
 import ContactForm from "../components/ContactForm";
@@ -116,14 +116,11 @@ function EditorialHero() {
           }}
         />
 
+        {/* LCP element on mobile — painted at first render, transform only */}
         <motion.p
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: reduce ? 0 : 0.6,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 1.6,
-          }}
+          initial={{ opacity: 1, y: reduce ? 0 : 8 }}
+          animate={{ y: 0 }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
           className="type-body-lg"
           style={{
             color: "var(--color-ink)",

@@ -230,10 +230,13 @@ function HeroComposition({
         </span>
       </h1>
 
+      {/* LCP element on mobile: painted at first render, transform only.
+          An opacity-0 start gives the browser nothing to measure until the
+          animation runs, so a delay here is a delay on LCP. */}
       <motion.p
-        initial={{ opacity: instant ? 1 : 0, y: instant ? 0 : 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: dur(0.6), ease: ease.outQuart, delay: d(T.kicker) }}
+        initial={{ opacity: 1, y: instant ? 0 : 8 }}
+        animate={{ y: 0 }}
+        transition={{ duration: dur(duration.base), ease: ease.outQuart }}
         className="type-body-lg measure-body"
         style={{ color: "var(--color-muted)", margin: "28px 0 0" }}
       >
