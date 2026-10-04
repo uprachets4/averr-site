@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { ease } from "../lib/motion";
+import { duration, ease } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import PillHl from "../components/PillHl";
 
@@ -71,10 +71,12 @@ export default function NotFound() {
           //_404 · wrong door
         </motion.div>
 
+        {/* LCP element on mobile — painted at first render, transform only.
+            The pill inside keeps its own entrance. */}
         <motion.h1
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.3 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 8 }}
+          animate={{ y: 0 }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
           className="type-display-l"
           style={{
             color: "var(--color-ink)",

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { ease } from "../lib/motion";
+import { duration, ease } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 
 const EMAIL_ADDR = "prachets@averrstudios.com";
@@ -93,10 +93,11 @@ export default function ComingSoon() {
           yet.
         </motion.h1>
 
+        {/* LCP element on mobile — painted at first render, transform only */}
         <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.2 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 8 }}
+          animate={{ y: 0 }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
           style={{
             fontSize: 19,
             lineHeight: 1.6,
