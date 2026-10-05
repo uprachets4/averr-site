@@ -118,10 +118,10 @@ export default function CaseHero({
         </motion.div>
 
         <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
           transition={{
-            duration: reduce ? 0 : 0.5,
+            duration: reduce ? 0 : duration.base,
             ease: ease.outQuart,
             delay: reduce ? 0 : 0.25,
           }}
@@ -131,19 +131,21 @@ export default function CaseHero({
           {client}
         </motion.div>
 
-        {/* the line masks up out of its own box, one element, exact sentence */}
+        {/* One element, exact sentence. The mask is gone: a line that starts
+            110% below its own clipping box is not on screen, and this is
+            above the fold on every case study. It now paints and travels. */}
         <h1
           className="type-display-l"
           style={{ color: "var(--color-ink)", marginBottom: 40, maxWidth: 1080 }}
         >
-          <span style={{ display: "block", overflow: "hidden", paddingBottom: "0.08em" }}>
+          <span style={{ display: "block", paddingBottom: "0.08em" }}>
             <motion.span
               style={{ display: "block" }}
-              initial={{ y: reduce ? 0 : "110%" }}
+              initial={{ y: reduce ? 0 : 12 }}
               animate={{ y: 0 }}
               transition={{
-                duration: reduce ? 0 : duration.slow,
-                ease: ease.outExpo,
+                duration: reduce ? 0 : duration.base,
+                ease: ease.outQuart,
                 delay: reduce ? 0 : 0.35,
               }}
             >
@@ -154,11 +156,16 @@ export default function CaseHero({
           </span>
         </h1>
 
-        {/* LCP element on mobile — painted at first render, transform only */}
+        {/* LCP element on mobile. Painted from the first frame, so its place
+            in the ladder moves it without holding up the paint. */}
         <motion.p
-          initial={{ opacity: 1, y: reduce ? 0 : 8 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
           animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
+          transition={{
+            duration: reduce ? 0 : duration.base,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 0.75,
+          }}
           className="type-body-lg"
           style={{ color: "var(--color-muted)", maxWidth: 720, marginBottom: 56 }}
         >
@@ -166,10 +173,10 @@ export default function CaseHero({
         </motion.p>
 
         <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 14 }}
+          animate={{ y: 0 }}
           transition={{
-            duration: reduce ? 0 : 0.6,
+            duration: reduce ? 0 : duration.base,
             ease: ease.outQuart,
             delay: reduce ? 0 : 0.9,
           }}

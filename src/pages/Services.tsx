@@ -50,12 +50,12 @@ function BuildHero() {
         style={{ position: "relative", zIndex: 2, maxWidth: 1000, margin: "0 auto" }}
       >
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
           transition={{
-            duration: reduce ? 0.01 : 0.5,
+            duration: reduce ? 0 : duration.base,
             ease: ease.outQuart,
-            delay: 0.2,
+            delay: reduce ? 0 : 0.2,
           }}
           style={{
             display: "inline-flex",
@@ -87,7 +87,8 @@ function BuildHero() {
           }}
         >
           <CharReveal
-            delay={0.3}
+            paint
+            delay={reduce ? 0 : 0.3}
             segments={[
               { text: "Watch us build " },
               { text: "your", accent: true },
@@ -96,11 +97,15 @@ function BuildHero() {
           />
         </h1>
 
-        {/* LCP element on mobile — painted at first render, transform only */}
+        {/* LCP element on mobile. Painted from the first frame. */}
         <motion.p
-          initial={{ opacity: 1, y: reduce ? 0 : 8 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
           animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
+          transition={{
+            duration: reduce ? 0 : duration.base,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 1.1,
+          }}
           className="type-body-lg"
           style={{ color: "var(--color-muted)", maxWidth: 620, margin: "0 auto" }}
         >

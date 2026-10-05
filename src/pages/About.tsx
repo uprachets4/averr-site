@@ -188,10 +188,10 @@ function MonogramHero() {
         }}
       >
         <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
           transition={{
-            duration: reduce ? 0 : 0.5,
+            duration: reduce ? 0 : duration.base,
             ease: ease.outQuart,
             delay: reduce ? 0 : 0.15,
           }}
@@ -204,10 +204,10 @@ function MonogramHero() {
         <MonogramMark variant="hero" />
 
         <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 6 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
           transition={{
-            duration: reduce ? 0 : 0.5,
+            duration: reduce ? 0 : duration.base,
             ease: ease.outQuart,
             delay: reduce ? 0 : 2.05,
           }}
@@ -236,12 +236,13 @@ function MonogramHero() {
           </div>
         </motion.div>
 
-        {/* LCP element on mobile — painted at first render. It sat behind
-            a 2.2s delay, which was the whole of that route's LCP. */}
+        {/* LCP element on mobile. Painted from the first frame; its 2.2s
+            place in the ladder is kept, because the monogram drawing above
+            it is the non-text entrance these two were always waiting on. */}
         <CharReveal
           text="The studio for founders who care how they show up."
           paint
-          delay={0}
+          delay={reduce ? 0 : 2.2}
           className="type-display-l"
           style={{
             color: "var(--color-ink)",
@@ -251,10 +252,10 @@ function MonogramHero() {
         />
 
         <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
           transition={{
-            duration: reduce ? 0 : 0.6,
+            duration: reduce ? 0 : duration.base,
             ease: ease.outQuart,
             delay: reduce ? 0 : 3.4,
           }}

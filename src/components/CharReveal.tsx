@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { ease } from "../lib/motion";
+import { duration as DUR, ease } from "../lib/motion";
 
 /**
  * Word-preserving character reveal — the single shared implementation.
@@ -27,10 +27,13 @@ export type Segment = { text: string; accent?: boolean };
  * `paint` keeps every character at opacity 1 from the first frame and
  * animates the transform only.
  *
- * Reserved for an LCP element. The browser cannot measure a largest
- * contentful paint it cannot see, so a reveal that starts at opacity 0
- * pushes LCP out by its own delay plus duration — which is how /about
- * ended up at 2.7s behind a 2.2s delay.
+ * The browser cannot measure a largest contentful paint it cannot see, so
+ * a reveal that starts at opacity 0 pushes LCP out by its own delay plus
+ * duration — which is how /about ended up at 2.7s behind a 2.2s delay.
+ *
+ * The per-character stagger is kept: painted characters still travel in
+ * reading order, so the line reads as a reveal rather than a block nudge.
+ * Only the fade is gone.
  */
 
 type Token = { chars: string[]; accent: boolean };
@@ -89,9 +92,9 @@ function Words({
                 globalIdx++;
                 const idx = globalIdx;
                 const transition = {
-                  duration: reduce ? 0 : paint ? 0.3 : PER_CHAR,
+                  duration: reduce ? 0 : paint ? DUR.base : PER_CHAR,
                   ease: ease.outQuart,
-                  delay: reduce || paint ? 0 : delay + idx * STAGGER,
+                  delay: reduce ? 0 : delay + idx * STAGGER,
                 };
                 const initial = {
                   opacity: reduce || paint ? 1 : 0,

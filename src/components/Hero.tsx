@@ -8,7 +8,7 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { duration, ease, spring } from "../lib/motion";
+import { duration, ease } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
 import PillHl from "./PillHl";
 import LineReveal from "./LineReveal";
@@ -45,17 +45,18 @@ const T_DESKTOP = {
   big: 0.65,
   pillWord: 0.8,
   slab: 1.15,
+  kicker: 1.35,
   ctaPrimary: 1.43,
   ctaSecondary: 1.51,
   scrollCue: 1.5,
   scale: 1,
 };
 
-/** Below 768 the film runs at half speed (≈1.0s).
- *
- *  The kicker used to have an entry here, pulled forward because it is the
- *  mobile LCP element. It no longer has a timing at all: 19-pre paints it at
- *  mount and animates the transform only, so there is nothing left to delay. */
+/** Below 768 the film runs at half speed (≈1.0s). The kicker is pulled
+ *  further forward than a flat ×0.5 would put it (0.675s): it is the mobile
+ *  LCP element, and although 19-pre-2 paints every hero text element — so a
+ *  delay here no longer delays the paint — it is still the first thing read
+ *  on a phone and should settle early. */
 const T_MOBILE: Film = {
   topRow: 0.12,
   lead1: 0.18,
@@ -63,6 +64,7 @@ const T_MOBILE: Film = {
   big: 0.32,
   pillWord: 0.4,
   slab: 0.58,
+  kicker: 0.55,
   ctaPrimary: 0.63,
   ctaSecondary: 0.71,
   scrollCue: 0.75,
@@ -163,11 +165,12 @@ function HeroComposition({
         margin: "0 auto",
       }}
     >
-      {/* top row — eyebrow + live Toronto clock */}
+      {/* Top row. The eyebrow is text, so it paints and only travels; the
+          clock is not, and keeps the fade it has always had. */}
       <motion.div
-        initial={{ opacity: instant ? 1 : 0, y: instant ? 0 : 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: dur(0.5), ease: ease.outQuart, delay: d(T.topRow) }}
+        initial={{ opacity: 1, y: instant ? 0 : 8 }}
+        animate={{ y: 0 }}
+        transition={{ duration: dur(duration.base), ease: ease.outQuart, delay: d(T.topRow) }}
         style={{
           display: "flex",
           alignItems: "baseline",
@@ -183,7 +186,13 @@ function HeroComposition({
         >
           {EYEBROW}
         </div>
-        <TorontoClock />
+        <motion.div
+          initial={{ opacity: instant ? 1 : 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: dur(0.5), ease: ease.outQuart, delay: d(T.topRow) }}
+        >
+          <TorontoClock />
+        </motion.div>
       </motion.div>
 
       {/* One h1. Its accessible text is the whole sentence. */}
@@ -197,15 +206,15 @@ function HeroComposition({
             opacity: 0.72,
           }}
         >
-          <LineReveal delay={d(T.lead1)} duration={dur(0.8)}>{LEAD_1}</LineReveal>
-          <LineReveal delay={d(T.lead2)} duration={dur(0.8)}>{LEAD_2}</LineReveal>
+          <LineReveal paint delay={d(T.lead1)}>{LEAD_1}</LineReveal>
+          <LineReveal paint delay={d(T.lead2)}>{LEAD_2}</LineReveal>
         </span>
 
         <span
           className="type-display-2xl"
           style={{ display: "block", color: "var(--color-ink)", marginTop: 8 }}
         >
-          <LineReveal delay={d(T.big)} duration={dur(duration.slow)}>
+          <LineReveal paint delay={d(T.big)}>
             {WORD_BIG}
           </LineReveal>
         </span>
@@ -214,7 +223,10 @@ function HeroComposition({
           className="type-display-2xl hero-pill-line"
           style={{ display: "block", marginTop: 4 }}
         >
-          <LineReveal delay={d(T.pillWord)} duration={dur(duration.slow)}>
+          {/* The word paints with the rest of the headline. The slab behind
+              it is not text and keeps its own entrance — it is the signature
+              moment of the page and nothing here touches it. */}
+          <LineReveal paint delay={d(T.pillWord)}>
             <span ref={pillRef} style={{ display: "inline-block" }}>
               <PillHl
                 entrance="slab"
@@ -230,13 +242,12 @@ function HeroComposition({
         </span>
       </h1>
 
-      {/* LCP element on mobile: painted at first render, transform only.
-          An opacity-0 start gives the browser nothing to measure until the
-          animation runs, so a delay here is a delay on LCP. */}
+      {/* LCP element on mobile. Painted from the first frame, so the delay
+          below moves it but cannot hold up the paint. */}
       <motion.p
-        initial={{ opacity: 1, y: instant ? 0 : 8 }}
+        initial={{ opacity: 1, y: instant ? 0 : 12 }}
         animate={{ y: 0 }}
-        transition={{ duration: dur(duration.base), ease: ease.outQuart }}
+        transition={{ duration: dur(duration.base), ease: ease.outQuart, delay: d(T.kicker) }}
         className="type-body-lg measure-body"
         style={{ color: "var(--color-muted)", margin: "28px 0 0" }}
       >
@@ -245,11 +256,9 @@ function HeroComposition({
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 28 }}>
         <motion.div
-          initial={{ opacity: instant ? 1 : 0, scale: instant ? 1 : 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={
-            instant ? { duration: 0 } : { delay: T.ctaPrimary, ...spring.snappy }
-          }
+          initial={{ opacity: 1, y: instant ? 0 : 12 }}
+          animate={{ y: 0 }}
+          transition={{ duration: dur(duration.base), ease: ease.outQuart, delay: d(T.ctaPrimary) }}
           style={{ display: "inline-flex" }}
         >
           <MagneticCTA to="/contact" variant="primary">
@@ -257,11 +266,9 @@ function HeroComposition({
           </MagneticCTA>
         </motion.div>
         <motion.div
-          initial={{ opacity: instant ? 1 : 0, scale: instant ? 1 : 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={
-            instant ? { duration: 0 } : { delay: T.ctaSecondary, ...spring.snappy }
-          }
+          initial={{ opacity: 1, y: instant ? 0 : 12 }}
+          animate={{ y: 0 }}
+          transition={{ duration: dur(duration.base), ease: ease.outQuart, delay: d(T.ctaSecondary) }}
           style={{ display: "inline-flex" }}
         >
           <MagneticCTA to="/work" variant="ghost">

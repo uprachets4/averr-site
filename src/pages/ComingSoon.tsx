@@ -55,9 +55,9 @@ export default function ComingSoon() {
         }}
       >
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.outQuart, delay: 0.1 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 0.1 }}
           className="type-eyebrow"
           style={{
             color: "var(--color-muted)",
@@ -68,9 +68,9 @@ export default function ComingSoon() {
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: reduce ? 0 : 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.7, ease: ease.outQuart, delay: 0.3 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 0.3 }}
           className="type-display-l"
           style={{
             color: "var(--color-ink)",
@@ -82,9 +82,9 @@ export default function ComingSoon() {
           {/* Cormorant accent, not PillHl: locked rule 9 confines the slab to
               the home hero, home's FinalCTA and the 404. */}
           <motion.span
-            initial={{ opacity: 0, scale: reduce ? 1 : 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reduce ? 0.01 : 0.5, ease: ease.bounce, delay: 0.9 }}
+            initial={{ opacity: 1, scale: reduce ? 1 : 0.85 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: reduce ? 0 : 0.5, ease: ease.bounce, delay: reduce ? 0 : 0.9 }}
             className="type-accent"
             style={{ display: "inline-block" }}
           >
@@ -93,11 +93,11 @@ export default function ComingSoon() {
           yet.
         </motion.h1>
 
-        {/* LCP element on mobile — painted at first render, transform only */}
+        {/* LCP element on mobile. Painted from the first frame. */}
         <motion.p
-          initial={{ opacity: 1, y: reduce ? 0 : 8 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
           animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 1.2 }}
           style={{
             fontSize: 19,
             lineHeight: 1.6,
@@ -111,9 +111,9 @@ export default function ComingSoon() {
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: reduce ? 0 : 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.5 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 1.5 }}
           style={{
             display: "inline-flex",
             flexWrap: "wrap",
@@ -130,9 +130,9 @@ export default function ComingSoon() {
         </motion.div>
 
         <motion.p
-          initial={{ opacity: 0, y: reduce ? 0 : 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.01 : 0.6, ease: ease.outQuart, delay: 1.8 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 1.8 }}
           style={{
             fontSize: 14,
             lineHeight: 1.6,

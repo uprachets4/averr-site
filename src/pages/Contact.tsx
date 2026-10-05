@@ -95,9 +95,9 @@ function EditorialHero() {
         }}
       >
         <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart, delay: reduce ? 0 : 0.15 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 0.15 }}
           className="type-eyebrow"
           style={{ color: "var(--color-ink-soft)", marginBottom: 40 }}
         >
@@ -106,7 +106,8 @@ function EditorialHero() {
 
         <CharReveal
           text="Let's build something that earns its place."
-          delay={0.4}
+          paint
+          delay={reduce ? 0 : 0.4}
           className="type-display-l"
           style={{
             color: "var(--color-ink)",
@@ -116,11 +117,15 @@ function EditorialHero() {
           }}
         />
 
-        {/* LCP element on mobile — painted at first render, transform only */}
+        {/* LCP element on mobile. Painted from the first frame. */}
         <motion.p
-          initial={{ opacity: 1, y: reduce ? 0 : 8 }}
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
           animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
+          transition={{
+            duration: reduce ? 0 : duration.base,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 1.6,
+          }}
           className="type-body-lg"
           style={{
             color: "var(--color-ink)",
