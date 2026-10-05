@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { prefetchRoute } from "../lib/prefetchRoute";
 import {
   AnimatePresence,
   motion,
@@ -146,12 +147,14 @@ function DesktopLink({
       aria-current={current ? "page" : undefined}
       onMouseEnter={function enter() {
         setActive(true);
+        prefetchRoute(to);
       }}
       onMouseLeave={function leave() {
         setActive(false);
       }}
       onFocus={function focus(e) {
         if (e.currentTarget.matches(":focus-visible")) setActive(true);
+        prefetchRoute(to);
       }}
       onBlur={function blur() {
         setActive(false);
@@ -574,6 +577,12 @@ export default function Nav() {
                     <Link
                       to={link.to}
                       aria-current={current ? "page" : undefined}
+                      onFocus={function warm() {
+                        prefetchRoute(link.to);
+                      }}
+                      onTouchStart={function warm() {
+                        prefetchRoute(link.to);
+                      }}
                       className="type-display-l"
                       style={{
                         display: "block",
