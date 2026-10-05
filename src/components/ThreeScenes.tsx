@@ -6,6 +6,7 @@ import { CharRevealInView } from "./CharReveal";
 import MagneticCTA from "./MagneticCTA";
 import AverrMark from "./AverrMark";
 import ImageFrame from "./case-study/ImageFrame";
+import Screenshot from "./Screenshot";
 import { SCENES, SCENE_TWO_SHOTS, SCENE_THREE_SHOT } from "../data/homeScenes";
 
 const MOBILE_QUERY = "(max-width: 767px)";
@@ -240,14 +241,11 @@ function SceneTwoSlot({
           <>
             <div style={{ aspectRatio: "16 / 10", overflow: "hidden", borderRadius: 10 }}>
               <ImageFrame variant="gallery">
-                <img
+                <Screenshot
                   src={shot.src}
                   alt={shot.alt}
-                  width={1680}
-                  height={1050}
-                  loading="lazy"
-                  decoding="async"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  sizes="(min-width: 1100px) 1100px, 100vw"
+                  style={{ height: "100%", objectFit: "cover" }}
                 />
               </ImageFrame>
             </div>
@@ -356,14 +354,10 @@ function SceneThree() {
             marginRight: "auto",
           }}
         >
-          <img
+          <Screenshot
             src={SCENE_THREE_SHOT.src}
             alt={SCENE_THREE_SHOT.alt}
-            width={1680}
-            height={931}
-            loading="lazy"
-            decoding="async"
-            style={{ width: "100%", height: "auto", display: "block" }}
+            sizes="(min-width: 1100px) 1100px, 100vw"
           />
         </motion.div>
       </div>

@@ -6,6 +6,7 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
+import { WebpSource, screenshotSize } from "../Screenshot";
 import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { duration, ease, easing } from "../../lib/motion";
 import ImageFrame from "./ImageFrame";
@@ -229,36 +230,58 @@ function ZoomImage({
 
   const origin = `${(focal.x * 100).toFixed(1)}% ${(focal.y * 100).toFixed(1)}%`;
 
+  // The <img> is the animated element here, so it cannot be swapped for
+  // <Screenshot>; it sits inside a <picture> instead, with the WebP source
+  // added beside it.
+  const meta = screenshotSize(src);
+  const dims = meta ? { width: meta.w, height: meta.h } : {};
+
   if (reduce) {
-    return <img src={src} alt={alt} loading="lazy" decoding="async" style={IMG} />;
+    return (
+      <picture>
+        <WebpSource src={src} sizes={SIG_SIZES} />
+        <img src={src} alt={alt} {...dims} loading="lazy" decoding="async" style={IMG} />
+      </picture>
+    );
   }
 
   if (!desktop) {
     return (
-      <motion.img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        decoding="async"
-        initial={{ scale: 1 }}
-        whileInView={{ scale: 1.2 }}
-        viewport={{ once: true, margin: "-20%" }}
-        transition={{ duration: duration.slow * 2, ease: ease.inOut }}
-        style={{ ...IMG, transformOrigin: origin }}
-      />
+      <picture>
+        <WebpSource src={src} sizes={SIG_SIZES} />
+        <motion.img
+          src={src}
+          alt={alt}
+          {...dims}
+          loading="lazy"
+          decoding="async"
+          initial={{ scale: 1 }}
+          whileInView={{ scale: 1.2 }}
+          viewport={{ once: true, margin: "-20%" }}
+          transition={{ duration: duration.slow * 2, ease: ease.inOut }}
+          style={{ ...IMG, transformOrigin: origin }}
+        />
+      </picture>
     );
   }
 
   return (
-    <motion.img
-      src={src}
-      alt={alt}
-      loading="lazy"
-      decoding="async"
-      style={{ ...IMG, transformOrigin: origin, scale }}
-    />
+    <picture>
+      <WebpSource src={src} sizes={SIG_SIZES} />
+      <motion.img
+        src={src}
+        alt={alt}
+        {...dims}
+        loading="lazy"
+        decoding="async"
+        style={{ ...IMG, transformOrigin: origin, scale }}
+      />
+    </picture>
   );
 }
+
+/** It fills its panel and is scaled up to 1.35, so ask for the wide rung. */
+const SIG_SIZES = "(min-width: 900px) 1280px, 100vw";
 
 const IMG: React.CSSProperties = {
   position: "absolute",

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { duration, ease } from "../../lib/motion";
 import ImageFrame from "../case-study/ImageFrame";
+import Screenshot from "../Screenshot";
 import MagneticCTA from "../MagneticCTA";
 import { vault, liveCount, type VaultEntry } from "../../data/workIndex";
 
@@ -150,15 +151,13 @@ export default function WorkMobile() {
                     style={{ marginBottom: 28 }}
                   >
                     <ImageFrame variant="gallery" tone="dark">
-                      <img
+                      <Screenshot
                         src={entry.preview.src}
                         alt={entry.preview.alt}
-                        width={entry.preview.w}
-                        height={entry.preview.h}
                         loading={i === 0 ? "eager" : "lazy"}
                         fetchPriority={i === 0 ? "high" : undefined}
                         decoding={i === 0 ? "sync" : "async"}
-                        style={{ display: "block", width: "100%", height: "auto" }}
+                        sizes="92vw"
                       />
                     </ImageFrame>
                   </motion.div>

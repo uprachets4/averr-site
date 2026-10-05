@@ -11,6 +11,7 @@ import {
 import { duration, ease, easing } from "../../lib/motion";
 import { useScrollStyle } from "../../lib/useScrollStyle";
 import ImageFrame from "../case-study/ImageFrame";
+import Screenshot from "../Screenshot";
 import MagneticCTA from "../MagneticCTA";
 import { CharRevealInView } from "../CharReveal";
 import { vault, type VaultEntry } from "../../data/workIndex";
@@ -538,13 +539,10 @@ function Segment({
 function FilmImage({ entry }: { entry: VaultEntry }) {
   return (
     <ImageFrame variant="gallery" tone="dark">
-      <img
+      <Screenshot
         src={entry.preview!.src}
         alt={entry.preview!.alt}
-        width={entry.preview!.w}
-        height={entry.preview!.h}
-        decoding="async"
-        style={{ display: "block", width: "100%", height: "auto" }}
+        sizes="(min-width: 1100px) 620px, 92vw"
       />
     </ImageFrame>
   );

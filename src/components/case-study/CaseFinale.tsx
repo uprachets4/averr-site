@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import Screenshot from "../Screenshot";
 import {
   motion,
   useReducedMotion,
@@ -167,12 +168,10 @@ export default function CaseFinale({ slug }: { slug: string }) {
             }}
           >
             {hero ? (
-              <img
+              <Screenshot
                 src={hero}
                 alt={`${next.client} — next case study`}
-                loading="lazy"
-                decoding="async"
-                style={{ display: "block", width: "100%", height: "auto" }}
+                sizes="(min-width: 1100px) 1100px, 100vw"
               />
             ) : null}
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
 import { duration, ease } from "../../lib/motion";
+import { WebpSource } from "../Screenshot";
 import type { VaultEntry } from "../../data/workIndex";
 
 type Clone = {
@@ -116,6 +117,8 @@ function CloneOverlay({ clone }: { clone: Clone }) {
         }}
       />
       {/* measured pixels: the clone has to land on the viewport exactly */}
+      <picture>
+      <WebpSource src={clone.src} sizes="100vw" />
       <motion.img
         src={clone.src}
         alt=""
@@ -130,6 +133,7 @@ function CloneOverlay({ clone }: { clone: Clone }) {
         transition={{ duration: duration.base, ease: ease.inOut }}
         style={{ position: "absolute", objectFit: "contain", display: "block" }}
       />
+      </picture>
     </div>
   );
 }

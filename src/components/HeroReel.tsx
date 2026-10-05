@@ -5,6 +5,10 @@ import { ease, spring } from "../lib/motion";
 import ImageFrame from "./case-study/ImageFrame";
 import MagneticCTA from "./MagneticCTA";
 import { reelCards, type ReelCard } from "../data/heroReel";
+import Screenshot from "./Screenshot";
+
+/** Reel cards are a third of the viewport at most. */
+const REEL_SIZES = "(min-width: 900px) 640px, 70vw";
 
 const MAX_TILT = 3;
 
@@ -107,17 +111,13 @@ export function ReelCardTile({
         }}
       >
         <ImageFrame variant="gallery" tone="dark">
-          <img
+          <Screenshot
             src={card.src}
             alt={card.alt}
-            width={1680}
-            height={1050}
-            loading="lazy"
             // the h1 must stay LCP — never let a reel image outrank it
             fetchPriority="low"
-            decoding="async"
-            draggable={false}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            sizes={REEL_SIZES}
+            style={{ height: "100%", objectFit: "cover" }}
           />
         </ImageFrame>
       </div>

@@ -23,37 +23,26 @@ function splitYear(year: string) {
 }
 
 /**
- * `w`/`h` are the files' real pixel dimensions. They go on the <img> as
- * attributes so the browser can reserve the box before the bytes land —
- * without them /work shifted by 0.054 as each preview decoded.
+ * Intrinsic size is NOT repeated here — `<Screenshot>` reads it from
+ * src/data/screenshots.ts, which is generated from the files themselves.
+ * Two hand-maintained copies of the same number is how they drift.
  */
-const PREVIEWS: Record<
-  string,
-  { src: string; alt: string; w: number; h: number }
-> = {
+const PREVIEWS: Record<string, { src: string; alt: string }> = {
   "cg-walls-and-floors": {
     src: "/work/cgwalls/hero.jpg",
     alt: "CG Walls & Floors — the site's home page",
-    w: 1400,
-    h: 776,
   },
   capitalcommand: {
     src: "/work/capitalcommand/01-overview.jpg",
     alt: "CapitalCommand — the command overview dashboard",
-    w: 1680,
-    h: 930,
   },
   sift: {
     src: "/work/sift/01-command-overview.jpg",
     alt: "SIFT — the command overview dashboard",
-    w: 1680,
-    h: 926,
   },
   cadencestack: {
     src: "/work/cadencestack/01-command-center.jpg",
     alt: "CadenceStack — the command centre dashboard",
-    w: 1680,
-    h: 889,
   },
 };
 
@@ -67,7 +56,7 @@ export type VaultEntry = {
   figure?: { value: string; caption: string };
   /** Shown in the figure slot when there is no measured figure. */
   status?: string;
-  preview?: { src: string; alt: string; w: number; h: number };
+  preview?: { src: string; alt: string };
   /** The client's own accent, for the film's light. Ambient only. */
   tint?: string;
   live: boolean;

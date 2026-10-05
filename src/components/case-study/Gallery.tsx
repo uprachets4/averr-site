@@ -10,6 +10,7 @@ import {
 } from "motion/react";
 import { duration, ease, spring } from "../../lib/motion";
 import ImageFrame from "./ImageFrame";
+import Screenshot from "../Screenshot";
 
 type Item = { src: string; caption: string };
 type Tone = "light" | "dark";
@@ -322,12 +323,10 @@ function GalleryImage({
       style={{ position: "relative" }}
     >
       <ImageFrame variant="gallery" tone={onDark ? "dark" : "light"}>
-        <img
+        <Screenshot
           src={item.src}
           alt={`${client} — ${item.caption}`}
-          loading="lazy"
-          decoding="async"
-          draggable={false}
+          sizes="(min-width: 1100px) 1100px, 100vw"
         />
       </ImageFrame>
       <motion.figcaption
@@ -359,7 +358,7 @@ function GalleryImage({
 function PeekImage({ src, onDark = false }: { src: string; onDark?: boolean }) {
   return (
     <ImageFrame variant="gallery" tone={onDark ? "dark" : "light"}>
-      <img src={src} alt="" loading="lazy" decoding="async" draggable={false} />
+      <Screenshot src={src} alt="" sizes="(min-width: 1100px) 1100px, 100vw" />
     </ImageFrame>
   );
 }

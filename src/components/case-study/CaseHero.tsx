@@ -10,6 +10,7 @@ import { duration, ease, easing } from "../../lib/motion";
 import { useScrollStyle } from "../../lib/useScrollStyle";
 import type { CaseStudy } from "../../data/caseStudies";
 import ImageFrame from "./ImageFrame";
+import Screenshot from "../Screenshot";
 
 type Props = Pick<
   CaseStudy,
@@ -333,11 +334,12 @@ function ZoomCluster({
           style={{ margin: 0 }}
         >
           <ImageFrame variant="hero">
-            <img
+            <Screenshot
               src={src}
               alt={`${client} overview screen`}
               loading="eager"
-              decoding="async"
+              fetchPriority="high"
+              sizes="(min-width: 1280px) 1200px, 100vw"
             />
           </ImageFrame>
         </motion.figure>
@@ -410,12 +412,12 @@ function FrontScreen({
         boxShadow: "0 24px 60px rgba(20,20,18,0.22)",
       }}
     >
-      <img
+      <Screenshot
         src={src}
         alt={`${client} overview screen`}
         loading="eager"
-        decoding="async"
-        style={{ display: "block", width: "100%", height: "auto" }}
+        fetchPriority="high"
+        sizes="(min-width: 1280px) 1200px, 100vw"
       />
     </motion.figure>
   );
@@ -465,13 +467,8 @@ function DepthScreen({
         boxShadow: "0 14px 40px rgba(20,20,18,0.15)",
       }}
     >
-      <img
-        src={src}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        style={{ display: "block", width: "100%", height: "auto" }}
-      />
+      {/* blurred to 8px, so the smallest rung is plenty */}
+      <Screenshot src={src} alt="" sizes='640px' />
       {/* the study's own colour, so the depth reads as atmosphere */}
       <div
         style={{

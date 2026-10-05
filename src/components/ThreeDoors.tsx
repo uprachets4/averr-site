@@ -9,6 +9,7 @@ import {
 import { duration, ease, spring } from "../lib/motion";
 import LineReveal from "./LineReveal";
 import MagneticCTA from "./MagneticCTA";
+import Screenshot from "./Screenshot";
 import { DESIGN_PREVIEW_SHOTS } from "../data/homeScenes";
 import {
   GROW_METRICS,
@@ -57,6 +58,9 @@ const PANEL_MAX_H = 225;
  *  1440 without pushing the preview's clearance; the brief's range is 3-4. */
 const DOOR_SERVICE_COUNT = 4;
 
+/** A door preview is never more than ~40% of the viewport. */
+const SMALL_SIZES = "(min-width: 900px) 640px, 60vw";
+
 const EDGE_CLEARANCE = 24;
 const DRIFT = 40;
 
@@ -67,15 +71,11 @@ function DesignPreview() {
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       {DESIGN_PREVIEW_SHOTS.map(function drawShot(shot, i) {
         return (
-          <img
+          <Screenshot
             key={shot.src}
             src={shot.src}
             alt=""
-            aria-hidden
-            width={1680}
-            height={1050}
-            loading="lazy"
-            decoding="async"
+            sizes={SMALL_SIZES}
             style={{
               position: "absolute",
               width: "72%",

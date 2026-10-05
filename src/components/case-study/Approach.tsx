@@ -9,6 +9,7 @@ import { SECTIONS, eyebrowFor } from "../../data/caseSections";
 import { duration, ease } from "../../lib/motion";
 import type { ApproachLayout, Pillar } from "../../data/caseStudies";
 import ImageFrame from "./ImageFrame";
+import Screenshot from "../Screenshot";
 import { CharRevealInView } from "../CharReveal";
 import { ReadFill } from "./ReadFill";
 
@@ -509,11 +510,11 @@ function StickyFrame({
 function Shot({ entry }: { entry: Entry }) {
   if (!entry.image) return <GeometricAnchor pillar={entry.pillar} />;
   return (
-    <img
+    <Screenshot
       src={entry.image}
       alt={`${entry.pillar} approach visual`}
-      decoding="async"
-      style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+      sizes="(min-width: 1100px) 1100px, 100vw"
+      style={{ height: "100%", objectFit: "contain" }}
     />
   );
 }
@@ -547,12 +548,10 @@ function StackedBlock({
         <ImageFrame variant="gallery">
           <div style={{ position: "relative", width: "100%" }}>
             {entry.image ? (
-              <img
+              <Screenshot
                 src={entry.image}
                 alt={`${entry.pillar} approach visual`}
-                loading="lazy"
-                decoding="async"
-                style={{ width: "100%", height: "auto", display: "block" }}
+                sizes="(min-width: 1100px) 1100px, 100vw"
               />
             ) : (
               <GeometricAnchor pillar={entry.pillar} />
