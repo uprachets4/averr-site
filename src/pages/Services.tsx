@@ -4,7 +4,7 @@ import { duration, ease } from "../lib/motion";
 import { CharReveal } from "../components/CharReveal";
 import ServicesBuild from "../components/services/ServicesBuild";
 import Chapter from "../components/Chapter";
-import KickoffPicker from "../components/services/KickoffPicker";
+import KickoffPass from "../components/services/KickoffPass";
 import NoList from "../components/services/NoList";
 import ServicesCloser from "../components/services/ServicesCloser";
 import { useDeclarePageEndTone } from "../lib/pageTone";
@@ -213,7 +213,7 @@ export default function Services() {
         <NoList />
       </Chapter>
       <Chapter tone="cream-warm" from="dark">
-        <KickoffPicker />
+        <KickoffPass />
       </Chapter>
       <Chapter tone="dark" from="cream-warm">
         <ServicesCloser />

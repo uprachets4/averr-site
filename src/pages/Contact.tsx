@@ -1013,11 +1013,21 @@ function BookingBand() {
   // Cal's PrefillAndIframeAttrsConfig is an index signature of strings
   // plus a typed `layout`; building the object in one literal keeps it
   // assignable instead of widening to a union of two shapes.
+  // The pass also sends the business name as `notes`, which is the field
+  // Cal.com prefills from that param. It is never put in `name`.
+  const notes = (params.get("notes") || "").slice(0, 60).trim();
   const calConfig: React.ComponentProps<typeof Cal>["config"] = {
     layout: "month_view",
     ...(picked ? { date: picked, month: picked.slice(0, 7) } : {}),
+    ...(notes ? { notes } : {}),
   };
-  const calHref = picked ? `${CAL_FULL_URL}?date=${picked}` : CAL_FULL_URL;
+  const calHref = (function hosted() {
+    const q = new URLSearchParams();
+    if (picked) q.set("date", picked);
+    if (notes) q.set("notes", notes);
+    const s = q.toString();
+    return s ? `${CAL_FULL_URL}?${s}` : CAL_FULL_URL;
+  })();
 
   useEffect(function initCal() {
     let cancelled = false;

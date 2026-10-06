@@ -89,6 +89,10 @@
   --color-bg:         #F4F0E6;
   --color-bg-alt:     #EDE9E2;
   --color-bg-warm:    #E8E1D0;
+  /* A card lifted off the warm ground. Added in 17f for the project-start
+     pass; it is paper, not white, so it sits in the same family as
+     --color-bg rather than punching a hole in the page. */
+  --surface-elevated: #FBF9F4;
   --color-dark:       #141412;
   --color-dark-alt:   #1C1B18;
   --color-ink:        #141412;
