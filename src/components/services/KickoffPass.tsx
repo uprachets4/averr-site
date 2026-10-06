@@ -546,7 +546,11 @@ export default function KickoffPass() {
           display: block; width: 100%; min-height: 44px;
           padding: 16px 20px;
           background: var(--surface-elevated);
-          border: 1px solid var(--hair-hi);
+          /* NOT --hair-hi. Composited over the fill that is 1.47:1, which
+             fails WCAG 1.4.11's 3:1 for a control boundary. At 0.55 it is
+             4.02:1 against the fill and 3.25:1 against the warm ground
+             outside it, so the field reads as a field from either side. */
+          border: 1px solid rgba(20,20,18,0.55);
           border-radius: 12px;
           color: var(--color-ink);
           font-family: var(--font-display);
@@ -554,7 +558,7 @@ export default function KickoffPass() {
           transition: border-color ${duration.base * 1000}ms ease, box-shadow ${duration.base * 1000}ms ease;
         }
         .kp2-field__input::placeholder { color: var(--color-muted-2); }
-        .kp2-field__input:hover { border-color: rgba(20,20,18,0.34); }
+        .kp2-field__input:hover { border-color: var(--color-ink); }
         .kp2-field__input:focus-visible {
           border-color: var(--color-ink);
           box-shadow: 0 0 0 2px var(--color-bg-warm), 0 0 0 4px var(--color-ink);
@@ -575,7 +579,7 @@ export default function KickoffPass() {
         .kp2-date:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 8px; }
         .kp2-arrow {
           flex: 0 0 auto; width: 52px; height: 52px; border-radius: 50%;
-          background: var(--surface-elevated); border: 1px solid var(--hair-hi);
+          background: var(--surface-elevated); border: 1px solid rgba(20,20,18,0.55);
           color: var(--color-ink); font-size: 26px; line-height: 1; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
           transition: border-color ${duration.base * 1000}ms ease;
@@ -598,7 +602,7 @@ export default function KickoffPass() {
         .kp2-date__tag { display: block; margin-top: 6px; color: var(--color-muted); }
         .kp2-date__foot { display: flex; align-items: center; gap: 16px; margin-top: 18px; flex-wrap: wrap; position: relative; }
         .kp2-pick {
-          background: none; border: none; border-bottom: 1px solid var(--hair-hi);
+          background: none; border: none; border-bottom: 1px solid rgba(20,20,18,0.55);
           color: var(--color-ink); cursor: pointer; padding: 6px 2px; min-height: 44px; font-family: inherit;
         }
         .kp2-pick:hover:not(:disabled) { border-bottom-color: var(--color-ink); }
