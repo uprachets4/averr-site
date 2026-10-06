@@ -781,7 +781,7 @@ export function ScreenDocs({ local, compact }: AutoScreenProps) {
 
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex", background: "#fff", color: "#1B1B19", overflow: "hidden" }}>
-      <div style={{ width: 168, flex: "0 0 168px", borderRight: "1px solid rgba(27,27,25,0.09)", padding: "18px 14px" }}>
+      <div style={{ width: 196, flex: "0 0 196px", borderRight: "1px solid rgba(27,27,25,0.09)", padding: "20px 16px", background: "#FCFBF9" }}>
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(27,27,25,0.42)", marginBottom: 10 }}>
           Runbooks
         </div>
@@ -833,7 +833,54 @@ export function ScreenDocs({ local, compact }: AutoScreenProps) {
             provider accounts, the prompts and this runbook are all in your
             workspace.
           </DocSection>
+
+          <DocSection title="What it costs to run">
+            Two provider accounts, billed to you directly. At the current volume
+            the model spend sits around nine dollars a month and the automation
+            platform is on its free tier until five hundred runs.
+          </DocSection>
+
+          {/* a short change log, so the page reads like a document that has
+              been maintained rather than one screen of prose */}
+          <div style={{ marginTop: 16 }}>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 13, fontWeight: 500, marginBottom: 7 }}>Change log</div>
+            {[["v1.3", "12 Mar", "Retry limit raised to three"], ["v1.2", "02 Mar", "Budget band added to scoring"], ["v1.1", "21 Feb", "Reply tone rewritten"], ["v1.0", "14 Feb", "Handed over"]].map(([v, d, t]) => (
+              <div key={v} style={{ display: "flex", gap: 14, padding: "6px 0", borderTop: "1px solid rgba(27,27,25,0.08)" }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,27,25,0.45)", width: 34 }}>{v}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,27,25,0.45)", width: 48 }}>{d}</span>
+                <span style={{ fontSize: 13, color: "rgba(27,27,25,0.78)" }}>{t}</span>
+              </div>
+            ))}
+          </div>
         </motion.div>
+      </div>
+
+      {/* right rail — a docs site has one, and it stops the page ending in
+          800px of white */}
+      <div style={{ width: 208, flex: "0 0 208px", borderLeft: "1px solid rgba(27,27,25,0.09)", padding: "20px 16px", background: "#FCFBF9" }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,27,25,0.42)", marginBottom: 10 }}>
+          On this page
+        </div>
+        {[...TOC, "What it costs to run", "Change log"].map((t) => (
+          <div key={t} style={{ fontSize: 12.5, padding: "5px 0", color: "rgba(27,27,25,0.6)" }}>{t}</div>
+        ))}
+        <div style={{ height: 1, background: "rgba(27,27,25,0.09)", margin: "14px 0" }} />
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,27,25,0.42)", marginBottom: 10 }}>
+          Owner
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14 }}>
+          <span style={{ width: 28, height: 28, borderRadius: "50%", background: "#1F5D4C" }} />
+          <span>
+            <span style={{ display: "block", fontSize: 13, fontWeight: 600 }}>Marcus Delacroix</span>
+            <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,27,25,0.45)" }}>Northgate</span>
+          </span>
+        </div>
+        <div style={{ background: "#fff", border: "1px solid rgba(27,27,25,0.12)", borderRadius: 8, padding: 11 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 4 }}>Averr holds no keys</div>
+          <div style={{ fontSize: 12, lineHeight: 1.55, color: "rgba(27,27,25,0.6)" }}>
+            Accounts, prompts and this runbook live in your workspace.
+          </div>
+        </div>
       </div>
     </div>
   );
