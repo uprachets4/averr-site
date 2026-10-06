@@ -318,6 +318,7 @@ export default function KickoffPicker() {
             meta="by"
             prefix
             accent
+            align="end"
             reduce={!!reduce}
           />
         </div>
@@ -359,8 +360,8 @@ export default function KickoffPicker() {
         }
         .kp-chip {
           flex: 0 0 auto;
-          min-width: 62px;
-          padding: 10px 12px 12px;
+          min-width: 54px;
+          padding: 9px 8px 11px;
           border-radius: 12px;
           text-align: center;
           scroll-snap-align: center;
@@ -396,6 +397,7 @@ function Node({
   meta,
   prefix,
   accent,
+  align,
   reduce,
 }: {
   label: string;
@@ -403,14 +405,28 @@ function Node({
   meta: string;
   prefix?: boolean;
   accent?: boolean;
+  align?: "end";
   reduce: boolean;
 }) {
   return (
-    <div style={{ flex: "0 0 auto", minWidth: 0 }}>
+    <div
+      style={{
+        flex: "0 0 auto",
+        minWidth: 0,
+        textAlign: align === "end" ? "right" : "left",
+      }}
+    >
       <div className="type-eyebrow" style={{ color: "var(--color-muted)", marginBottom: 10 }}>
         {label}
       </div>
-      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          gap: 8,
+          justifyContent: align === "end" ? "flex-end" : "flex-start",
+        }}
+      >
         {prefix ? (
           <span className="type-small" style={{ color: "var(--color-muted)" }}>
             {meta}
@@ -503,11 +519,11 @@ function Segment({
       style={{
         flexGrow: flex,
         flexBasis: 0,
-        minWidth: 40,
+        minWidth: 28,
         height: 1,
         marginTop: 44,
-        marginLeft: 20,
-        marginRight: 20,
+        marginLeft: 18,
+        marginRight: 18,
         background: "rgba(20,20,18,0.14)",
         overflow: "hidden",
       }}
