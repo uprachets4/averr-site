@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~110 commits ahead of `main`** at the end of Session 17-fix — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `231f1f2` — *"17f: pass rows stack their label on a narrow card"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
-| **Doc currency** | Written at the end of Session 17f. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **HEAD** | `b51fa7d` — *"17g: the card sizes to whichever face is showing"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
+| **Doc currency** | Written at the end of Session 17g. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -25,8 +25,9 @@
 ```
 dist/index.html                    3.18 kB │ gzip:   1.40 kB  ← carries the route-chunk map
 dist/assets/index-*.css           42.09 kB │ gzip:   8.75 kB
-dist/assets/index-*.js           482.30 kB │ gzip: 152.93 kB  ← home + shell + motion
-dist/assets/Services-*.js        183.18 kB │ gzip:  45.75 kB  ← the build page + the start pass
+dist/assets/index-*.js           473.71 kB │ gzip: 150.18 kB  ← home + shell + motion
+dist/assets/Services-*.js        196.38 kB │ gzip:  49.33 kB  ← the build page + the start pass
+dist/assets/Cal.es-*.js            1.39 kB │ gzip:   0.75 kB  ← the embed, fetched on intent only
 dist/assets/CaseStudy-*.js        51.34 kB │ gzip:  12.71 kB
 dist/assets/Contact-*.js          44.67 kB │ gzip:  11.14 kB
 dist/assets/Work-*.js             22.49 kB │ gzip:   6.80 kB
@@ -434,6 +435,70 @@ The **pass** is a 560px card on the new `--surface-elevated` token with a three-
 
 **Deviations.** `--surface-elevated` **did not exist** — I added it to `index.css` as `#FBF9F4`, paper rather than white, so the card sits in the same family as `--color-bg`. The "mid-typing" screenshot is the **completed** state rather than a true mid-keystroke frame; the stamp moment and mid-typing are therefore one capture, not two.
 
+**17g** `267c248` … `b51fa7d` — **A guided conversation, an obvious date control, and a pass that confirms.** Five commits.
+
+*Owner audit of 17f:* the name question was missed — a faint mono label over a pale underline reads as a caption, not an action; the date wheel could not be changed by clicking; the call is 30 minutes; and a booked pass should show the booked time.
+
+### Pre-flight
+
+| | |
+|---|---|
+| Booking event | **`bookingSuccessfulV2`**. Only **`startTime`** is read. The deprecated `bookingSuccessful` carries `organizer.name` and `.email`; V2 carries **no attendee identity at all**, which is why it is used. |
+| Modal | `cal("modal", { calLink, config })`, taking the same `date` / `month` / `notes` prefill. |
+| Loader | The embed is **dynamic-imported on first intent**. It is now its own **1.39 kB** chunk and `app.cal.com` is not contacted until hover, focus or click — **measured: 0 cal.com requests before the CTA, 87 after.** |
+| "20" mentions | **Six**, all corrected (below). |
+
+### 1 · Thirty minutes, site-wide
+
+| File | Before → after |
+|---|---|
+| `ServicesCloser.tsx:97` | "Twenty minutes, no deck" → **"Thirty minutes, no deck"** |
+| `servicesProcess.ts:39` | "20 minutes. No slide deck." → **"30 minutes."** |
+| `KickoffPass.tsx` | `meta="20 min"` → **`"30 min"`** |
+| `ComingSoon.tsx:110` | "a 20-minute call" → **"a 30-minute call"** |
+| `Contact.tsx:1096` | "Book a 20-minute intro call." → **"30-minute"** |
+| `businessDays.ts:178` | the doc comment naming the facts |
+
+**Zero remaining.** This closes the owner item 17f opened.
+
+### 2 · The conversation
+
+Each step carries a mono "STEP n OF 2" over the question at **`type-h3` in ink**, never the muted token — measured at **14.15:1**. The name input is a real field: elevated fill, 12px radius, `type-h2` text at **17.53:1**, a 2px focus ring, **93px tall**. An animated placeholder types and deletes three example names with a blinking caret once the section is in view, **stops the moment the field is focused**, and is replaced by a static placeholder under reduced motion. Nothing is autofocused. At ≥2 characters Step 1 takes a tick and dims to 0.62 while Step 2 goes to full emphasis — **Step 2 is never locked.** The pass's empty name slot carries a **pulsing dashed outline** until a name is typed, so both columns point at the same first action.
+
+### 3 · The date control
+
+Centre day at `type-display-l` with **52px arrows**, clickable dimmed neighbours, swipe, arrow keys, Home/End, and a **month popover** (this month and next, past days disabled, Escape and outside-click close with focus returned to the trigger). Range **today → +60 days**. Weekends and holidays are named on the day itself.
+
+| | |
+|---|---|
+| initial | Tuesday, Oct 6 · **Today** |
+| next arrow | Wednesday, Oct 7 |
+| neighbour click | Thursday, Oct 8 |
+| ArrowRight | Friday, Oct 9 |
+| End | Saturday, Dec 5 · **Weekend call** |
+| Home | Tuesday, Oct 6 |
+| popover | 31 days, 5 disabled, October 2026; Escape returns focus to "Pick another date" |
+
+### 4 · In-page booking
+
+The CTA opens the Cal modal. **Measured end to end:** `/embed?layout=month_view&date=2026-10-07&month=2026-10&notes=Northgate+Renovations&embedType=modal` — the chosen day preselected and the business name in notes. Embed failure falls back to `/contact?date=…&notes=…`; /contact is unchanged.
+
+### 5 · Booked → CONFIRMED
+
+A 180° `rotateY` flip (instant under reduced motion — `transform: none` measured) to a back face carrying **"Wed, Oct 7 · 2:30 PM ET · 30 MIN"**, the proposal and kickoff **recomputed from the booked day** (Oct 7 → proposal Tue Oct 13, past Thanksgiving; kickoff Wed Oct 21), the inbox line, a green CONFIRMED stamp, and aria-live **"Booked: Wednesday, October 7 at 2:30 PM Eastern."** The CTA becomes a quiet "Book another call" and the date control is disabled showing "Booked: Wed, Oct 7".
+
+**Verified with a simulated event, not a real booking.** `?simulateBooking=<ISO>` sets component state and nothing else — no request, no storage. **It is reachable on a deployment when typed by hand**, which is a deliberate trade so the flip could be verified on the alias; the dev-only `CustomEvent` path exists too. See §7.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · Q1 **14.15:1**, input text **17.53:1**, field outline composited **4.02:1** against the fill and **3.25:1** against the warm ground · animated placeholder runs, stops on focus, absent under reduced motion · pulsing slot before typing · step progression with tick · date control by arrow, neighbour, keyboard, Home/End and popover · range limits · weekend and holiday labels · **0 cal.com requests before intent** · modal on the selected date with notes · the flip in both motion modes · mobile 375: **no control under 44px**, minimum font **13px**, field full-width, **zero overflow** · **crash scroll 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2336 ms, home 1876 ms**, CLS 0.001/0.000 · **12 date tests passing**.
+
+*Three faults the screenshots caught, not the numbers.* **The booking CTA was 700px below the fold** in the empty state: `.kp2-pass` sets `position: relative` later in the same stylesheet at the same specificity, so it beat `.kp2-face--back`, the back face sat in normal flow and the card measured 1267px instead of 613. Then **the CONFIRMED stamp and barcode were clipped** — the back face is taller than the front, and `inset: 0` clipped it to the front's height; the face that is NOT showing is now the one taken out of flow. And **a confirmed pass was still pulsing the dashed "fill this in" slot** when no name had been typed.
+
+*One measurement error of mine, reported:* I first read the field outline as 17.53:1 by substituting alpha 1 into the `rgba` — that measures the ink, not the border. Composited properly, `--hair-hi` is **1.47:1** and fails WCAG 1.4.11; the border is now `rgba(20,20,18,0.55)`.
+
+**Deviations.** There is **no `--border` token** — §5.23 records that `--color-border` does not exist — and `--hair-hi` fails 3:1, so the field, the arrows and the "pick another date" control use a literal `rgba(20,20,18,0.55)`. The eyebrow remains **`//_05 · TRY IT`** rather than bare "TRY IT", keeping the site's `//_NN ·` section convention. And the simulated-booking harness is reachable in production via an explicit query param, as above.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -496,7 +561,7 @@ One continuous pinned scene. A generic GTA home-services business (**Northgate**
 | 1 | `BuildHero` | Eyebrow counts `SERVICE_COUNT`; h1 "Watch us build *your* business." on one `CharReveal`; scroll cue |
 | 2 | `ServicesBuild` | **The stage.** 16 beats + 2 chapter transitions on one pin |
 | 3 | `Chapter dark from cream` → `NoList` | unchanged |
-| 4 | `Chapter cream-warm from dark` → `KickoffPass` | **17f**: "Your project start pass" — name + 28-day wheel building a live boarding pass; weekends bookable, Ontario stat holidays in the count |
+| 4 | `Chapter cream-warm from dark` → `KickoffPass` | **17g**: guided two-step conversation (visible name field + live typing hint, arrows/neighbours/month popover) building a live boarding pass; in-page Cal.com modal; flips to CONFIRMED on a real booking |
 | 5 | `Chapter dark from cream-warm` → `ServicesCloser` | `useDeclarePageEndTone("dark")` |
 
 **Slot model.** Beats are not evenly spaced, so scroll maps onto SLOTS, not beats: 5 Design beats at 65vh, an 80vh transition, 5 Automate beats, an 80vh transition, 6 Grow beats. **Travel 1200vh, wrapper 1300vh** (the n+1 rule, §5.4). Per beat: caption in 0–0.15, screen builds 0.05–0.40, **dwell 0.40–0.85**, caption out 0.85–1.00. One continuous float drives caption, canvas and rail.
@@ -646,7 +711,13 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **37 · "+3 business days" needs two anchors, not one.** *Cause:* counting from the first business day on or after the call makes a Saturday call land a day LATER than the Monday after it. *Fix:* a call on a business day counts from the day after; a call on a weekend or holiday counts the following business day as day one. Saturday → Wednesday, Monday → Thursday. Unit tested both ways.
 
-**38 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
+**38 · Two single-class selectors, later wins — and it silently moved a CTA off the page.** *Cause:* `.kp2-face--back { position: absolute }` was declared before `.kp2-pass { position: relative }` in the same `<style>` block. Equal specificity, so the later rule won, the back face sat in normal flow, the card measured twice its height and the booking CTA ended 700px below the fold. *Fix:* compound selectors (`.kp2-pass.kp2-face--back`). **In a component-scoped `<style>` block, order is the only thing separating two single-class rules; make the one that must win compound.**
+
+**39 · A flipped card must size to the face that is showing.** *Cause:* with the back face `position: absolute; inset: 0`, it is clipped to the FRONT face's height. The back was taller, so the CONFIRMED stamp and barcode were cut off. *Fix:* take the hidden face out of flow instead of always the back one.
+
+**40 · Compositing matters when measuring a border's contrast.** *Cause:* reading `rgba(20,20,18,0.18)` as if it were opaque reports 17.5:1 — the ink's contrast, not the border's. Composited over the fill it is **1.47:1**, failing WCAG 1.4.11's 3:1 for a control boundary. *Fix:* composite `fg·α + bg·(1−α)` first, and check against BOTH adjacent colours (the fill inside and the page ground outside).
+
+**41 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
 
 ---
 
@@ -714,7 +785,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 9. **Full mobile review** — automated checks confirm zero overflow, but no human pass has been done on a real device. The Session 17 stacked stills are no longer a concern here: **Prachets ruled the ~6px Automate labels a defect, and 17-fix-2 replaced that still below 900px with a purpose-built vertical composition** — five nodes on a straight vertical path, every label at real `type-eyebrow` size. Design and Grow still scale, and both were checked as readable at 375.
 10. ~~**`/work`'s LCP image.**~~ **APPROVED and DONE in 19-pre-2.** Prachets ruled that resized derivatives of existing screenshots are not new assets, so rule 11 does not apply. `/work` is 2320 ms.
 11. **Prerendering the shell — deferred to the Ship pass by Prachets.** First contentful paint is 1.64–1.86 s on every route because nothing paints until 152 kB of JS downloads and React mounts. Static-rendering each route's hero into its HTML would put LCP near first byte. Build-pipeline decision, not a page change.
-12. **The Cal.com event is 30 minutes; the site says 20.** Every surface — the pass, `STEPS`, the closer — promises "20 minutes", and the live `prachets/discoverycall` event is **"Discovery Call 30m"**. The pass prints 20 MIN on a boarding-pass-styled artefact, which makes the mismatch far more prominent than it was. **Either shorten the Cal event to 20m or change the copy to 30.** Not actionable without the owner.
+12. **The `?simulateBooking=<ISO>` harness is reachable in production.** It sets component state so the pass shows the CONFIRMED face — no request, no storage, nothing server-side, and it affects only the browser that types it. It exists because the flip had to be verified on the alias, where a dev-only build flag does not apply. **Say the word and it becomes dev-only, at the cost of never verifying the confirmed state on a deployment again.**
 13. **Weekend bookability now depends on the Cal.com availability schedule.** The pass offers Saturday and Sunday, and both showed slots when checked — but if the schedule is ever narrowed to weekdays, the page will offer a day the booking page refuses. **Keep weekend availability on, or tell me to grey weekends out again.**
 14. **The holiday table ends after 2027.** `businessDays.ts` covers 2026–2027; past that the proposal count silently degrades to weekends only. `holidayCoverageEndsAfter` exists so a future session can assert on it.
 15. **Six /services screens are still over the ~15% blank target** (largest flat rectangle as a share of the window, measured at 1680 / 1440): **Reporting 28.8 / 30**, **Brand & design direction 24.2 / 24.2**, **Human review built in 21.9 / 12.2**, **Paid ads 20 / 22.5**, **Product & SaaS interfaces 18.8 / 18.8**, **Design systems 18.3 / 18.3**, **Landing pages 16.4 / 16.4**. Type and legibility are met everywhere (base 13px, min 11px); these are composition density only. Each needs the same treatment the other eight got — content that reaches the bottom of the window, or panes that stretch rather than sit at their natural height.
@@ -733,7 +804,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **Needs the photo.**
 - ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`).
 - ~~**Session 19-pre-2 — Prachets's four rulings.**~~ **DONE** (`e521774` … `895313d`). **All eleven routes under 2.5 s.** See §2.
-- ~~**Session 17f — "Your project start pass".**~~ **DONE** (`b6ea58f` … `231f1f2`). Weekends bookable, Ontario stat holidays in the business-day count, kickoff clipping fixed. **Two owner items — §7.12 (20 vs 30 min) and §7.13 (weekend availability).**
+- ~~**Session 17g — guided conversation + in-page booking.**~~ **DONE** (`267c248` … `b51fa7d`). The call is 30 minutes site-wide, the name field is unmissable, the date control is obvious, booking happens in a modal and the pass flips to CONFIRMED. **One owner item — §7.13 (weekend availability).**
+- ~~**Session 17f — "Your project start pass".**~~ **DONE** (`b6ea58f` … `231f1f2`). Weekends bookable, Ontario stat holidays in the business-day count, kickoff clipping fixed.
 - ~~**Session 17e — /services kickoff section.**~~ **DONE** (`aae26c8` … `ccd4c1f`). The 14-day calendar is an interactive personal timeline; `KickoffCalendar` removed.
 - ~~**Session 17d — /services quality + two site-wide fixes.**~~ **DONE** (`608a0c6` … `d925553`). Captions, spotlight, density, nav CTA, ledger, hero CTAs. **Six screens remain over the blank target — §7.12.**
 - **Session 19 — /contact.** After the recording.
