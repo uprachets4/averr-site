@@ -372,6 +372,13 @@ export default function KickoffPicker() {
           align-items: flex-start;
           gap: 0;
         }
+        .kp-node { text-align: left; }
+        .kp-node__row { justify-content: flex-start; }
+        /* flush right only while the three sit on one line */
+        @media (min-width: 901px) {
+          .kp-node--end { text-align: right; }
+          .kp-node--end .kp-node__row { justify-content: flex-end; }
+        }
         @media (max-width: 900px) {
           .kp-result { flex-direction: column; align-items: stretch; gap: 18px; }
           .kp-chip { min-width: 56px; }
@@ -379,9 +386,11 @@ export default function KickoffPicker() {
              nodes rather than sitting as a stray 1px line */
           .kp-seg {
             flex-grow: 0 !important;
-            width: 1px;
-            height: 22px !important;
+            width: 2px;
+            height: 26px !important;
             margin: 0 0 0 3px !important;
+            border-radius: 2px;
+            background: rgba(20,20,18,0.2) !important;
           }
         }
       `}</style>
@@ -410,23 +419,13 @@ function Node({
 }) {
   return (
     <div
-      style={{
-        flex: "0 0 auto",
-        minWidth: 0,
-        textAlign: align === "end" ? "right" : "left",
-      }}
+      className={align === "end" ? "kp-node kp-node--end" : "kp-node"}
+      style={{ flex: "0 0 auto", minWidth: 0 }}
     >
       <div className="type-eyebrow" style={{ color: "var(--color-muted)", marginBottom: 10 }}>
         {label}
       </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "baseline",
-          gap: 8,
-          justifyContent: align === "end" ? "flex-end" : "flex-start",
-        }}
-      >
+      <div className="kp-node__row" style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
         {prefix ? (
           <span className="type-small" style={{ color: "var(--color-muted)" }}>
             {meta}
