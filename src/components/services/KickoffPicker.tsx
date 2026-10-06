@@ -420,8 +420,12 @@ function Node({
           className={accent ? "type-h2 type-accent" : "type-h2"}
           style={{ color: "var(--color-ink)", whiteSpace: "nowrap" }}
         >
-          {weekdayShort(date)}{" "}
-          <Odometer value={dayOfMonth(date)} reduce={reduce} />
+          {/* The odometer is a column of all ten glyphs, so it is hidden
+              from assistive tech and the real date is given here. */}
+          <span className="sr-only">{longLabel(date)}</span>
+          <span aria-hidden>
+            {weekdayShort(date)} <Odometer value={dayOfMonth(date)} reduce={reduce} />
+          </span>
         </span>
       </div>
       <div className="type-small" style={{ color: "var(--color-muted)", marginTop: 6 }}>
