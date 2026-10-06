@@ -84,7 +84,7 @@ export function ScreenAudit({ local, compact }: AutoScreenProps) {
         </div>
         {TASKS.map(([n, h, a]) => (
           <div key={n} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderTop: "1px solid rgba(36,27,18,0.08)" }}>
-            <span style={{ flex: 1, fontSize: 12 }}>{n}</span>
+            <span style={{ flex: 1, fontSize: 13 }}>{n}</span>
             <span style={{ fontSize: MIN, fontFamily: "var(--font-mono)", color: "rgba(36,27,18,0.6)" }}>{h}h</span>
             {a && on ? (
               <span style={{ fontSize: MIN, background: "rgba(194,100,31,0.14)", color: WARM, borderRadius: 999, padding: "2px 8px" }}>auto</span>
@@ -100,13 +100,13 @@ export function ScreenAudit({ local, compact }: AutoScreenProps) {
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <div>
           <div style={{ fontSize: 15, fontWeight: 600 }}>Where the week goes</div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(36,27,18,0.5)", marginTop: 2 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(36,27,18,0.5)", marginTop: 2 }}>
             Northgate · office hours · last 4 weeks
           </div>
         </div>
         <span style={{ flex: 1 }} />
         <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 10.5, color: "rgba(36,27,18,0.66)" }}>Show automatable</span>
+          <span style={{ fontSize: 13, color: "rgba(36,27,18,0.66)" }}>Show automatable</span>
           <span style={{ width: 34, height: 19, borderRadius: 999, background: on ? WARM : "rgba(36,27,18,0.18)", position: "relative", transition: "background 240ms ease" }}>
             <span style={{ position: "absolute", top: 2, left: on ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", transition: "left 240ms cubic-bezier(0.25,1,0.5,1)" }} />
           </span>
@@ -119,12 +119,12 @@ export function ScreenAudit({ local, compact }: AutoScreenProps) {
           <div style={{ display: "grid", gridTemplateColumns: `34px repeat(${HOURS.length}, 1fr)`, gap: 3, marginBottom: 4 }}>
             <span />
             {HOURS.map((h) => (
-              <span key={h} style={{ fontFamily: "var(--font-mono)", fontSize: 8, color: "rgba(36,27,18,0.38)", textAlign: "center" }}>{h}</span>
+              <span key={h} style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(36,27,18,0.38)", textAlign: "center" }}>{h}</span>
             ))}
           </div>
           {DAYS.map((d, r) => (
             <div key={d} style={{ display: "grid", gridTemplateColumns: `34px repeat(${HOURS.length}, 1fr)`, gap: 3, marginBottom: 3 }}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(36,27,18,0.5)", lineHeight: "22px" }}>{d}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(36,27,18,0.5)", lineHeight: "22px" }}>{d}</span>
               {HOURS.map((_, c) => {
                 const v = HEAT[r][c];
                 const auto = AUTO_CELLS.has(`${r}-${c}`);
@@ -146,7 +146,7 @@ export function ScreenAudit({ local, compact }: AutoScreenProps) {
               })}
             </div>
           ))}
-          <div style={{ display: "flex", gap: 14, marginTop: 10, fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(36,27,18,0.45)" }}>
+          <div style={{ display: "flex", gap: 14, marginTop: 10, fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(36,27,18,0.45)" }}>
             <span>■ admin</span>
             <span style={{ color: WARM }}>■ automatable</span>
           </div>
@@ -155,24 +155,24 @@ export function ScreenAudit({ local, compact }: AutoScreenProps) {
         {/* tasks + total */}
         <div style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
           <div style={{ background: "#fff", border: "1px solid rgba(36,27,18,0.12)", borderRadius: 10, padding: 13, marginBottom: 12 }}>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(36,27,18,0.45)" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(36,27,18,0.45)" }}>
               Automatable
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 5 }}>
               <span style={{ fontSize: 30, fontWeight: 600, color: WARM, letterSpacing: "-0.02em" }}>{hours}h</span>
-              <span style={{ fontSize: 10.5, color: "rgba(36,27,18,0.5)" }}>/ week</span>
+              <span style={{ fontSize: 13, color: "rgba(36,27,18,0.5)" }}>/ week</span>
             </div>
-            <div style={{ fontSize: 9.5, color: "rgba(36,27,18,0.5)", marginTop: 4 }}>
+            <div style={{ fontSize: 13, color: "rgba(36,27,18,0.5)", marginTop: 4 }}>
               of 17.5h logged on admin
             </div>
           </div>
           {TASKS.map(([n, h, a]) => (
             <div key={n} style={{ display: "flex", alignItems: "center", gap: 9, padding: "7px 0", borderTop: "1px solid rgba(36,27,18,0.08)" }}>
-              <span style={{ flex: 1, fontSize: 10.5 }}>{n}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: "rgba(36,27,18,0.62)" }}>{h}h</span>
+              <span style={{ flex: 1, fontSize: 13 }}>{n}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(36,27,18,0.62)" }}>{h}h</span>
               <span style={{ width: 40, textAlign: "right" }}>
                 {a ? (
-                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 8, background: on ? "rgba(194,100,31,0.16)" : "rgba(36,27,18,0.06)", color: on ? WARM : "rgba(36,27,18,0.4)", borderRadius: 999, padding: "2px 7px", transition: "all 300ms ease" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, background: on ? "rgba(194,100,31,0.16)" : "rgba(36,27,18,0.06)", color: on ? WARM : "rgba(36,27,18,0.4)", borderRadius: 999, padding: "2px 7px", transition: "all 300ms ease" }}>
                     auto
                   </span>
                 ) : null}
@@ -227,7 +227,7 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
       <div style={{ position: "absolute", inset: 0, background: NAVY, color: "#DCE6F5", padding: 16, overflow: "hidden" }}>
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Lead intake agent</div>
         <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 9, padding: 12, marginBottom: 12 }}>
-          <div style={{ fontSize: 12, fontWeight: 600 }}>Priya Raghunathan</div>
+          <div style={{ fontSize: 13, fontWeight: 600 }}>Priya Raghunathan</div>
           <div style={{ fontSize: MIN, color: "rgba(220,230,245,0.6)", marginTop: 3 }}>
             Oshawa L1J 2K8 · Basement finishing · Full basement
           </div>
@@ -237,7 +237,7 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
             <span style={{ width: 17, height: 17, borderRadius: "50%", background: i <= step ? "#3FD08A" : "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: MIN, lineHeight: 1, color: NAVY }}>
               {i <= step ? "✓" : ""}
             </span>
-            <span style={{ flex: 1, fontSize: 12 }}>{n}</span>
+            <span style={{ flex: 1, fontSize: 13 }}>{n}</span>
             <span style={{ fontSize: MIN, fontFamily: "var(--font-mono)", color: ACC }}>{i <= step ? d : ""}</span>
           </div>
         ))}
@@ -283,7 +283,7 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
             const active = i === step + 1 && step < STEPS.length - 1;
             return (
               <div key={n} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0" }}>
-                <span style={{ width: 22, height: 22, borderRadius: "50%", background: done ? "#3FD08A" : "transparent", border: done ? "none" : `1.5px solid ${active ? ACC : "rgba(255,255,255,0.18)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: NAVY, flex: "0 0 22px" }}>
+                <span style={{ width: 22, height: 22, borderRadius: "50%", background: done ? "#3FD08A" : "transparent", border: done ? "none" : `1.5px solid ${active ? ACC : "rgba(255,255,255,0.18)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: NAVY, flex: "0 0 22px" }}>
                   {done ? "✓" : ""}
                 </span>
                 <span style={{ flex: 1, fontSize: 13, color: done ? "#DCE6F5" : "rgba(220,230,245,0.45)" }}>{n}</span>
@@ -301,7 +301,7 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
           </div>
           {SOURCES.map(([n, d], i) => (
             <div key={n} style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, padding: "7px 0", borderTop: i ? "1px solid rgba(255,255,255,0.06)" : "none", opacity: step >= 1 ? 1 : 0.25, transition: "opacity 400ms ease" }}>
-              <span style={{ fontSize: 12.5 }}>{n}</span>
+              <span style={{ fontSize: 13 }}>{n}</span>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(220,230,245,0.5)", textAlign: "right" }}>{d}</span>
             </div>
           ))}
@@ -331,7 +331,7 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
           </div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 600 }}>Fit score</div>
-            <div style={{ fontSize: 12.5, color: "rgba(220,230,245,0.6)", marginTop: 4, lineHeight: 1.55 }}>
+            <div style={{ fontSize: 13, color: "rgba(220,230,245,0.6)", marginTop: 4, lineHeight: 1.55 }}>
               In service area, budget band matches, job type we take.
             </div>
           </div>
@@ -445,7 +445,7 @@ export function ScreenCanvas({ local, compact }: AutoScreenProps) {
             <span style={{ width: 22, height: 22, borderRadius: 6, background: "#fff", border: "1px solid rgba(29,34,32,0.14)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <NodeIcon i={i} />
             </span>
-            <span style={{ flex: 1, fontSize: 12, background: "#fff", border: "1px solid rgba(29,34,32,0.12)", borderRadius: 7, padding: "8px 11px" }}>{n}</span>
+            <span style={{ flex: 1, fontSize: 13, background: "#fff", border: "1px solid rgba(29,34,32,0.12)", borderRadius: 7, padding: "8px 11px" }}>{n}</span>
           </div>
         ))}
         <div style={{ marginTop: 12, background: "#fff", border: "1px solid rgba(29,34,32,0.12)", borderRadius: 8, padding: 11 }}>
@@ -544,7 +544,7 @@ export function ScreenCanvas({ local, compact }: AutoScreenProps) {
           {LOG.map(([t, m], i) => (
             <div key={m} style={{ display: "flex", gap: 11, padding: "4px 0", opacity: i < lines ? 1 : 0.18, transition: "opacity 260ms ease" }}>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(29,34,32,0.45)" }}>{t}</span>
-              <span style={{ fontSize: 12.5 }}>{m}</span>
+              <span style={{ fontSize: 13 }}>{m}</span>
             </div>
           ))}
         </div>
@@ -652,7 +652,7 @@ export function ScreenInbox({ local, compact }: AutoScreenProps) {
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 3 }}>Awaiting your approval</div>
         <div style={{ fontSize: MIN, color: "rgba(28,33,38,0.55)", marginBottom: 13 }}>6 drafts · agent-written</div>
         <div style={{ border: "1px solid rgba(28,33,38,0.12)", borderRadius: 9, padding: 12 }}>
-          <div style={{ fontSize: 12, fontWeight: 600 }}>{DRAFTS[0][0]}</div>
+          <div style={{ fontSize: 13, fontWeight: 600 }}>{DRAFTS[0][0]}</div>
           <div style={{ fontSize: MIN, color: "rgba(28,33,38,0.55)", marginBottom: 9 }}>{DRAFTS[0][1]}</div>
           <div style={{ fontSize: MIN + 0.5, lineHeight: 1.6 }}>
             We can usually get out for an estimate{" "}
@@ -679,8 +679,8 @@ export function ScreenInbox({ local, compact }: AutoScreenProps) {
               <span style={{ fontSize: 13, fontWeight: 600, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{n}</span>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(28,33,38,0.42)" }}>{t}</span>
             </div>
-            <div style={{ fontSize: 12, color: "rgba(28,33,38,0.7)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: 3 }}>{sub}</div>
-            <div style={{ fontSize: 11.5, color: "rgba(28,33,38,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: 2 }}>{prev}</div>
+            <div style={{ fontSize: 13, color: "rgba(28,33,38,0.7)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: 3 }}>{sub}</div>
+            <div style={{ fontSize: 13, color: "rgba(28,33,38,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: 2 }}>{prev}</div>
           </div>
         ))}
       </div>
@@ -730,7 +730,7 @@ export function ScreenInbox({ local, compact }: AutoScreenProps) {
       <motion.div
         animate={{ opacity: sent ? 1 : 0, y: sent ? 0 : 10 }}
         transition={{ duration: 0.28 }}
-        style={{ position: "absolute", right: 18, bottom: 16, background: "#1C2126", color: "#fff", borderRadius: 9, padding: "11px 16px", fontSize: 12.5, boxShadow: "0 12px 26px rgba(28,33,38,0.28)" }}
+        style={{ position: "absolute", right: 18, bottom: 16, background: "#1C2126", color: "#fff", borderRadius: 9, padding: "11px 16px", fontSize: 13, boxShadow: "0 12px 26px rgba(28,33,38,0.28)" }}
       >
         Sent · approved by you
       </motion.div>
@@ -759,7 +759,7 @@ export function ScreenDocs({ local, compact }: AutoScreenProps) {
         </div>
         <div style={{ fontSize: MIN, color: "rgba(27,27,25,0.5)", marginBottom: 14 }}>Last updated 12 Mar · Marcus</div>
         {TOC.map((t) => (
-          <div key={t} style={{ fontSize: 12, padding: "8px 0", borderTop: "1px solid rgba(27,27,25,0.09)", fontWeight: t === "How to pause it" && jumped ? 600 : 400 }}>
+          <div key={t} style={{ fontSize: 13, padding: "8px 0", borderTop: "1px solid rgba(27,27,25,0.09)", fontWeight: t === "How to pause it" && jumped ? 600 : 400 }}>
             {t}
           </div>
         ))}
@@ -776,17 +776,17 @@ export function ScreenDocs({ local, compact }: AutoScreenProps) {
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex", background: "#fff", color: "#1B1B19", overflow: "hidden" }}>
       <div style={{ width: 168, flex: "0 0 168px", borderRight: "1px solid rgba(27,27,25,0.09)", padding: "18px 14px" }}>
-        <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(27,27,25,0.42)", marginBottom: 10 }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(27,27,25,0.42)", marginBottom: 10 }}>
           Runbooks
         </div>
         {["Lead intake agent", "Quote follow-ups", "Review requests", "Invoice chasing"].map((t, i) => (
-          <div key={t} style={{ fontSize: 10.5, padding: "5px 7px", borderRadius: 5, background: i === 0 ? "rgba(27,27,25,0.06)" : "transparent", fontWeight: i === 0 ? 600 : 400, marginBottom: 1 }}>
+          <div key={t} style={{ fontSize: 13, padding: "5px 7px", borderRadius: 5, background: i === 0 ? "rgba(27,27,25,0.06)" : "transparent", fontWeight: i === 0 ? 600 : 400, marginBottom: 1 }}>
             {t}
           </div>
         ))}
         <div style={{ height: 1, background: "rgba(27,27,25,0.09)", margin: "12px 0" }} />
         {TOC.map((t) => (
-          <div key={t} style={{ fontSize: 10, padding: "4px 7px", color: jumped && t === "How to pause it" ? "#1B1B19" : "rgba(27,27,25,0.55)", fontWeight: jumped && t === "How to pause it" ? 600 : 400, borderLeft: jumped && t === "How to pause it" ? "2px solid #1F5D4C" : "2px solid transparent" }}>
+          <div key={t} style={{ fontSize: 13, padding: "4px 7px", color: jumped && t === "How to pause it" ? "#1B1B19" : "rgba(27,27,25,0.55)", fontWeight: jumped && t === "How to pause it" ? 600 : 400, borderLeft: jumped && t === "How to pause it" ? "2px solid #1F5D4C" : "2px solid transparent" }}>
             {t}
           </div>
         ))}
@@ -797,7 +797,7 @@ export function ScreenDocs({ local, compact }: AutoScreenProps) {
           <div style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 500, letterSpacing: "-0.025em", marginBottom: 5 }}>
             Lead intake agent: runbook
           </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,27,25,0.45)", marginBottom: 16 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,27,25,0.45)", marginBottom: 16 }}>
             Last updated 12 Mar 2026 · Marcus Delacroix · v1.3
           </div>
 
@@ -814,8 +814,8 @@ export function ScreenDocs({ local, compact }: AutoScreenProps) {
           </DocSection>
 
           <div style={{ background: jumped ? "rgba(240,180,41,0.18)" : "#FAF9F6", borderLeft: "3px solid #E0A63A", borderRadius: 7, padding: "12px 14px", margin: "14px 0", transition: "background 340ms ease" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>How to pause it</div>
-            <div style={{ fontSize: 10.5, lineHeight: 1.65, color: "rgba(27,27,25,0.78)" }}>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>How to pause it</div>
+            <div style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(27,27,25,0.78)" }}>
               Settings → Automations → Lead intake → <strong>Pause</strong>. Drafts
               already queued stay queued and can still be approved by hand. Resuming
               does not replay missed submissions — they are in the CRM either way.
@@ -837,14 +837,14 @@ function DocSection({ title, children }: { title: string; children: React.ReactN
   return (
     <div style={{ marginBottom: 14 }}>
       <div style={{ fontFamily: "var(--font-display)", fontSize: 13, fontWeight: 500, marginBottom: 5 }}>{title}</div>
-      <div style={{ fontSize: 10.5, lineHeight: 1.7, color: "rgba(27,27,25,0.76)" }}>{children}</div>
+      <div style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(27,27,25,0.76)" }}>{children}</div>
     </div>
   );
 }
 
 function Code({ children }: { children: React.ReactNode }) {
   return (
-    <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, background: "rgba(27,27,25,0.07)", borderRadius: 4, padding: "1px 5px" }}>
+    <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, background: "rgba(27,27,25,0.07)", borderRadius: 4, padding: "1px 5px" }}>
       {children}
     </span>
   );

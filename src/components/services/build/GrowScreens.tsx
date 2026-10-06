@@ -71,7 +71,7 @@ export function ScreenMap({ local, compact }: P) {
           <div key={b.name} style={{ display: "flex", gap: 10, alignItems: "center", padding: "9px 0", borderTop: i ? "1px solid rgba(27,34,32,0.08)" : "none", background: b.me ? "rgba(31,93,76,0.07)" : "transparent", borderRadius: b.me ? 7 : 0, paddingLeft: b.me ? 8 : 0 }}>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: MIN, color: "rgba(27,34,32,0.45)", width: 14 }}>{i + 1}</span>
             <span style={{ flex: 1 }}>
-              <span style={{ display: "block", fontSize: 12, fontWeight: b.me ? 600 : 400 }}>{b.name}</span>
+              <span style={{ display: "block", fontSize: 13, fontWeight: b.me ? 600 : 400 }}>{b.name}</span>
               <span style={{ display: "block", fontSize: MIN, color: "rgba(27,34,32,0.55)" }}>
                 ★ {b.rating} · {b.me ? reviews : b.reviews} reviews
               </span>
@@ -87,11 +87,11 @@ export function ScreenMap({ local, compact }: P) {
       {/* results panel */}
       <div style={{ width: "38%", flex: "0 0 38%", background: "#fff", borderRight: "1px solid rgba(27,34,32,0.1)", display: "flex", flexDirection: "column", minHeight: 0 }}>
         <div style={{ padding: "12px 14px", borderBottom: "1px solid rgba(27,34,32,0.08)" }}>
-          <div style={{ background: "#F2F1ED", borderRadius: 999, padding: "8px 13px", fontSize: 10.5, color: "rgba(27,34,32,0.7)", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ background: "#F2F1ED", borderRadius: 999, padding: "8px 13px", fontSize: 13, color: "rgba(27,34,32,0.7)", display: "flex", alignItems: "center", gap: 8 }}>
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.6" stroke="rgba(27,34,32,0.5)" strokeWidth="1.4" /><path d="M10.6 10.6 L14 14" stroke="rgba(27,34,32,0.5)" strokeWidth="1.4" strokeLinecap="round" /></svg>
             basement renovation near me
           </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.42)", marginTop: 8 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.42)", marginTop: 8 }}>
             7 results · Durham Region
           </div>
         </div>
@@ -103,11 +103,11 @@ export function ScreenMap({ local, compact }: P) {
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
               style={{ display: "flex", gap: 9, alignItems: "center", padding: "8px 7px", borderRadius: 7, background: b.me ? "rgba(31,93,76,0.08)" : "transparent", boxShadow: b.me ? `inset 0 0 0 1px rgba(31,93,76,0.3)` : "none" }}
             >
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: b.me ? GREEN : "rgba(27,34,32,0.4)", width: 13, fontWeight: b.me ? 600 : 400 }}>{i + 1}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: b.me ? GREEN : "rgba(27,34,32,0.4)", width: 13, fontWeight: b.me ? 600 : 400 }}>{i + 1}</span>
               <span style={{ width: 26, height: 26, borderRadius: 5, background: b.me ? GREEN : "rgba(27,34,32,0.1)", flex: "0 0 26px" }} />
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: "block", fontSize: 10.5, fontWeight: b.me ? 600 : 400, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b.name}</span>
-                <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.5)" }}>
+                <span style={{ display: "block", fontSize: 13, fontWeight: b.me ? 600 : 400, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b.name}</span>
+                <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.5)" }}>
                   ★ {b.rating} · {b.me ? reviews : b.reviews} reviews
                 </span>
               </span>
@@ -116,13 +116,13 @@ export function ScreenMap({ local, compact }: P) {
         </div>
         {/* profile card */}
         <div style={{ borderTop: "1px solid rgba(27,34,32,0.1)", padding: 12 }}>
-          <div style={{ fontSize: 10.5, fontWeight: 600, marginBottom: 7 }}>Northgate Home Services</div>
+          <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 7 }}>Northgate Home Services</div>
           <div style={{ display: "flex", gap: 5, marginBottom: 8 }}>
             {["linear-gradient(135deg,#D9CDB4,#A08A66)", "linear-gradient(135deg,#2F5D50,#16211D)", "linear-gradient(135deg,#C9C3B6,#8E887C)"].map((g, i) => (
               <span key={i} style={{ flex: 1, height: 26, borderRadius: 4, background: g }} />
             ))}
           </div>
-          <div style={{ fontSize: 10, fontWeight: 600, background: climbed ? GREEN : "rgba(27,34,32,0.1)", color: climbed ? "#fff" : "rgba(27,34,32,0.6)", borderRadius: 6, padding: "6px 0", textAlign: "center", transition: "all 260ms ease" }}>
+          <div style={{ fontSize: 13, fontWeight: 600, background: climbed ? GREEN : "rgba(27,34,32,0.1)", color: climbed ? "#fff" : "rgba(27,34,32,0.6)", borderRadius: 6, padding: "6px 0", textAlign: "center", transition: "all 260ms ease" }}>
             {climbed ? "Update posted ✓" : "Publish update"}
           </div>
         </div>
@@ -159,7 +159,7 @@ export function ScreenMap({ local, compact }: P) {
 
         {/* neighbourhood labels */}
         {([["Whitby", 10, 22], ["Oshawa", 62, 30], ["Lakeview", 34, 74]] as Array<[string, number, number]>).map(([t, x, y]) => (
-          <span key={t} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.14em", color: "rgba(27,34,32,0.6)", textShadow: "0 1px 2px rgba(255,255,255,0.8)" }}>
+          <span key={t} style={{ position: "absolute", left: `${x}%`, top: `${y}%`, fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", color: "rgba(27,34,32,0.6)", textShadow: "0 1px 2px rgba(255,255,255,0.8)" }}>
             {t}
           </span>
         ))}
@@ -170,7 +170,7 @@ export function ScreenMap({ local, compact }: P) {
         ))}
 
         {/* ODbL attribution — required, and legible */}
-        <span style={{ position: "absolute", right: 7, bottom: 5, fontSize: 11, color: "rgba(27,34,32,0.62)", background: "rgba(255,255,255,0.82)", borderRadius: 4, padding: "2px 7px" }}>
+        <span style={{ position: "absolute", right: 7, bottom: 5, fontSize: 13, color: "rgba(27,34,32,0.62)", background: "rgba(255,255,255,0.82)", borderRadius: 4, padding: "2px 7px" }}>
           © OpenStreetMap contributors
         </span>
 
@@ -227,7 +227,7 @@ export function ScreenSequence({ local, compact }: P) {
           return (
             <div key={n} style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 0", borderTop: "1px solid rgba(27,34,32,0.08)" }}>
               <span style={{ flex: 1 }}>
-                <span style={{ display: "block", fontSize: 12 }}>{n}</span>
+                <span style={{ display: "block", fontSize: 13 }}>{n}</span>
                 <span style={{ display: "block", fontSize: MIN, color: "rgba(27,34,32,0.55)" }}>{b}</span>
               </span>
               <span style={{ fontSize: MIN, background: bg, color: fg, borderRadius: 999, padding: "2px 8px" }}>{live ? st : "Draft"}</span>
@@ -244,12 +244,12 @@ export function ScreenSequence({ local, compact }: P) {
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div>
             <div style={{ fontSize: 13.5, fontWeight: 600 }}>Pre-listing outreach</div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.45)", marginTop: 2 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.45)", marginTop: 2 }}>
               realtors · Durham Region · 142 prospects
             </div>
           </div>
           <span style={{ flex: 1 }} />
-          <span style={{ fontSize: 10.5, fontWeight: 600, background: live ? GREEN : "rgba(27,34,32,0.1)", color: live ? "#fff" : "rgba(27,34,32,0.6)", borderRadius: 7, padding: "7px 13px", transition: "all 260ms ease" }}>
+          <span style={{ fontSize: 13, fontWeight: 600, background: live ? GREEN : "rgba(27,34,32,0.1)", color: live ? "#fff" : "rgba(27,34,32,0.6)", borderRadius: 7, padding: "7px 13px", transition: "all 260ms ease" }}>
             {live ? "Running" : "Launch sequence"}
           </span>
         </div>
@@ -258,27 +258,27 @@ export function ScreenSequence({ local, compact }: P) {
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           {["Email 1", "wait 3d", "Email 2", "Call task"].map((s, i) => (
             <span key={s} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, background: i % 2 ? "transparent" : live ? "rgba(31,93,76,0.12)" : "rgba(27,34,32,0.07)", color: i % 2 ? "rgba(27,34,32,0.45)" : live ? GREEN : "rgba(27,34,32,0.6)", border: i % 2 ? "1px dashed rgba(27,34,32,0.2)" : "none", borderRadius: 6, padding: "5px 9px", transition: "all 300ms ease" }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, background: i % 2 ? "transparent" : live ? "rgba(31,93,76,0.12)" : "rgba(27,34,32,0.07)", color: i % 2 ? "rgba(27,34,32,0.45)" : live ? GREEN : "rgba(27,34,32,0.6)", border: i % 2 ? "1px dashed rgba(27,34,32,0.2)" : "none", borderRadius: 6, padding: "5px 9px", transition: "all 300ms ease" }}>
                 {s}
               </span>
-              {i < 3 ? <span style={{ color: "rgba(27,34,32,0.3)", fontSize: 9 }}>→</span> : null}
+              {i < 3 ? <span style={{ color: "rgba(27,34,32,0.3)", fontSize: 13 }}>→</span> : null}
             </span>
           ))}
         </div>
 
         {/* table */}
         <div style={{ flex: 1, minHeight: 0 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1.2fr 0.7fr", gap: 8, fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(27,34,32,0.4)", paddingBottom: 7, borderBottom: "1px solid rgba(27,34,32,0.1)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1.2fr 0.7fr", gap: 8, fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(27,34,32,0.4)", paddingBottom: 7, borderBottom: "1px solid rgba(27,34,32,0.1)" }}>
             <span>Prospect</span><span>Brokerage</span><span>Status</span>
           </div>
           {PROSPECTS.map(([n, b, st]) => {
             const [bg, fg] = STATUS_C[st];
             return (
-              <div key={n} style={{ display: "grid", gridTemplateColumns: "1.3fr 1.2fr 0.7fr", gap: 8, alignItems: "center", padding: "8px 0", borderBottom: "1px solid rgba(27,34,32,0.06)", fontSize: 10.5 }}>
+              <div key={n} style={{ display: "grid", gridTemplateColumns: "1.3fr 1.2fr 0.7fr", gap: 8, alignItems: "center", padding: "8px 0", borderBottom: "1px solid rgba(27,34,32,0.06)", fontSize: 13 }}>
                 <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{n}</span>
-                <span style={{ color: "rgba(27,34,32,0.6)", fontSize: 10, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b}</span>
+                <span style={{ color: "rgba(27,34,32,0.6)", fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b}</span>
                 <span>
-                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, background: live ? bg : "rgba(27,34,32,0.06)", color: live ? fg : "rgba(27,34,32,0.4)", borderRadius: 999, padding: "2.5px 8px", transition: "all 300ms ease" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, background: live ? bg : "rgba(27,34,32,0.06)", color: live ? fg : "rgba(27,34,32,0.4)", borderRadius: 999, padding: "2.5px 8px", transition: "all 300ms ease" }}>
                     {live ? st : "Draft"}
                   </span>
                 </span>
@@ -287,7 +287,7 @@ export function ScreenSequence({ local, compact }: P) {
           })}
         </div>
 
-        <div style={{ display: "flex", gap: 20, fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(27,34,32,0.55)" }}>
+        <div style={{ display: "flex", gap: 20, fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.55)" }}>
           <span><strong style={{ color: "#1B2220", fontSize: 13 }}>{sent}</strong> sent</span>
           <span><strong style={{ color: GREEN, fontSize: 13 }}>{live ? 2 : 0}</strong> replies</span>
           <span><strong style={{ color: "#1B2220", fontSize: 13 }}>{live ? 31 : 0}</strong> opens</span>
@@ -296,17 +296,17 @@ export function ScreenSequence({ local, compact }: P) {
 
       {/* email preview */}
       <div style={{ padding: "16px 18px", background: "#FAF9F6", display: "flex", flexDirection: "column", gap: 11, minHeight: 0 }}>
-        <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,34,32,0.42)" }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,34,32,0.42)" }}>
           Email 1 · preview
         </div>
-        <div style={{ background: "#fff", border: "1px solid rgba(27,34,32,0.1)", borderRadius: 9, padding: 13, fontSize: 10.5, lineHeight: 1.68, flex: 1, minHeight: 0 }}>
+        <div style={{ background: "#fff", border: "1px solid rgba(27,34,32,0.1)", borderRadius: 9, padding: 13, fontSize: 13, lineHeight: 1.68, flex: 1, minHeight: 0 }}>
           <div style={{ fontWeight: 600, marginBottom: 7 }}>Quick one about 118 Ravenscroft</div>
           Hi <mark style={{ background: "rgba(31,93,76,0.14)", color: GREEN, padding: "0 3px", borderRadius: 3 }}>Nadia</mark> — saw the listing at{" "}
           <mark style={{ background: "rgba(31,93,76,0.14)", color: GREEN, padding: "0 3px", borderRadius: 3 }}>118 Ravenscroft Rd</mark>{" "}
           come up. We do pre-listing basement and floor refreshes across{" "}
           <mark style={{ background: "rgba(31,93,76,0.14)", color: GREEN, padding: "0 3px", borderRadius: 3 }}>Ajax</mark>{" "}
           and can usually turn one around before the first open house. Worth a walkthrough?
-          <div style={{ marginTop: 10, fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.45)" }}>
+          <div style={{ marginTop: 10, fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.45)" }}>
             — Marcus, Northgate Home Services
           </div>
         </div>
@@ -316,7 +316,7 @@ export function ScreenSequence({ local, compact }: P) {
           style={{ background: "#fff", border: `1px solid rgba(31,93,76,0.3)`, borderRadius: 8, padding: 10, display: "flex", gap: 9, alignItems: "center" }}
         >
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: GREEN }} />
-          <span style={{ fontSize: 10 }}>
+          <span style={{ fontSize: 13 }}>
             <strong>Nadia Okonkwo</strong> replied · interested in a walkthrough
           </span>
         </motion.div>
@@ -349,7 +349,7 @@ export function ScreenAds({ local, compact }: P) {
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>Campaigns</div>
         {CAMPAIGNS.map(([n, imp, , ctr, l], i) => (
           <div key={n} style={{ padding: "10px 0", borderTop: i ? "1px solid rgba(27,34,32,0.08)" : "none" }}>
-            <div style={{ fontSize: 12, marginBottom: 4 }}>{n}</div>
+            <div style={{ fontSize: 13, marginBottom: 4 }}>{n}</div>
             <div style={{ display: "flex", gap: 14, fontSize: MIN, color: "rgba(27,34,32,0.6)", fontFamily: "var(--font-mono)" }}>
               <span>{imp} impr</span><span>{ctr} CTR</span>
               <span style={{ color: GREEN }}>{i === 2 ? leads : l} leads</span>
@@ -364,30 +364,30 @@ export function ScreenAds({ local, compact }: P) {
     <div style={{ position: "absolute", inset: 0, background: "#fff", padding: "16px 20px", color: "#1B2220", display: "flex", flexDirection: "column", gap: 13, overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ fontSize: 13.5, fontWeight: 600 }}>Campaigns</div>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.45)" }}>last 30 days</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.45)" }}>last 30 days</span>
         <span style={{ flex: 1 }} />
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.45)" }}>Performance only · no spend shown</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.45)" }}>Performance only · no spend shown</span>
       </div>
 
       <div>
-        <div style={{ display: "grid", gridTemplateColumns: "2.4fr 0.9fr 0.7fr 0.6fr 0.6fr 0.7fr", gap: 8, fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(27,34,32,0.4)", paddingBottom: 7, borderBottom: "1px solid rgba(27,34,32,0.1)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2.4fr 0.9fr 0.7fr 0.6fr 0.6fr 0.7fr", gap: 8, fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(27,34,32,0.4)", paddingBottom: 7, borderBottom: "1px solid rgba(27,34,32,0.1)" }}>
           <span>Campaign</span><span>Impr.</span><span>Clicks</span><span>CTR</span><span>Leads</span><span>Conv.</span>
         </div>
         {CAMPAIGNS.map(([n, imp, clicks, ctr, l, conv], i) => {
           const isThird = i === 2;
           return (
-            <div key={n} style={{ display: "grid", gridTemplateColumns: "2.4fr 0.9fr 0.7fr 0.6fr 0.6fr 0.7fr", gap: 8, alignItems: "center", padding: "9px 0", borderBottom: "1px solid rgba(27,34,32,0.06)", fontSize: 10.5, opacity: isThird && !on ? 0.45 : 1, transition: "opacity 300ms ease" }}>
+            <div key={n} style={{ display: "grid", gridTemplateColumns: "2.4fr 0.9fr 0.7fr 0.6fr 0.6fr 0.7fr", gap: 8, alignItems: "center", padding: "9px 0", borderBottom: "1px solid rgba(27,34,32,0.06)", fontSize: 13, opacity: isThird && !on ? 0.45 : 1, transition: "opacity 300ms ease" }}>
               <span style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                 <span style={{ width: 26, height: 15, borderRadius: 999, background: isThird ? (on ? GREEN : "rgba(27,34,32,0.18)") : GREEN, position: "relative", flex: "0 0 26px", transition: "background 260ms ease" }}>
                   <span style={{ position: "absolute", top: 2, left: isThird && !on ? 2 : 13, width: 11, height: 11, borderRadius: "50%", background: "#fff", transition: "left 260ms cubic-bezier(0.25,1,0.5,1)" }} />
                 </span>
                 <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{n}</span>
               </span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}>{imp}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}>{clicks}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}>{ctr}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 600, color: GREEN }}>{isThird ? leads : l}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}>{conv}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{imp}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{clicks}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{ctr}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, color: GREEN }}>{isThird ? leads : l}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{conv}</span>
             </div>
           );
         })}
@@ -396,22 +396,22 @@ export function ScreenAds({ local, compact }: P) {
       {/* ad previews */}
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 14, flex: 1, minHeight: 0 }}>
         <div style={{ border: "1px solid rgba(27,34,32,0.12)", borderRadius: 9, padding: 13 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,34,32,0.4)", marginBottom: 9 }}>Search ad</div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.5)", marginBottom: 3 }}>Ad · northgate.ca/basements</div>
-          <div style={{ fontSize: 12.5, color: "#2A4FA8", marginBottom: 4 }}>Basement Finishing in Durham Region</div>
-          <div style={{ fontSize: 10, lineHeight: 1.55, color: "rgba(27,34,32,0.7)" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,34,32,0.4)", marginBottom: 9 }}>Search ad</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.5)", marginBottom: 3 }}>Ad · northgate.ca/basements</div>
+          <div style={{ fontSize: 13, color: "#2A4FA8", marginBottom: 4 }}>Basement Finishing in Durham Region</div>
+          <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(27,34,32,0.7)" }}>
             Licensed and insured since 2009. Free on-site estimate, usually within three days. Ajax · Pickering · Whitby · Oshawa.
           </div>
         </div>
         <div style={{ border: "1px solid rgba(27,34,32,0.12)", borderRadius: 9, padding: 13, display: "flex", flexDirection: "column" }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,34,32,0.4)", marginBottom: 9 }}>Social ad</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,34,32,0.4)", marginBottom: 9 }}>Social ad</div>
           <div style={{ flex: 1, borderRadius: 7, background: "linear-gradient(135deg,#2F5D50,#16211D)", position: "relative", overflow: "hidden", minHeight: 64 }}>
             <span style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "50%", background: "linear-gradient(135deg,#B9B2A6,#8E877C)" }} />
             <span style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: 1.5, background: "rgba(255,255,255,0.7)" }} />
-            <span style={{ position: "absolute", left: 8, bottom: 7, fontFamily: "var(--font-mono)", fontSize: 7.5, color: "#fff", opacity: 0.85 }}>BEFORE</span>
-            <span style={{ position: "absolute", right: 8, bottom: 7, fontFamily: "var(--font-mono)", fontSize: 7.5, color: "#fff", opacity: 0.85 }}>AFTER</span>
+            <span style={{ position: "absolute", left: 8, bottom: 7, fontFamily: "var(--font-mono)", fontSize: 11, color: "#fff", opacity: 0.85 }}>BEFORE</span>
+            <span style={{ position: "absolute", right: 8, bottom: 7, fontFamily: "var(--font-mono)", fontSize: 11, color: "#fff", opacity: 0.85 }}>AFTER</span>
           </div>
-          <div style={{ fontSize: 9.5, marginTop: 7, color: "rgba(27,34,32,0.7)" }}>Six weeks, start to finish →</div>
+          <div style={{ fontSize: 13, marginTop: 7, color: "rgba(27,34,32,0.7)" }}>Six weeks, start to finish →</div>
         </div>
       </div>
     </div>
@@ -435,7 +435,7 @@ export function ScreenABTest({ local, compact }: P) {
         {[["A", "4.1%", false], ["B", "6.3%", true]].map(([v, c, win]) => (
           <div key={v as string} style={{ background: "#fff", border: `1px solid ${win ? "rgba(31,93,76,0.4)" : "rgba(27,34,32,0.12)"}`, borderRadius: 9, padding: 13, marginBottom: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 12, fontWeight: 600 }}>Variant {v as string}</span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>Variant {v as string}</span>
               {win ? <span style={{ fontSize: MIN, background: GREEN, color: "#fff", borderRadius: 999, padding: "2px 8px" }}>Winner</span> : null}
             </div>
             <div style={{ fontSize: 26, fontWeight: 600, color: win ? GREEN : "rgba(27,34,32,0.7)", marginTop: 6 }}>{c as string}</div>
@@ -450,9 +450,9 @@ export function ScreenABTest({ local, compact }: P) {
     <div style={{ position: "absolute", inset: 0, background: "#F7F7F4", padding: "16px 20px", color: "#1B2220", display: "flex", flexDirection: "column", gap: 13, overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ fontSize: 13.5, fontWeight: 600 }}>Landing page test</div>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.45)" }}>2 variants · 14 days · illustrative</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.45)" }}>2 variants · 14 days · illustrative</span>
         <span style={{ flex: 1 }} />
-        <span style={{ fontSize: 10.5, fontWeight: 600, background: promoted ? GREEN : "rgba(27,34,32,0.1)", color: promoted ? "#fff" : "rgba(27,34,32,0.6)", borderRadius: 7, padding: "7px 13px", transition: "all 260ms ease" }}>
+        <span style={{ fontSize: 13, fontWeight: 600, background: promoted ? GREEN : "rgba(27,34,32,0.1)", color: promoted ? "#fff" : "rgba(27,34,32,0.6)", borderRadius: 7, padding: "7px 13px", transition: "all 260ms ease" }}>
           {promoted ? "B promoted ✓" : "Promote B"}
         </span>
       </div>
@@ -461,7 +461,7 @@ export function ScreenABTest({ local, compact }: P) {
         <motion.div
           animate={{ flex: promoted ? 0.6 : 1, opacity: promoted ? 0.5 : 1 }}
           transition={{ type: "spring", stiffness: 180, damping: 26 }}
-          style={{ background: "#fff", border: "1px solid rgba(27,34,32,0.12)", borderRadius: 9, padding: 12, minWidth: 0, display: "flex", flexDirection: "column" }}
+          style={{ background: "#fff", border: "1px solid rgba(27,34,32,0.12)", borderRadius: 11, padding: 14, minWidth: 0, display: "flex", flexDirection: "column" }}
         >
           <Badge label="Variant A" tone="plain" />
           <MiniPage layout="stacked" />
@@ -471,7 +471,7 @@ export function ScreenABTest({ local, compact }: P) {
         <motion.div
           animate={{ flex: promoted ? 2.2 : 1 }}
           transition={{ type: "spring", stiffness: 180, damping: 26 }}
-          style={{ background: "#fff", border: `1px solid ${promoted ? "rgba(31,93,76,0.45)" : "rgba(27,34,32,0.12)"}`, borderRadius: 9, padding: 12, minWidth: 0, display: "flex", flexDirection: "column", boxShadow: promoted ? "0 8px 24px rgba(31,93,76,0.14)" : "none", transition: "box-shadow 300ms ease, border-color 300ms ease" }}
+          style={{ background: "#fff", border: `1px solid ${promoted ? "rgba(31,93,76,0.45)" : "rgba(27,34,32,0.12)"}`, borderRadius: 11, padding: 14, minWidth: 0, display: "flex", flexDirection: "column", boxShadow: promoted ? "0 8px 24px rgba(31,93,76,0.14)" : "none", transition: "box-shadow 300ms ease, border-color 300ms ease" }}
         >
           <Badge label="Variant B" tone="win" />
           <MiniPage layout="split" />
@@ -485,35 +485,81 @@ export function ScreenABTest({ local, compact }: P) {
 function Badge({ label, tone }: { label: string; tone: "plain" | "win" }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 9 }}>
-      <span style={{ fontSize: 11, fontWeight: 600 }}>{label}</span>
+      <span style={{ fontSize: 13, fontWeight: 600 }}>{label}</span>
       {tone === "win" ? (
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: 8, background: GREEN, color: "#fff", borderRadius: 999, padding: "2px 8px" }}>Winner</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, background: GREEN, color: "#fff", borderRadius: 999, padding: "3px 10px" }}>Winner</span>
       ) : null}
     </div>
   );
 }
 
 function MiniPage({ layout }: { layout: "stacked" | "split" }) {
+  // A real landing page in miniature — nav, hero, proof row, form and a
+  // section strip. The first version was five grey bars, which is what
+  // made this beat read as a wireframe rather than a test of two pages.
+  const label = { fontSize: 13, color: "rgba(27,34,32,0.55)" } as const;
   return (
-    <div style={{ flex: 1, minHeight: 0, borderRadius: 6, background: "#FAF9F6", border: "1px solid rgba(27,34,32,0.08)", padding: 10, overflow: "hidden" }}>
-      <div style={{ height: 8, borderRadius: 3, background: "#16211D", marginBottom: 8 }} />
-      {layout === "stacked" ? (
-        <>
-          <div style={{ height: 30, borderRadius: 5, background: "rgba(31,93,76,0.14)", marginBottom: 7 }} />
-          <div style={{ width: "70%", height: 5, borderRadius: 3, background: "rgba(27,34,32,0.16)", marginBottom: 5 }} />
-          <div style={{ width: "52%", height: 5, borderRadius: 3, background: "rgba(27,34,32,0.12)", marginBottom: 9 }} />
-          <div style={{ width: 62, height: 14, borderRadius: 999, background: AMBER }} />
-        </>
-      ) : (
-        <div style={{ display: "flex", gap: 8 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ width: "88%", height: 7, borderRadius: 3, background: "rgba(27,34,32,0.2)", marginBottom: 5 }} />
-            <div style={{ width: "66%", height: 7, borderRadius: 3, background: "rgba(27,34,32,0.16)", marginBottom: 9 }} />
-            <div style={{ width: 58, height: 14, borderRadius: 999, background: GREEN }} />
+    <div style={{ flex: 1, minHeight: 0, borderRadius: 7, background: "#FAF9F6", border: "1px solid rgba(27,34,32,0.08)", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 11px", background: "#16211D", color: "#F2EFE7" }}>
+        <span style={{ fontSize: 13, fontWeight: 600 }}>Northgate</span>
+        <span style={{ flex: 1 }} />
+        {["Services", "Work", "Contact"].map((t) => (
+          <span key={t} style={{ fontSize: 13, opacity: 0.72 }}>{t}</span>
+        ))}
+      </div>
+
+      <div style={{ padding: "11px 12px", flex: 1, minHeight: 0, display: "flex", flexDirection: "column", gap: 9 }}>
+        {layout === "stacked" ? (
+          <>
+            <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.22, color: "#16211D" }}>
+              Basement finishing across Durham
+            </div>
+            <div style={{ ...label, lineHeight: 1.5 }}>
+              Free on-site estimate. Fixed quote before we start.
+            </div>
+            <span style={{ alignSelf: "flex-start", fontSize: 13, fontWeight: 600, color: "#fff", background: AMBER, borderRadius: 999, padding: "6px 14px" }}>
+              Get a quote
+            </span>
+          </>
+        ) : (
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.22, color: "#16211D" }}>
+                Basement finished in 4–6 weeks
+              </div>
+              <div style={{ ...label, lineHeight: 1.5 }}>
+                Book an estimate for this week. No deposit to book.
+              </div>
+              <div style={{ background: "#fff", border: "1px solid rgba(27,34,32,0.14)", borderRadius: 7, padding: 9 }}>
+                <div style={{ fontSize: 13, color: "rgba(27,34,32,0.5)", marginBottom: 5 }}>Postal code</div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <span style={{ flex: 1, fontSize: 13, background: "#F4F2EC", borderRadius: 5, padding: "5px 8px", color: "#16211D" }}>L1J 2K8</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#fff", background: GREEN, borderRadius: 5, padding: "5px 11px" }}>Check</span>
+                </div>
+              </div>
+            </div>
+            <div style={{ flex: "0 0 34%", borderRadius: 6, background: "linear-gradient(135deg,#D9CDB4,#A08A66)" }} />
           </div>
-          <div style={{ flex: "0 0 38%", borderRadius: 5, background: "linear-gradient(135deg,#D9CDB4,#A08A66)", minHeight: 44 }} />
+        )}
+
+        {/* proof row — present on both variants */}
+        <div style={{ display: "flex", gap: 8, marginTop: "auto" }}>
+          {[["180+", "jobs"], ["4.9", "rating"], ["12yr", "in Durham"]].map(([v, k]) => (
+            <div key={k} style={{ flex: 1, background: "#fff", border: "1px solid rgba(27,34,32,0.1)", borderRadius: 6, padding: "7px 8px" }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#16211D" }}>{v}</div>
+              <div style={{ fontSize: 13, color: "rgba(27,34,32,0.5)" }}>{k}</div>
+            </div>
+          ))}
         </div>
-      )}
+
+        <div style={{ display: "flex", gap: 8 }}>
+          {["Basements", "Kitchens", "Flooring"].map((t) => (
+            <span key={t} style={{ flex: 1, fontSize: 13, textAlign: "center", color: "rgba(27,34,32,0.6)", background: "#fff", border: "1px solid rgba(27,34,32,0.1)", borderRadius: 6, padding: "6px 0" }}>
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -522,8 +568,8 @@ function Conv({ value, win }: { value: string; win: boolean }) {
   return (
     <div style={{ marginTop: 9 }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-        <span style={{ fontSize: 20, fontWeight: 600, color: win ? GREEN : "rgba(27,34,32,0.7)", letterSpacing: "-0.02em" }}>{value}</span>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.45)" }}>conversion</span>
+        <span style={{ fontSize: 24, fontWeight: 600, color: win ? GREEN : "rgba(27,34,32,0.7)", letterSpacing: "-0.02em" }}>{value}</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.5)" }}>conversion</span>
       </div>
       <div style={{ height: 5, borderRadius: 3, background: "rgba(27,34,32,0.08)", marginTop: 6, overflow: "hidden" }}>
         <span style={{ display: "block", height: "100%", width: win ? "78%" : "51%", background: win ? GREEN : "rgba(27,34,32,0.3)" }} />
@@ -537,15 +583,30 @@ function Conv({ value, win }: { value: string; win: boolean }) {
    ═══════════════════════════════════════════════════════════════ */
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+/** Keyed by cell index (0 = the 1st). Most weekdays carry something — a
+ *  content calendar with eight entries in a month reads as an empty
+ *  month, which is how this screen looked in the 17d recording. */
 const POSTS: Record<number, Array<[string, string]>> = {
+  0: [["post", "Week ahead"]],
+  1: [["blog", "Permit costs"]],
   2: [["post", "Basement reveal"]],
-  4: [["video", "60-sec walkthrough"]],
-  9: [["blog", "What permits cost you"]],
-  11: [["post", "Crew spotlight"]],
-  16: [["video", "Before / after"]],
-  18: [["post", "5 flooring myths"]],
-  23: [["blog", "Timeline, honestly"]],
-  25: [["post", "Oshawa job done"]],
+  3: [["video", "Walkthrough"]],
+  4: [["post", "Crew spotlight"]],
+  7: [["post", "Before / after"]],
+  8: [["video", "Site tour"]],
+  9: [["blog", "What permits cost"]],
+  10: [["post", "Flooring myths"]],
+  11: [["post", "Quote explained"]],
+  14: [["video", "Framing day"]],
+  15: [["post", "Oshawa job done"]],
+  16: [["blog", "Timeline, honestly"]],
+  17: [["post", "Client question"]],
+  18: [["video", "60-sec recap"]],
+  21: [["post", "Whitby kitchen"]],
+  22: [["blog", "Choosing a crew"]],
+  23: [["post", "Team photo"]],
+  24: [["video", "Finish reveal"]],
+  25: [["post", "Month in review"]],
 };
 const KIND_C: Record<string, string> = { post: GREEN, video: AMBER, blog: "#3E7CA6" };
 
@@ -565,7 +626,7 @@ export function ScreenCalendar({ local, compact }: P) {
           <div key={d as string} style={{ display: "flex", gap: 10, alignItems: "center", padding: "10px 0", borderTop: "1px solid rgba(27,34,32,0.08)" }}>
             <span style={{ width: 8, height: 8, borderRadius: 2, background: KIND_C[k as string] }} />
             <span style={{ flex: 1 }}>
-              <span style={{ display: "block", fontSize: 12 }}>{t as string}</span>
+              <span style={{ display: "block", fontSize: 13 }}>{t as string}</span>
               <span style={{ display: "block", fontSize: MIN, color: "rgba(27,34,32,0.55)" }}>{d as string} · {k as string}</span>
             </span>
           </div>
@@ -578,12 +639,12 @@ export function ScreenCalendar({ local, compact }: P) {
     <div style={{ position: "absolute", inset: 0, display: "grid", gridTemplateColumns: "1.5fr 1fr", background: "#fff", color: "#1B2220", overflow: "hidden" }}>
       <div style={{ padding: "16px 18px", borderRight: "1px solid rgba(27,34,32,0.1)", minHeight: 0, display: "flex", flexDirection: "column" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 11 }}>
-          <span style={{ fontSize: 13.5, fontWeight: 600 }}>March 2026</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.45)" }}>8 scheduled · 1 draft</span>
+          <span style={{ fontSize: 16, fontWeight: 600 }}>March 2026</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.5)" }}>20 scheduled · 1 draft</span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginBottom: 4 }}>
           {WEEKDAYS.map((d) => (
-            <span key={d} style={{ fontFamily: "var(--font-mono)", fontSize: 8, color: "rgba(27,34,32,0.4)", textAlign: "center" }}>{d}</span>
+            <span key={d} style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.45)", textAlign: "center" }}>{d}</span>
           ))}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gridAutoRows: "1fr", gap: 4, flex: 1, minHeight: 0 }}>
@@ -591,15 +652,15 @@ export function ScreenCalendar({ local, compact }: P) {
             const posts = POSTS[i] || [];
             const isTarget = i === 17;
             return (
-              <div key={i} style={{ borderRadius: 5, background: "#FAF9F6", border: `1px solid ${isTarget && scheduled ? "rgba(31,93,76,0.45)" : "rgba(27,34,32,0.07)"}`, padding: 4, minHeight: 0, overflow: "hidden", transition: "border-color 300ms ease" }}>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 7.5, color: "rgba(27,34,32,0.35)" }}>{i + 1}</span>
+              <div key={i} style={{ borderRadius: 5, background: "#FAF9F6", border: `1px solid ${isTarget && scheduled ? "rgba(31,93,76,0.45)" : "rgba(27,34,32,0.07)"}`, padding: 6, minHeight: 0, overflow: "hidden", transition: "border-color 300ms ease" }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.4)" }}>{i + 1}</span>
                 {posts.map(([k, t]) => (
-                  <span key={t} style={{ display: "block", marginTop: 2, fontSize: 7.5, lineHeight: 1.25, background: `${KIND_C[k]}22`, color: KIND_C[k], borderRadius: 3, padding: "2px 3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <span key={t} style={{ display: "block", marginTop: 2, fontSize: 13, lineHeight: 1.3, background: `${KIND_C[k]}22`, color: KIND_C[k], borderRadius: 4, padding: "3px 5px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {t}
                   </span>
                 ))}
                 {isTarget && scheduled ? (
-                  <span style={{ display: "block", marginTop: 2, fontSize: 7.5, lineHeight: 1.25, background: `${GREEN}22`, color: GREEN, borderRadius: 3, padding: "2px 3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <span style={{ display: "block", marginTop: 2, fontSize: 13, lineHeight: 1.3, background: `${GREEN}22`, color: GREEN, borderRadius: 4, padding: "3px 5px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     Quote-to-job
                   </span>
                 ) : null}
@@ -609,7 +670,7 @@ export function ScreenCalendar({ local, compact }: P) {
         </div>
         {/* the draft being dragged */}
         <motion.div
-          style={{ position: "absolute", left: 24, bottom: 18, x: dragX, y: dragY, background: "#fff", border: `1px solid ${GREEN}`, borderRadius: 7, padding: "7px 11px", boxShadow: "0 8px 20px rgba(27,34,32,0.16)", fontSize: 9.5, display: scheduled ? "none" : "flex", alignItems: "center", gap: 7, zIndex: 5 }}
+          style={{ position: "absolute", left: 24, bottom: 18, x: dragX, y: dragY, background: "#fff", border: `1px solid ${GREEN}`, borderRadius: 7, padding: "7px 11px", boxShadow: "0 8px 20px rgba(27,34,32,0.16)", fontSize: 13, display: scheduled ? "none" : "flex", alignItems: "center", gap: 7, zIndex: 5 }}
         >
           <span style={{ width: 7, height: 7, borderRadius: 2, background: GREEN }} />
           Quote-to-job, honestly
@@ -618,27 +679,38 @@ export function ScreenCalendar({ local, compact }: P) {
 
       {/* composer */}
       <div style={{ padding: "16px 18px", background: "#FAF9F6", display: "flex", flexDirection: "column", gap: 11, minHeight: 0 }}>
-        <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,34,32,0.42)" }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(27,34,32,0.45)" }}>
           Composer
         </div>
         <div style={{ background: "#fff", border: "1px solid rgba(27,34,32,0.1)", borderRadius: 9, padding: 13, flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 9 }}>
-            <span style={{ width: 22, height: 22, borderRadius: "50%", background: GREEN }} />
+            <span style={{ width: 30, height: 30, borderRadius: "50%", background: GREEN }} />
             <span>
-              <span style={{ display: "block", fontSize: 10, fontWeight: 600 }}>Marcus Delacroix</span>
-              <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 8, color: "rgba(27,34,32,0.45)" }}>Northgate Home Services</span>
+              <span style={{ display: "block", fontSize: 13, fontWeight: 600 }}>Marcus Delacroix</span>
+              <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.48)" }}>Northgate Home Services</span>
             </span>
           </div>
-          <div style={{ fontSize: 10.5, lineHeight: 1.6, marginBottom: 9 }}>
+          <div style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>
             Most quotes die because nobody explains the timeline. Here's what six
-            weeks on a basement actually looks like, week by week.
+            weeks on a basement actually looks like, week by week — demo, framing,
+            rough-in, inspection, finishes, handover.
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 10 }}>
+            {["#durham", "#basement", "#renovation"].map((t) => (
+              <span key={t} style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: GREEN, background: `${GREEN}14`, borderRadius: 999, padding: "3px 9px" }}>{t}</span>
+            ))}
           </div>
           <div style={{ flex: 1, borderRadius: 6, background: "linear-gradient(135deg,#EFE7D8,#C9B593)", minHeight: 54, position: "relative", overflow: "hidden" }}>
             <span style={{ position: "absolute", left: 10, top: 10, width: "46%", height: 6, borderRadius: 3, background: "rgba(22,33,29,0.35)" }} />
             <span style={{ position: "absolute", left: 10, top: 22, width: "30%", height: 6, borderRadius: 3, background: "rgba(22,33,29,0.22)" }} />
           </div>
-          <div style={{ marginTop: 9, fontFamily: "var(--font-mono)", fontSize: 9, color: scheduled ? GREEN : "rgba(27,34,32,0.45)", transition: "color 300ms ease" }}>
-            {scheduled ? "Scheduled Thu 9:00" : "Draft · not scheduled"}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 11, paddingTop: 10, borderTop: "1px solid rgba(27,34,32,0.1)" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: scheduled ? GREEN : "rgba(27,34,32,0.5)", transition: "color 300ms ease" }}>
+              {scheduled ? "Scheduled Thu 9:00" : "Draft · not scheduled"}
+            </span>
+            <span style={{ marginLeft: "auto", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.4)" }}>
+              3 channels
+            </span>
           </div>
         </div>
       </div>
@@ -698,12 +770,12 @@ export function ScreenReport({ local, compact }: P) {
           <div style={{ fontFamily: "var(--font-display)", fontSize: 19, fontWeight: 500, letterSpacing: "-0.02em" }}>
             March report
           </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.45)", marginTop: 3 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.45)", marginTop: 3 }}>
             Northgate Home Services · prepared 1 Apr
           </div>
         </div>
         <span style={{ flex: 1 }} />
-        <span style={{ fontSize: 10.5, fontWeight: 600, background: sent ? GREEN : "rgba(27,34,32,0.1)", color: sent ? "#fff" : "rgba(27,34,32,0.65)", borderRadius: 7, padding: "7px 13px", transition: "all 260ms ease" }}>
+        <span style={{ fontSize: 13, fontWeight: 600, background: sent ? GREEN : "rgba(27,34,32,0.1)", color: sent ? "#fff" : "rgba(27,34,32,0.65)", borderRadius: 7, padding: "7px 13px", transition: "all 260ms ease" }}>
           {sent ? "Sent ✓" : "Send monthly report"}
         </span>
       </div>
@@ -712,15 +784,15 @@ export function ScreenReport({ local, compact }: P) {
         {[["100", "leads", "+22% vs Feb"], ["28", "booked jobs", "+9"], ["Local search", "top channel", "34 leads"]].map(([v, l, d]) => (
           <div key={l} style={{ flex: 1, background: "#F7F7F4", borderRadius: 9, padding: 12 }}>
             <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.02em" }}>{v}</div>
-            <div style={{ fontSize: 10, color: "rgba(27,34,32,0.6)", marginTop: 2 }}>{l}</div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: GREEN, marginTop: 4 }}>{d}</div>
+            <div style={{ fontSize: 13, color: "rgba(27,34,32,0.6)", marginTop: 2 }}>{l}</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: GREEN, marginTop: 4 }}>{d}</div>
           </div>
         ))}
       </div>
 
       {/* attribution flow */}
       <div style={{ flex: 1, minHeight: 0, border: "1px solid rgba(27,34,32,0.1)", borderRadius: 9, padding: 13, display: "flex", flexDirection: "column" }}>
-        <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,34,32,0.42)", marginBottom: 9 }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,34,32,0.42)", marginBottom: 9 }}>
           Where the work came from
         </div>
         <div style={{ flex: 1, minHeight: 0, display: "flex", gap: 0 }}>
@@ -728,8 +800,8 @@ export function ScreenReport({ local, compact }: P) {
             {CHANNELS.map(([n, v, c]) => (
               <div key={n} style={{ display: "flex", alignItems: "center", gap: 7 }}>
                 <span style={{ width: 7, height: 7, borderRadius: 2, background: c }} />
-                <span style={{ fontSize: 9.5, flex: 1 }}>{n}</span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(27,34,32,0.5)" }}>{v}</span>
+                <span style={{ fontSize: 13, flex: 1 }}>{n}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.5)" }}>{v}</span>
               </div>
             ))}
           </div>
@@ -753,13 +825,13 @@ export function ScreenReport({ local, compact }: P) {
             <rect x="128" y="18" width="13" height="84" rx="3" fill="rgba(27,34,32,0.72)" />
             <motion.rect x="168" y="40" width="13" height="40" rx="3" fill={GREEN} style={{ scaleY: draw, originY: 1 }} />
           </svg>
-            <span style={{ position: "absolute", left: "64%", bottom: 0, fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.5)" }}>Leads</span>
-            <span style={{ position: "absolute", left: "83%", bottom: 0, fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,34,32,0.5)" }}>Booked</span>
+            <span style={{ position: "absolute", left: "64%", bottom: 0, fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.5)" }}>Leads</span>
+            <span style={{ position: "absolute", left: "83%", bottom: 0, fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.5)" }}>Booked</span>
           </div>
         </div>
       </div>
 
-      <div style={{ background: "#F7F7F4", borderRadius: 8, padding: 11, fontSize: 10.5, lineHeight: 1.6, color: "rgba(27,34,32,0.78)" }}>
+      <div style={{ background: "#F7F7F4", borderRadius: 8, padding: 11, fontSize: 13, lineHeight: 1.6, color: "rgba(27,34,32,0.78)" }}>
         <strong style={{ color: "#1B2220" }}>What worked:</strong> the map profile climbed into
         the top three in Ajax and Whitby, which is where most of March's leads came
         from. The before/after reel reached the most people but converted least —
@@ -769,7 +841,7 @@ export function ScreenReport({ local, compact }: P) {
       <motion.div
         animate={{ opacity: sent ? 1 : 0, y: sent ? 0 : 10 }}
         transition={{ duration: 0.28 }}
-        style={{ position: "absolute", right: 22, bottom: 18, background: "#1B2220", color: "#fff", borderRadius: 9, padding: "10px 14px", fontSize: 10.5, boxShadow: "0 12px 26px rgba(27,34,32,0.28)" }}
+        style={{ position: "absolute", right: 22, bottom: 18, background: "#1B2220", color: "#fff", borderRadius: 9, padding: "10px 14px", fontSize: 13, boxShadow: "0 12px 26px rgba(27,34,32,0.28)" }}
       >
         Sent to owner@northgate.ca
       </motion.div>

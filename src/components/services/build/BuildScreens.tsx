@@ -99,7 +99,7 @@ function MRow({
 }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderTop: "1px solid rgba(27,31,29,0.08)" }}>
-      <span style={{ flex: 1, fontSize: 12, color: "#1B1F1D" }}>{label}</span>
+      <span style={{ flex: 1, fontSize: 13, color: "#1B1F1D" }}>{label}</span>
       {value != null ? (
         <span style={{ fontFamily: "var(--font-mono)", fontSize: MIN, color: tint || "rgba(27,31,29,0.6)" }}>{value}</span>
       ) : null}
@@ -210,7 +210,7 @@ export function ScreenBrandBoard({ local, compact }: ScreenProps) {
           <div
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: 9.5,
+              fontSize: 11,
               letterSpacing: "0.34em",
               color: "rgba(22,33,29,0.5)",
               marginTop: 6,
@@ -264,11 +264,11 @@ export function ScreenBrandBoard({ local, compact }: ScreenProps) {
                     boxShadow: "inset 0 0 0 1px rgba(22,33,29,0.08)",
                   }}
                 />
-                <div style={{ fontSize: 9.5, fontWeight: 600, marginTop: 6 }}>{n}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, marginTop: 6 }}>{n}</div>
                 <div
                   style={{
                     fontFamily: "var(--font-mono)",
-                    fontSize: 8.5,
+                    fontSize: 11,
                     color: "rgba(22,33,29,0.45)",
                   }}
                 >
@@ -285,11 +285,11 @@ export function ScreenBrandBoard({ local, compact }: ScreenProps) {
             <span style={{ fontSize: 40, fontWeight: 600, letterSpacing: "-0.03em" }}>
               Aa
             </span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 9 }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
               Söhne · 600 / 40
             </span>
           </div>
-          <div style={{ fontSize: 11.5, lineHeight: 1.55, color: "rgba(22,33,29,0.72)", marginTop: 8 }}>
+          <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(22,33,29,0.72)", marginTop: 8 }}>
             Basement renovations, flooring and tile across Durham Region —
             quoted in person, finished on schedule.
           </div>
@@ -297,7 +297,7 @@ export function ScreenBrandBoard({ local, compact }: ScreenProps) {
             {["12 / 18", "16 / 24", "22 / 30"].map((s) => (
               <span
                 key={s}
-                style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(22,33,29,0.45)" }}
+                style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(22,33,29,0.45)" }}
               >
                 {s}
               </span>
@@ -347,13 +347,13 @@ export function ScreenBrandBoard({ local, compact }: ScreenProps) {
             <svg width="17" height="17" viewBox="0 0 48 48" fill="none">
               <path d="M8 38 L8 14 L24 24 L40 14 L40 38" stroke={accent} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.16em" }}>
+            <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.16em" }}>
               {BRAND.name}
             </span>
           </div>
           <div>
-            <div style={{ fontSize: 10.5, fontWeight: 500 }}>Marcus Delacroix</div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, opacity: 0.6, marginTop: 3 }}>
+            <div style={{ fontSize: 13, fontWeight: 500 }}>Marcus Delacroix</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, opacity: 0.6, marginTop: 3 }}>
               (905) 555-0142 · northgate.ca
             </div>
           </div>
@@ -396,7 +396,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
     <div
       style={{
         fontFamily: "var(--font-mono)",
-        fontSize: 8.5,
+        fontSize: 11,
         letterSpacing: "0.22em",
         textTransform: "uppercase",
         color: "rgba(22,33,29,0.42)",
@@ -453,7 +453,7 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
           4.9★ · 212 reviews · Licensed &amp; insured
         </div>
         <div style={{ background: "#FAF8F4", border: "1px solid rgba(22,33,29,0.12)", borderRadius: 9, padding: 12, marginBottom: 12 }}>
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: BRAND.ink }}>Get a free quote</div>
+          <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: BRAND.ink }}>Get a free quote</div>
           <div style={{ height: 30, borderRadius: 6, border: "1px solid rgba(22,33,29,0.16)", background: "#fff", display: "flex", alignItems: "center", padding: "0 10px", fontSize: MIN + 1, color: "rgba(22,33,29,0.75)", marginBottom: 8 }}>
             {postal || "Postal code"}
           </div>
@@ -484,17 +484,17 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
             <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
               <path d="M8 38 L8 14 L24 24 L40 14 L40 38" stroke={BRAND.primary} strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: "0.14em", color: BRAND.ink }}>
+            <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.14em", color: BRAND.ink }}>
               {BRAND.name}
             </span>
           </span>
           {["Services", "Gallery", "About", "Reviews"].map((l) => (
-            <span key={l} style={{ fontSize: 10.5, color: "rgba(22,33,29,0.66)" }}>
+            <span key={l} style={{ fontSize: 13, color: "rgba(22,33,29,0.66)" }}>
               {l}
             </span>
           ))}
           <span style={{ flex: 1 }} />
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, fontWeight: 600, color: BRAND.primary }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, color: BRAND.primary }}>
             (905) 555-0142
           </span>
         </div>
@@ -515,7 +515,7 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
               <br />
               across Durham Region.
             </div>
-            <div style={{ fontSize: 11.5, lineHeight: 1.55, color: "rgba(22,33,29,0.66)", marginTop: 12, maxWidth: 300 }}>
+            <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(22,33,29,0.66)", marginTop: 12, maxWidth: 300 }}>
               Licensed, insured and finishing on schedule since 2009. Free
               on-site estimate, usually within three days.
             </div>
@@ -523,7 +523,7 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
               {[["4.9★", "212 reviews"], ["17 yrs", "in business"], ["Licensed", "& insured"]].map(([a, b]) => (
                 <div key={a}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: BRAND.ink }}>{a}</div>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(22,33,29,0.5)" }}>{b}</div>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(22,33,29,0.5)" }}>{b}</div>
                 </div>
               ))}
             </div>
@@ -538,7 +538,7 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
               boxShadow: "0 10px 30px rgba(22,33,29,0.12)",
             }}
           >
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, color: BRAND.ink }}>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: BRAND.ink }}>
               Get a free quote
             </div>
             <Field label="Service">Basement finishing ▾</Field>
@@ -558,7 +558,7 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 11.5,
+                fontSize: 13,
                 fontWeight: 600,
               }}
             >
@@ -567,7 +567,7 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
             <div
               style={{
                 fontFamily: "var(--font-mono)",
-                fontSize: 8,
+                fontSize: 11,
                 color: "rgba(22,33,29,0.42)",
                 textAlign: "center",
                 marginTop: 8,
@@ -609,8 +609,8 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
                     <path d="M2 13 L9 6 M6 3 L13 10" stroke={BRAND.primary} strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
                 </span>
-                <div style={{ fontSize: 10.5, fontWeight: 600, color: BRAND.ink }}>{t}</div>
-                <div style={{ fontSize: 9, color: "rgba(22,33,29,0.55)", marginTop: 3 }}>{d}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: BRAND.ink }}>{t}</div>
+                <div style={{ fontSize: 13, color: "rgba(22,33,29,0.55)", marginTop: 3 }}>{d}</div>
               </div>
             ))}
           </div>
@@ -633,7 +633,7 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
                   <span style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 22, background: "rgba(22,33,29,0.18)" }} />
                   <span style={{ position: "absolute", left: "14%", bottom: 22, width: "26%", height: 30, background: "rgba(255,255,255,0.25)", borderRadius: 3 }} />
                 </div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, marginTop: 5, color: "rgba(22,33,29,0.5)" }}>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, marginTop: 5, color: "rgba(22,33,29,0.5)" }}>
                   {l}
                 </div>
               </div>
@@ -653,11 +653,11 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
                 padding: 12,
               }}
             >
-              <div style={{ fontSize: 10, color: BRAND.accentA, letterSpacing: 1 }}>★★★★★</div>
-              <div style={{ fontSize: 10, lineHeight: 1.5, color: "rgba(22,33,29,0.75)", margin: "6px 0 8px" }}>
+              <div style={{ fontSize: 13, color: BRAND.accentA, letterSpacing: 1 }}>★★★★★</div>
+              <div style={{ fontSize: 13, lineHeight: 1.5, color: "rgba(22,33,29,0.75)", margin: "6px 0 8px" }}>
                 "{body}"
               </div>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(22,33,29,0.48)" }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(22,33,29,0.48)" }}>
                 {n} · {city}
               </div>
             </div>
@@ -665,7 +665,7 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
         </div>
 
         {/* footer */}
-        <div style={{ background: BRAND.ink, color: "rgba(251,249,244,0.66)", padding: "16px 24px", fontSize: 9 }}>
+        <div style={{ background: BRAND.ink, color: "rgba(251,249,244,0.66)", padding: "16px 24px", fontSize: 13 }}>
           © 2026 {BRAND.name} Home Services · Ajax · Pickering · Whitby · Oshawa
         </div>
       </motion.div>
@@ -704,7 +704,7 @@ export function ScreenLocalSite({ local, compact }: ScreenProps) {
             <path d="M2.5 6.4 L4.8 8.6 L9.5 3.6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </span>
-        <span style={{ fontSize: 10.5 }}>
+        <span style={{ fontSize: 13 }}>
           Quote request sent — we'll call within 1 business day.
         </span>
       </motion.div>
@@ -718,7 +718,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <div
         style={{
           fontFamily: "var(--font-mono)",
-          fontSize: 8,
+          fontSize: 11,
           letterSpacing: "0.14em",
           textTransform: "uppercase",
           color: "rgba(22,33,29,0.45)",
@@ -736,7 +736,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
           display: "flex",
           alignItems: "center",
           padding: "0 10px",
-          fontSize: 10.5,
+          fontSize: 13,
           color: "rgba(22,33,29,0.8)",
         }}
       >
@@ -809,7 +809,7 @@ export function ScreenAnalytics({ local, compact }: ScreenProps) {
         </div>
         {JOBS.slice(0, 3).map(([job, , status]) => (
           <div key={job} style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 0", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-            <span style={{ flex: 1, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{job}</span>
+            <span style={{ flex: 1, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{job}</span>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: MIN, background: STATUS_TINT[status][0], color: STATUS_TINT[status][1], borderRadius: 999, padding: "2px 8px" }}>{status}</span>
           </div>
         ))}
@@ -868,7 +868,7 @@ export function ScreenAnalytics({ local, compact }: ScreenProps) {
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div>
             <div style={{ fontSize: 13.5, fontWeight: 600 }}>Operations</div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(237,231,218,0.42)", marginTop: 2 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(237,231,218,0.42)", marginTop: 2 }}>
               Ajax · Pickering · Whitby
             </div>
           </div>
@@ -880,7 +880,7 @@ export function ScreenAnalytics({ local, compact }: ScreenProps) {
                 key={r}
                 style={{
                   fontFamily: "var(--font-mono)",
-                  fontSize: 9.5,
+                  fontSize: 11,
                   padding: "5px 12px",
                   borderRadius: 5,
                   background: range === r ? "rgba(255,255,255,0.14)" : "transparent",
@@ -923,12 +923,12 @@ export function ScreenAnalytics({ local, compact }: ScreenProps) {
                 padding: "10px 11px",
               }}
             >
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(237,231,218,0.42)" }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(237,231,218,0.42)" }}>
                 {label}
               </div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 6 }}>
                 <span style={{ fontSize: 19, fontWeight: 600, letterSpacing: "-0.02em" }}>{value}</span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: delta.startsWith("−") ? "#E08C7F" : "#7FD3A3" }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: delta.startsWith("−") ? "#E08C7F" : "#7FD3A3" }}>
                   {delta}
                 </span>
               </div>
@@ -957,8 +957,8 @@ export function ScreenAnalytics({ local, compact }: ScreenProps) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-            <span style={{ fontSize: 10.5, fontWeight: 500 }}>Revenue booked</span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(237,231,218,0.4)" }}>
+            <span style={{ fontSize: 13, fontWeight: 500 }}>Revenue booked</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(237,231,218,0.4)" }}>
               {range === "30d" ? "last 30 days" : "last 7 days"}
             </span>
           </div>
@@ -1004,7 +1004,7 @@ export function ScreenAnalytics({ local, compact }: ScreenProps) {
               gridTemplateColumns: "2.2fr 0.8fr 1fr 0.8fr",
               gap: 8,
               fontFamily: "var(--font-mono)",
-              fontSize: 8,
+              fontSize: 11,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               color: "rgba(237,231,218,0.36)",
@@ -1029,17 +1029,17 @@ export function ScreenAnalytics({ local, compact }: ScreenProps) {
                   alignItems: "center",
                   padding: "7px 0",
                   borderBottom: "1px solid rgba(255,255,255,0.04)",
-                  fontSize: 10,
+                  fontSize: 13,
                 }}
               >
                 <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{job}</span>
-                <span style={{ color: "rgba(237,231,218,0.6)", fontFamily: "var(--font-mono)", fontSize: 9 }}>{crew}</span>
+                <span style={{ color: "rgba(237,231,218,0.6)", fontFamily: "var(--font-mono)", fontSize: 11 }}>{crew}</span>
                 <span>
-                  <span style={{ background: bg, color: fg, borderRadius: 999, padding: "2.5px 8px", fontSize: 8.5, fontFamily: "var(--font-mono)" }}>
+                  <span style={{ background: bg, color: fg, borderRadius: 999, padding: "2.5px 8px", fontSize: 11, fontFamily: "var(--font-mono)" }}>
                     {status}
                   </span>
                 </span>
-                <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 9.5 }}>{rev}</span>
+                <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 11 }}>{rev}</span>
               </div>
             );
           })}
@@ -1063,15 +1063,15 @@ export function ScreenAnalytics({ local, compact }: ScreenProps) {
           zIndex: 22,
         }}
       >
-        <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(237,231,218,0.4)", marginBottom: 8 }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(237,231,218,0.4)", marginBottom: 8 }}>
           Notifications
         </div>
         {[["New quote request", "Ravenscroft Rd · 2m"], ["Crew B checked in", "Kingston Rd E · 18m"]].map(([a, b]) => (
           <div key={a} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#3FA06B", marginTop: 4 }} />
             <span>
-              <span style={{ display: "block", fontSize: 10 }}>{a}</span>
-              <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 8, color: "rgba(237,231,218,0.42)" }}>{b}</span>
+              <span style={{ display: "block", fontSize: 13 }}>{a}</span>
+              <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(237,231,218,0.42)" }}>{b}</span>
             </span>
           </div>
         ))}
@@ -1147,14 +1147,14 @@ export function ScreenLibrary({ local, compact }: ScreenProps) {
       <div style={{ width: 128, flex: "0 0 128px", borderRight: `1px solid ${line}`, padding: "14px 12px", background: panel, transition: "background 320ms ease" }}>
         {TREE.map(([group, items]) => (
           <div key={group} style={{ marginBottom: 14 }}>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 7.5, letterSpacing: "0.16em", textTransform: "uppercase", color: muted, marginBottom: 7 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: muted, marginBottom: 7 }}>
               {group}
             </div>
             {items.map((it) => (
               <div
                 key={it}
                 style={{
-                  fontSize: 10,
+                  fontSize: 13,
                   padding: "4px 7px",
                   borderRadius: 5,
                   marginBottom: 1,
@@ -1173,11 +1173,11 @@ export function ScreenLibrary({ local, compact }: ScreenProps) {
       <div style={{ flex: 1, minWidth: 0, padding: "14px 18px", display: "flex", flexDirection: "column", gap: 12, overflow: "hidden" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 13, fontWeight: 600 }}>Button</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: muted }}>4 variants · 4 states</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: muted }}>4 variants · 4 states</span>
           <span style={{ flex: 1 }} />
           {/* the toggle the cursor flips */}
           <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: muted }}>Dark mode</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: muted }}>Dark mode</span>
             <span
               style={{
                 width: 32,
@@ -1209,7 +1209,7 @@ export function ScreenLibrary({ local, compact }: ScreenProps) {
         <div style={{ display: "grid", gridTemplateColumns: "58px repeat(4, minmax(0,1fr))", gap: 8, alignItems: "center" }}>
           <span />
           {["Default", "Hover", "Active", "Disabled"].map((s) => (
-            <span key={s} style={{ fontFamily: "var(--font-mono)", fontSize: 7.5, letterSpacing: "0.12em", textTransform: "uppercase", color: muted }}>
+            <span key={s} style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: muted }}>
               {s}
             </span>
           ))}
@@ -1236,7 +1236,7 @@ export function ScreenLibrary({ local, compact }: ScreenProps) {
                     display: "flex",
                     alignItems: "center",
                     padding: "0 9px",
-                    fontSize: 10,
+                    fontSize: 13,
                     color: val ? ink : muted,
                     background: dark ? "rgba(255,255,255,0.03)" : "#fff",
                   }}
@@ -1244,7 +1244,7 @@ export function ScreenLibrary({ local, compact }: ScreenProps) {
                   {val || "Postal code"}
                 </div>
                 {state === "Error" ? (
-                  <div style={{ fontSize: 8.5, color: "#E0705F", marginTop: 3 }}>Enter a full postal code</div>
+                  <div style={{ fontSize: 11.5, color: "#E0705F", marginTop: 3 }}>Enter a full postal code</div>
                 ) : null}
               </div>
             ))}
@@ -1264,7 +1264,7 @@ export function ScreenLibrary({ local, compact }: ScreenProps) {
                   display: "flex",
                   justifyContent: "space-between",
                   fontFamily: "var(--font-mono)",
-                  fontSize: 9,
+                  fontSize: 11,
                   padding: "4.5px 0",
                   borderBottom: `1px solid ${line}`,
                   color: muted,
@@ -1283,7 +1283,7 @@ export function ScreenLibrary({ local, compact }: ScreenProps) {
 
 function PanelLabel({ children, muted }: { children: React.ReactNode; muted: string }) {
   return (
-    <div style={{ fontFamily: "var(--font-mono)", fontSize: 7.5, letterSpacing: "0.16em", textTransform: "uppercase", color: muted, marginBottom: 8 }}>
+    <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: muted, marginBottom: 8 }}>
       {children}
     </div>
   );
@@ -1311,7 +1311,7 @@ function VariantRow({
 
   return (
     <>
-      <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: muted }}>{variant}</span>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: muted }}>{variant}</span>
       {states.map((o, i) => (
         <span
           key={i}
@@ -1324,7 +1324,7 @@ function VariantRow({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 9.5,
+            fontSize: 13,
             fontWeight: 500,
             opacity: o,
             transform: i === 2 ? "scale(0.97)" : "none",
@@ -1400,7 +1400,7 @@ export function ScreenRelease({ local, compact }: ScreenProps) {
             {score}
           </span>
           <span>
-            <span style={{ display: "block", fontSize: 12, fontWeight: 600 }}>Performance</span>
+            <span style={{ display: "block", fontSize: 13, fontWeight: 600 }}>Performance</span>
             <span style={{ display: "block", fontSize: MIN, color: "rgba(27,31,29,0.58)", marginTop: 2 }}>Mobile, after each deploy</span>
           </span>
         </div>
@@ -1432,7 +1432,7 @@ export function ScreenRelease({ local, compact }: ScreenProps) {
           <span style={{ flex: 1 }} />
           <span
             style={{
-              fontSize: 10,
+              fontSize: 13,
               fontWeight: 600,
               color: "#fff",
               background: published ? "#3FA06B" : "#1F5D4C",
@@ -1464,7 +1464,7 @@ export function ScreenRelease({ local, compact }: ScreenProps) {
                 <span
                   style={{
                     fontFamily: "var(--font-mono)",
-                    fontSize: 9,
+                    fontSize: 11,
                     fontWeight: 600,
                     background: i === 0 ? "#1F5D4C" : "rgba(27,31,29,0.07)",
                     color: i === 0 ? "#fff" : "rgba(27,31,29,0.62)",
@@ -1478,14 +1478,14 @@ export function ScreenRelease({ local, compact }: ScreenProps) {
                   {v}
                 </span>
                 <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: "block", fontSize: 10.5, lineHeight: 1.35 }}>
+                  <span style={{ display: "block", fontSize: 13, lineHeight: 1.35 }}>
                     {note}
                   </span>
                   <span style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 3 }}>
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,31,29,0.45)" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,31,29,0.45)" }}>
                       {date} · deployed in {28 + i * 4} s
                     </span>
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 8, background: tbg, color: tfg, borderRadius: 999, padding: "1.5px 7px" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, background: tbg, color: tfg, borderRadius: 999, padding: "1.5px 7px" }}>
                       {tag}
                     </span>
                   </span>
@@ -1497,10 +1497,10 @@ export function ScreenRelease({ local, compact }: ScreenProps) {
 
         {/* diff card */}
         <div style={{ border: "1px solid rgba(27,31,29,0.1)", borderRadius: 8, background: "#fff", padding: 11, marginTop: 8 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,31,29,0.45)", marginBottom: 7 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,31,29,0.45)", marginBottom: 7 }}>
             New page shipped
           </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, lineHeight: 1.7 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, lineHeight: 1.7 }}>
             <div style={{ background: "rgba(63,160,107,0.12)", padding: "1px 6px", borderRadius: 3 }}>
               + /services/basement-finishing
             </div>
@@ -1554,8 +1554,8 @@ export function ScreenRelease({ local, compact }: ScreenProps) {
             </span>
           </div>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600 }}>Performance</div>
-            <div style={{ fontSize: 10, color: "rgba(27,31,29,0.58)", marginTop: 3, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, fontWeight: 600 }}>Performance</div>
+            <div style={{ fontSize: 13, color: "rgba(27,31,29,0.58)", marginTop: 3, lineHeight: 1.5 }}>
               Mobile, simulated 4G.
               <br />
               Measured after each deploy.
@@ -1564,12 +1564,12 @@ export function ScreenRelease({ local, compact }: ScreenProps) {
         </div>
 
         <div style={{ background: "#fff", border: "1px solid rgba(27,31,29,0.09)", borderRadius: 10, padding: 13 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,31,29,0.45)", marginBottom: 9 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,31,29,0.45)", marginBottom: 9 }}>
             Core Web Vitals
           </div>
           {VITALS.map(([k, v, verdict]) => (
             <div key={k} style={{ display: "flex", alignItems: "center", gap: 9, padding: "6px 0" }}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, width: 30, color: "rgba(27,31,29,0.6)" }}>{k}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, width: 30, color: "rgba(27,31,29,0.6)" }}>{k}</span>
               <span style={{ flex: 1, height: 5, borderRadius: 3, background: "rgba(27,31,29,0.08)", overflow: "hidden" }}>
                 <motion.span
                   style={{
@@ -1581,11 +1581,11 @@ export function ScreenRelease({ local, compact }: ScreenProps) {
                   }}
                 />
               </span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, width: 42, textAlign: "right" }}>{v}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, width: 42, textAlign: "right" }}>{v}</span>
               <span
                 style={{
                   fontFamily: "var(--font-mono)",
-                  fontSize: 8,
+                  fontSize: 11,
                   background: published ? "rgba(63,160,107,0.14)" : "rgba(216,192,122,0.2)",
                   color: published ? "#2E7A50" : "#8A6E22",
                   borderRadius: 999,
@@ -1601,14 +1601,14 @@ export function ScreenRelease({ local, compact }: ScreenProps) {
 
         <div style={{ background: "#fff", border: "1px solid rgba(27,31,29,0.09)", borderRadius: 10, padding: 13, flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,31,29,0.45)" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,31,29,0.45)" }}>
               Deploys
             </span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(27,31,29,0.4)" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,31,29,0.4)" }}>
               last 10 weeks
             </span>
             <span style={{ flex: 1 }} />
-            <span style={{ fontSize: 12, fontWeight: 600 }}>61</span>
+            <span style={{ fontSize: 13, fontWeight: 600 }}>61</span>
           </div>
           <div style={{ flex: 1, display: "flex", alignItems: "flex-end", gap: 6, minHeight: 54 }}>
             {DEPLOYS.map((d, i) => (
