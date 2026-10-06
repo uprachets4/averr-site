@@ -8,7 +8,7 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { duration, ease } from "../lib/motion";
+import { duration, ease, spring } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
 import PillHl from "./PillHl";
 import LineReveal from "./LineReveal";
@@ -254,11 +254,14 @@ function HeroComposition({
         {KICKER}
       </motion.p>
 
+      {/* The CTAs keep their spring, but on the TRANSFORM only — they are
+          painted at opacity 1 from the first frame like the rest of the hero
+          text, so the bounce is motion on something already on screen. */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 28 }}>
         <motion.div
-          initial={{ opacity: 1, y: instant ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{ duration: dur(duration.base), ease: ease.outQuart, delay: d(T.ctaPrimary) }}
+          initial={{ opacity: 1, y: instant ? 0 : 12, scale: instant ? 1 : 0.96 }}
+          animate={{ y: 0, scale: 1 }}
+          transition={instant ? { duration: 0 } : { delay: d(T.ctaPrimary), ...spring.snappy }}
           style={{ display: "inline-flex" }}
         >
           <MagneticCTA to="/contact" variant="primary">
@@ -266,9 +269,9 @@ function HeroComposition({
           </MagneticCTA>
         </motion.div>
         <motion.div
-          initial={{ opacity: 1, y: instant ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{ duration: dur(duration.base), ease: ease.outQuart, delay: d(T.ctaSecondary) }}
+          initial={{ opacity: 1, y: instant ? 0 : 12, scale: instant ? 1 : 0.96 }}
+          animate={{ y: 0, scale: 1 }}
+          transition={instant ? { duration: 0 } : { delay: d(T.ctaSecondary), ...spring.snappy }}
           style={{ display: "inline-flex" }}
         >
           <MagneticCTA to="/work" variant="ghost">
