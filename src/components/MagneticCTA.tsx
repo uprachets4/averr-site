@@ -62,6 +62,8 @@ export default function MagneticCTA(props: MagneticCTAProps) {
   } = props;
 
   const reduce = useReducedMotion();
+  /** Tone cross-fade length. Reduced motion swaps both in one frame. */
+  const toneMs = reduce ? 0 : duration.base * 1000;
   const ref = useRef<HTMLElement | null>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -101,9 +103,24 @@ export default function MagneticCTA(props: MagneticCTAProps) {
     textDecoration: "none",
     cursor: "pointer",
     userSelect: "none",
-    transitionProperty: "background-color, border-color, color, box-shadow",
-    transitionDuration: `${duration.base * 1000}ms`,
-    transitionTimingFunction: `cubic-bezier(${ease.outQuart.join(",")})`,
+    /* The label must never cross-fade through its own pill.
+     *
+     * Background and colour used to run the same duration from opposite
+     * ends, so they met in the middle: 175ms into a nav tone flip the pill
+     * was rgb(133,131,127) and the label rgb(127,125,119) — 1.09:1, which
+     * is the "grey pill with no label" in the 17d recording. Arithmetic,
+     * not tuning: two opposite ramps over one duration always cross.
+     *
+     * So the colour does not ramp at all. It steps, once, at the halfway
+     * point, and `ease.inOut` is used for the ramp because it is the one
+     * token that is point-symmetric ([0.65,0,0.35,1]) — it reaches exactly
+     * half its distance at exactly half its time, in both directions. The
+     * pill is therefore mid-value at the instant the label flips, which
+     * leaves ~3.5:1 going either way and only improves from there. */
+    transitionProperty: "background-color, border-color, box-shadow, color",
+    transitionDuration: `${toneMs}ms, ${toneMs}ms, ${toneMs}ms, 0ms`,
+    transitionDelay: `0ms, 0ms, 0ms, ${toneMs / 2}ms`,
+    transitionTimingFunction: `cubic-bezier(${ease.inOut.join(",")})`,
     ...sizeStyles[size],
   };
 
