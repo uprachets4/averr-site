@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~110 commits ahead of `main`** at the end of Session 17-fix — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `b51fa7d` — *"17g: the card sizes to whichever face is showing"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
-| **Doc currency** | Written at the end of Session 17g. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **HEAD** | `57af7b2` — *"17g-fix: whole-token dates, placeholder reads as one, spaced arrows"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
+| **Doc currency** | Written at the end of Session 17g-fix. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -26,7 +26,7 @@
 dist/index.html                    3.18 kB │ gzip:   1.40 kB  ← carries the route-chunk map
 dist/assets/index-*.css           42.09 kB │ gzip:   8.75 kB
 dist/assets/index-*.js           473.71 kB │ gzip: 150.18 kB  ← home + shell + motion
-dist/assets/Services-*.js        196.38 kB │ gzip:  49.33 kB  ← the build page + the start pass
+dist/assets/Services-*.js        197.63 kB │ gzip:  49.92 kB  ← the build page + the start pass
 dist/assets/Cal.es-*.js            1.39 kB │ gzip:   0.75 kB  ← the embed, fetched on intent only
 dist/assets/CaseStudy-*.js        51.34 kB │ gzip:  12.71 kB
 dist/assets/Contact-*.js          44.67 kB │ gzip:  11.14 kB
@@ -499,6 +499,24 @@ Build exit **0** unfiltered · Q1 **14.15:1**, input text **17.53:1**, field out
 
 **Deviations.** There is **no `--border` token** — §5.23 records that `--color-border` does not exist — and `--hair-hi` fails 3:1, so the field, the arrows and the "pick another date" control use a literal `rgba(20,20,18,0.55)`. The eyebrow remains **`//_05 · TRY IT`** rather than bare "TRY IT", keeping the site's `//_NN ·` section convention. And the simulated-booking harness is reachable in production via an explicit query param, as above.
 
+**17g-fix** — **five display fixes from the 17g recording.** One commit.
+
+**1 · The odometer is gone.** Per-digit rolling columns leaked their neighbours AT REST: "Oct 12" showed the leading 1 as a bar with stray strokes, and a pass row read "Monday, Oct 1g". **A column of ten glyphs clipped to a line box is always one mis-measured pixel away from showing the next one** — no amount of padding fixes the class of bug. `DateToken` replaces it everywhere (main date, both pass rows, the kickoff line): the whole string slides out at y −40% while the new one slides in from +40%, opacity and transform only, `duration.base` / `ease.outQuart`, instant under reduced motion. **The clip box is measured from the font's real ink**, via canvas `actualBoundingBoxAscent`/`Descent` on the string plus every digit in the element's own computed font, re-measured after `document.fonts.ready`; the padding that gives Cormorant's italic room is cancelled by an equal negative margin so nothing moves.
+
+*Verified:* 10 consecutive dates covering **digits 0–9**, in both faces — **every token holds exactly one layer at rest and no ink falls outside its measured box.** Zoomed crops at 1440 and 1680 show complete glyphs.
+
+**2 · The animated example reads as a placeholder.** It was dark and full-size and looked like a typed value while the pass still said "Your business". It is now prefixed **"e.g. "**, in `--color-muted-2` — **3.49:1 on the field, against ink's 17.53:1 for typed text** — with the blinking caret at the **start** of the field where a cursor would actually be, rather than trailing the example.
+
+**3 · One contextual tag.** The date repeated under the main date is gone. Above: the weekday. Below: a single outlined pill, shown only when it says something — **Today / Tomorrow / Weekend call / the holiday name** — in a row whose height is reserved. *Verified across six consecutive days: the tag row stays 28px and the date's y never moves.*
+
+**4 · Arrows and neighbours.** The reel is a grid, so the three numerals share one baseline row instead of being centred by box, with the weekday and tag in their own rows. **Measured clear space between each arrow and its neighbouring numeral: 28px at 1280, 1440, 1680 and 1920** — above the 24px asked for.
+
+**5 · `?simulateBooking` is dev and preview only.** Active on localhost and `*.vercel.app`; inert anywhere else, so nothing on averrstudios.com can make the pass claim a booking that does not exist. **Closes §7.12.**
+
+**Verified on the alias:** build exit **0** unfiltered · the digit sweep above · placeholder vs typed captured side by side · tag and baseline measurements above · mobile 375: minimum font **13px**, **no control under 44px**, zero overflow · reduced motion: the animated example is absent, the static placeholder serves, and every token computes `transform: none` · **crash scroll 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2408 ms, home 1880 ms**, CLS 0.001/0.000 · 12 date tests passing.
+
+*One probe error of mine, reported:* the first artefact audit selected three hosts that contain no `DateToken` and scored their zero layers as failures — "10 frames with artefacts" when the real tokens were all clean. The selector now requires a host to contain a sizer span.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -717,7 +735,11 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **40 · Compositing matters when measuring a border's contrast.** *Cause:* reading `rgba(20,20,18,0.18)` as if it were opaque reports 17.5:1 — the ink's contrast, not the border's. Composited over the fill it is **1.47:1**, failing WCAG 1.4.11's 3:1 for a control boundary. *Fix:* composite `fg·α + bg·(1−α)` first, and check against BOTH adjacent colours (the fill inside and the page ground outside).
 
-**41 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
+**41 · A per-digit odometer is the wrong mechanism for a date.** *Cause:* each digit is a column of ten glyphs clipped to a window. Even measured carefully the window cut the neighbours at rest — a leading "1" rendered as a bar with strokes above it, and "15" read as "1g". *Fix:* transition the WHOLE token, so only one string is ever in the box, and measure the box from the font's real ink (`actualBoundingBoxAscent`/`Descent` via canvas, re-run after `document.fonts.ready`) rather than from its line box. **Any rolling-digit effect in a face with real ascenders is a clipping bug waiting to happen.**
+
+**42 · Baseline alignment needs a grid row, not `align-items: center`.** *Cause:* the date control centred three numerals of different sizes by box, so the neighbours sat half a line off the main date. *Fix:* a grid with the numerals in one row and `align-items: baseline`; the weekday and tag get their own rows. A wrapper per column cannot work — its baseline is its FIRST line's, which was the weekday.
+
+**43 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
 
 ---
 
@@ -785,15 +807,14 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 9. **Full mobile review** — automated checks confirm zero overflow, but no human pass has been done on a real device. The Session 17 stacked stills are no longer a concern here: **Prachets ruled the ~6px Automate labels a defect, and 17-fix-2 replaced that still below 900px with a purpose-built vertical composition** — five nodes on a straight vertical path, every label at real `type-eyebrow` size. Design and Grow still scale, and both were checked as readable at 375.
 10. ~~**`/work`'s LCP image.**~~ **APPROVED and DONE in 19-pre-2.** Prachets ruled that resized derivatives of existing screenshots are not new assets, so rule 11 does not apply. `/work` is 2320 ms.
 11. **Prerendering the shell — deferred to the Ship pass by Prachets.** First contentful paint is 1.64–1.86 s on every route because nothing paints until 152 kB of JS downloads and React mounts. Static-rendering each route's hero into its HTML would put LCP near first byte. Build-pipeline decision, not a page change.
-12. **The `?simulateBooking=<ISO>` harness is reachable in production.** It sets component state so the pass shows the CONFIRMED face — no request, no storage, nothing server-side, and it affects only the browser that types it. It exists because the flip had to be verified on the alias, where a dev-only build flag does not apply. **Say the word and it becomes dev-only, at the cost of never verifying the confirmed state on a deployment again.**
-13. **Weekend bookability now depends on the Cal.com availability schedule.** The pass offers Saturday and Sunday, and both showed slots when checked — but if the schedule is ever narrowed to weekdays, the page will offer a day the booking page refuses. **Keep weekend availability on, or tell me to grey weekends out again.**
-14. **The holiday table ends after 2027.** `businessDays.ts` covers 2026–2027; past that the proposal count silently degrades to weekends only. `holidayCoverageEndsAfter` exists so a future session can assert on it.
-15. **Six /services screens are still over the ~15% blank target** (largest flat rectangle as a share of the window, measured at 1680 / 1440): **Reporting 28.8 / 30**, **Brand & design direction 24.2 / 24.2**, **Human review built in 21.9 / 12.2**, **Paid ads 20 / 22.5**, **Product & SaaS interfaces 18.8 / 18.8**, **Design systems 18.3 / 18.3**, **Landing pages 16.4 / 16.4**. Type and legibility are met everywhere (base 13px, min 11px); these are composition density only. Each needs the same treatment the other eight got — content that reaches the bottom of the window, or panes that stretch rather than sit at their natural height.
-16. **A second, larger WebP rung is fetched on some case-study loads** — `01-command-overview-1280.webp` *and* `-1680.webp` on `/work/sift`, about 32 kB wasted. Seen in two probes, **not reproducible in a third, and I did not identify which element re-selects.** Both are lazy and land after LCP, so it costs bytes, not a metric. Worth one instrumented pass next time something touches that page.
-17. **`/work/sift` carries 0.009 CLS** from the hero meta grid moving 27 px at ~3.1 s — almost certainly the Inter swap relaying the one subhead long enough to change line count, despite the metric-matched fallback. Inside "good" and the route passes; left alone deliberately rather than chased.
-18. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
-19. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
-20. ~~**Commit-message convention.**~~ **CLOSED — Prachets ruled in 17-fix: standing rule 18 wins, always.** Commit + push per verified item. The `Commit:` line at the foot of a brief is the **summary for the final report**, not a single commit message to squash onto. See §4.18.
+12. **Weekend bookability depends on the Cal.com availability schedule.** The pass offers Saturday and Sunday, and both showed slots when checked — but if the schedule is ever narrowed to weekdays, the page will offer a day the booking page refuses. **Keep weekend availability on, or tell me to grey weekends out again.**
+13. **The holiday table ends after 2027.** `businessDays.ts` covers 2026–2027; past that the proposal count silently degrades to weekends only. `holidayCoverageEndsAfter` exists so a future session can assert on it.
+14. **Six /services screens are still over the ~15% blank target** (largest flat rectangle as a share of the window, measured at 1680 / 1440): **Reporting 28.8 / 30**, **Brand & design direction 24.2 / 24.2**, **Human review built in 21.9 / 12.2**, **Paid ads 20 / 22.5**, **Product & SaaS interfaces 18.8 / 18.8**, **Design systems 18.3 / 18.3**, **Landing pages 16.4 / 16.4**. Type and legibility are met everywhere (base 13px, min 11px); these are composition density only. Each needs the same treatment the other eight got — content that reaches the bottom of the window, or panes that stretch rather than sit at their natural height.
+15. **A second, larger WebP rung is fetched on some case-study loads** — `01-command-overview-1280.webp` *and* `-1680.webp` on `/work/sift`, about 32 kB wasted. Seen in two probes, **not reproducible in a third, and I did not identify which element re-selects.** Both are lazy and land after LCP, so it costs bytes, not a metric. Worth one instrumented pass next time something touches that page.
+16. **`/work/sift` carries 0.009 CLS** from the hero meta grid moving 27 px at ~3.1 s — almost certainly the Inter swap relaying the one subhead long enough to change line count, despite the metric-matched fallback. Inside "good" and the route passes; left alone deliberately rather than chased.
+17. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
+18. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
+19. ~~**Commit-message convention.**~~ **CLOSED — Prachets ruled in 17-fix: standing rule 18 wins, always.** Commit + push per verified item. The `Commit:` line at the foot of a brief is the **summary for the final report**, not a single commit message to squash onto. See §4.18.
 
 ---
 
@@ -804,7 +825,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **Needs the photo.**
 - ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`).
 - ~~**Session 19-pre-2 — Prachets's four rulings.**~~ **DONE** (`e521774` … `895313d`). **All eleven routes under 2.5 s.** See §2.
-- ~~**Session 17g — guided conversation + in-page booking.**~~ **DONE** (`267c248` … `b51fa7d`). The call is 30 minutes site-wide, the name field is unmissable, the date control is obvious, booking happens in a modal and the pass flips to CONFIRMED. **One owner item — §7.13 (weekend availability).**
+- ~~**Session 17g-fix — start pass display fixes.**~~ **DONE.** Whole-token dates, a placeholder that reads as one, a single contextual tag, spaced arrows on a shared baseline, simulateBooking preview-only.
+- ~~**Session 17g — guided conversation + in-page booking.**~~ **DONE** (`267c248` … `b51fa7d`). The call is 30 minutes site-wide, the name field is unmissable, the date control is obvious, booking happens in a modal and the pass flips to CONFIRMED. **One owner item — §7.12 (weekend availability).**
 - ~~**Session 17f — "Your project start pass".**~~ **DONE** (`b6ea58f` … `231f1f2`). Weekends bookable, Ontario stat holidays in the business-day count, kickoff clipping fixed.
 - ~~**Session 17e — /services kickoff section.**~~ **DONE** (`aae26c8` … `ccd4c1f`). The 14-day calendar is an interactive personal timeline; `KickoffCalendar` removed.
 - ~~**Session 17d — /services quality + two site-wide fixes.**~~ **DONE** (`608a0c6` … `d925553`). Captions, spotlight, density, nav CTA, ledger, hero CTAs. **Six screens remain over the blank target — §7.12.**
