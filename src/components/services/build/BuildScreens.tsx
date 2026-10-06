@@ -381,9 +381,6 @@ export function ScreenBrandBoard({ local, compact }: ScreenProps) {
               {BRAND.name}
             </text>
             <rect x="52" y="55" width="86" height="3" rx="1.5" fill={accent} />
-            <text x="146" y="59" fill="rgba(255,255,255,0.72)" fontSize="7" fontFamily="var(--font-mono)" letterSpacing="1">
-              (905) 555-0142
-            </text>
           </svg>
         </div>
       </Fade>
