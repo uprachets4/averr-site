@@ -592,8 +592,26 @@ function MiniPage({ layout }: { layout: "stacked" | "split" }) {
           </div>
         )}
 
+        {/* A line of social proof between the hero and the numbers. The
+            proof row used to be pushed to the bottom with margin-top:auto,
+            which left ~200px of dead page in the middle of variant B. */}
+        <div
+          style={{
+            marginTop: 4,
+            padding: "9px 11px",
+            borderRadius: 7,
+            background: "#fff",
+            border: "1px solid rgba(27,34,32,0.1)",
+          }}
+        >
+          <div style={{ fontSize: 11, color: AMBER, letterSpacing: "0.12em" }}>★★★★★</div>
+          <div style={{ ...label, lineHeight: 1.5, marginTop: 3 }}>
+            "Quoted in person, finished on the day they said." — Dana R., Whitby
+          </div>
+        </div>
+
         {/* proof row — present on both variants */}
-        <div style={{ display: "flex", gap: 8, marginTop: "auto" }}>
+        <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
           {[["180+", "jobs"], ["4.9", "rating"], ["12yr", "in Durham"]].map(([v, k]) => (
             <div key={k} style={{ flex: 1, background: "#fff", border: "1px solid rgba(27,34,32,0.1)", borderRadius: 6, padding: "7px 8px" }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: "#16211D" }}>{v}</div>
