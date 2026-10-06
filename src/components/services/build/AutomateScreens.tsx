@@ -675,7 +675,7 @@ export function ScreenInbox({ local, compact }: AutoScreenProps) {
 
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex", background: "#fff", color: "#1C2126", overflow: "hidden" }}>
-      <div style={{ width: 268, flex: "0 0 268px", background: GREY, borderRight: "1px solid rgba(28,33,38,0.1)", padding: "16px 0", minHeight: 0, overflow: "hidden" }}>
+      <div style={{ width: 268, flex: "0 0 268px", background: GREY, borderRight: "1px solid rgba(28,33,38,0.1)", padding: "16px 0 0", minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "0 16px 12px", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(28,33,38,0.45)" }}>
           Awaiting approval · {DRAFTS.length}
         </div>
@@ -689,6 +689,18 @@ export function ScreenInbox({ local, compact }: AutoScreenProps) {
             <div style={{ fontSize: 13, color: "rgba(28,33,38,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: 2 }}>{prev}</div>
           </div>
         ))}
+        {/* so the column ends in a status line rather than bare grey */}
+        <div
+          style={{
+            marginTop: "auto", padding: "14px 16px",
+            borderTop: "1px solid rgba(28,33,38,0.1)",
+            fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(28,33,38,0.5)",
+            display: "flex", justifyContent: "space-between", gap: 10,
+          }}
+        >
+          <span>Showing {DRAFTS.length}</span>
+          <span>Auto-send off</span>
+        </div>
       </div>
 
       <div style={{ flex: 1, minWidth: 0, padding: "18px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
@@ -699,7 +711,7 @@ export function ScreenInbox({ local, compact }: AutoScreenProps) {
           </div>
         </div>
 
-        <div style={{ flex: 1, minHeight: 0, border: "1px solid rgba(28,33,38,0.12)", borderRadius: 11, padding: 18, fontSize: 13, lineHeight: 1.72 }}>
+        <div style={{ flex: 1, minHeight: 0, border: "1px solid rgba(28,33,38,0.12)", borderRadius: 11, padding: 18, fontSize: 13, lineHeight: 1.72, display: "flex", flexDirection: "column" }}>
           Hi Priya — thanks for the details on the Ravenscroft basement. We cover
           Oshawa and the rest of Durham, and can usually get out for an on-site estimate{" "}
           <span style={{ textDecoration: "line-through", color: "#C2453A", opacity: edited ? 1 : 0.35, transition: "opacity 300ms ease" }}>
@@ -720,7 +732,37 @@ export function ScreenInbox({ local, compact }: AutoScreenProps) {
             quoted separately and I will include a figure either way.
           </div>
           <div style={{ marginTop: 14 }}>Happy to walk the space and give you a fixed number.</div>
-          <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(28,33,38,0.1)", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(28,33,38,0.45)" }}>
+
+          {/* A sign-off and the files the agent attached. Without them the
+              panel stretched to flex:1 over roughly 290px of white. */}
+          <div style={{ marginTop: 18, lineHeight: 1.6 }}>
+            <div style={{ fontWeight: 600 }}>Marcus Delacroix</div>
+            <div style={{ color: "rgba(28,33,38,0.6)" }}>Northgate Home Services</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(28,33,38,0.5)", marginTop: 3 }}>
+              (905) 555-0142 · northgate.ca
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 9, marginTop: 16, flexWrap: "wrap" }}>
+            {["estimate-checklist.pdf", "basement-gallery.pdf"].map((f) => (
+              <span
+                key={f}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 7,
+                  fontFamily: "var(--font-mono)", fontSize: 11,
+                  border: "1px solid rgba(28,33,38,0.16)", borderRadius: 7,
+                  padding: "6px 10px", color: "rgba(28,33,38,0.68)",
+                }}
+              >
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden>
+                  <path d="M4 2h5l3 3v9H4z M9 2v3h3" stroke="rgba(28,33,38,0.55)" strokeWidth="1.2" strokeLinejoin="round" />
+                </svg>
+                {f}
+              </span>
+            ))}
+          </div>
+
+          <div style={{ marginTop: "auto", paddingTop: 14, borderTop: "1px solid rgba(28,33,38,0.1)", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(28,33,38,0.45)" }}>
             1 edit by Marcus · {edited ? "just now" : "—"}
           </div>
         </div>
