@@ -1334,7 +1334,7 @@ export function ScreenLibrary({ local, compact }: ScreenProps) {
                 Tell us about the job
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 10, fontSize: 13, color: ink }}>
-                <span style={{ width: 15, height: 15, borderRadius: 4, background: "#3FA06B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff" }}>✓</span>
+                <span style={{ width: 17, height: 17, borderRadius: 4, background: "#3FA06B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, lineHeight: 1, color: "#fff" }}>✓</span>
                 Send me the estimate by email
               </div>
             </div>
