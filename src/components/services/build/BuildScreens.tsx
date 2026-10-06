@@ -1280,6 +1280,8 @@ export function ScreenLibrary({ local, compact }: ScreenProps) {
               ["Empty", line, ""],
               ["Focus", "#3FA06B", "L1N 8K4"],
               ["Error", "#E0705F", "L1N"],
+              ["Filled", line, "L1J 2K8"],
+              ["Disabled", line, "—"],
             ].map(([state, colour, val]) => (
               <div key={state} style={{ marginBottom: 7 }}>
                 <div
@@ -1302,15 +1304,57 @@ export function ScreenLibrary({ local, compact }: ScreenProps) {
                 ) : null}
               </div>
             ))}
+
+            {/* the rest of the form kit, so the panel is not three boxes
+                over 350px of dark */}
+            <div style={{ marginTop: 12, paddingTop: 11, borderTop: `1px solid ${line}` }}>
+              <div style={{ display: "flex", gap: 9, marginBottom: 9 }}>
+                {["Select a service", "▾"].map((t, i) => (
+                  <span
+                    key={t}
+                    style={{
+                      flex: i === 0 ? 1 : "0 0 30px", height: 26, borderRadius: 6,
+                      border: `1.5px solid ${line}`, display: "flex", alignItems: "center",
+                      justifyContent: i === 0 ? "flex-start" : "center", padding: "0 9px",
+                      fontSize: 13, color: muted,
+                      background: dark ? "rgba(255,255,255,0.03)" : "#fff",
+                    }}
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+              <div
+                style={{
+                  height: 54, borderRadius: 6, border: `1.5px solid ${line}`,
+                  padding: "7px 9px", fontSize: 13, color: muted,
+                  background: dark ? "rgba(255,255,255,0.03)" : "#fff",
+                }}
+              >
+                Tell us about the job
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 10, fontSize: 13, color: ink }}>
+                <span style={{ width: 15, height: 15, borderRadius: 4, background: "#3FA06B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff" }}>✓</span>
+                Send me the estimate by email
+              </div>
+            </div>
           </div>
 
           <div style={{ border: `1px solid ${line}`, borderRadius: 8, padding: 11, minHeight: 0, overflow: "hidden" }}>
             <PanelLabel muted={muted}>Tokens</PanelLabel>
             {[
               ["color/primary", "#1F5D4C"],
+              ["color/accent", "#C8763C"],
+              ["color/ink", "#16211D"],
+              ["color/paper", "#EFE7D8"],
+              ["space/2", "8px"],
               ["space/3", "12px"],
+              ["space/5", "24px"],
+              ["radius/sm", "4px"],
               ["radius/md", "8px"],
               ["text/body", "14 / 22"],
+              ["text/h3", "20 / 26"],
+              ["shadow/card", "0 8 24 / 10%"],
             ].map(([k, v]) => (
               <div
                 key={k}
