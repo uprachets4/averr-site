@@ -317,7 +317,8 @@ export default function KickoffPass() {
                 <div className="kp2-date__reel">
                   {[-1, 0, 1].map((d) => {
                     const o = offset + d;
-                    if (o < 0 || o > RANGE_DAYS) return <span key={d} className="kp2-date__slot" />;
+                    if (o < 0 || o > RANGE_DAYS)
+                      return <span key={d} aria-hidden className="kp2-date__slot kp2-date__slot--empty" />;
                     const day = addDays(today, o);
                     return d === 0 ? (
                       <span key={d} className="kp2-date__slot kp2-date__slot--main">
@@ -588,6 +589,8 @@ export default function KickoffPass() {
         .kp2-arrow:disabled { opacity: 0.32; cursor: default; }
         .kp2-date__reel { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
         .kp2-date__slot { flex: 0 0 auto; display: block; text-align: center; }
+        /* holds the row's shape at either end of the range */
+        .kp2-date__slot--empty { min-width: 56px; min-height: 44px; }
         .kp2-date__slot--near {
           background: none; border: none; cursor: pointer; opacity: 0.42;
           color: var(--color-muted); font-family: inherit; padding: 8px;
@@ -611,7 +614,11 @@ export default function KickoffPass() {
         .kp2-flip { position: relative; }
         .kp2-flip__inner { position: relative; transform-style: preserve-3d; }
         .kp2-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-        .kp2-face--back { position: absolute; inset: 0; transform: rotateY(180deg); }
+        /* Compound, not ".kp2-face--back" alone: .kp2-pass sets
+           position:relative later in this sheet at the same specificity
+           and won, which put the back face in normal flow and doubled the
+           card's height — the CTA ended up 700px below the fold. */
+        .kp2-pass.kp2-face--back { position: absolute; inset: 0; transform: rotateY(180deg); }
 
         .kp2-pass {
           position: relative; background: var(--surface-elevated); border-radius: 18px;
