@@ -435,6 +435,45 @@ export function ScreenBrandBoard({ local, compact }: ScreenProps) {
             <rect x="52" y="55" width="86" height="3" rx="1.5" fill={accent} />
           </svg>
         </div>
+
+        {/* A yard sign. The applications column stopped after two items,
+            leaving the right half of the window blank below the van —
+            which is where the flat region actually was, not the bottom
+            strip I first assumed. */}
+        <div
+          style={{
+            marginTop: 14,
+            borderRadius: 8,
+            background: BRAND.primary,
+            color: BRAND.paper,
+            padding: "18px 16px 16px",
+            textAlign: "center",
+            boxShadow: "0 10px 26px rgba(22,33,29,0.18)",
+          }}
+        >
+          <svg width="22" height="22" viewBox="0 0 48 48" fill="none" style={{ marginBottom: 8 }}>
+            <path d="M8 38 L8 14 L24 24 L40 14 L40 38" stroke={accent} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: "0.16em" }}>{BRAND.name}</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, opacity: 0.75, marginTop: 5 }}>
+            Basements · Flooring · Tile
+          </div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, opacity: 0.75, marginTop: 3 }}>
+            (905) 555-0142
+          </div>
+          <div
+            style={{
+              marginTop: 11,
+              paddingTop: 10,
+              borderTop: "1px solid rgba(239,231,216,0.22)",
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              opacity: 0.6,
+            }}
+          >
+            Yard sign · 18 × 24
+          </div>
+        </div>
       </Fade>
     </div>
   );
