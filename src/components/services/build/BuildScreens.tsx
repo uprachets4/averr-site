@@ -316,7 +316,7 @@ export function ScreenBrandBoard({ local, compact }: ScreenProps) {
             ].map((g, i) => (
               <span
                 key={i}
-                style={{ flex: 1, height: 46, borderRadius: 5, background: g }}
+                style={{ flex: 1, height: 58, borderRadius: 5, background: g }}
               />
             ))}
           </div>
@@ -345,7 +345,7 @@ export function ScreenBrandBoard({ local, compact }: ScreenProps) {
                   flexDirection: "column",
                   alignItems: "center",
                   gap: 9,
-                  minHeight: 86,
+                  minHeight: 104,
                   justifyContent: "center",
                 }}
               >
