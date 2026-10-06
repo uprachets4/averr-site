@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~110 commits ahead of `main`** at the end of Session 17-fix — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `57af7b2` — *"17g-fix: whole-token dates, placeholder reads as one, spaced arrows"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
-| **Doc currency** | Written at the end of Session 17g-fix. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **HEAD** | `f9452c0` — *"17h: a third application fills the brand board's right column"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
+| **Doc currency** | Written at the end of Session 17h. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -26,7 +26,7 @@
 dist/index.html                    3.18 kB │ gzip:   1.40 kB  ← carries the route-chunk map
 dist/assets/index-*.css           42.09 kB │ gzip:   8.75 kB
 dist/assets/index-*.js           473.71 kB │ gzip: 150.18 kB  ← home + shell + motion
-dist/assets/Services-*.js        197.63 kB │ gzip:  49.92 kB  ← the build page + the start pass
+dist/assets/Services-*.js        204.42 kB │ gzip:  51.06 kB  ← the build page + the start pass
 dist/assets/Cal.es-*.js            1.39 kB │ gzip:   0.75 kB  ← the embed, fetched on intent only
 dist/assets/CaseStudy-*.js        51.34 kB │ gzip:  12.71 kB
 dist/assets/Contact-*.js          44.67 kB │ gzip:  11.14 kB
@@ -517,6 +517,25 @@ Build exit **0** unfiltered · Q1 **14.15:1**, input text **17.53:1**, field out
 
 *One probe error of mine, reported:* the first artefact audit selected three hosts that contain no `DateToken` and scored their zero layers as failures — "10 frames with artefacts" when the real tokens were all clean. The selector now requires a host to contain a sizer span.
 
+**17h** — **the /services screens that were still over the blank target.** Seven commits. Carry-forward from 17d (§7.14), not a new brief.
+
+**All sixteen screens now meet every density gate at BOTH widths: base 13px, minimum 11px, no flat region over 15% of the window — 17/17 at 1440 and 17/17 at 1680.**
+
+| Screen | before → after (1680) | what it needed |
+|---|---|---|
+| Brand & design direction | 24.2 → **7.0** | a Lockups row, taller photography, and a yard sign in Applications |
+| Human review built in | 21.9 → **10** | a sign-off and attachments on the draft, a status row under the thread list |
+| Paid ads | 20 → **6.6** | sitelinks, a second ad variant and the keywords buying the clicks |
+| Product & SaaS interfaces | 18.8 → **10.9** | eight job rows instead of five |
+| Design systems | 18.3 → **6.1** | filled/disabled input states, a select, a textarea, a checkbox, twelve tokens |
+| Landing pages | 16.4 → **13.1** | a review line where `margin-top: auto` had left 200px of dead page |
+
+**⚠ A number in 17d's entry was wrong.** It listed **Reporting at 28.8 / 30** as one of the six failing screens. Measured correctly it is **8.4 / 7.8 and was never failing** — the sample had landed on the kickoff section *below* the released pin, the same leak flagged in 17d's own probe notes. The guard now requires the **stage grid itself** to be on screen, not just a stale frame rect. Only five of the six were real, plus Landing pages.
+
+*Two faults of mine in this session.* I added the design-system checkbox tick at **10px**, in the very session enforcing the 11px floor — caught by a probe that scans every scroll position rather than one sample per beat, because the tick only renders once a step completes. And on the brand board I **raised the wrong heights first**: the flat region was the right column below the van decal, not the bottom strip; raising the lockups and photography changed the measurement by nothing. Looking at the screenshot found it in one pass.
+
+**Verified on the alias:** build exit **0** unfiltered · density and type at 1440 and 1680 with dwell screenshots reviewed one by one · **no sub-11px text anywhere on the stage, scanned at every scroll position** · mobile 375 across a full scroll: screen minimum **11px**, max `scrollWidth` **375** · **3-speed crash scroll at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2464 ms, home 1940 ms**, CLS 0.001/0.000 · 12 date tests passing. The Services chunk grew 49.92 → **51.06 kB** gzip (+1.14).
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -739,7 +758,11 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **42 · Baseline alignment needs a grid row, not `align-items: center`.** *Cause:* the date control centred three numerals of different sizes by box, so the neighbours sat half a line off the main date. *Fix:* a grid with the numerals in one row and `align-items: baseline`; the weekday and tag get their own rows. A wrapper per column cannot work — its baseline is its FIRST line's, which was the weekday.
 
-**43 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
+**43 · A single sample per beat misses state-dependent type.** *Cause:* the density probe measures each screen once, at its dwell. A tick that only renders after a step completes is invisible to that pass — a 10px glyph survived a session whose whole point was an 11px floor. *Fix:* a second probe that scans EVERY scroll position and reports any sub-floor text, run after any change to the screens. It also mis-attributes the beat during a crossfade, since both screens are mounted; trust the size, not the caption it names.
+
+**44 · Measure where the blank actually is before filling it.** *Cause:* told the brand board had a 24% flat region, I assumed the empty bottom strip and raised two heights. The measurement did not move. The region was the right-hand column below the van decal. *Fix:* look at the screenshot first — the flat-rectangle number says how big, never where.
+
+**45 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
 
 ---
 
@@ -809,7 +832,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 11. **Prerendering the shell — deferred to the Ship pass by Prachets.** First contentful paint is 1.64–1.86 s on every route because nothing paints until 152 kB of JS downloads and React mounts. Static-rendering each route's hero into its HTML would put LCP near first byte. Build-pipeline decision, not a page change.
 12. **Weekend bookability depends on the Cal.com availability schedule.** The pass offers Saturday and Sunday, and both showed slots when checked — but if the schedule is ever narrowed to weekdays, the page will offer a day the booking page refuses. **Keep weekend availability on, or tell me to grey weekends out again.**
 13. **The holiday table ends after 2027.** `businessDays.ts` covers 2026–2027; past that the proposal count silently degrades to weekends only. `holidayCoverageEndsAfter` exists so a future session can assert on it.
-14. **Six /services screens are still over the ~15% blank target** (largest flat rectangle as a share of the window, measured at 1680 / 1440): **Reporting 28.8 / 30**, **Brand & design direction 24.2 / 24.2**, **Human review built in 21.9 / 12.2**, **Paid ads 20 / 22.5**, **Product & SaaS interfaces 18.8 / 18.8**, **Design systems 18.3 / 18.3**, **Landing pages 16.4 / 16.4**. Type and legibility are met everywhere (base 13px, min 11px); these are composition density only. Each needs the same treatment the other eight got — content that reaches the bottom of the window, or panes that stretch rather than sit at their natural height.
+14. ~~**Six /services screens over the ~15% blank target.**~~ **CLOSED in 17h — 17/17 at both 1440 and 1680.** One of the six, Reporting, had never been failing; its number came from a probe sampling below the released pin.
 15. **A second, larger WebP rung is fetched on some case-study loads** — `01-command-overview-1280.webp` *and* `-1680.webp` on `/work/sift`, about 32 kB wasted. Seen in two probes, **not reproducible in a third, and I did not identify which element re-selects.** Both are lazy and land after LCP, so it costs bytes, not a metric. Worth one instrumented pass next time something touches that page.
 16. **`/work/sift` carries 0.009 CLS** from the hero meta grid moving 27 px at ~3.1 s — almost certainly the Inter swap relaying the one subhead long enough to change line count, despite the metric-matched fallback. Inside "good" and the route passes; left alone deliberately rather than chased.
 17. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
@@ -825,6 +848,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **Needs the photo.**
 - ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`).
 - ~~**Session 19-pre-2 — Prachets's four rulings.**~~ **DONE** (`e521774` … `895313d`). **All eleven routes under 2.5 s.** See §2.
+- ~~**Session 17h — the remaining /services density debt.**~~ **DONE.** All sixteen screens meet base 13px, min 11px and ≤15% blank at 1440 and 1680. §7.14 closed.
 - ~~**Session 17g-fix — start pass display fixes.**~~ **DONE.** Whole-token dates, a placeholder that reads as one, a single contextual tag, spaced arrows on a shared baseline, simulateBooking preview-only.
 - ~~**Session 17g — guided conversation + in-page booking.**~~ **DONE** (`267c248` … `b51fa7d`). The call is 30 minutes site-wide, the name field is unmissable, the date control is obvious, booking happens in a modal and the pass flips to CONFIRMED. **One owner item — §7.12 (weekend availability).**
 - ~~**Session 17f — "Your project start pass".**~~ **DONE** (`b6ea58f` … `231f1f2`). Weekends bookable, Ontario stat holidays in the business-day count, kickoff clipping fixed.
