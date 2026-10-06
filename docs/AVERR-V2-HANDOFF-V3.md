@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~110 commits ahead of `main`** at the end of Session 17-fix — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `ccd4c1f` — *"17e: each odometer column is sized by the glyph it shows"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
-| **Doc currency** | Written at the end of Session 17e. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **HEAD** | `231f1f2` — *"17f: pass rows stack their label on a narrow card"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
+| **Doc currency** | Written at the end of Session 17f. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -26,7 +26,7 @@
 dist/index.html                    3.18 kB │ gzip:   1.40 kB  ← carries the route-chunk map
 dist/assets/index-*.css           42.09 kB │ gzip:   8.75 kB
 dist/assets/index-*.js           482.30 kB │ gzip: 152.93 kB  ← home + shell + motion
-dist/assets/Services-*.js        177.28 kB │ gzip:  44.15 kB  ← the build page + kickoff picker
+dist/assets/Services-*.js        183.18 kB │ gzip:  45.75 kB  ← the build page + the start pass
 dist/assets/CaseStudy-*.js        51.34 kB │ gzip:  12.71 kB
 dist/assets/Contact-*.js          44.67 kB │ gzip:  11.14 kB
 dist/assets/Work-*.js             22.49 kB │ gzip:   6.80 kB
@@ -386,6 +386,54 @@ Plus the time audit (heatmap rows were a fixed 22px, so it sat in the top third 
 
 **One cosmetic nit left:** the accented kickoff date still shows a hair more space between its two digits than the sans dates do. It is Cormorant italic's own side bearings, not a layout bug, and it is far better than it was.
 
+**17f** `b6ea58f` … `231f1f2` — **"Your project start pass".** Five commits.
+
+*Owner verdict on 17e: concept right, presentation 4/10, and the kickoff date was clipped.* This is the centrepiece version: two questions that build one artefact.
+
+### Pre-flight, as asked
+
+| | |
+|---|---|
+| Cal.com `?notes=` prefill | **Supported** — survives the redirect and reaches the embed |
+| Cal.com `?date=` | **Works** — applied, then stripped from the visible URL by Cal's router |
+| Weekend availability | **Saturday and Sunday both showed slots** when checked |
+| **Event duration** | **"Discovery Call 30m"** — the site says **20 minutes** everywhere. See §7. |
+
+### The date rules changed
+
+**Weekends are bookable.** The call may be any day. Only the proposal count skips non-working days, and it now skips **Ontario's nine statutory holidays** as well as weekends — a static 2026–2027 table in `businessDays.ts`, which closes the no-holiday-calendar limitation 17e logged.
+
+**It needed two anchors, and a test caught it.** A call ON a business day counts from the day after (Monday → Thursday). A call on a weekend or a holiday counts the following business day as day one (Saturday → Wednesday). Without the second anchor a Saturday call would have landed *later* than the Monday after it, which is not a promise anyone would make out loud. **12 tests passing, up from 8.**
+
+**Eight picks on the alias, all correct** (Thanksgiving is Mon Oct 12 2026):
+
+| Call | Proposal | Kickoff |
+|---|---|---|
+| Wed Oct 7 | Tue Oct 13 | Wed Oct 21 |
+| Thu Oct 8 | Wed Oct 14 | Thu Oct 22 |
+| Fri Oct 9 | Thu Oct 15 | Fri Oct 23 |
+| **Sat Oct 10** | **Thu Oct 15** | Sat Oct 24 |
+| **Sun Oct 11** | **Thu Oct 15** | Sun Oct 25 |
+| **Mon Oct 12 (Thanksgiving)** | **Thu Oct 15** | Mon Oct 26 |
+| Tue Oct 13 | Fri Oct 16 | Tue Oct 27 |
+| Wed Oct 14 | Mon Oct 19 | Wed Oct 28 |
+
+### What it is
+
+A **28-day wheel** that centres its selection, scales and fades neighbours by distance (transform and opacity only), marks today, labels weekends "Weekend call" and **names the holiday on the day itself** — "THANKSGIVING" appears under Oct 12. Drag with momentum, click, arrows, Home/End; `role="listbox"` with `aria-activedescendant` and an `aria-live` sentence.
+
+The **pass** is a 560px card on the new `--surface-elevated` token with a three-layer tinted shadow: Averr mark, "PROJECT START PASS", the business name at `type-h1`, three rows, a radial-gradient perforation, a barcode drawn deterministically from the name and the day, a pass number (`AV-1006-NR`), and a **READY TO BOOK** stamp that lands once per completion. On change the dates roll, a sheen sweeps and the card settles through ≤3°; on desktop it tilts ≤4° toward the cursor.
+
+**The kickoff date is MEASURED**, not hoped for — the line is measured against the card's inner width and the font scaled to fit, one pass, reset-measure-write. **Verified unclipped at 1280 / 1440 / 1680 / 1920 / 375** with a 32-character business name: right edge 932 vs 1195, 1114 vs 1348, 1300 vs 1526, 1420 vs 1646, 144 vs 333.
+
+**Privacy.** The business name is component state only — **no storage, no analytics, no fetch**. It rides to /contact as `notes`, which is the field Cal.com prefills from, and **never as `name`**, which belongs to a person. **Verified end to end:** `/contact?date=2026-10-10&notes=Northgate%20Renovations` produces `…/embed?layout=month_view&date=2026-10-10&month=2026-10&notes=Northgate+Renovations`.
+
+**Verified on the alias:** build exit **0** unfiltered · 8 picks correct incl. Sat, Sun, a holiday and a holiday straddle · weekends selectable · **kickoff unclipped at all five widths** · name typing updates pass, pass number and CTA · the stamp fires on completion and resets when the name is cleared · keyboard, drag and touch all select · `aria-live` announces · **zero horizontal overflow at 375**, minimum font **13px** · **reduced motion: the sheen is absent and the stamp simply appears** · **3-speed crash scroll on /services at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2236 ms (was 2388), home 1872 ms**, CLS 0.001/0.000. The section's code was NOT lazy-loaded — the Services chunk grew 44.15 → 45.75 kB gzip and LCP did not regress, so the extra boundary would have bought nothing.
+
+*Four faults the screenshots caught, not the numbers.* The wheel read as a stub — the opacity falloff hit zero four days out and the track was anchored left, so the selection sat against the edge; it now centres and keeps six days legible. **Cormorant's italic figures draw outside a 1em line box**, so the odometer window clipped them and leaked the tail of the digit above as a stray stroke over "Sat 24"; window and cells are 1.35em with the strip lifted by half the extra leading. At 375 the pass rows' fixed 132px label column squeezed the date onto two lines and pushed it under the "20 MIN" meta; below 1024 the row is a grid with the label on its own line. And the mobile wheel showed two days at a 104px cell, now 82px and five.
+
+**Deviations.** `--surface-elevated` **did not exist** — I added it to `index.css` as `#FBF9F4`, paper rather than white, so the card sits in the same family as `--color-bg`. The "mid-typing" screenshot is the **completed** state rather than a true mid-keystroke frame; the stamp moment and mid-typing are therefore one capture, not two.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -448,7 +496,7 @@ One continuous pinned scene. A generic GTA home-services business (**Northgate**
 | 1 | `BuildHero` | Eyebrow counts `SERVICE_COUNT`; h1 "Watch us build *your* business." on one `CharReveal`; scroll cue |
 | 2 | `ServicesBuild` | **The stage.** 16 beats + 2 chapter transitions on one pin |
 | 3 | `Chapter dark from cream` → `NoList` | unchanged |
-| 4 | `Chapter cream-warm from dark` → `KickoffPicker` | **17e**: "Pick the day you call us" — 21-day strip, live personal dates, date-aware CTA |
+| 4 | `Chapter cream-warm from dark` → `KickoffPass` | **17f**: "Your project start pass" — name + 28-day wheel building a live boarding pass; weekends bookable, Ontario stat holidays in the count |
 | 5 | `Chapter dark from cream-warm` → `ServicesCloser` | `useDeclarePageEndTone("dark")` |
 
 **Slot model.** Beats are not evenly spaced, so scroll maps onto SLOTS, not beats: 5 Design beats at 65vh, an 80vh transition, 5 Automate beats, an 80vh transition, 6 Grow beats. **Travel 1200vh, wrapper 1300vh** (the n+1 rule, §5.4). Per beat: caption in 0–0.15, screen builds 0.05–0.40, **dwell 0.40–0.85**, caption out 0.85–1.00. One continuous float drives caption, canvas and rail.
@@ -594,7 +642,11 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **35 · Civil dates must not be built with the local-time `Date` constructor.** *Cause:* "add 14 days" to a local-midnight Date lands on the day before twice a year, and a CI box in UTC disagrees with a reader in Toronto about what "today" is. *Fix:* `src/lib/businessDays.ts` pins every date to **12:00 UTC** and reads only UTC getters; "today" comes from `Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto" })`. Unit tested — `npm run test:dates`.
 
-**36 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
+**36 · A clipped odometer needs a window TALLER than one em.** *Cause:* Cormorant's italic figures draw outside their 1em line box, so a window of exactly 1em cut them and let the tail of the next digit in the column show above — a stray stroke over the accented date. *Fix:* window and cells at **1.35em**, with the rolling strip lifted by half the extra leading so the glyph keeps the baseline of the text beside it. **Any face with real ascenders or a slanted axis needs the bleed.**
+
+**37 · "+3 business days" needs two anchors, not one.** *Cause:* counting from the first business day on or after the call makes a Saturday call land a day LATER than the Monday after it. *Fix:* a call on a business day counts from the day after; a call on a weekend or holiday counts the following business day as day one. Saturday → Wednesday, Monday → Thursday. Unit tested both ways.
+
+**38 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
 
 ---
 
@@ -662,12 +714,15 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 9. **Full mobile review** — automated checks confirm zero overflow, but no human pass has been done on a real device. The Session 17 stacked stills are no longer a concern here: **Prachets ruled the ~6px Automate labels a defect, and 17-fix-2 replaced that still below 900px with a purpose-built vertical composition** — five nodes on a straight vertical path, every label at real `type-eyebrow` size. Design and Grow still scale, and both were checked as readable at 375.
 10. ~~**`/work`'s LCP image.**~~ **APPROVED and DONE in 19-pre-2.** Prachets ruled that resized derivatives of existing screenshots are not new assets, so rule 11 does not apply. `/work` is 2320 ms.
 11. **Prerendering the shell — deferred to the Ship pass by Prachets.** First contentful paint is 1.64–1.86 s on every route because nothing paints until 152 kB of JS downloads and React mounts. Static-rendering each route's hero into its HTML would put LCP near first byte. Build-pipeline decision, not a page change.
-12. **Six /services screens are still over the ~15% blank target** (largest flat rectangle as a share of the window, measured at 1680 / 1440): **Reporting 28.8 / 30**, **Brand & design direction 24.2 / 24.2**, **Human review built in 21.9 / 12.2**, **Paid ads 20 / 22.5**, **Product & SaaS interfaces 18.8 / 18.8**, **Design systems 18.3 / 18.3**, **Landing pages 16.4 / 16.4**. Type and legibility are met everywhere (base 13px, min 11px); these are composition density only. Each needs the same treatment the other eight got — content that reaches the bottom of the window, or panes that stretch rather than sit at their natural height.
-13. **A second, larger WebP rung is fetched on some case-study loads** — `01-command-overview-1280.webp` *and* `-1680.webp` on `/work/sift`, about 32 kB wasted. Seen in two probes, **not reproducible in a third, and I did not identify which element re-selects.** Both are lazy and land after LCP, so it costs bytes, not a metric. Worth one instrumented pass next time something touches that page.
-14. **`/work/sift` carries 0.009 CLS** from the hero meta grid moving 27 px at ~3.1 s — almost certainly the Inter swap relaying the one subhead long enough to change line count, despite the metric-matched fallback. Inside "good" and the route passes; left alone deliberately rather than chased.
-15. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
-16. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
-17. ~~**Commit-message convention.**~~ **CLOSED — Prachets ruled in 17-fix: standing rule 18 wins, always.** Commit + push per verified item. The `Commit:` line at the foot of a brief is the **summary for the final report**, not a single commit message to squash onto. See §4.18.
+12. **The Cal.com event is 30 minutes; the site says 20.** Every surface — the pass, `STEPS`, the closer — promises "20 minutes", and the live `prachets/discoverycall` event is **"Discovery Call 30m"**. The pass prints 20 MIN on a boarding-pass-styled artefact, which makes the mismatch far more prominent than it was. **Either shorten the Cal event to 20m or change the copy to 30.** Not actionable without the owner.
+13. **Weekend bookability now depends on the Cal.com availability schedule.** The pass offers Saturday and Sunday, and both showed slots when checked — but if the schedule is ever narrowed to weekdays, the page will offer a day the booking page refuses. **Keep weekend availability on, or tell me to grey weekends out again.**
+14. **The holiday table ends after 2027.** `businessDays.ts` covers 2026–2027; past that the proposal count silently degrades to weekends only. `holidayCoverageEndsAfter` exists so a future session can assert on it.
+15. **Six /services screens are still over the ~15% blank target** (largest flat rectangle as a share of the window, measured at 1680 / 1440): **Reporting 28.8 / 30**, **Brand & design direction 24.2 / 24.2**, **Human review built in 21.9 / 12.2**, **Paid ads 20 / 22.5**, **Product & SaaS interfaces 18.8 / 18.8**, **Design systems 18.3 / 18.3**, **Landing pages 16.4 / 16.4**. Type and legibility are met everywhere (base 13px, min 11px); these are composition density only. Each needs the same treatment the other eight got — content that reaches the bottom of the window, or panes that stretch rather than sit at their natural height.
+16. **A second, larger WebP rung is fetched on some case-study loads** — `01-command-overview-1280.webp` *and* `-1680.webp` on `/work/sift`, about 32 kB wasted. Seen in two probes, **not reproducible in a third, and I did not identify which element re-selects.** Both are lazy and land after LCP, so it costs bytes, not a metric. Worth one instrumented pass next time something touches that page.
+17. **`/work/sift` carries 0.009 CLS** from the hero meta grid moving 27 px at ~3.1 s — almost certainly the Inter swap relaying the one subhead long enough to change line count, despite the metric-matched fallback. Inside "good" and the route passes; left alone deliberately rather than chased.
+18. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
+19. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
+20. ~~**Commit-message convention.**~~ **CLOSED — Prachets ruled in 17-fix: standing rule 18 wins, always.** Commit + push per verified item. The `Commit:` line at the foot of a brief is the **summary for the final report**, not a single commit message to squash onto. See §4.18.
 
 ---
 
@@ -678,7 +733,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **Needs the photo.**
 - ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`).
 - ~~**Session 19-pre-2 — Prachets's four rulings.**~~ **DONE** (`e521774` … `895313d`). **All eleven routes under 2.5 s.** See §2.
-- ~~**Session 17e — /services kickoff section.**~~ **DONE** (`aae26c8` … `ccd4c1f`). The 14-day calendar is an interactive personal timeline; `KickoffCalendar` removed. **No holiday calendar — §2.**
+- ~~**Session 17f — "Your project start pass".**~~ **DONE** (`b6ea58f` … `231f1f2`). Weekends bookable, Ontario stat holidays in the business-day count, kickoff clipping fixed. **Two owner items — §7.12 (20 vs 30 min) and §7.13 (weekend availability).**
+- ~~**Session 17e — /services kickoff section.**~~ **DONE** (`aae26c8` … `ccd4c1f`). The 14-day calendar is an interactive personal timeline; `KickoffCalendar` removed.
 - ~~**Session 17d — /services quality + two site-wide fixes.**~~ **DONE** (`608a0c6` … `d925553`). Captions, spotlight, density, nav CTA, ledger, hero CTAs. **Six screens remain over the blank target — §7.12.**
 - **Session 19 — /contact.** After the recording.
 - **Session 20 — site-wide.** Page transitions using the slab wipe, footer redesign, home polish (richer door previews, reel hover, 404 pill).
