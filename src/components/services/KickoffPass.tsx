@@ -227,7 +227,7 @@ export default function KickoffPass() {
                 onPointerCancel={onPointerUp}
                 className="kp2-wheel"
               >
-                <motion.div className="kp2-track" style={{ x }}>
+                <motion.div className="kp2-track" style={{ x, paddingLeft: `calc(50% - ${cell / 2}px)`, paddingRight: `calc(50% - ${cell / 2}px)` }}>
                   {days.map((d, i) => {
                     const dist = Math.abs(i - index);
                     const active = i === index;
@@ -246,8 +246,11 @@ export default function KickoffPass() {
                         style={{
                           width: cell,
                           // transform + opacity only
-                          transform: `scale(${active ? 1 : Math.max(0.56, 1 - dist * 0.16)})`,
-                          opacity: Math.max(0, 1 - dist * 0.3),
+                          // slow enough that six days either side stay
+                          // readable — at 0.3 the wheel showed four and
+                          // read as a stub
+                          transform: `scale(${active ? 1 : Math.max(0.52, 1 - dist * 0.13)})`,
+                          opacity: Math.max(0.14, 1 - dist * 0.145),
                           color: active ? "var(--color-ink)" : "var(--color-muted)",
                         }}
                       >
@@ -408,10 +411,10 @@ export default function KickoffPass() {
           background: none;
           border: none;
           padding: 0 6px;
-          text-align: left;
+          text-align: center;
           cursor: pointer;
           font-family: inherit;
-          transform-origin: left bottom;
+          transform-origin: center bottom;
           transition: color ${duration.base * 1000}ms ease;
         }
         .kp2-day__wd { display: block; opacity: 0.7; }
