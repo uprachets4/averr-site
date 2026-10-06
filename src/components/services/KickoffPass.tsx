@@ -595,6 +595,18 @@ function Odometer({ value, reduce }: { value: number; reduce: boolean }) {
   );
 }
 
+/**
+ * The window is taller than one em.
+ *
+ * Cormorant's italic figures draw outside a 1em line box, so a window of
+ * exactly 1em clipped them and let the tail of the next digit in the
+ * column show above — a stray stroke over "Sat 24". The window and the
+ * cells are both LEAD tall, and the strip is lifted by half the extra
+ * leading so the glyph still sits on the same baseline as the text
+ * beside it.
+ */
+const LEAD = 1.35;
+
 function Digit({ d, reduce }: { d: number; reduce: boolean }) {
   return (
     <span
@@ -603,19 +615,24 @@ function Digit({ d, reduce }: { d: number; reduce: boolean }) {
         position: "relative",
         display: "inline-block",
         overflow: "hidden",
-        height: "1em",
+        height: `${LEAD}em`,
         lineHeight: 1,
         verticalAlign: "baseline",
       }}
     >
       <span style={{ visibility: "hidden" }}>{d}</span>
       <motion.span
-        style={{ display: "block", position: "absolute", left: 0, top: 0 }}
+        style={{
+          display: "block",
+          position: "absolute",
+          left: 0,
+          top: `${-(LEAD - 1) / 2}em`,
+        }}
         animate={{ y: `${-d * 10}%` }}
         transition={reduce ? { duration: 0 } : { duration: duration.base, ease: ease.outQuart }}
       >
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-          <span key={n} style={{ display: "block", height: "1em", lineHeight: 1 }}>
+          <span key={n} style={{ display: "block", height: `${LEAD}em`, lineHeight: LEAD }}>
             {n}
           </span>
         ))}
