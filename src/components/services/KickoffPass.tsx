@@ -411,7 +411,7 @@ export default function KickoffPass() {
               >
                 {/* front */}
                 <motion.div
-                  className="kp2-pass kp2-face"
+                  className={booked ? "kp2-pass kp2-face kp2-face--off" : "kp2-pass kp2-face"}
                   onMouseMove={onCardMove}
                   onMouseLeave={onCardLeave}
                   initial={{ opacity: 0, y: reduce ? 0 : 40, rotate: reduce ? 0 : -2.5 }}
@@ -468,7 +468,7 @@ export default function KickoffPass() {
 
                 {/* back */}
                 <div
-                  className="kp2-pass kp2-face kp2-face--back"
+                  className={booked ? "kp2-pass kp2-face kp2-face--back" : "kp2-pass kp2-face kp2-face--back kp2-face--off"}
                   aria-hidden={!booked}
                   style={
                     reduce
@@ -477,7 +477,7 @@ export default function KickoffPass() {
                   }
                 >
                   <PassHead confirmed />
-                  <PassName name={trimmed} />
+                  <PassName name={trimmed} confirmed />
                   <div className="kp2-booked">
                     <span className="type-eyebrow" style={{ color: "var(--color-muted)" }}>
                       Discovery call
@@ -614,11 +614,14 @@ export default function KickoffPass() {
         .kp2-flip { position: relative; }
         .kp2-flip__inner { position: relative; transform-style: preserve-3d; }
         .kp2-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-        /* Compound, not ".kp2-face--back" alone: .kp2-pass sets
-           position:relative later in this sheet at the same specificity
-           and won, which put the back face in normal flow and doubled the
-           card's height — the CTA ended up 700px below the fold. */
-        .kp2-pass.kp2-face--back { position: absolute; inset: 0; transform: rotateY(180deg); }
+        .kp2-pass.kp2-face--back { transform: rotateY(180deg); }
+        /* The face that is NOT showing is taken out of flow, so the card
+           always measures the one you can see. Compound selectors because
+           .kp2-pass sets position:relative later in this sheet at the same
+           specificity and would otherwise win — that is what put the back
+           face in flow and pushed the CTA 700px below the fold, and what
+           clipped the stamp when the back was the taller of the two. */
+        .kp2-pass.kp2-face--off { position: absolute; inset: 0; }
 
         .kp2-pass {
           position: relative; background: var(--surface-elevated); border-radius: 18px;
@@ -682,10 +685,17 @@ function PassHead({ confirmed }: { confirmed?: boolean }) {
   );
 }
 
-function PassName({ name }: { name: string }) {
+function PassName({ name, confirmed }: { name: string; confirmed?: boolean }) {
   return (
     <div className="kp2-pass__name type-h1">
-      {name ? name : <span className="kp2-pass__slot">Your business</span>}
+      {name ? (
+        name
+      ) : confirmed ? (
+        // the booking is done; nothing here is still asking to be filled
+        <span style={{ color: "var(--color-muted-2)" }}>Your business</span>
+      ) : (
+        <span className="kp2-pass__slot">Your business</span>
+      )}
     </div>
   );
 }
