@@ -316,8 +316,60 @@ export function ScreenBrandBoard({ local, compact }: ScreenProps) {
             ].map((g, i) => (
               <span
                 key={i}
-                style={{ flex: 1, height: 34, borderRadius: 5, background: g }}
+                style={{ flex: 1, height: 46, borderRadius: 5, background: g }}
               />
+            ))}
+          </div>
+        </Fade>
+
+        {/* The board used to stop here, leaving the bottom third of the
+            window empty cream. Lockups are what a brand board carries
+            next, and they fill it with something the beat is about. */}
+        <Fade opacity={spec}>
+          <SectionLabel>Lockups</SectionLabel>
+          <div style={{ display: "flex", gap: 10 }}>
+            {[
+              { label: "Primary", stacked: false, mark: true },
+              { label: "Stacked", stacked: true, mark: true },
+              { label: "Mark only", stacked: false, mark: "only" as const },
+            ].map((l) => (
+              <div
+                key={l.label}
+                style={{
+                  flex: 1,
+                  borderRadius: 7,
+                  border: "1px solid rgba(22,33,29,0.12)",
+                  background: "#fff",
+                  padding: "13px 12px 11px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 9,
+                  minHeight: 86,
+                  justifyContent: "center",
+                }}
+              >
+                <span
+                  style={{
+                    display: "flex",
+                    flexDirection: l.stacked ? "column" : "row",
+                    alignItems: "center",
+                    gap: l.stacked ? 4 : 7,
+                  }}
+                >
+                  <svg width="17" height="17" viewBox="0 0 48 48" fill="none">
+                    <path d="M8 38 L8 14 L24 24 L40 14 L40 38" stroke={accent} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  {l.mark !== "only" ? (
+                    <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.14em", color: BRAND.ink }}>
+                      {BRAND.name}
+                    </span>
+                  ) : null}
+                </span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(22,33,29,0.45)" }}>
+                  {l.label}
+                </span>
+              </div>
             ))}
           </div>
         </Fade>
