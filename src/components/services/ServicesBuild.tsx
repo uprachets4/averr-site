@@ -33,6 +33,9 @@ import { GROW_SPECS } from "./build/GrowScreens";
  *  dwell 0.40-0.85 (29.25vh of a 65vh beat), caption out 0.85-1.00. */
 const PHASE = { captionIn: 0.15, buildFrom: 0.05, buildTo: 0.4, dwellTo: 0.85 };
 
+/** Caption swap window at each beat edge, as a fraction of a beat. */
+const SWAP = 0.07;
+
 /**
  * "Watch us build your business" — the pinned stage.
  *
@@ -340,15 +343,25 @@ function BuildCaption({
   beat: Beat;
   position: MotionValue<number>;
 }) {
-  const i = beat.index;
-  // Fades out across the beat's last 15%; the next caption mounts after.
-  // The last caption holds, for the same reason the last window does:
-  // its beat ends exactly where the pin releases.
-  const isLast = i === LIVE_BEATS.length - 1;
+  // SLOT space, not beat space.
+  //
+  // This read `position` — which is a slot float — against `beat.index`.
+  // The two agree only for Design, because the first chapter transition
+  // displaces every later beat by one slot and the second by two. So on
+  // every Automate and Grow beat the window [i+0.85, i+1] was already
+  // behind the playhead, useTransform clamped to its end value, and the
+  // caption sat at opacity 0 for the WHOLE beat. That is the empty
+  // caption column in the 17d recording. The trap §5 warns about, in the
+  // one place that had not been checked for it.
+  const slot = slotForBeat(beat.index);
+  const isLast = beat.index === LIVE_BEATS.length - 1;
+  // Visible for the whole beat bar a short swap at each edge: out over
+  // the last 7%, in over the first 7% of the next. The outgoing caption
+  // is at 0 before the next one mounts, so they never overlap.
   const opacity = useTransform(
     position,
-    [i + PHASE.dwellTo, i + 1],
-    [1, isLast ? 1 : 0]
+    [slot, slot + SWAP, slot + 1 - SWAP, slot + 1],
+    [0, 1, 1, isLast ? 1 : 0]
   );
   const ref = useScrollStyle<HTMLDivElement>(opacity);
   const proofs = beat.service.proof
@@ -377,23 +390,19 @@ function BuildCaption({
 
       <FittedName name={beat.service.name} />
 
-      <motion.p
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: ease.outQuart, delay: 0.25 }}
+      {/* No per-element entrance here any more. These were wall-clock
+          delays (0.25s, 0.4s) inside a scroll-driven scene, so on a quick
+          scroll the outcome and chips were still fading in several beats
+          later. The caption now arrives as one block on the scroll. */}
+      <p
         className="type-body-lg"
         style={{ color: "var(--color-muted)", margin: 0, maxWidth: 440 }}
       >
         {beat.service.outcome}
-      </motion.p>
+      </p>
 
       {proofs.length ? (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: ease.outQuart, delay: 0.4 }}
-          style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 20 }}
-        >
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 20 }}>
           {proofs.map(function chip(study) {
             return (
               <Link
@@ -412,7 +421,7 @@ function BuildCaption({
               </Link>
             );
           })}
-        </motion.div>
+        </div>
       ) : null}
     </div>
   );
