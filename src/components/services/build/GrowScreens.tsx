@@ -420,6 +420,38 @@ export function ScreenAds({ local, compact }: P) {
           <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(27,34,32,0.7)" }}>
             Licensed and insured since 2009. Free on-site estimate, usually within three days. Ajax · Pickering · Whitby · Oshawa.
           </div>
+
+          {/* Sitelinks, a second variant and the keywords buying them. The
+              panel held four lines above ~340px of white without these. */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 10 }}>
+            {["Basements", "Flooring", "Free estimate", "Reviews"].map((t) => (
+              <span key={t} style={{ fontSize: 12.5, color: "#2A4FA8" }}>{t}</span>
+            ))}
+          </div>
+
+          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(27,34,32,0.1)" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.5)", marginBottom: 3 }}>
+              Ad · northgate.ca/quote
+            </div>
+            <div style={{ fontSize: 13, color: "#2A4FA8", marginBottom: 4 }}>
+              Fixed-Price Basement Quotes · Durham
+            </div>
+            <div style={{ fontSize: 13, lineHeight: 1.55, color: "rgba(27,34,32,0.7)" }}>
+              Quoted in person, finished on schedule. Four to six weeks once permits are back.
+            </div>
+          </div>
+
+          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(27,34,32,0.1)" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(27,34,32,0.4)", marginBottom: 9 }}>
+              Top keywords
+            </div>
+            {[["basement finishing oshawa", "182"], ["basement contractor durham", "121"], ["finished basement cost", "96"]].map(([k, v]) => (
+              <div key={k} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "5px 0", fontSize: 12.5 }}>
+                <span style={{ color: "rgba(27,34,32,0.72)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{k}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.5)" }}>{v} clicks</span>
+              </div>
+            ))}
+          </div>
         </div>
         <div style={{ border: "1px solid rgba(27,34,32,0.12)", borderRadius: 9, padding: 13, display: "flex", flexDirection: "column" }}>
           <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(27,34,32,0.4)", marginBottom: 9 }}>Social ad</div>
