@@ -11,6 +11,7 @@ import { motion, useInView, useReducedMotion, useSpring } from "motion/react";
 import { duration, ease, spring } from "../../lib/motion";
 import MagneticCTA from "../MagneticCTA";
 import AverrMark from "../AverrMark";
+import DateToken from "./DateToken";
 import {
   addDays,
   civil,
@@ -103,10 +104,20 @@ export default function KickoffPass() {
   /**
    * A harness for the confirmed state, so the flip can be verified
    * without putting a real booking on the owner's calendar. It only
-   * sets component state. Reachable in dev via an event, and on a
-   * deployment only when the query param is typed by hand.
+   * ever sets component state — no request, no storage.
+   *
+   * Dev and the Vercel preview alias ONLY. On averrstudios.com, or any
+   * other host, the param is inert: a visitor cannot make the pass claim
+   * a booking that does not exist.
    */
   useEffect(function harness() {
+    const host = window.location.hostname;
+    const allowed =
+      import.meta.env.DEV ||
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host.endsWith(".vercel.app");
+    if (!allowed) return;
     const q = new URLSearchParams(window.location.search).get("simulateBooking");
     if (q && !Number.isNaN(new Date(q).getTime())) setBooked(q);
     if (!import.meta.env.DEV) return;
@@ -279,8 +290,8 @@ export default function KickoffPass() {
                 />
                 {!reduce && animating && !name ? (
                   <span aria-hidden className="type-h2 kp2-field__hint">
-                    {hint}
                     <span className="kp2-caret" />
+                    e.g. {hint}
                   </span>
                 ) : null}
               </div>
@@ -314,38 +325,56 @@ export default function KickoffPass() {
                   ‹
                 </button>
 
+                {/* A grid, so the three numerals share one baseline row
+                    and the weekday and tag sit in their own rows above and
+                    below the middle one. Aligning by box centre put the
+                    neighbours half a line out. */}
                 <div className="kp2-date__reel">
-                  {[-1, 0, 1].map((d) => {
+                  <span className="type-eyebrow kp2-date__wd">{weekdayLong(selected)}</span>
+
+                  {[-1, 1].map((d) => {
                     const o = offset + d;
+                    const col = d === -1 ? 1 : 3;
                     if (o < 0 || o > RANGE_DAYS)
-                      return <span key={d} aria-hidden className="kp2-date__slot kp2-date__slot--empty" />;
+                      return (
+                        <span
+                          key={d}
+                          aria-hidden
+                          className="kp2-date__near kp2-date__near--empty"
+                          style={{ gridColumn: col }}
+                        />
+                      );
                     const day = addDays(today, o);
-                    return d === 0 ? (
-                      <span key={d} className="kp2-date__slot kp2-date__slot--main">
-                        <span className="type-eyebrow kp2-date__wd">{weekdayLong(day)}</span>
-                        <span className="type-display-l kp2-date__n">
-                          <span className="sr-only">{longLabel(day)}</span>
-                          <span aria-hidden>
-                            {shortLabel(day).split(" ")[0]}{" "}
-                            <Odometer value={dayOfMonth(day)} reduce={!!reduce} />
-                          </span>
-                        </span>
-                        <span className="type-eyebrow kp2-date__tag">{dayTag(day, today)}</span>
-                      </span>
-                    ) : (
+                    return (
                       <button
                         key={d}
                         type="button"
-                        className="kp2-date__slot kp2-date__slot--near"
+                        className="type-h1 kp2-date__near"
+                        style={{ gridColumn: col }}
                         disabled={!!booked}
                         onClick={() => move(d)}
                         aria-label={`Choose ${longLabel(day)}`}
                       >
-                        <span className="type-eyebrow">{weekdayShort(day)}</span>
-                        <span className="type-h1 kp2-date__near-n">{dayOfMonth(day)}</span>
+                        {dayOfMonth(day)}
                       </button>
                     );
                   })}
+
+                  <span className="type-display-l kp2-date__n">
+                    <DateToken
+                      reduce={!!reduce}
+                      srText={longLabel(selected)}
+                      text={`${shortLabel(selected).split(" ")[0]} ${dayOfMonth(selected)}`}
+                    />
+                  </span>
+
+                  {/* one tag, only when it says something; its row is
+                      reserved either way so nothing jumps */}
+                  <span className="kp2-date__tagrow">
+                    {dayTag(selected, today) ? (
+                      <span className="type-eyebrow kp2-date__tag">{dayTag(selected, today)}</span>
+                    ) : null}
+                  </span>
                 </div>
 
                 <button
@@ -564,19 +593,25 @@ export default function KickoffPass() {
           border-color: var(--color-ink);
           box-shadow: 0 0 0 2px var(--color-bg-warm), 0 0 0 4px var(--color-ink);
         }
+        /* Clearly a placeholder, not a value: the muted token (3.49:1 on
+           the field, so still legible) against ink's 17.53:1 for typed
+           text, prefixed "e.g.", with the caret at the START of the field
+           where the cursor would actually be. */
         .kp2-field__hint {
           position: absolute; left: 21px; top: 50%; transform: translateY(-50%);
           color: var(--color-muted-2); pointer-events: none; white-space: nowrap;
           max-width: calc(100% - 42px); overflow: hidden;
         }
         .kp2-caret {
-          display: inline-block; width: 2px; height: 0.86em; margin-left: 3px;
-          background: var(--color-muted-2); vertical-align: -0.08em;
+          display: inline-block; width: 2px; height: 0.86em; margin-right: 6px;
+          background: var(--color-ink); vertical-align: -0.08em;
           animation: kp2blink 1s steps(1) infinite;
         }
         @keyframes kp2blink { 0%,50% { opacity: 1 } 50.01%,100% { opacity: 0 } }
 
-        .kp2-date { display: flex; align-items: center; gap: 10px; margin-top: 4px; border-radius: 14px; }
+        /* 28px flex gap plus the reel's own 16px column gap puts well
+           over the 24px of clear space the arrows need from the numerals. */
+        .kp2-date { display: flex; align-items: center; gap: 28px; margin-top: 4px; border-radius: 14px; }
         .kp2-date:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 8px; }
         .kp2-arrow {
           flex: 0 0 auto; width: 52px; height: 52px; border-radius: 50%;
@@ -587,22 +622,39 @@ export default function KickoffPass() {
         }
         .kp2-arrow:hover:not(:disabled) { border-color: var(--color-ink); }
         .kp2-arrow:disabled { opacity: 0.32; cursor: default; }
-        .kp2-date__reel { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-        .kp2-date__slot { flex: 0 0 auto; display: block; text-align: center; }
-        /* holds the row's shape at either end of the range */
-        .kp2-date__slot--empty { min-width: 56px; min-height: 44px; }
-        .kp2-date__slot--near {
+        .kp2-date__reel {
+          flex: 1; min-width: 0;
+          display: grid;
+          grid-template-columns: minmax(44px, auto) 1fr minmax(44px, auto);
+          grid-template-rows: auto auto auto;
+          column-gap: 16px;
+          align-items: baseline;
+          justify-items: center;
+        }
+        .kp2-date__wd { grid-column: 2; grid-row: 1; color: var(--color-muted); }
+        .kp2-date__n {
+          grid-column: 2; grid-row: 2;
+          line-height: 1; color: var(--color-ink); white-space: nowrap;
+        }
+        .kp2-date__near {
+          grid-row: 2;
           background: none; border: none; cursor: pointer; opacity: 0.42;
-          color: var(--color-muted); font-family: inherit; padding: 8px;
-          min-width: 56px; min-height: 44px;
+          color: var(--color-muted); font-family: inherit; line-height: 1;
+          padding: 8px; min-width: 44px; min-height: 44px;
           transition: opacity ${duration.base * 1000}ms ease;
         }
-        .kp2-date__slot--near:hover:not(:disabled) { opacity: 0.8; }
-        .kp2-date__near-n { display: block; line-height: 1; }
-        .kp2-date__slot--main { flex: 1; min-width: 0; }
-        .kp2-date__wd { display: block; color: var(--color-muted); }
-        .kp2-date__n { display: block; line-height: 1; color: var(--color-ink); white-space: nowrap; }
-        .kp2-date__tag { display: block; margin-top: 6px; color: var(--color-muted); }
+        .kp2-date__near:hover:not(:disabled) { opacity: 0.8; }
+        .kp2-date__near--empty { pointer-events: none; }
+        /* reserved, so adding or losing a tag never moves the date */
+        .kp2-date__tagrow {
+          grid-column: 2; grid-row: 3;
+          min-height: 28px; display: flex; align-items: center; margin-top: 8px;
+        }
+        .kp2-date__tag {
+          color: var(--color-muted);
+          border: 1px solid rgba(20,20,18,0.28);
+          border-radius: 999px; padding: 4px 11px;
+        }
         .kp2-date__foot { display: flex; align-items: center; gap: 16px; margin-top: 18px; flex-wrap: wrap; position: relative; }
         .kp2-pick {
           background: none; border: none; border-bottom: 1px solid rgba(20,20,18,0.55);
@@ -700,12 +752,14 @@ function PassName({ name, confirmed }: { name: string; confirmed?: boolean }) {
   );
 }
 
-function dayTag(d: CivilDate, today: CivilDate) {
+/** Only when it adds something. The date itself is already on screen. */
+function dayTag(d: CivilDate, today: CivilDate): string | null {
   if (sameDay(d, today)) return "Today";
+  if (sameDay(d, addDays(today, 1))) return "Tomorrow";
   const h = holidayName(d);
   if (h) return h;
   if (isWeekend(d)) return "Weekend call";
-  return shortLabel(d);
+  return null;
 }
 
 function ctaLabel(name: string, call: CivilDate) {
@@ -874,11 +928,11 @@ function Row({ label, date, meta, reduce }: { label: string; date: CivilDate; me
     <div className="kp2-row">
       <span className="type-eyebrow kp2-row__label" style={{ color: "var(--color-muted)" }}>{label}</span>
       <span className="type-body-lg kp2-row__val" style={{ color: "var(--color-ink)", minWidth: 0 }}>
-        <span className="sr-only">{longLabel(date)}</span>
-        <span aria-hidden>
-          {weekdayLong(date)}, {shortLabel(date).split(" ")[0]}{" "}
-          <Odometer value={dayOfMonth(date)} reduce={reduce} />
-        </span>
+        <DateToken
+          reduce={reduce}
+          srText={longLabel(date)}
+          text={`${weekdayLong(date)}, ${shortLabel(date)}`}
+        />
       </span>
       {meta ? (
         <span className="type-eyebrow kp2-row__meta" style={{ color: "var(--color-muted)" }}>{meta}</span>
@@ -925,50 +979,17 @@ function KickoffRow({ date, reduce }: { date: CivilDate; reduce: boolean }) {
         Kickoff by
       </span>
       <span ref={hostRef} className="type-display-l" style={{ display: "block", minWidth: 0 }}>
-        <span className="sr-only">{longLabel(date)}</span>
         {/* type-accent nests INSIDE the size class (§5.33) */}
-        <span ref={lineRef} aria-hidden className="type-accent" style={{ display: "inline-block", whiteSpace: "nowrap", color: "var(--color-ink)" }}>
-          {weekdayShort(date)} <Odometer value={dayOfMonth(date)} reduce={reduce} />
+        <span ref={lineRef} className="type-accent" style={{ display: "inline-block" }}>
+          <DateToken
+            reduce={reduce}
+            srText={longLabel(date)}
+            text={`${weekdayShort(date)} ${dayOfMonth(date)}`}
+            style={{ color: "var(--color-ink)" }}
+          />
         </span>
       </span>
     </div>
-  );
-}
-
-/** Window taller than 1em: Cormorant's italic figures overflow it (§5.36). */
-const LEAD = 1.35;
-
-function Odometer({ value, reduce }: { value: number; reduce: boolean }) {
-  const digits = String(value).split("");
-  return (
-    <span style={{ display: "inline-flex" }}>
-      {digits.map((d, i) => (
-        <Digit key={`${digits.length}-${i}`} d={+d} reduce={reduce} />
-      ))}
-    </span>
-  );
-}
-
-function Digit({ d, reduce }: { d: number; reduce: boolean }) {
-  return (
-    <span
-      aria-hidden
-      style={{
-        position: "relative", display: "inline-block", overflow: "hidden",
-        height: `${LEAD}em`, lineHeight: 1, verticalAlign: "baseline",
-      }}
-    >
-      <span style={{ visibility: "hidden" }}>{d}</span>
-      <motion.span
-        style={{ display: "block", position: "absolute", left: 0, top: `${-(LEAD - 1) / 2}em` }}
-        animate={{ y: `${-d * 10}%` }}
-        transition={reduce ? { duration: 0 } : { duration: duration.base, ease: ease.outQuart }}
-      >
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-          <span key={n} style={{ display: "block", height: `${LEAD}em`, lineHeight: LEAD }}>{n}</span>
-        ))}
-      </motion.span>
-    </span>
   );
 }
 
