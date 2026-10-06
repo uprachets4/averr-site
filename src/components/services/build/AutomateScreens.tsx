@@ -114,17 +114,19 @@ export function ScreenAudit({ local, compact }: AutoScreenProps) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 18, flex: 1, minHeight: 0 }}>
-        {/* heatmap */}
-        <div>
+        {/* heatmap — rows stretch, so the grid fills the column instead of
+            sitting in the top third of it */}
+        <div style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
           <div style={{ display: "grid", gridTemplateColumns: `34px repeat(${HOURS.length}, 1fr)`, gap: 3, marginBottom: 4 }}>
             <span />
             {HOURS.map((h) => (
               <span key={h} style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(36,27,18,0.38)", textAlign: "center" }}>{h}</span>
             ))}
           </div>
+          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", gap: 4 }}>
           {DAYS.map((d, r) => (
-            <div key={d} style={{ display: "grid", gridTemplateColumns: `34px repeat(${HOURS.length}, 1fr)`, gap: 3, marginBottom: 3 }}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(36,27,18,0.5)", lineHeight: "22px" }}>{d}</span>
+            <div key={d} style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: `34px repeat(${HOURS.length}, 1fr)`, gap: 3, alignItems: "stretch" }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(36,27,18,0.5)", alignSelf: "center" }}>{d}</span>
               {HOURS.map((_, c) => {
                 const v = HEAT[r][c];
                 const auto = AUTO_CELLS.has(`${r}-${c}`);
@@ -133,7 +135,8 @@ export function ScreenAudit({ local, compact }: AutoScreenProps) {
                   <span
                     key={c}
                     style={{
-                      height: 22,
+                      height: "100%",
+                      minHeight: 22,
                       borderRadius: 4,
                       background: lit
                         ? `rgba(194,100,31,${0.28 + v * 0.2})`
@@ -146,6 +149,7 @@ export function ScreenAudit({ local, compact }: AutoScreenProps) {
               })}
             </div>
           ))}
+          </div>
           <div style={{ display: "flex", gap: 14, marginTop: 10, fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(36,27,18,0.45)" }}>
             <span>■ admin</span>
             <span style={{ color: WARM }}>■ automatable</span>
@@ -166,6 +170,7 @@ export function ScreenAudit({ local, compact }: AutoScreenProps) {
               of 17.5h logged on admin
             </div>
           </div>
+          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
           {TASKS.map(([n, h, a]) => (
             <div key={n} style={{ display: "flex", alignItems: "center", gap: 9, padding: "7px 0", borderTop: "1px solid rgba(36,27,18,0.08)" }}>
               <span style={{ flex: 1, fontSize: 13 }}>{n}</span>
@@ -179,6 +184,7 @@ export function ScreenAudit({ local, compact }: AutoScreenProps) {
               </span>
             </div>
           ))}
+          </div>
         </div>
       </div>
     </div>
@@ -216,7 +222,7 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
   useMotionValueEvent(local, "change", function run(t) {
     const started = t > 0.34;
     setStep(started ? Math.min(STEPS.length, Math.floor(at(t, 0.34, 0.74) * (STEPS.length + 0.4))) : -1);
-    setTyped(Math.round(at(t, 0.44, 0.8) * REPLY.length));
+    setTyped(Math.round(at(t, 0.40, 0.62) * REPLY.length));
   });
 
   const NAVY = "#0E1730";
@@ -282,7 +288,7 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
             const done = i <= step;
             const active = i === step + 1 && step < STEPS.length - 1;
             return (
-              <div key={n} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0" }}>
+              <div key={n} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 0" }}>
                 <span style={{ width: 22, height: 22, borderRadius: "50%", background: done ? "#3FD08A" : "transparent", border: done ? "none" : `1.5px solid ${active ? ACC : "rgba(255,255,255,0.18)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: NAVY, flex: "0 0 22px" }}>
                   {done ? "✓" : ""}
                 </span>
@@ -295,12 +301,12 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
 
         {/* what the agent pulled — fills the column instead of leaving it
             half dark, and shows the work behind the score */}
-        <div style={{ flex: 1, minHeight: 0, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11, padding: "13px 15px" }}>
+        <div style={{ flex: 1, minHeight: 0, overflow: "hidden", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11, padding: "12px 15px" }}>
           <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(220,230,245,0.45)", marginBottom: 10 }}>
             Sources used
           </div>
           {SOURCES.map(([n, d], i) => (
-            <div key={n} style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, padding: "7px 0", borderTop: i ? "1px solid rgba(255,255,255,0.06)" : "none", opacity: step >= 1 ? 1 : 0.25, transition: "opacity 400ms ease" }}>
+            <div key={n} style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, padding: "6px 0", borderTop: i ? "1px solid rgba(255,255,255,0.06)" : "none", opacity: step >= 1 ? 1 : 0.25, transition: "opacity 400ms ease" }}>
               <span style={{ fontSize: 13 }}>{n}</span>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(220,230,245,0.5)", textAlign: "right" }}>{d}</span>
             </div>
