@@ -462,7 +462,10 @@ function Node({
 function Odometer({ value, reduce }: { value: number; reduce: boolean }) {
   const digits = String(value).split("");
   return (
-    <span style={{ display: "inline-flex" }}>
+    // Tabular figures, so every column is one advance wide. Proportional
+    // digits make each column as wide as the widest glyph in it, which
+    // rendered "14" as "1 4".
+    <span style={{ display: "inline-flex", fontVariantNumeric: "tabular-nums" }}>
       {digits.map((d, i) => (
         <Digit key={`${digits.length}-${i}`} d={+d} reduce={reduce} />
       ))}
@@ -477,9 +480,11 @@ function Digit({ d, reduce }: { d: number; reduce: boolean }) {
       style={{
         display: "inline-block",
         overflow: "hidden",
+        width: "1ch",
         height: "1em",
         lineHeight: 1,
         verticalAlign: "baseline",
+        textAlign: "center",
       }}
     >
       <motion.span
