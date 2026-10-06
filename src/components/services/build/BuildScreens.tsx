@@ -812,12 +812,17 @@ const KPI_30D = [
   ["Crew utilisation", "86%", "+6pt"],
 ];
 
+/** A jobs board has a board's worth of rows; five left the table ending
+ *  ~190px above the bottom of the window. */
 const JOBS = [
   ["Basement — Ravenscroft Rd", "Crew A", "In progress", "8,400"],
   ["Flooring — Kingston Rd E", "Crew B", "Scheduled", "3,150"],
   ["Bathroom — Harwood Ave", "Crew A", "Quoted", "11,900"],
   ["Kitchen — Rossland Rd W", "Crew C", "Complete", "22,600"],
   ["Tiling — Brock St N", "Crew B", "In progress", "2,480"],
+  ["Deck rebuild — Simcoe St N", "Crew C", "Scheduled", "6,900"],
+  ["Basement — Taunton Rd W", "Crew A", "Quoted", "14,250"],
+  ["Flooring — Brock St S", "Crew B", "Complete", "4,180"],
 ];
 
 const STATUS_TINT: Record<string, [string, string]> = {
