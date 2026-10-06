@@ -461,10 +461,7 @@ function Node({
 function Odometer({ value, reduce }: { value: number; reduce: boolean }) {
   const digits = String(value).split("");
   return (
-    // Tabular figures, so every column is one advance wide. Proportional
-    // digits make each column as wide as the widest glyph in it, which
-    // rendered "14" as "1 4".
-    <span style={{ display: "inline-flex", fontVariantNumeric: "tabular-nums" }}>
+    <span style={{ display: "inline-flex" }}>
       {digits.map((d, i) => (
         <Digit key={`${digits.length}-${i}`} d={+d} reduce={reduce} />
       ))}
@@ -473,21 +470,25 @@ function Odometer({ value, reduce }: { value: number; reduce: boolean }) {
 }
 
 function Digit({ d, reduce }: { d: number; reduce: boolean }) {
+  // The column is sized by an invisible copy of the digit it is showing,
+  // not by `ch`. Cormorant has no tabular figures, so a fixed advance
+  // left a gap inside the accented date ("Thu 2 2"); a hidden glyph
+  // gives every face its own correct width.
   return (
     <span
       aria-hidden
       style={{
+        position: "relative",
         display: "inline-block",
         overflow: "hidden",
-        width: "1ch",
         height: "1em",
         lineHeight: 1,
         verticalAlign: "baseline",
-        textAlign: "center",
       }}
     >
+      <span style={{ visibility: "hidden" }}>{d}</span>
       <motion.span
-        style={{ display: "block" }}
+        style={{ display: "block", position: "absolute", left: 0, top: 0 }}
         animate={{ y: `${-d * 10}%` }}
         transition={reduce ? { duration: 0 } : { duration: duration.base, ease: ease.outQuart }}
       >
