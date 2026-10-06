@@ -30,11 +30,6 @@ export type ProcessStep = {
   n: string;
   title: string;
   body: string;
-  /** First calendar day this step occupies, 1-indexed. The card enters as
-   *  this day's cell fills. */
-  dayStart: number;
-  /** Last calendar day this step occupies, inclusive. */
-  dayEnd: number;
 };
 
 export const STEPS: ProcessStep[] = [
@@ -42,40 +37,23 @@ export const STEPS: ProcessStep[] = [
     n: "01",
     title: "Book a discovery call.",
     body: "20 minutes. No slide deck. We ask questions, you ask questions, both sides decide whether this is a fit.",
-    dayStart: 1,
-    dayEnd: 1,
   },
   {
     n: "02",
     title: "Scoped proposal in 3 business days.",
     body: "Fixed scope, fixed timeline, fixed price. If we can't quote it, we tell you why and refer you to someone who can.",
-    dayStart: 2,
-    dayEnd: 4,
   },
   {
     n: "03",
     title: "Kickoff week.",
     body: "Async by default, one review call a week. You get preview URLs from day one, not deliverables at the end.",
-    dayStart: 8,
-    dayEnd: 12,
   },
 ];
 
-/** Total cells on the calendar. */
-export const CALENDAR_DAYS = 14;
 
-/** Column headers, Monday-first — day 01 is a Monday. */
-export const WEEKDAY_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-/** 1-indexed days that fall on a weekend, rendered quieter. */
-export const WEEKEND_DAYS = [6, 7, 13, 14];
 
-/** Printed once the last step day (12) has filled. The outer bound the
- *  headline promises — not a meeting date, so no Sunday kickoff is implied. */
-export const KICKOFF_STAMP = "WITHIN 14 DAYS · KICKOFF";
 
-/** The day whose fill reveals the stamp. */
-export const KICKOFF_STAMP_DAY = 12;
 
 /* ── what we don't do ─────────────────────────────────────────────── */
 

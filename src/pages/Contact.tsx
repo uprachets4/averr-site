@@ -8,6 +8,8 @@ import {
   type MotionValue,
 } from "motion/react";
 import Cal, { getCalApi } from "@calcom/embed-react";
+import { useSearchParams } from "react-router-dom";
+import { fromISO, toISO } from "../lib/businessDays";
 import {
   Check,
   Envelope,
@@ -994,6 +996,29 @@ function BookingBand() {
   const reduce = useReducedMotion();
   const [calReady, setCalReady] = useState(false);
 
+  /**
+   * /services' kickoff picker sends the day the reader chose as ?date=.
+   * Cal.com's embed takes `date` and `month` in its config, and its
+   * hosted page takes the same as query params, so the chosen day is
+   * already selected whichever of the two the reader ends up on.
+   * A malformed or past value is simply ignored.
+   */
+  const [params] = useSearchParams();
+  const picked = (function readDate() {
+    const raw = params.get("date");
+    if (!raw) return null;
+    const d = fromISO(raw);
+    return d ? toISO(d) : null;
+  })();
+  // Cal's PrefillAndIframeAttrsConfig is an index signature of strings
+  // plus a typed `layout`; building the object in one literal keeps it
+  // assignable instead of widening to a union of two shapes.
+  const calConfig: React.ComponentProps<typeof Cal>["config"] = {
+    layout: "month_view",
+    ...(picked ? { date: picked, month: picked.slice(0, 7) } : {}),
+  };
+  const calHref = picked ? `${CAL_FULL_URL}?date=${picked}` : CAL_FULL_URL;
+
   useEffect(function initCal() {
     let cancelled = false;
     (async function boot() {
@@ -1110,7 +1135,7 @@ function BookingBand() {
                 minHeight: 640,
                 border: "none",
               }}
-              config={{ layout: "month_view" }}
+              config={calConfig}
             />
           ) : (
             <div
@@ -1125,7 +1150,7 @@ function BookingBand() {
               <p className="type-body" style={{ color: "var(--color-ink)" }}>
                 Open the calendar in a new tab to book.
               </p>
-              <MagneticCTA to={CAL_FULL_URL} variant="primary">
+              <MagneticCTA to={calHref} variant="primary">
                 Book on Cal.com ↗
               </MagneticCTA>
             </div>
