@@ -7,11 +7,14 @@
  * the day before or after. Building them with the local-time `Date`
  * constructor is what makes "add 14 days" land on the 13th twice a year.
  *
- * Weekends are Saturday and Sunday. THERE IS NO HOLIDAY CALENDAR: a
- * proposal due three business days after a pick that straddles Victoria
- * Day will read one working day early. The page only ever promises "3
- * business days", which is the same promise the old calendar made, but
- * the limitation is real and is recorded in the handoff.
+ * Weekends are Saturday and Sunday, and Ontario's nine statutory
+ * holidays are skipped in the business-day count — see HOLIDAYS. The
+ * table is static and covers 2026–2027; past the end of it the maths
+ * silently degrades to weekends only, which `holidayCoverageEndsAfter`
+ * exists to let a caller notice.
+ *
+ * A weekend or holiday is still a perfectly good day to TALK — the call
+ * can be any day. Only the three-business-day proposal count skips them.
  */
 
 export type CivilDate = Date;
@@ -57,26 +60,78 @@ export function isWeekend(d: CivilDate): boolean {
   return w === 0 || w === 6;
 }
 
+/**
+ * Ontario statutory holidays, 2026–2027.
+ *
+ * The nine public holidays under the Employment Standards Act. Easter
+ * Monday, the Civic Holiday and Remembrance Day are NOT among them in
+ * Ontario and are deliberately absent. The dates are written out rather
+ * than computed because an Easter algorithm is a lot of surface area for
+ * two years of data, and the test asserts the weekday of every rule-based
+ * one so a typo cannot survive.
+ */
+export const HOLIDAYS: Record<string, string> = {
+  "2026-01-01": "New Year's Day",
+  "2026-02-16": "Family Day",
+  "2026-04-03": "Good Friday",
+  "2026-05-18": "Victoria Day",
+  "2026-07-01": "Canada Day",
+  "2026-09-07": "Labour Day",
+  "2026-10-12": "Thanksgiving",
+  "2026-12-25": "Christmas Day",
+  "2026-12-26": "Boxing Day",
+  "2027-01-01": "New Year's Day",
+  "2027-02-15": "Family Day",
+  "2027-03-26": "Good Friday",
+  "2027-05-24": "Victoria Day",
+  "2027-07-01": "Canada Day",
+  "2027-09-06": "Labour Day",
+  "2027-10-11": "Thanksgiving",
+  "2027-12-25": "Christmas Day",
+  "2027-12-26": "Boxing Day",
+};
+
+/** The last date the holiday table can speak for. */
+export const holidayCoverageEndsAfter = civil(2027, 12, 31);
+
+export function holidayName(d: CivilDate): string | null {
+  return HOLIDAYS[toISO(d)] ?? null;
+}
+
+/** Neither a weekend nor an Ontario statutory holiday. */
+export function isBusinessDay(d: CivilDate): boolean {
+  return !isWeekend(d) && !holidayName(d);
+}
+
 /** The date itself if it is a business day, otherwise the next one. */
 export function nextBusinessDay(d: CivilDate): CivilDate {
   let out = d;
-  while (isWeekend(out)) out = addDays(out, 1);
+  // bounded: a run of non-business days cannot plausibly exceed a week
+  for (let i = 0; i < 14 && !isBusinessDay(out); i++) out = addDays(out, 1);
   return out;
 }
 
 /**
- * `n` business days after `d`, skipping Saturdays and Sundays.
+ * `n` business days after `d`, skipping weekends and Ontario stat days.
  *
- * Counting starts the day AFTER `d`: a Monday plus three business days
- * is Thursday, not Wednesday. If `d` itself is a weekend the count still
- * starts from the following day, so a Saturday plus one is Monday.
+ * Two anchors, because a call on a working day and a call on a Sunday do
+ * not start the same clock:
+ *
+ *   - a call ON a business day counts from the day AFTER it, so a Monday
+ *     call is Tue, Wed, Thu.
+ *   - a call on a weekend or a holiday counts the following business day
+ *     as day one, so a Saturday call is Mon, Tue, Wed.
+ *
+ * Without the second anchor a Saturday call would land a day later than
+ * the Monday after it, which is not a promise anyone would make out loud.
  */
 export function addBusinessDays(d: CivilDate, n: number): CivilDate {
-  let out = d;
-  let left = n;
+  const onBusinessDay = isBusinessDay(d);
+  let out = onBusinessDay ? d : nextBusinessDay(d);
+  let left = onBusinessDay ? n : n - 1;
   while (left > 0) {
     out = addDays(out, 1);
-    if (!isWeekend(out)) left--;
+    if (isBusinessDay(out)) left--;
   }
   return out;
 }
@@ -120,8 +175,8 @@ export function sameDay(a: CivilDate, b: CivilDate): boolean {
 /**
  * The three dates the section promises, from one chosen call date.
  *
- * Only these three facts exist: the call is 20 minutes, the proposal
- * lands within 3 business days, and kickoff is within 14 calendar days.
+ * Only these facts exist: the call is 20 minutes, the proposal lands
+ * within 3 business days, and kickoff is within 14 calendar days.
  * Nothing here invents a fourth.
  */
 export function scheduleFrom(call: CivilDate) {
