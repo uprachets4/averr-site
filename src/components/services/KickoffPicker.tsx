@@ -432,14 +432,16 @@ function Node({
             {meta}
           </span>
         ) : null}
-        <span
-          className={accent ? "type-h2 type-accent" : "type-h2"}
-          style={{ color: "var(--color-ink)", whiteSpace: "nowrap" }}
-        >
+        <span className="type-h2" style={{ color: "var(--color-ink)", whiteSpace: "nowrap" }}>
           {/* The odometer is a column of all ten glyphs, so it is hidden
               from assistive tech and the real date is given here. */}
           <span className="sr-only">{longLabel(date)}</span>
-          <span aria-hidden>
+          {/* type-accent must sit INSIDE type-h2, never beside it: its
+              font-size is 1.12em, which resolves against the parent's
+              size. On the same element it measured against the inherited
+              body size and rendered the kickoff date at a third of the
+              others. */}
+          <span aria-hidden className={accent ? "type-accent" : undefined}>
             {weekdayShort(date)} <Odometer value={dayOfMonth(date)} reduce={reduce} />
           </span>
         </span>
