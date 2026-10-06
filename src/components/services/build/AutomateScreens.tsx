@@ -197,7 +197,18 @@ const STEPS: Array<[string, string]> = [
   ["Queued for review", "Marcus"],
 ];
 const REPLY =
-  "Hi Priya — thanks for the details on the Ravenscroft basement. We cover Oshawa and can usually get out for an on-site estimate within three days. Based on the square footage you gave, a full finish typically runs four to six weeks.";
+  "Hi Priya — thanks for the details on the Ravenscroft basement.\n\n" +
+  "We cover Oshawa and the rest of Durham, and we can usually get out for an on-site estimate within three days. For a full basement at roughly 900 square feet, a finish like the one you described typically runs four to six weeks once permits are back.\n\n" +
+  "I have put a hold on Thursday at 2pm for the estimate. If that does not suit, reply with a window that does and I will move it.\n\n" +
+  "One thing worth flagging early: the photos show the panel on the far wall, so we may need an electrician in before framing. That is quoted separately and I will include a figure either way.";
+
+/** What the agent read to write the reply. */
+const SOURCES: Array<[string, string]> = [
+  ["Website form", "4 fields · submitted 10:02"],
+  ["Service area map", "L1J 2K8 → Durham"],
+  ["Pricing table", "Basement · full finish"],
+  ["Crew calendar", "Thu 2pm open"],
+];
 
 export function ScreenAgent({ local, compact }: AutoScreenProps) {
   const [step, setStep] = useState(-1);
@@ -235,30 +246,30 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
   }
 
   return (
-    <div style={{ position: "absolute", inset: 0, background: NAVY, color: "#DCE6F5", display: "grid", gridTemplateColumns: "1fr 1.15fr", overflow: "hidden" }}>
-      <div style={{ padding: "18px 20px", borderRight: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", gap: 13, minHeight: 0 }}>
+    <div style={{ position: "absolute", inset: 0, background: NAVY, color: "#DCE6F5", display: "grid", gridTemplateColumns: "1fr 1.2fr", overflow: "hidden" }}>
+      <div style={{ padding: "24px 26px", borderRight: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", gap: 16, minHeight: 0 }}>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600 }}>Lead intake agent</div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(220,230,245,0.45)", marginTop: 2 }}>
+          <div style={{ fontSize: 18, fontWeight: 600 }}>Lead intake agent</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(220,230,245,0.5)", marginTop: 4 }}>
             run #4182 · triggered by website form
           </div>
         </div>
 
-        <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9, padding: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-            <span style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(95,168,255,0.18)", color: ACC, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600 }}>
+        <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 11, padding: 15 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <span style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(95,168,255,0.18)", color: ACC, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600 }}>
               PR
             </span>
             <span>
-              <span style={{ display: "block", fontSize: 11.5, fontWeight: 600 }}>Priya Raghunathan</span>
-              <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(220,230,245,0.5)" }}>
+              <span style={{ display: "block", fontSize: 14, fontWeight: 600 }}>Priya Raghunathan</span>
+              <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(220,230,245,0.55)", marginTop: 2 }}>
                 Oshawa · L1J 2K8
               </span>
             </span>
           </div>
-          <div style={{ display: "flex", gap: 7, marginTop: 10 }}>
-            {["Basement finishing", "Full basement", "This month"].map((t) => (
-              <span key={t} style={{ fontFamily: "var(--font-mono)", fontSize: 8, background: "rgba(255,255,255,0.07)", borderRadius: 999, padding: "3px 8px", color: "rgba(220,230,245,0.75)" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 13 }}>
+            {["Basement finishing", "Full basement", "This month", "~900 sq ft"].map((t) => (
+              <span key={t} style={{ fontFamily: "var(--font-mono)", fontSize: 11, background: "rgba(255,255,255,0.07)", borderRadius: 999, padding: "4px 10px", color: "rgba(220,230,245,0.78)" }}>
                 {t}
               </span>
             ))}
@@ -266,63 +277,81 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
         </div>
 
         {/* run timeline */}
-        <div style={{ flex: 1, minHeight: 0 }}>
+        <div>
           {STEPS.map(([n, d], i) => {
             const done = i <= step;
             const active = i === step + 1 && step < STEPS.length - 1;
             return (
-              <div key={n} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0" }}>
-                <span style={{ width: 17, height: 17, borderRadius: "50%", background: done ? "#3FD08A" : "transparent", border: done ? "none" : `1.5px solid ${active ? ACC : "rgba(255,255,255,0.18)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9.5, color: NAVY, flex: "0 0 17px" }}>
+              <div key={n} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0" }}>
+                <span style={{ width: 22, height: 22, borderRadius: "50%", background: done ? "#3FD08A" : "transparent", border: done ? "none" : `1.5px solid ${active ? ACC : "rgba(255,255,255,0.18)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: NAVY, flex: "0 0 22px" }}>
                   {done ? "✓" : ""}
                 </span>
-                <span style={{ flex: 1, fontSize: 10.5, color: done ? "#DCE6F5" : "rgba(220,230,245,0.45)" }}>{n}</span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: done ? ACC : "transparent" }}>{d}</span>
+                <span style={{ flex: 1, fontSize: 13, color: done ? "#DCE6F5" : "rgba(220,230,245,0.45)" }}>{n}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: done ? ACC : "transparent" }}>{d}</span>
               </div>
             );
           })}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 600, background: step >= 0 ? "rgba(95,168,255,0.2)" : ACC, color: step >= 0 ? ACC : NAVY, borderRadius: 7, padding: "7px 14px", transition: "all 260ms ease" }}>
+        {/* what the agent pulled — fills the column instead of leaving it
+            half dark, and shows the work behind the score */}
+        <div style={{ flex: 1, minHeight: 0, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 11, padding: "13px 15px" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(220,230,245,0.45)", marginBottom: 10 }}>
+            Sources used
+          </div>
+          {SOURCES.map(([n, d], i) => (
+            <div key={n} style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, padding: "7px 0", borderTop: i ? "1px solid rgba(255,255,255,0.06)" : "none", opacity: step >= 1 ? 1 : 0.25, transition: "opacity 400ms ease" }}>
+              <span style={{ fontSize: 12.5 }}>{n}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(220,230,245,0.5)", textAlign: "right" }}>{d}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, background: step >= 0 ? "rgba(95,168,255,0.2)" : ACC, color: step >= 0 ? ACC : NAVY, borderRadius: 9, padding: "9px 18px", transition: "all 260ms ease" }}>
             {step >= STEPS.length - 1 ? "Run complete" : step >= 0 ? "Running…" : "Run agent"}
+          </span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(220,230,245,0.45)" }}>
+            {step >= STEPS.length - 1 ? "6.2s · 5 steps" : "avg 6s"}
           </span>
         </div>
       </div>
 
       {/* draft + gauge */}
-      <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 13, minHeight: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ position: "relative", width: 62, height: 62, flex: "0 0 62px" }}>
+      <div style={{ padding: "24px 26px", display: "flex", flexDirection: "column", gap: 16, minHeight: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <div style={{ position: "relative", width: 78, height: 78, flex: "0 0 78px" }}>
             <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }}>
               <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="9" />
               <circle cx="50" cy="50" r="42" fill="none" stroke={ACC} strokeWidth="9" strokeLinecap="round" strokeDasharray={`${step >= 2 ? 0.86 * 264 : 0} 264`} style={{ transition: "stroke-dasharray 700ms cubic-bezier(0.25,1,0.5,1)" }} />
             </svg>
-            <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, fontWeight: 600 }}>
+            <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 600 }}>
               {step >= 2 ? 86 : "—"}
             </span>
           </div>
           <div>
-            <div style={{ fontSize: 11.5, fontWeight: 600 }}>Fit score</div>
-            <div style={{ fontSize: 9.5, color: "rgba(220,230,245,0.55)", marginTop: 3, lineHeight: 1.5 }}>
-              In service area, budget band matches,
-              <br />
-              job type we take.
+            <div style={{ fontSize: 14, fontWeight: 600 }}>Fit score</div>
+            <div style={{ fontSize: 12.5, color: "rgba(220,230,245,0.6)", marginTop: 4, lineHeight: 1.55 }}>
+              In service area, budget band matches, job type we take.
             </div>
           </div>
         </div>
 
-        <div style={{ flex: 1, minHeight: 0, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 9, padding: 12, display: "flex", flexDirection: "column" }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(220,230,245,0.42)", marginBottom: 8 }}>
+        <div style={{ flex: 1, minHeight: 0, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 11, padding: 16, display: "flex", flexDirection: "column" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(220,230,245,0.45)", marginBottom: 11 }}>
             Drafted reply
           </div>
-          <div style={{ fontSize: 10.5, lineHeight: 1.62, color: "rgba(220,230,245,0.88)", flex: 1 }}>
+          <div style={{ fontSize: 13, lineHeight: 1.62, color: "rgba(220,230,245,0.9)", flex: 1, minHeight: 0, whiteSpace: "pre-wrap" }}>
             {REPLY.slice(0, typed)}
             <span style={{ opacity: typed < REPLY.length ? 1 : 0, color: ACC }}>▍</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, paddingTop: 9, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: step >= 4 ? "#F0B429" : "rgba(255,255,255,0.2)" }} />
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(220,230,245,0.6)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12, paddingTop: 11, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: step >= 4 ? "#F0B429" : "rgba(255,255,255,0.2)" }} />
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(220,230,245,0.62)" }}>
               {step >= 4 ? "Queued for review · Marcus" : "Not sent"}
+            </span>
+            <span style={{ marginLeft: "auto", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(220,230,245,0.45)" }}>
+              {Math.round((typed / REPLY.length) * 212)} words
             </span>
           </div>
         </div>
@@ -335,12 +364,14 @@ export function ScreenAgent({ local, compact }: AutoScreenProps) {
    3 · Tool integration — workflow canvas
    ═══════════════════════════════════════════════════════════════ */
 
-const NODES: Array<[string, number, number]> = [
-  ["Website form", 8, 46],
-  ["CRM", 30, 22],
-  ["Email", 52, 52],
-  ["Calendar", 74, 24],
-  ["Team chat", 88, 62],
+/** name, x%, y%, status line. Spread wide: the graph is meant to span the
+ *  canvas, not huddle in the middle of it. */
+const NODES: Array<[string, number, number, string]> = [
+  ["Website form", 11, 30, "northgate.ca"],
+  ["CRM", 31, 68, "HubSpot · contact"],
+  ["Email", 51, 28, "Gmail · template 4"],
+  ["Calendar", 71, 66, "Crew A · Thu 2pm"],
+  ["Team chat", 90, 30, "#dispatch"],
 ];
 const LOG: Array<[string, string]> = [
   ["10:04", "Lead created in CRM"],
@@ -431,15 +462,15 @@ export function ScreenCanvas({ local, compact }: AutoScreenProps) {
 
   return (
     <div style={{ position: "absolute", inset: 0, background: "#F7F7F4", backgroundImage: "radial-gradient(rgba(29,34,32,0.13) 1px, transparent 1px)", backgroundSize: "18px 18px", display: "flex", flexDirection: "column", overflow: "hidden", color: "#1D2220" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "13px 18px", background: "rgba(255,255,255,0.86)", borderBottom: "1px solid rgba(29,34,32,0.1)" }}>
-        <span style={{ fontSize: 12.5, fontWeight: 600 }}>Lead routing</span>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(29,34,32,0.45)" }}>5 steps · 3 tools</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "15px 20px", background: "rgba(255,255,255,0.86)", borderBottom: "1px solid rgba(29,34,32,0.1)" }}>
+        <span style={{ fontSize: 15, fontWeight: 600 }}>Lead routing</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(29,34,32,0.5)" }}>5 steps · 3 tools</span>
         <span style={{ flex: 1 }} />
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "rgba(29,34,32,0.5)" }}>Draft</span>
-        <span style={{ width: 34, height: 19, borderRadius: 999, background: active ? "#3FA06B" : "rgba(29,34,32,0.18)", position: "relative", transition: "background 240ms ease" }}>
-          <span style={{ position: "absolute", top: 2, left: active ? 17 : 2, width: 15, height: 15, borderRadius: "50%", background: "#fff", transition: "left 240ms cubic-bezier(0.25,1,0.5,1)" }} />
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(29,34,32,0.5)" }}>Draft</span>
+        <span style={{ width: 40, height: 22, borderRadius: 999, background: active ? "#3FA06B" : "rgba(29,34,32,0.18)", position: "relative", transition: "background 240ms ease" }}>
+          <span style={{ position: "absolute", top: 2, left: active ? 20 : 2, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left 240ms cubic-bezier(0.25,1,0.5,1)" }} />
         </span>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 600, color: active ? "#2E7A50" : "rgba(29,34,32,0.5)" }}>Active</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, color: active ? "#2E7A50" : "rgba(29,34,32,0.5)" }}>Active</span>
       </div>
 
       <div ref={hostRef} style={{ position: "relative", flex: 1, minHeight: 0 }}>
@@ -478,29 +509,42 @@ export function ScreenCanvas({ local, compact }: AutoScreenProps) {
             ))
           : null}
 
-        {NODES.map(([n, x, y], i) => (
+        {NODES.map(([n, x, y, sub], i) => (
           <div
             key={n}
             ref={function set(el) {
               nodeRefs.current[i] = el;
             }}
-            style={{ position: "absolute", left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)", background: "#fff", border: "1px solid rgba(29,34,32,0.14)", borderRadius: 9, padding: "9px 12px", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 3px 10px rgba(29,34,32,0.07)", whiteSpace: "nowrap", zIndex: 2 }}
+            style={{ position: "absolute", left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)", minWidth: 148, background: "#fff", border: "1px solid rgba(29,34,32,0.14)", borderRadius: 11, padding: "12px 14px", display: "flex", alignItems: "center", gap: 11, boxShadow: "0 4px 14px rgba(29,34,32,0.08)", whiteSpace: "nowrap", zIndex: 2 }}
           >
             <NodeIcon i={i} />
-            <span style={{ fontSize: 10.5, fontWeight: 500 }}>{n}</span>
+            <span style={{ display: "block" }}>
+              <span style={{ display: "block", fontSize: 13, fontWeight: 600 }}>{n}</span>
+              <span style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(29,34,32,0.5)", marginTop: 2 }}>{sub}</span>
+            </span>
+            <span style={{ marginLeft: "auto", width: 7, height: 7, borderRadius: "50%", background: active ? "#3FA06B" : "rgba(29,34,32,0.2)", transition: "background 300ms ease" }} />
           </div>
         ))}
 
-        {/* run log — positioned in percentages so the spotlight rect can
-            name the same box without a second measurement */}
-        <div style={{ position: "absolute", right: "3%", bottom: "4%", width: "31%", background: "#fff", border: "1px solid rgba(29,34,32,0.12)", borderRadius: 9, padding: 11, boxShadow: "0 8px 22px rgba(29,34,32,0.1)", zIndex: 3 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(29,34,32,0.42)", marginBottom: 8 }}>
+      </div>
+
+      {/* Run log as a full-width console strip rather than a small floating
+          card in the corner. It fills the bottom of the window, and it can
+          no longer collide with a node now that the graph spans the canvas. */}
+      <div style={{ background: "#fff", borderTop: "1px solid rgba(29,34,32,0.12)", padding: "12px 20px 14px", zIndex: 3 }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 9 }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(29,34,32,0.45)" }}>
             Run log
-          </div>
+          </span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(29,34,32,0.38)" }}>
+            today · {lines} of {LOG.length} steps
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: 28 }}>
           {LOG.map(([t, m], i) => (
-            <div key={m} style={{ display: "flex", gap: 8, padding: "3px 0", opacity: i < lines ? 1 : 0.16, transition: "opacity 260ms ease" }}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(29,34,32,0.42)" }}>{t}</span>
-              <span style={{ fontSize: 9.5 }}>{m}</span>
+            <div key={m} style={{ display: "flex", gap: 11, padding: "4px 0", opacity: i < lines ? 1 : 0.18, transition: "opacity 260ms ease" }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(29,34,32,0.45)" }}>{t}</span>
+              <span style={{ fontSize: 12.5 }}>{m}</span>
             </div>
           ))}
         </div>
@@ -581,11 +625,15 @@ function NodeIcon({ i }: { i: number }) {
    4 · Human review built in — approval inbox
    ═══════════════════════════════════════════════════════════════ */
 
-const DRAFTS: Array<[string, string, string]> = [
-  ["Priya Raghunathan", "Basement estimate — Ravenscroft Rd", "2m"],
-  ["Dan Mireau", "Re: flooring quote — Kingston Rd E", "14m"],
-  ["Ayesha Karim", "Bathroom refit — Harwood Ave", "1h"],
-  ["Tomas Beck", "Follow-up — Rossland Rd W", "3h"],
+/** name, subject, age, preview. Six threads, each with the first line of
+ *  its draft, so the list reads as a real inbox rather than four stubs. */
+const DRAFTS: Array<[string, string, string, string]> = [
+  ["Priya Raghunathan", "Basement estimate — Ravenscroft Rd", "2m", "Hi Priya — thanks for the details on the…"],
+  ["Dan Mireau", "Re: flooring quote — Kingston Rd E", "14m", "Dan, the engineered oak is back in stock…"],
+  ["Ayesha Karim", "Bathroom refit — Harwood Ave", "1h", "We can hold the 18th for the tear-out if…"],
+  ["Tomas Beck", "Follow-up — Rossland Rd W", "3h", "Following up on the quote from last week…"],
+  ["Elaine Osei", "Kitchen island — Taunton Rd", "5h", "The quartz you picked is a two-week lead…"],
+  ["Marco Silva", "Re: deck rebuild — Simcoe St N", "1d", "Permit came back approved this morning…"],
 ];
 
 export function ScreenInbox({ local, compact }: AutoScreenProps) {
@@ -602,7 +650,7 @@ export function ScreenInbox({ local, compact }: AutoScreenProps) {
     return (
       <div style={{ position: "absolute", inset: 0, background: "#fff", padding: 16, overflow: "hidden", color: "#1C2126" }}>
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 3 }}>Awaiting your approval</div>
-        <div style={{ fontSize: MIN, color: "rgba(28,33,38,0.55)", marginBottom: 13 }}>4 drafts · agent-written</div>
+        <div style={{ fontSize: MIN, color: "rgba(28,33,38,0.55)", marginBottom: 13 }}>6 drafts · agent-written</div>
         <div style={{ border: "1px solid rgba(28,33,38,0.12)", borderRadius: 9, padding: 12 }}>
           <div style={{ fontSize: 12, fontWeight: 600 }}>{DRAFTS[0][0]}</div>
           <div style={{ fontSize: MIN, color: "rgba(28,33,38,0.55)", marginBottom: 9 }}>{DRAFTS[0][1]}</div>
@@ -621,57 +669,68 @@ export function ScreenInbox({ local, compact }: AutoScreenProps) {
 
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex", background: "#fff", color: "#1C2126", overflow: "hidden" }}>
-      <div style={{ width: 196, flex: "0 0 196px", background: GREY, borderRight: "1px solid rgba(28,33,38,0.1)", padding: "14px 0", minHeight: 0, overflow: "hidden" }}>
-        <div style={{ padding: "0 13px 10px", fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(28,33,38,0.45)" }}>
-          Awaiting approval · 4
+      <div style={{ width: 268, flex: "0 0 268px", background: GREY, borderRight: "1px solid rgba(28,33,38,0.1)", padding: "16px 0", minHeight: 0, overflow: "hidden" }}>
+        <div style={{ padding: "0 16px 12px", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(28,33,38,0.45)" }}>
+          Awaiting approval · {DRAFTS.length}
         </div>
-        {DRAFTS.map(([n, s, t], i) => (
-          <div key={n} style={{ padding: "9px 13px", background: i === 0 ? "#fff" : "transparent", borderLeft: i === 0 ? "2px solid #1F5D4C" : "2px solid transparent" }}>
-            <div style={{ display: "flex", gap: 6, alignItems: "baseline" }}>
-              <span style={{ fontSize: 10.5, fontWeight: 600, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{n}</span>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 8, color: "rgba(28,33,38,0.4)" }}>{t}</span>
+        {DRAFTS.map(([n, sub, t, prev], i) => (
+          <div key={n} style={{ padding: "11px 16px", background: i === 0 ? "#fff" : "transparent", borderLeft: i === 0 ? "3px solid #1F5D4C" : "3px solid transparent" }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "baseline" }}>
+              <span style={{ fontSize: 13, fontWeight: 600, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{n}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(28,33,38,0.42)" }}>{t}</span>
             </div>
-            <div style={{ fontSize: 9.5, color: "rgba(28,33,38,0.55)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: 2 }}>{s}</div>
+            <div style={{ fontSize: 12, color: "rgba(28,33,38,0.7)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: 3 }}>{sub}</div>
+            <div style={{ fontSize: 11.5, color: "rgba(28,33,38,0.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginTop: 2 }}>{prev}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ flex: 1, minWidth: 0, padding: "16px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ flex: 1, minWidth: 0, padding: "18px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
         <div>
-          <div style={{ fontSize: 13.5, fontWeight: 600 }}>{DRAFTS[0][1]}</div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(28,33,38,0.45)", marginTop: 3 }}>
+          <div style={{ fontSize: 16, fontWeight: 600 }}>{DRAFTS[0][1]}</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(28,33,38,0.48)", marginTop: 4 }}>
             drafted by agent · to priya.r@example.com
           </div>
         </div>
 
-        <div style={{ flex: 1, minHeight: 0, border: "1px solid rgba(28,33,38,0.12)", borderRadius: 9, padding: 14, fontSize: 11, lineHeight: 1.72 }}>
+        <div style={{ flex: 1, minHeight: 0, border: "1px solid rgba(28,33,38,0.12)", borderRadius: 11, padding: 18, fontSize: 13, lineHeight: 1.72 }}>
           Hi Priya — thanks for the details on the Ravenscroft basement. We cover
-          Oshawa and can usually get out for an on-site estimate{" "}
+          Oshawa and the rest of Durham, and can usually get out for an on-site estimate{" "}
           <span style={{ textDecoration: "line-through", color: "#C2453A", opacity: edited ? 1 : 0.35, transition: "opacity 300ms ease" }}>
             within a week
           </span>{" "}
           <span style={{ background: edited ? "rgba(63,160,107,0.18)" : "transparent", color: edited ? "#2E7A50" : "transparent", borderRadius: 3, padding: "0 3px", transition: "all 300ms ease" }}>
             within three days
           </span>
-          . Based on the square footage you gave, a full finish typically runs four
-          to six weeks. Happy to walk the space and give you a fixed number.
-          <div style={{ marginTop: 12, fontFamily: "var(--font-mono)", fontSize: 8.5, color: "rgba(28,33,38,0.4)" }}>
+          . Based on the square footage you gave, a full finish typically runs
+          four to six weeks once permits are back.
+          <div style={{ marginTop: 14 }}>
+            I have put a hold on Thursday at 2pm for the estimate. If that does
+            not suit, reply with a window that does and I will move it.
+          </div>
+          <div style={{ marginTop: 14 }}>
+            One thing worth flagging early: the photos show the panel on the far
+            wall, so we may need an electrician in before framing. That is
+            quoted separately and I will include a figure either way.
+          </div>
+          <div style={{ marginTop: 14 }}>Happy to walk the space and give you a fixed number.</div>
+          <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(28,33,38,0.1)", fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(28,33,38,0.45)" }}>
             1 edit by Marcus · {edited ? "just now" : "—"}
           </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, background: sent ? "#3FA06B" : "#1F5D4C", color: "#fff", borderRadius: 7, padding: "8px 16px", transition: "background 260ms ease" }}>
+          <span style={{ fontSize: 13, fontWeight: 600, background: sent ? "#3FA06B" : "#1F5D4C", color: "#fff", borderRadius: 9, padding: "10px 18px", transition: "background 260ms ease" }}>
             {sent ? "Sent ✓" : "Approve & send"}
           </span>
-          <span style={{ fontSize: 11, color: "rgba(28,33,38,0.5)" }}>Request changes</span>
+          <span style={{ fontSize: 13, color: "rgba(28,33,38,0.55)" }}>Request changes</span>
         </div>
       </div>
 
       <motion.div
         animate={{ opacity: sent ? 1 : 0, y: sent ? 0 : 10 }}
         transition={{ duration: 0.28 }}
-        style={{ position: "absolute", right: 18, bottom: 16, background: "#1C2126", color: "#fff", borderRadius: 9, padding: "10px 14px", fontSize: 10.5, boxShadow: "0 12px 26px rgba(28,33,38,0.28)" }}
+        style={{ position: "absolute", right: 18, bottom: 16, background: "#1C2126", color: "#fff", borderRadius: 9, padding: "11px 16px", fontSize: 12.5, boxShadow: "0 12px 26px rgba(28,33,38,0.28)" }}
       >
         Sent · approved by you
       </motion.div>
