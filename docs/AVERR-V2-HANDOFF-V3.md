@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~110 commits ahead of `main`** at the end of Session 17-fix — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `895313d` — *"19-pre-2: preload the route chunk for the path being loaded"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
-| **Doc currency** | Written at the end of Session 19-pre-2. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **HEAD** | `d925553` — *"17d: the first caption does not fade in from nothing"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
+| **Doc currency** | Written at the end of Session 17d. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -26,7 +26,7 @@
 dist/index.html                    3.18 kB │ gzip:   1.40 kB  ← carries the route-chunk map
 dist/assets/index-*.css           42.09 kB │ gzip:   8.75 kB
 dist/assets/index-*.js           481.39 kB │ gzip: 152.53 kB  ← home + shell + motion
-dist/assets/Services-*.js        164.14 kB │ gzip:  40.60 kB  ← the 16-beat build page
+dist/assets/Services-*.js        174.15 kB │ gzip:  42.79 kB  ← the 16-beat build page
 dist/assets/CaseStudy-*.js        51.34 kB │ gzip:  12.71 kB
 dist/assets/Contact-*.js          44.67 kB │ gzip:  11.14 kB
 dist/assets/Work-*.js             22.49 kB │ gzip:   6.80 kB
@@ -322,6 +322,36 @@ Prachets's rulings: 20 minutes is the canonical call length (a sweep found /cont
 
 *A measurement correction that matters more than the numbers.* **Every single-pass figure in this project, 19-pre's "after" table included, was measuring a cold edge cache.** The first pass over a freshly deployed asset set is consistently 300–600 ms slower than the second and third; 19-pre-2's first pass read `/` at 2504 ms and the median is 1904 ms. **Measure three passes and take the median** — one pass straight after a deploy is a worst case, not a result.
 
+**17d** `608a0c6` … `d925553` — **Owner recording audit: /services quality plus two site-wide fixes.** Twelve commits.
+
+**1 · The captions were in beat space, not slot space.** `BuildCaption` read `position` — a SLOT float — against `beat.index`. The two agree only for Design: the first chapter transition displaces every later beat by one slot and the second by two. So on every Automate and Grow beat the fade window `[i+0.85, i+1]` was already behind the playhead, `useTransform` clamped to its end value, and **the caption sat at opacity 0 for the whole beat.** That is the empty caption column in the recording — **§5's own slot-vs-beat trap, in the one place nobody had checked.** The caption is now visible for the whole beat bar a 7% swap at each edge, the first beat does not fade in at all (its slot starts at position 0, while the stage is already on screen during the lead-in), and the two per-element entrances are gone: they were wall-clock delays inside a scroll-driven scene, so a quick scroll left the outcome and chips still fading in several beats later. **Verified: all 16 beats show name + outcome at 10 of 10 samples.**
+
+**2 · The spotlight had two faults.** `backdrop-filter: blur(2px)` ran inside a transformed ancestor, where Chromium composites the band as an **opaque fill** rather than failing quietly — that is the white box over the Approvals diff. The old comment called it free because it "costs nothing where it works"; **a filter documented as unreliable in the exact context it runs in is not free.** And one fixed near-black tint sat over every screen, which on a light screen is a grey wash over cream. The scrim is now the screen's **own** surface: light screens fade toward their paper at 0.55, dark ones deepen toward their ink at 0.5. **Verified: 18/18 veils screen-tinted, zero backdrop-filter anywhere, nothing covered.**
+
+**3 · Density and scale.** Measured before: **base type 7.5–10.5px, minimum 7px, blank regions up to 39%** of the window. Now: **base 13px and minimum 11px on every screen at both 1440 and 1680.** 174 font sizes were raised by a codemod that reads each style object — anything in a mono object floors at 11px, anything else lands at 13px unless it was already a heading — and five screens were rebuilt by hand:
+
+| Screen | Was | Now |
+|---|---|---|
+| Agent console | one reply line above ~500px of nothing | four streamed paragraphs + a "sources used" block |
+| Workflow canvas | small nodes, a floating log card | 148px node cards with icon/name/status, graph spans the canvas, full-width log strip |
+| Approvals | 4 stubs, short draft | 6 threads with previews, 268px list, draft fills the pane |
+| A/B test | five grey bars per variant | two real landing pages — nav, hero, proof row, postal-code form, services strip |
+| Content calendar | 8 entries, 7.5px day numbers | 20 entries across most weekdays at 11px, composer with body copy, hashtags, channels |
+
+Plus the time audit (heatmap rows were a fixed 22px, so it sat in the top third — now stretches), the runbook (gained the right rail a docs site has, a costs section and a change log) and outreach (10 prospects, and the rest of the sequence under the email preview).
+
+**Six screens are still over the 15% blank target** and are listed in §7. **The van decal's phone number** was SVG `<text>` at 7 units in a stretched viewBox — the §5 SVG-text gotcha again — and was removed rather than enlarged; the same number already sits at 11px on the business card above it.
+
+**4 · The nav CTA.** Not a tone bug — a **cross-fade collision**. Background and colour ran the same duration from opposite ends, so they met in the middle: 175ms into a tone flip the pill was `rgb(133,131,127)` and the label `rgb(127,125,119)` — **1.09:1**. Two opposite ramps over one duration always cross; arithmetic, not tuning. The colour now **steps once at the halfway point**, and the ramp uses `ease.inOut` because it is the only token that is point-symmetric (`[0.65,0,0.35,1]`), so it is exactly half way at exactly half time **in both directions**. Worst contrast through a flip is now **3.56:1**, and the settled states were never the problem. **Verified: 50 settled samples and 174 continuous-scroll samples across 5 routes, zero blank frames.**
+
+**5 · The home ledger** lost the CareerClarity row — an unverified "student throughput" figure for an unreleased product — and was deliberately **not** repadded. Four rows remain (SIFT 42%, and the three studio figures), count-up resolves, hairline gaps even.
+
+**6 · The home CTAs** have their `spring.snappy` back, on the transform only: they stay painted at opacity 1 from the first frame per the hero LCP rule, so the bounce is motion on something already on screen.
+
+**Verified on the alias:** build exit **0** unfiltered · caption sampling 10 points × 16 beats · spotlight veil and backdrop-filter audited per beat with screenshots · density and type measured at **1440 and 1680** with dwell screenshots reviewed one by one · nav CTA pixel-tested at 50 settled and 174 continuous points with dark-state screenshots · ledger rows, figures and spacing · **zero horizontal overflow at 375 on all 11 routes, scrolled** · **3-speed crash scroll at 1440/1920/375 on /, /work, a case study, /services, /about — 15 route-runs, 0 console errors, 0 React errors** · **mobile LCP median of 3: home 1964 ms, /services 2240 ms, both under 2.5 s**, CLS 0.000/0.001.
+
+*Three probe errors of mine, all caught before they reached a number in this log.* A caption baseline of "0/160" was measured against a **Vercel Security Checkpoint 403** page — §5.22, tripped by my own polling. Twice, a density sample for the **last beat** landed on the kickoff calendar **below** the stage, because the final caption keeps its text after the pin releases and the sticky frame still reports a positive top; the probe now requires the frame to sit near the top of the viewport. And the first font-size census read the **modal size including mono labels** as "base", which is not what the brief means by base UI text — it now reads the modal of non-mono text and judges mono by the 11px floor.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -518,7 +548,13 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **29 · A 600px-step probe scroll invents layout shift.** A full-scroll CLS probe reported **0.155 on /work/sift** and 0.076 on cadencestack, attributed to the nav. Under a gentle 100px-step scroll both read **0.009 and 0.000**. Jumping 600px at a time skips the sticky nav's intermediate states, so a 4px compaction registers as a large unanchored shift that no visitor could experience. **Scroll in steps a human could produce, or the number is fiction.** (§4.24 again.)
 
-**30 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
+**30 · `backdrop-filter` inside a transformed ancestor paints an opaque box.** *Cause:* the spotlight bands carried `backdrop-filter: blur(2px)` with a comment saying it was kept because it "costs nothing where it works". Inside a transformed ancestor Chromium does not fail quietly — it composites the band as a solid fill, which is the white box over the Approvals diff. *Fix:* removed. **A filter documented as unreliable in the exact context it runs in is not free; delete it rather than leaving it in as a maybe.**
+
+**31 · Two colours cross-fading from opposite ends always collide.** *Cause:* the nav CTA's pill background and its label ran the same duration and easing in opposite directions, so at the midpoint both were mid-grey — 1.09:1, a pill with no label, for roughly 80ms of every tone flip. *Fix:* the label does not ramp. It **steps once at the halfway point**, and the background uses `ease.inOut`, the only token that is point-symmetric, so the step lands when the pill is exactly mid-value in both directions. Minimum 3.56:1. **Any two-colour transition where both sides move needs one of them to be a step.**
+
+**32 · A caption keyed to beat index cannot read a slot-space playhead.** *Cause:* see §2's 17d entry. *Fix:* `slotForBeat(beat.index)`. **Every scroll-linked value on /services is in SLOT space — if a component indexes by beat, convert first.** The screens already did; the caption did not, and it had shipped that way since 17c-2.
+
+**33 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
 
 ---
 
@@ -586,11 +622,12 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 9. **Full mobile review** — automated checks confirm zero overflow, but no human pass has been done on a real device. The Session 17 stacked stills are no longer a concern here: **Prachets ruled the ~6px Automate labels a defect, and 17-fix-2 replaced that still below 900px with a purpose-built vertical composition** — five nodes on a straight vertical path, every label at real `type-eyebrow` size. Design and Grow still scale, and both were checked as readable at 375.
 10. ~~**`/work`'s LCP image.**~~ **APPROVED and DONE in 19-pre-2.** Prachets ruled that resized derivatives of existing screenshots are not new assets, so rule 11 does not apply. `/work` is 2320 ms.
 11. **Prerendering the shell — deferred to the Ship pass by Prachets.** First contentful paint is 1.64–1.86 s on every route because nothing paints until 152 kB of JS downloads and React mounts. Static-rendering each route's hero into its HTML would put LCP near first byte. Build-pipeline decision, not a page change.
-12. **A second, larger WebP rung is fetched on some case-study loads** — `01-command-overview-1280.webp` *and* `-1680.webp` on `/work/sift`, about 32 kB wasted. Seen in two probes, **not reproducible in a third, and I did not identify which element re-selects.** Both are lazy and land after LCP, so it costs bytes, not a metric. Worth one instrumented pass next time something touches that page.
-13. **`/work/sift` carries 0.009 CLS** from the hero meta grid moving 27 px at ~3.1 s — almost certainly the Inter swap relaying the one subhead long enough to change line count, despite the metric-matched fallback. Inside "good" and the route passes; left alone deliberately rather than chased.
-14. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
-15. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
-16. ~~**Commit-message convention.**~~ **CLOSED — Prachets ruled in 17-fix: standing rule 18 wins, always.** Commit + push per verified item. The `Commit:` line at the foot of a brief is the **summary for the final report**, not a single commit message to squash onto. See §4.18.
+12. **Six /services screens are still over the ~15% blank target** (largest flat rectangle as a share of the window, measured at 1680 / 1440): **Reporting 28.8 / 30**, **Brand & design direction 24.2 / 24.2**, **Human review built in 21.9 / 12.2**, **Paid ads 20 / 22.5**, **Product & SaaS interfaces 18.8 / 18.8**, **Design systems 18.3 / 18.3**, **Landing pages 16.4 / 16.4**. Type and legibility are met everywhere (base 13px, min 11px); these are composition density only. Each needs the same treatment the other eight got — content that reaches the bottom of the window, or panes that stretch rather than sit at their natural height.
+13. **A second, larger WebP rung is fetched on some case-study loads** — `01-command-overview-1280.webp` *and* `-1680.webp` on `/work/sift`, about 32 kB wasted. Seen in two probes, **not reproducible in a third, and I did not identify which element re-selects.** Both are lazy and land after LCP, so it costs bytes, not a metric. Worth one instrumented pass next time something touches that page.
+14. **`/work/sift` carries 0.009 CLS** from the hero meta grid moving 27 px at ~3.1 s — almost certainly the Inter swap relaying the one subhead long enough to change line count, despite the metric-matched fallback. Inside "good" and the route passes; left alone deliberately rather than chased.
+15. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
+16. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
+17. ~~**Commit-message convention.**~~ **CLOSED — Prachets ruled in 17-fix: standing rule 18 wins, always.** Commit + push per verified item. The `Commit:` line at the foot of a brief is the **summary for the final report**, not a single commit message to squash onto. See §4.18.
 
 ---
 
@@ -601,6 +638,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **Needs the photo.**
 - ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`).
 - ~~**Session 19-pre-2 — Prachets's four rulings.**~~ **DONE** (`e521774` … `895313d`). **All eleven routes under 2.5 s.** See §2.
+- ~~**Session 17d — /services quality + two site-wide fixes.**~~ **DONE** (`608a0c6` … `d925553`). Captions, spotlight, density, nav CTA, ledger, hero CTAs. **Six screens remain over the blank target — §7.12.**
 - **Session 19 — /contact.** After the recording.
 - **Session 20 — site-wide.** Page transitions using the slab wipe, footer redesign, home polish (richer door previews, reel hover, 404 pill).
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
