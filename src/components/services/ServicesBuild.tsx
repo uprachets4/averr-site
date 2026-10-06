@@ -358,10 +358,15 @@ function BuildCaption({
   // Visible for the whole beat bar a short swap at each edge: out over
   // the last 7%, in over the first 7% of the next. The outgoing caption
   // is at 0 before the next one mounts, so they never overlap.
+  // The FIRST beat does not fade in. Its slot starts at position 0, and the
+  // stage is already on screen during the lead-in before the sticky child
+  // engages — so a fade from 0 means the opening window sits there with an
+  // empty caption column beside it.
+  const isFirst = beat.index === 0;
   const opacity = useTransform(
     position,
     [slot, slot + SWAP, slot + 1 - SWAP, slot + 1],
-    [0, 1, 1, isLast ? 1 : 0]
+    [isFirst ? 1 : 0, 1, 1, isLast ? 1 : 0]
   );
   const ref = useScrollStyle<HTMLDivElement>(opacity);
   const proofs = beat.service.proof
