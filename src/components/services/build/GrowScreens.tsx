@@ -200,6 +200,11 @@ const PROSPECTS: Array<[string, string, string]> = [
   ["Mei-Ling Chau", "Birchway Realty Group", "Replied"],
   ["Owen Brathwaite", "Lakeshore & Co.", "Sent"],
   ["Farah Desai", "Kingsway Residential", "Sent"],
+  ["Tomas Abara", "Rowanwood Realty", "Opened"],
+  ["Priya Venkat", "Cedar & Main", "Sent"],
+  ["Declan Moss", "Northshore Brokers", "Opened"],
+  ["Hana Ishikawa", "Brightline Property", "Sent"],
+  ["Samuel Oyelaran", "Dunbarton Realty", "Sent"],
 ];
 const STATUS_C: Record<string, [string, string]> = {
   Replied: ["rgba(31,93,76,0.14)", GREEN],
@@ -308,6 +313,19 @@ export function ScreenSequence({ local, compact }: P) {
           and can usually turn one around before the first open house. Worth a walkthrough?
           <div style={{ marginTop: 10, fontFamily: "var(--font-mono)", fontSize: 11, color: "rgba(27,34,32,0.45)" }}>
             — Marcus, Northgate Home Services
+          </div>
+
+          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(27,34,32,0.1)" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(27,34,32,0.42)", marginBottom: 10 }}>
+              Rest of the sequence
+            </div>
+            {[["Wait", "3 days", "done"], ["Email 2", "Case study — Ajax basement", live ? "sent" : "queued"], ["Wait", "4 days", live ? "running" : "queued"], ["Call task", "Assigned to Marcus", "queued"]].map(([a, b2, c], i) => (
+              <div key={a + String(i)} style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "7px 0", borderTop: i ? "1px solid rgba(27,34,32,0.07)" : "none" }}>
+                <span style={{ fontSize: 12.5, fontWeight: 600, width: 62 }}>{a}</span>
+                <span style={{ flex: 1, fontSize: 12.5, color: "rgba(27,34,32,0.65)" }}>{b2}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: c === "done" || c === "sent" ? GREEN : "rgba(27,34,32,0.42)" }}>{c}</span>
+              </div>
+            ))}
           </div>
         </div>
         <motion.div
