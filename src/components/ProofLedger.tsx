@@ -38,13 +38,11 @@ function fromData(slug: string) {
 const ROWS: Row[] = [
   // No CG Walls row: the FeaturedCard directly above already leads with its
   // 85%, and printing the same figure twice reads as two results.
-  {
-    label: "CareerClarity AI",
-    target: 3.2,
-    decimals: 1,
-    suffix: "×",
-    caption: "Student throughput increase after AI-driven test analysis shipped.",
-  },
+  //
+  // No CareerClarity row either. Its 3.2x "student throughput" opened this
+  // ledger while CareerClarity itself is a draft with no case study behind
+  // it — an unverified figure for an unreleased product. Removed in 17d and
+  // deliberately NOT replaced: the ledger is shorter rather than padded.
   {
     label: "SIFT",
     ...fromData("sift"),
