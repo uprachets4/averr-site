@@ -175,7 +175,7 @@ export function sameDay(a: CivilDate, b: CivilDate): boolean {
 /**
  * The three dates the section promises, from one chosen call date.
  *
- * Only these facts exist: the call is 20 minutes, the proposal lands
+ * Only these facts exist: the call is 30 minutes, the proposal lands
  * within 3 business days, and kickoff is within 14 calendar days.
  * Nothing here invents a fourth.
  */

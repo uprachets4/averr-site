@@ -107,7 +107,7 @@ export default function ComingSoon() {
           }}
         >
           The project is real and the work is done — the write-up is still in
-          the queue. If you want the story now, easiest way is a 20-minute call.
+          the queue. If you want the story now, easiest way is a 30-minute call.
         </motion.p>
 
         <motion.div

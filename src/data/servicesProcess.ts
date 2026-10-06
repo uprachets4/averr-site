@@ -36,7 +36,7 @@ export const STEPS: ProcessStep[] = [
   {
     n: "01",
     title: "Book a discovery call.",
-    body: "20 minutes. No slide deck. We ask questions, you ask questions, both sides decide whether this is a fit.",
+    body: "30 minutes. No slide deck. We ask questions, you ask questions, both sides decide whether this is a fit.",
   },
   {
     n: "02",

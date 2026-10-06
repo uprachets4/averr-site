@@ -1093,7 +1093,7 @@ function BookingBand() {
           style={{ color: "var(--color-ink)", marginBottom: 24, maxWidth: "20ch", marginInline: "auto" }}
         >
           <CharRevealInView
-            text="Book a 20-minute intro call."
+            text="Book a 30-minute intro call."
             style={{ color: "var(--color-ink)" }}
           />
         </div>

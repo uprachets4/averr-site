@@ -94,7 +94,7 @@ export default function ServicesCloser() {
             margin: "0 auto 48px",
           }}
         >
-          That's what the first call is for. Twenty minutes, no deck, an
+          That's what the first call is for. Thirty minutes, no deck, an
           honest answer about where to start.
         </motion.p>
 

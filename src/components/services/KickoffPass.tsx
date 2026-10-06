@@ -316,7 +316,7 @@ export default function KickoffPass() {
                   )}
                 </div>
 
-                <Row label="Discovery call" date={plan.call} meta="20 min" reduce={!!reduce} />
+                <Row label="Discovery call" date={plan.call} meta="30 min" reduce={!!reduce} />
                 <Row label="Proposal by" date={plan.proposal} reduce={!!reduce} />
                 <KickoffRow date={plan.kickoff} reduce={!!reduce} />
 
