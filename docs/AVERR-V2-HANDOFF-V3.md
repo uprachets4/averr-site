@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~110 commits ahead of `main`** at the end of Session 17-fix — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `d925553` — *"17d: the first caption does not fade in from nothing"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
-| **Doc currency** | Written at the end of Session 17d. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **HEAD** | `ccd4c1f` — *"17e: each odometer column is sized by the glyph it shows"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
+| **Doc currency** | Written at the end of Session 17e. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -25,8 +25,8 @@
 ```
 dist/index.html                    3.18 kB │ gzip:   1.40 kB  ← carries the route-chunk map
 dist/assets/index-*.css           42.09 kB │ gzip:   8.75 kB
-dist/assets/index-*.js           481.39 kB │ gzip: 152.53 kB  ← home + shell + motion
-dist/assets/Services-*.js        174.15 kB │ gzip:  42.79 kB  ← the 16-beat build page
+dist/assets/index-*.js           482.30 kB │ gzip: 152.93 kB  ← home + shell + motion
+dist/assets/Services-*.js        177.28 kB │ gzip:  44.15 kB  ← the build page + kickoff picker
 dist/assets/CaseStudy-*.js        51.34 kB │ gzip:  12.71 kB
 dist/assets/Contact-*.js          44.67 kB │ gzip:  11.14 kB
 dist/assets/Work-*.js             22.49 kB │ gzip:   6.80 kB
@@ -352,6 +352,40 @@ Plus the time audit (heatmap rows were a fixed 22px, so it sat in the top third 
 
 *Three probe errors of mine, all caught before they reached a number in this log.* A caption baseline of "0/160" was measured against a **Vercel Security Checkpoint 403** page — §5.22, tripped by my own polling. Twice, a density sample for the **last beat** landed on the kickoff calendar **below** the stage, because the final caption keeps its text after the pin releases and the sticky frame still reports a positive top; the probe now requires the frame to sit near the top of the viewport. And the first font-size census read the **modal size including mono labels** as "base", which is not what the brief means by base UI text — it now reads the modal of non-mono text and judges mono by the 11px floor.
 
+**17e** `aae26c8` … `ccd4c1f` — **/services: the 14-day calendar becomes "Pick the day you call us."** Seven commits.
+
+*Owner feedback:* the calendar was accurate and inert — fourteen cells filling as you scrolled past, which the reader had to decode before it said anything. It is replaced by one question and the reader's own dates.
+
+**Pre-flight, as asked.** The booking tool is **Cal.com**, link `prachets/discoverycall`, embedded on /contact via `@calcom/embed-react`. **It does support a date parameter** — both the embed `config` and the hosted page take `date` and `month`. /services' CTA previously pointed at `/contact` with no parameter. The calendar sat in the `cream-warm` chapter between `NoList` and `ServicesCloser`, under `//_05 · how to start` and the h2 "Three steps. Two weeks to kickoff, max." **Only `Services.tsx` imported it.**
+
+**What it is now.** A strip of the next 21 days from today in **America/Toronto**; weekend chips are quieter and disabled; the default is the next business day (today, when today is one). A lens glides between chips on `spring.soft`. Pointer drag, click/tap, and the keyboard all drive it — arrows skip weekends, Home/End jump to the first and last selectable day — with `role="radiogroup"` and an `aria-live` sentence. Three nodes on a line show **Discovery call** (the pick, "20 minutes"), **Proposal** (+3 business days) and **Kickoff** (+14 calendar days, the bound, in the Cormorant accent). Digits roll on an odometer, the nodes shift as the segment lengths change, and the line redraws. The old h2 survives verbatim as the closing line, so **no copy was lost and no new promise was made** — the only facts used are the 20-minute call, 3 business days, 14 days, preview URLs from day one.
+
+**The CTA carries the date.** "Book {Weekday}'s call" → `/contact?date=YYYY-MM-DD`, and Contact passes it to both the Cal embed config and the hosted-page fallback link. **Verified end to end:** `?date=2026-10-09` produces `…/embed?layout=month_view&date=2026-10-09&month=2026-10`; a malformed value is ignored; no page errors.
+
+**The date maths is its own tested module.** `src/lib/businessDays.ts` carries civil dates **pinned to midday UTC** and read only through UTC getters, so a DST boundary cannot move "add 14 days" onto the day before. `tools/business-days.test.ts` runs on node's own test runner with no new dependency — **`npm run test:dates`, 8 passing**: a Friday pick, a +3 that crosses a weekend, a month boundary, a year boundary, a leap day, the weekend rules and ISO round-tripping.
+
+**⚠ There is no holiday calendar.** Only Saturday and Sunday are skipped, so a proposal due three business days after a pick that straddles a statutory holiday will read one working day early. The page only ever promises "3 business days", which is the same promise the old calendar made — but it is a real limitation and a holiday list is the fix if it ever matters.
+
+**Five sampled picks, all correct:**
+
+| Call | Proposal (+3 business) | Kickoff (+14 calendar) |
+|---|---|---|
+| Tue Oct 6 | Fri Oct 9 | Tue Oct 20 |
+| Wed Oct 7 | Mon Oct 12 | Wed Oct 21 |
+| Thu Oct 8 | Tue Oct 13 | Thu Oct 22 |
+| **Fri Oct 9** | **Wed Oct 14** | **Fri Oct 23** |
+| Mon Oct 12 | Thu Oct 15 | Mon Oct 26 |
+
+**Deleted:** `KickoffCalendar.tsx` (zero importers verified) plus `CALENDAR_DAYS`, `WEEKDAY_HEADERS`, `WEEKEND_DAYS`, `KICKOFF_STAMP`, `KICKOFF_STAMP_DAY` and the `dayStart`/`dayEnd` fields on `ProcessStep`, none of which anything else read. `STEPS` stays — `ProcessTimeline` and `AutomateScreens` use it.
+
+**Verified on the alias:** build exit **0** unfiltered · default selection = next business day · 21 chips, 6 weekend chips disabled and a weekend click ignored · keyboard, pointer drag and tap all select · `aria-live` announces the full sentence, and each node carries its own date as `sr-only` text because the odometer renders all ten glyphs · CTA date param correct after arrow, Home/End and tap · **reduced motion: both the digit column and the line segment compute `transform: none`** · mobile 375: strip scrolls with `scroll-snap-type: x`, minimum font **13px**, document width 375 · **zero horizontal overflow at 375 on all 11 routes** · **3-speed crash scroll on /services at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2388 ms, home 1876 ms**, CLS 0.001/0.000.
+
+*Four faults found by looking at the screenshots rather than the numbers.* The kickoff node sat flush against the container edge and its date read as clipped. All 21 chips did not fit at 1680 — the strip ran ~400px past the container and cut the last one. **`type-accent` was on the same element as `type-h2`**, and its `font-size: 1.12em` resolves against the PARENT's size, so the kickoff date rendered at about a third of the other two — it must nest INSIDE. And the odometer's clipped columns were as wide as the widest glyph, so a two-digit date read "Wed 1 4"; each column is now sized by an invisible copy of its own digit, because Cormorant has no tabular figures and a fixed `1ch` advance did not fix the accented date.
+
+**One deviation from the brief:** the eyebrow reads **`//_05 · TRY IT`**, not bare "TRY IT" — the site's section eyebrows all carry the `//_NN ·` prefix and this section was `//_05 · how to start`. Say the word and it drops to "TRY IT".
+
+**One cosmetic nit left:** the accented kickoff date still shows a hair more space between its two digits than the sans dates do. It is Cormorant italic's own side bearings, not a layout bug, and it is far better than it was.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -414,7 +448,7 @@ One continuous pinned scene. A generic GTA home-services business (**Northgate**
 | 1 | `BuildHero` | Eyebrow counts `SERVICE_COUNT`; h1 "Watch us build *your* business." on one `CharReveal`; scroll cue |
 | 2 | `ServicesBuild` | **The stage.** 16 beats + 2 chapter transitions on one pin |
 | 3 | `Chapter dark from cream` → `NoList` | unchanged |
-| 4 | `Chapter cream-warm from dark` → `KickoffCalendar` | unchanged |
+| 4 | `Chapter cream-warm from dark` → `KickoffPicker` | **17e**: "Pick the day you call us" — 21-day strip, live personal dates, date-aware CTA |
 | 5 | `Chapter dark from cream-warm` → `ServicesCloser` | `useDeclarePageEndTone("dark")` |
 
 **Slot model.** Beats are not evenly spaced, so scroll maps onto SLOTS, not beats: 5 Design beats at 65vh, an 80vh transition, 5 Automate beats, an 80vh transition, 6 Grow beats. **Travel 1200vh, wrapper 1300vh** (the n+1 rule, §5.4). Per beat: caption in 0–0.15, screen builds 0.05–0.40, **dwell 0.40–0.85**, caption out 0.85–1.00. One continuous float drives caption, canvas and rail.
@@ -554,7 +588,13 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **32 · A caption keyed to beat index cannot read a slot-space playhead.** *Cause:* see §2's 17d entry. *Fix:* `slotForBeat(beat.index)`. **Every scroll-linked value on /services is in SLOT space — if a component indexes by beat, convert first.** The screens already did; the caption did not, and it had shipped that way since 17c-2.
 
-**33 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
+**33 · `type-accent` must NEST inside the size class, never sit beside it.** *Cause:* its `font-size: 1.12em` resolves against the PARENT's computed size. On `className="type-h2 type-accent"` the accent measured against the inherited body size and rendered a display date at roughly a third of its neighbours. *Fix:* `<span className="type-h2"><span className="type-accent">…</span></span>`. **Anywhere the accent voice is wanted at a display size, it goes in a child.**
+
+**34 · A clipped odometer column is as wide as its widest glyph.** *Cause:* each rolling digit is a column of 0–9 with `overflow: hidden`, so the box takes the width of the widest numeral and a "1" floats in it — "14" rendered as "1 4". `font-variant-numeric: tabular-nums` fixes it only in a face that has tabular figures; Cormorant does not. *Fix:* size the column with an invisible copy of the digit it is currently showing and absolutely position the rolling strip over it. Correct in every face.
+
+**35 · Civil dates must not be built with the local-time `Date` constructor.** *Cause:* "add 14 days" to a local-midnight Date lands on the day before twice a year, and a CI box in UTC disagrees with a reader in Toronto about what "today" is. *Fix:* `src/lib/businessDays.ts` pins every date to **12:00 UTC** and reads only UTC getters; "today" comes from `Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto" })`. Unit tested — `npm run test:dates`.
+
+**36 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
 
 ---
 
@@ -638,6 +678,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **Needs the photo.**
 - ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`).
 - ~~**Session 19-pre-2 — Prachets's four rulings.**~~ **DONE** (`e521774` … `895313d`). **All eleven routes under 2.5 s.** See §2.
+- ~~**Session 17e — /services kickoff section.**~~ **DONE** (`aae26c8` … `ccd4c1f`). The 14-day calendar is an interactive personal timeline; `KickoffCalendar` removed. **No holiday calendar — §2.**
 - ~~**Session 17d — /services quality + two site-wide fixes.**~~ **DONE** (`608a0c6` … `d925553`). Captions, spotlight, density, nav CTA, ledger, hero CTAs. **Six screens remain over the blank target — §7.12.**
 - **Session 19 — /contact.** After the recording.
 - **Session 20 — site-wide.** Page transitions using the slab wipe, footer redesign, home polish (richer door previews, reel hover, 404 pill).
