@@ -1,50 +1,63 @@
 import { type MotionValue } from "motion/react";
 import { useScrollStyle } from "../../../lib/useScrollStyle";
 import type { FocusMove } from "./camera";
+import type { ChromeTone } from "./WindowChrome";
 
 /**
- * Dims and blurs everything outside the focus rect.
+ * Dims everything outside the focus rect.
  *
  * Built as four bands rather than one masked overlay because the effect
- * needed is the inverse of what `backdrop-filter` gives you on a single
- * element: a filter applies to what is behind THAT element, so a single
- * rect over the focus area would blur the thing we want sharp. Four
- * bands around the rect blur the surroundings and leave the focus alone.
+ * needed is the inverse of what a single rect gives you: an overlay over
+ * the focus area would cover the thing we want sharp. Four bands around
+ * the rect dim the surroundings and never touch the focus.
  *
- * The bands live inside the scaled content layer and are positioned in
- * the same percentage space as the rect, so they stay aligned at every
- * scale without any coordinate maths. They extend far past the content
- * box so nothing leaks at the edges once the content is scaled up.
+ * The bands are positioned in the same percentage space as the rect and
+ * extend far past the content box so nothing leaks at the edges.
+ *
+ * TWO THINGS WERE WRONG, both fixed in 17d.
+ *
+ * 1. `backdrop-filter: blur(2px)`. The old comment said it was "kept
+ *    because it costs nothing where it works" — inside a transformed
+ *    ancestor, which this is, it does not merely fail: Chromium falls
+ *    back to compositing the band as an opaque fill. That is the white
+ *    box over the Approvals diff in the recording. A filter that is
+ *    documented as unreliable in the exact context it runs in is not
+ *    free, and it is gone.
+ *
+ * 2. One fixed near-black tint over every screen. On the light screens
+ *    that is a grey wash over cream — the "murky" veil. The scrim is now
+ *    the screen's OWN surface colour, so dimming a light screen lightens
+ *    it toward its own paper and dimming a dark screen deepens it toward
+ *    its own ink. No grey, no colour that is not already on screen.
  */
 
+/** Far enough past the content box that nothing leaks once laid out. */
 const OUT = "-300%";
-/** 0.66 leaves the surroundings at roughly a third of their brightness —
- *  the "dims to 0.35" the brief asks for. At 0.55 the veil barely
- *  registered on the dark dashboard and the cropped edges still read as
- *  damage rather than as background. */
-const TINT = "rgba(11,12,14,0.66)";
-const BAND: React.CSSProperties = {
-  position: "absolute",
-  // backdrop-filter is unreliable inside a transformed ancestor, which
-  // this is — it is kept because it costs nothing where it works, but the
-  // veil is what actually does the job and does not depend on it.
-  backdropFilter: "blur(2px)",
-  WebkitBackdropFilter: "blur(2px)",
-  background: TINT,
-  pointerEvents: "none",
+
+/** Each tone veils toward its own window body (see WindowChrome TONES). */
+const VEIL: Record<ChromeTone, string> = {
+  light: "rgba(244,240,230,0.55)",
+  dark: "rgba(16,18,21,0.5)",
 };
 
 export default function FocusSpotlight({
   rect,
   amount,
+  tone,
 }: {
   rect: FocusMove["rect"];
-  /** 0 → 1, the same ramp the scale uses. */
+  /** 0 → 1, the ramp the focus move defines. */
   amount: MotionValue<number>;
+  tone: ChromeTone;
 }) {
   // opacity inside a sticky frame — written by hand, never by motion (§5.1)
   const ref = useScrollStyle<HTMLDivElement>(amount);
   const { x, y, w, h } = rect;
+  const band: React.CSSProperties = {
+    position: "absolute",
+    background: VEIL[tone],
+    pointerEvents: "none",
+  };
 
   return (
     <div
@@ -52,10 +65,10 @@ export default function FocusSpotlight({
       aria-hidden
       style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 6 }}
     >
-      <div style={{ ...BAND, inset: `${OUT} ${OUT} ${100 - y}% ${OUT}` }} />
-      <div style={{ ...BAND, inset: `${y + h}% ${OUT} ${OUT} ${OUT}` }} />
-      <div style={{ ...BAND, inset: `${y}% ${100 - x}% ${100 - (y + h)}% ${OUT}` }} />
-      <div style={{ ...BAND, inset: `${y}% ${OUT} ${100 - (y + h)}% ${x + w}%` }} />
+      <div style={{ ...band, inset: `${OUT} ${OUT} ${100 - y}% ${OUT}` }} />
+      <div style={{ ...band, inset: `${y + h}% ${OUT} ${OUT} ${OUT}` }} />
+      <div style={{ ...band, inset: `${y}% ${100 - x}% ${100 - (y + h)}% ${OUT}` }} />
+      <div style={{ ...band, inset: `${y}% ${OUT} ${100 - (y + h)}% ${x + w}%` }} />
     </div>
   );
 }

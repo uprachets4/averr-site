@@ -752,7 +752,13 @@ function ScreenLayer({
           {/* no transform on the content at all — the focus is the veil */}
           <div style={{ position: "absolute", inset: 0 }}>
             <Screen local={local} />
-            {focus.rect ? <FocusSpotlight rect={focus.rect} amount={focus.dim} /> : null}
+            {focus.rect ? (
+              <FocusSpotlight
+                rect={focus.rect}
+                amount={focus.dim}
+                tone={spec.tone}
+              />
+            ) : null}
           </div>
           <GhostCursor local={local} keys={spec.cursor} hidden={reduce} />
         </WindowChrome>
