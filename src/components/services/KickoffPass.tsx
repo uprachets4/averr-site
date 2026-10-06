@@ -48,7 +48,7 @@ import {
 const DAYS_SHOWN = 28;
 /** Width of one wheel cell. The wheel is centred by translating by this. */
 const CELL = 150;
-const CELL_MOBILE = 104;
+const CELL_MOBILE = 82;
 
 export default function KickoffPass() {
   const reduce = useReducedMotion();
@@ -474,7 +474,20 @@ export default function KickoffPass() {
           pointer-events: none;
         }
 
+        .kp2-row {
+          display: flex; align-items: baseline; gap: 14; padding: 10px 0;
+          gap: 14px;
+        }
+        .kp2-row__label { flex: 0 0 132px; }
+        .kp2-row__val { flex: 1; }
+
         @media (max-width: 1023px) {
+          /* the fixed label column squeezed the date into two lines and
+             pushed it under the meta at 375 */
+          .kp2-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 0; }
+          .kp2-row__label { grid-column: 1 / -1; flex: none; }
+          .kp2-row__val { grid-column: 1; flex: none; }
+          .kp2-row__meta { grid-column: 2; grid-row: 2; align-self: baseline; }
           .kp2-stage { grid-template-columns: minmax(0, 1fr); gap: 48px; }
           .kp2-pass { padding: 24px 22px 0; border-radius: 14px; }
           .kp2-perf { margin: 22px -22px 0; }
@@ -500,11 +513,11 @@ function Row({
   reduce: boolean;
 }) {
   return (
-    <div style={{ display: "flex", alignItems: "baseline", gap: 14, padding: "10px 0" }}>
-      <span className="type-eyebrow" style={{ color: "var(--color-muted)", flex: "0 0 132px" }}>
+    <div className="kp2-row">
+      <span className="type-eyebrow kp2-row__label" style={{ color: "var(--color-muted)" }}>
         {label}
       </span>
-      <span className="type-body-lg" style={{ color: "var(--color-ink)", flex: 1, minWidth: 0 }}>
+      <span className="type-body-lg kp2-row__val" style={{ color: "var(--color-ink)", minWidth: 0 }}>
         <span className="sr-only">{longLabel(date)}</span>
         <span aria-hidden>
           {weekdayLong(date)}, {shortLabel(date).split(" ")[0]}{" "}
@@ -512,7 +525,7 @@ function Row({
         </span>
       </span>
       {meta ? (
-        <span className="type-eyebrow" style={{ color: "var(--color-muted)" }}>
+        <span className="type-eyebrow kp2-row__meta" style={{ color: "var(--color-muted)" }}>
           {meta}
         </span>
       ) : null}
