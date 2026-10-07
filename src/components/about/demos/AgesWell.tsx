@@ -130,7 +130,7 @@ function Mock({
               background: "rgba(20,20,18,0.72)",
               color: "#F4F0E6",
               fontFamily: "var(--font-mono)",
-              fontSize: 9,
+              fontSize: 11,
               letterSpacing: "0.08em",
               opacity: Math.min(1, t * 2.4),
               transition: `opacity ${duration.base}s ease`,
@@ -193,7 +193,7 @@ function TrendInside({ t }: { t: number }) {
           background: "rgba(255,255,255,0.9)",
           color: "#3B2BBF",
           fontFamily: "var(--font-body)",
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 700,
         }}
       >
@@ -236,7 +236,7 @@ function CraftedInside({ c }: { c: ReturnType<typeof demoInk> }) {
           background: c.ink,
           color: c.surface,
           fontFamily: "var(--font-body)",
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 500,
         }}
       >

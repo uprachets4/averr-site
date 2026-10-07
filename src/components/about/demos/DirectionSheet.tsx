@@ -66,6 +66,17 @@ export default function DirectionSheet({ active, dark }: DemoProps) {
           gap: 26,
         }}
       >
+        {/* Palette and type share a row: stacking all three groups
+            overflowed the frame by 2px at 1440×900 and would have
+            clipped badly on a short laptop. */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "26px 40px",
+            alignItems: "flex-start",
+          }}
+        >
         {/* ── palette ── */}
         <Group label="Palette" c={c}>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -111,13 +122,14 @@ export default function DirectionSheet({ active, dark }: DemoProps) {
                   transition={p.transition}
                   style={{ display: "flex", flexDirection: "column", gap: 4 }}
                 >
-                  <span style={{ fontSize: 52, lineHeight: 1.1, color: c.ink }}>{t.node}</span>
+                  <span style={{ fontSize: 46, lineHeight: 1.1, color: c.ink }}>{t.node}</span>
                   <span style={mono(c.muted)}>{t.spec}</span>
                 </motion.div>
               );
             })}
           </div>
         </Group>
+        </div>
 
         {/* ── spacing ── */}
         <Group label="Spacing" c={c}>
