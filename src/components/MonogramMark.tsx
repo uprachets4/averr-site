@@ -5,7 +5,7 @@ import {
   useReducedMotion,
   useSpring,
 } from "motion/react";
-import { ease, spring } from "../lib/motion";
+import { duration, ease, spring } from "../lib/motion";
 
 type Variant = "hero" | "mini" | "signature";
 
@@ -61,14 +61,16 @@ function StrokeDrawMark({ reduce }: { reduce: boolean }) {
             opacity: [1, 1, 0],
           }}
           transition={{
+            // duration.slow x 2, ease.inOut — the mark is non-text, so a
+            // timed entrance is allowed under the hero LCP rule.
             strokeDashoffset: {
-              duration: reduce ? 0 : 1.6,
-              ease: ease.outQuart,
+              duration: reduce ? 0 : duration.slow * 2,
+              ease: ease.inOut,
             },
             opacity: {
-              duration: reduce ? 0 : 2.2,
-              times: [0, 0.68, 1],
-              ease: ease.outQuart,
+              duration: reduce ? 0 : duration.slow * 2 + 0.4,
+              times: [0, 0.74, 1],
+              ease: ease.inOut,
             },
           }}
         />
@@ -81,9 +83,11 @@ function StrokeDrawMark({ reduce }: { reduce: boolean }) {
           initial={{ opacity: reduce ? 1 : 0 }}
           animate={{ opacity: 1 }}
           transition={{
-            duration: reduce ? 0 : 0.6,
-            delay: reduce ? 0 : 1.5,
-            ease: ease.outQuart,
+            // after the stroke completes, with a small overlap so the
+            // mark is never an empty outline
+            duration: reduce ? 0 : duration.slow,
+            delay: reduce ? 0 : duration.slow * 2 - 0.1,
+            ease: ease.inOut,
           }}
         />
       </svg>

@@ -236,20 +236,33 @@ function MonogramHero() {
           </div>
         </motion.div>
 
-        {/* LCP element on mobile. Painted from the first frame; its 2.2s
-            place in the ladder is kept, because the monogram drawing above
-            it is the non-text entrance these two were always waiting on. */}
-        <CharReveal
-          text="The studio for founders who care how they show up."
-          paint
-          delay={reduce ? 0 : 2.2}
-          className="type-display-l"
-          style={{
-            color: "var(--color-ink)",
-            maxWidth: "22ch",
-            margin: 0,
+        {/* The headline. Painted from the first frame per the hero LCP
+            rule; its place in the ladder is kept because the monogram
+            drawing above it is the non-text entrance these were always
+            waiting on. type-accent nests INSIDE the size class (§5.33). */}
+        <h1 className="type-display-2xl" style={{ color: "var(--color-ink)", margin: 0 }}>
+          <CharReveal
+            paint
+            delay={reduce ? 0 : 2.2}
+            segments={[{ text: "Small on " }, { text: "purpose.", accent: true }]}
+          />
+        </h1>
+
+        {/* The old headline, kept verbatim as the subhead so no copy is
+            lost. LCP element on mobile. */}
+        <motion.p
+          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          animate={{ y: 0 }}
+          transition={{
+            duration: reduce ? 0 : duration.base,
+            ease: ease.outQuart,
+            delay: reduce ? 0 : 2.7,
           }}
-        />
+          className="type-body-lg"
+          style={{ color: "var(--color-muted)", maxWidth: "34ch", margin: 0 }}
+        >
+          The studio for founders who care how they show up.
+        </motion.p>
 
         <motion.div
           initial={{ opacity: 1, y: reduce ? 0 : 12 }}
