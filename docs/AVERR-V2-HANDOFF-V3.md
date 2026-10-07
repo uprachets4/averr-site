@@ -820,8 +820,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 ## 7. OPEN ITEMS (owner actions — Prachets)
 
 1. **Number truth check.** CareerClarity AI's **3.2×** opens the home ledger while CareerClarity itself is a draft with no case study; and the three Averr Studio figures (**40+ sites, 15× AI agents/workflows, 1.4s Core Web Vitals**) have never been audited in-session. Confirm each is defensible or replace it.
-2. **Founder photo for /about** — Session 18 ("proof of a person") is blocked without it.
-3. **A /contact recording** — Session 19 is blocked; /contact has never been reviewed against a recording.
+2. **Founder photo for /about** — wanted, but **NOT blocking**. Ruled 2026-10-06: the spec keeps the PU mark until a real photo exists, and **no placeholder is ever used**. Supply one and the mark's slot takes it.
+3. **A /contact recording** — useful, but **NOT blocking**. Session 19 captures /contact's current state in its own pre-flight instead.
 4. **Iubenda + legal pages** — the footer links `/privacy`, `/cookies`, `/terms`; confirm these resolve.
 5. **`RESEND_API_KEY` on Vercel** — the contact form cannot deliver without it.
 6. **Contact-form budget bands** — Under $5K / $5K–$10K / $10K–$25K / $25K+. Deliberately kept under the no-prices rule; confirm the bands.
@@ -845,7 +845,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 
 - ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
 - ~~**Session 17 — /services.**~~ **COMPLETE** (17 → 17c-5). The page is the build scene; see §3.
-- **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **Needs the photo.**
+- **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **UNBLOCKED** — the mark stands in for the photo until one exists, and no placeholder is used.
 - ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`).
 - ~~**Session 19-pre-2 — Prachets's four rulings.**~~ **DONE** (`e521774` … `895313d`). **All eleven routes under 2.5 s.** See §2.
 - ~~**Session 17h — the remaining /services density debt.**~~ **DONE.** All sixteen screens meet base 13px, min 11px and ≤15% blank at 1440 and 1680. §7.14 closed.
@@ -854,7 +854,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 17f — "Your project start pass".**~~ **DONE** (`b6ea58f` … `231f1f2`). Weekends bookable, Ontario stat holidays in the business-day count, kickoff clipping fixed.
 - ~~**Session 17e — /services kickoff section.**~~ **DONE** (`aae26c8` … `ccd4c1f`). The 14-day calendar is an interactive personal timeline; `KickoffCalendar` removed.
 - ~~**Session 17d — /services quality + two site-wide fixes.**~~ **DONE** (`608a0c6` … `d925553`). Captions, spotlight, density, nav CTA, ledger, hero CTAs. **Six screens remain over the blank target — §7.12.**
-- **Session 19 — /contact.** After the recording.
+- **Session 19 — /contact.** **UNBLOCKED** — its pre-flight captures the current state.
 - **Session 20 — site-wide.** Page transitions using the slab wipe, footer redesign, home polish (richer door previews, reel hover, 404 pill).
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
 
