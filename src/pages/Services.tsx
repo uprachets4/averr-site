@@ -1,12 +1,23 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useCallback, useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { duration, ease } from "../lib/motion";
 import { CharReveal } from "../components/CharReveal";
-import ServicesBuild from "../components/services/ServicesBuild";
 import Chapter from "../components/Chapter";
-import KickoffPass from "../components/services/KickoffPass";
+import LazyBelowFold from "../components/LazyBelowFold";
 import NoList from "../components/services/NoList";
 import ServicesCloser from "../components/services/ServicesCloser";
+
+/**
+ * The two heavy sections load off the critical path.
+ *
+ * The hero's subhead is this route's LCP element and cannot paint until
+ * the route chunk has downloaded and run, so everything in that chunk
+ * the hero does not need is delay. The build stage is ~4,800 lines of
+ * screens and the start pass another ~1,000; neither is on screen when
+ * the hero paints.
+ */
+const ServicesBuild = lazy(() => import("../components/services/ServicesBuild"));
+const KickoffPass = lazy(() => import("../components/services/KickoffPass"));
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { SERVICE_COUNT } from "../data/servicePillars";
 
@@ -204,16 +215,32 @@ export default function Services() {
   // The closer is dark, so the footer reveals over dark.
   useDeclarePageEndTone("dark");
 
+  // stable identities, so LazyBelowFold's effect does not re-run
+  const loadBuild = useCallback(() => import("../components/services/ServicesBuild"), []);
+  const loadPass = useCallback(() => import("../components/services/KickoffPass"), []);
+
   return (
     <>
       <BuildHero />
-      <ServicesBuild />
+
+      {/* 1300vh is the stage's real wrapper height (§5.4), so the
+          reserve is exactly what it will occupy. */}
+      <LazyBelowFold load={loadBuild} minHeight="1300vh" background="var(--color-bg)">
+        <Suspense fallback={<div aria-hidden style={{ minHeight: "1300vh", background: "var(--color-bg)" }} />}>
+          <ServicesBuild />
+        </Suspense>
+      </LazyBelowFold>
+
       {/* The pin releases straight into these — no dead space. */}
       <Chapter tone="dark" from="cream">
         <NoList />
       </Chapter>
       <Chapter tone="cream-warm" from="dark">
-        <KickoffPass />
+        <LazyBelowFold load={loadPass} minHeight="1120px" background="var(--color-bg-warm)">
+          <Suspense fallback={<div aria-hidden style={{ minHeight: "1120px", background: "var(--color-bg-warm)" }} />}>
+            <KickoffPass />
+          </Suspense>
+        </LazyBelowFold>
       </Chapter>
       <Chapter tone="dark" from="cream-warm">
         <ServicesCloser />
