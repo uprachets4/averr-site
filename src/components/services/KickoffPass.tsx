@@ -462,26 +462,10 @@ export default function KickoffPass() {
                     transition={reduce ? { duration: 0 } : spring.snappy}
                     style={{ position: "relative" }}
                   >
-                    <PassHead />
-                    <PassName name={trimmed} />
-                    <Row label="Discovery call" date={plan.call} meta="30 min" reduce={!!reduce} />
-                    <Row label="Proposal by" date={plan.proposal} reduce={!!reduce} />
-                    <KickoffRow date={plan.kickoff} reduce={!!reduce} />
-                    <div aria-hidden className="kp2-perf" />
-                    <div className="kp2-stub">
-                      <Barcode seed={`${trimmed}|${toISO(basis)}`} />
-                      <span className="kp2-stub__no type-eyebrow">{passNumber(trimmed, basis)}</span>
-                      {named ? (
-                        <motion.span
-                          className="kp2-stamp type-eyebrow"
-                          initial={reduce ? false : { scale: 1.3, rotate: -14, opacity: 0 }}
-                          animate={{ scale: 1, rotate: -8, opacity: 1 }}
-                          transition={reduce ? { duration: 0 } : spring.snappy}
-                        >
-                          Ready to book
-                        </motion.span>
-                      ) : null}
-                    </div>
+                    {/* The sheen sweeps BETWEEN the card surface and the
+                        type, never over it. Painted over the glyphs it put
+                        a gradient across the dates — light enough to look
+                        like a rendering fault in a still frame. */}
                     {reduce ? null : (
                       <motion.span
                         aria-hidden
@@ -492,6 +476,28 @@ export default function KickoffPass() {
                         transition={{ duration: duration.slow, ease: ease.outQuart }}
                       />
                     )}
+                    <div className="kp2-above">
+                      <PassHead />
+                      <PassName name={trimmed} />
+                      <Row label="Discovery call" date={plan.call} meta="30 min" reduce={!!reduce} />
+                      <Row label="Proposal by" date={plan.proposal} reduce={!!reduce} />
+                      <KickoffRow date={plan.kickoff} reduce={!!reduce} />
+                      <div aria-hidden className="kp2-perf" />
+                      <div className="kp2-stub">
+                        <Barcode seed={`${trimmed}|${toISO(basis)}`} />
+                        <span className="kp2-stub__no type-eyebrow">{passNumber(trimmed, basis)}</span>
+                        {named ? (
+                          <motion.span
+                            className="kp2-stamp type-eyebrow"
+                            initial={reduce ? false : { scale: 1.3, rotate: -14, opacity: 0 }}
+                            animate={{ scale: 1, rotate: -8, opacity: 1 }}
+                            transition={reduce ? { duration: 0 } : spring.snappy}
+                          >
+                            Ready to book
+                          </motion.span>
+                        ) : null}
+                      </div>
+                    </div>
                   </motion.div>
                 </motion.div>
 
@@ -700,7 +706,9 @@ export default function KickoffPass() {
         .kp2-stub__no { color: var(--color-muted); letter-spacing: 0.18em; }
         .kp2-stamp { margin-left: auto; border: 2px solid #B4452F; color: #B4452F; border-radius: 6px; padding: 6px 12px; letter-spacing: 0.16em; transform: rotate(-8deg); }
         .kp2-stamp--ok { border-color: #1F5D4C; color: #1F5D4C; }
-        .kp2-sheen { position: absolute; inset: -40% -10%; background: linear-gradient(100deg, transparent 38%, rgba(255,255,255,0.72) 50%, transparent 62%); pointer-events: none; }
+        .kp2-sheen { position: absolute; inset: -40% -10%; z-index: 0; background: linear-gradient(100deg, transparent 38%, rgba(255,255,255,0.72) 50%, transparent 62%); pointer-events: none; }
+        /* the type layer, above the sweep */
+        .kp2-above { position: relative; z-index: 1; }
         .kp2-again { background: none; border: none; border-bottom: 1px solid var(--hair-hi); color: var(--color-ink); cursor: pointer; padding: 8px 2px; min-height: 44px; font-family: inherit; }
 
         .kp2-row { display: flex; align-items: baseline; gap: 14px; padding: 10px 0; }
