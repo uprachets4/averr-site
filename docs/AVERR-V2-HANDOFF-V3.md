@@ -12,9 +12,9 @@
 | | |
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
-| **Working branch** | `redesign-v2` (**~221 commits ahead of `main`** at the end of Session 18 — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `6f256aa` — *18a-2 deviation fix: the principle bodies read-fill, as the brief asked*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
-| **Doc currency** | Written at the end of Session 18. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **Working branch** | `redesign-v2` (**~231 commits ahead of `main`** at the end of Session 18c-1 — `git rev-list --count main..HEAD` for the exact number) |
+| **HEAD** | `5cea0e6` — *18c-1c fix: the caption stops moving the page*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 18c-1. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -30,7 +30,7 @@ dist/assets/motion-*.js          162.61 kB │ gzip:  53.98 kB  ← the motion l
 dist/assets/ServicesBuild-*.js   166.86 kB │ gzip:  40.73 kB  ← lazy, one viewport early (17i)
 dist/assets/CaseStudy-*.js        50.24 kB │ gzip:  12.40 kB
 dist/assets/Contact-*.js          43.92 kB │ gzip:  10.86 kB
-dist/assets/About-*.js            40.21 kB │ gzip:  10.58 kB  ← the playground + the line
+dist/assets/About-*.js            59.88 kB │ gzip:  13.92 kB  ← the studio: the desk + four screens
 dist/assets/KickoffPass-*.js      29.68 kB │ gzip:   9.26 kB  ← lazy (17i)
 dist/assets/Work-*.js             22.46 kB │ gzip:   6.83 kB
 dist/assets/Services-*.js         10.04 kB │ gzip:   3.17 kB  ← was 51.06 before 17i
@@ -1181,6 +1181,83 @@ Bundle: `About` **40.21 kB / 10.58 kB gzip**; a shared `ReadFill` chunk (1.42 / 
 4. One founder read-fill sample read `--p: 0` because it sampled immediately after `scrollIntoView`, before the scroll handler had run. A proper trace showed the mechanism working.
 5. A probe run immediately after a push reported stale frame heights, and another returned zero `.read-fill` nodes — both an edge still serving the previous build. **An asset returning 200 does not mean the page is serving it:** intercept the request and check which chunk the page actually asks for.
 
+**SESSION 18c-1 — /about, "inside the studio".** Ten commits (`5f0b0bc` … `5cea0e6`). Owner verdict on Session 18 was **4–5/10**: "Small on purpose." was not understood, the principle demos were small and pale on empty cream, and there was no atmosphere. The owner liked the dark ground and blue/violet screen of the ages-well panel, so /about's world is built from it.
+
+### The world (18c-1a)
+
+Derived from the panel, not invented. The panel's violet is `--about-glow-2` **verbatim**; `--about-glow` sits at **hue 226°**, between that violet (252°) and the panel's cyan (182°), at full saturation; the ground and surfaces are the same hue family at the panel ground's lightness.
+
+| token | value | measured on the live page |
+|---|---|---|
+| `--about-ground` | `#0A0D14` | hue 222°, the room |
+| `--about-surface` | `#111624` | the monitor's glass |
+| `--about-surface-2` | `#171D2E` | the bezel's lit face |
+| `--about-glow` | `#3D6BFF` | **4.39:1** — fills and rules only |
+| `--about-glow-2` | `#7C5CFF` | **4.47:1** — fills and rules only |
+| `--about-glow-text` | `#6E90FF` | **6.57:1** — the blue when it is type |
+| `--about-ink` | `#EDE9E2` | **16.06:1** |
+| `--about-body` | `#9AA6C6` | **8.00:1** (6.91:1 on surface-2) |
+
+**Both glows miss AA for body text by a hair.** That is why `--about-glow-text` exists and why nothing readable is ever `--about-glow`. Measured off the live page: hero h1 16.06:1 · hero subhead 8.00:1 · principle title 16.06:1 · principle eyebrow 6.57:1 · principle body 8.00:1 · process week label 6.57:1 · screen-04 mono 8.00:1. **Every one passes.**
+
+The tokens are scoped to `html[data-route="about"]`, not to the route's subtree, because the nav and footer live outside it. Overriding `--color-dark` there makes every dark surface on the route the studio's ground for free, and the footer's `endTone` still resolves dark. `--mark-ink` and `--nav-dark-bar` are new tokens with their old values as fallbacks. `Chapter`'s clip-path slabs are gone from this route — there is no surface change left to reveal — replaced by **`GlowHorizon`**, a soft blue horizon between sections. Grain is at 4%.
+
+**read-fill's unread floor is a token now** (`--rf-floor`), raised from 0.22 to **0.46** here because 0.22 is invisible on this ground.
+
+### The hero (18c-1b) — COPY CHANGE
+
+**"Small on purpose." is deleted.** The headline is **"You work directly with *the person who builds it*."**, the Cormorant accent on the half that is the promise. Subhead, name/role line and both CTAs are untouched. *Verified: h1 computes `opacity: 1` with only a transform — painted at the first frame, transform-only, top to bottom.*
+
+**ASSET RULE — there is no founder photograph in the repo.** `public/about/` does not exist and nothing matching `founder`/`prachet` is anywhere under `public/`. The PU mark holds the slot and **no placeholder image is used**: it draws in parch, then at 1.8s the studio's light comes up behind and on it — a radial blue/violet glow plus a two-layer drop-shadow on the SVG. **No filter touches any text.** Behind it, `AmbientDrift` runs two lamps on **86s and 68s** loops so they never settle into a visible cycle; CSS keyframes, so leaving the hero genuinely *pauses* them, and reduced motion holds both still.
+
+### The desk (18c-1c) — the signature
+
+One monitor, four things shown on it, at full scale.
+
+*Measured at 1440:* wrapper **4500px = 500vh**, travel **3600px = 400vh** (the n+1 rule) · sticky pinned (`top: 0`) at all four dwells · dolly **0.88 → 1** across the approach, with the tilt settling to flat · exactly **one screen opaque, the other three `inert`** at every dwell · spill **blue / blue-violet / cyan / violet** per screen · active mark correct · **minimum font inside every live screen 13px** · zero page errors. At 1920: wrapper 5400 = 500vh, travel 4320 = 400vh.
+
+| | screen | verified by mouse AND keyboard |
+|---|---|---|
+| 01 | a whole landing page rebuilding from grey slabs — bar, hero, three cards, footer | Template → hover → Crafted → away → Template; keyboard focus → Crafted with a 2px ring; Enter pins |
+| 02 | the direction sheet, built from the studio's own tokens, plus the signature moves | settled on arrival; 130ms into a replay the swatches read `0.5, 0.26, 0.04, 0, 0, 0` — the stagger — from **both** a click and Enter |
+| 03 | the real MagneticCTA, and linear vs eased on two tracks at once | at ~360ms the dots sit at **203px linear / 525px eased**; identical from a keypress |
+| 04 | the owner's favourite, at full size, its look kept as the reference | three `ArrowRight`s reach 2029; the trend half changes and **the built-to-last half is byte-identical** across a full snapshot of every descendant |
+
+**The hand-off never shows a blank screen.** Sampled mid-change: the slot opacities are `[0,0,1,0]` with a **maximum of 1**, the scanline is present and sweeping, and the screen's own background is opaque `rgb(17,22,36)`. The caption's out-then-in is `AnimatePresence mode="wait"` — **no timers anywhere**. Clicking mark 04 landed at **y=4424 against an expected 4424**.
+
+**Mobile (375) and reduced motion:** the stage is `static`, all four principles stack as caption + a monitor-framed screen, every screen still interactive (tap toggles the page; arrow keys drive the slider and still touch only the trend half). **Nothing in the desk is under 13px and no control I added is under 44px.** Reduced motion: no scanlines, lamp `animation-name: none`, dolly `transform: none`, read-fill `--p: 1`, swatches at opacity 1.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **/about mobile LCP median of 3, warm = 2096 ms** `[2076, 2096, 2248]`, FCP 1728 ms, load-window CLS **0.0000**, LCP element the hero subhead · **3-speed crash scroll at 1440 / 1920 / 375, both directions — CLS 0 (0.0001 at 375 and 1440-gentle), zero overflow, zero console errors, zero React errors** · **zero ViewTimeline on sticky descendants** · zero horizontal overflow at 375, 1440 and 1920.
+
+Bundle: `About` **59.88 kB / 13.92 kB gzip** (was 44.93 / 11.53 before the desk).
+
+**Three CLS faults found and fixed, each by attributing the shift rather than guessing.**
+1. **The scanline animated `top`** — a layout property — so every frame of the sweep was a layout shift. Attribution put **0.1295 of 0.142 on `SPAN.mon-scan` alone**. It is a transform now (`y: 775%`, which is its own height × the screen).
+2. **The stacked desk leaked sideways.** The spill is 168% wide on purpose; the pinned stage clips it for free, but the stacked layout did not, so the page scrolled horizontally — **469px wide at 375, and 1833px at 1440 under reduced motion**, which uses the same stacked build. `overflow-x: clip`, so the spill still bleeds vertically.
+3. **The caption moved the page.** One 450px box changing height by up to 123px between principles. Its height is reserved now and the captions are top-aligned, which also stops the eyebrow jumping.
+
+**Three faults the first screenshots showed, which no probe would have caught.** The mark is 560px and the hero column was centred, so the new headline sat below the fold — the hero is two columns now. The mark was drawing in `--color-ink` on a near-black ground: a hole with a glow around it. And nothing declared itself dark, so the Averr logo was dark on dark.
+
+**Deviations, all reported.**
+1. **The hero is two columns** and the mark takes the slot the brief gives the photograph. Centred under a 560px mark the headline was below the fold.
+2. **The h1 is `type-display-l`, not `display-2xl`.** 2xl was chosen for a three-word line; the nine-word sentence ran **903px tall** at that size.
+3. **Screen 03 shows linear and eased at the same time** on two tracks rather than behind a toggle. At monitor size there is room to show the comparison instead of asking the reader to remember it.
+4. **Screen 04's frames fill the glass** rather than holding 4:3 — at full size the fixed ratio left ~200px of dead screen under the slider. Its gradient, type, tag and behaviour are untouched, which is what "keep its look" is about.
+5. **The monitor has no stand.** The foot read as a stray clipped shape under the bezel rather than as an object.
+6. The process line's mono labels went **12 → 13px** to meet this brief's floor.
+7. **The monitor is ~76vh**, not exactly 78vh, once the bezel is included.
+8. `PrinciplesTrack.tsx` and its five demo files are **deleted** — superseded by the desk.
+9. **read-fill's unread words composite to 2.54:1**, under AA. It is the transient state before a paragraph is read and it settles at 8.00:1; the floor was already raised from 0.22 to 0.46 for this ground. Reaching 4.5:1 at the floor needs ~0.78 alpha, which erases the effect. **Flagging rather than deciding it.**
+10. The **global footer** still carries 11–12px text (`Studio` / `Resources` / `Contact` headings, the copyright line, `Terms`). Pre-existing and site-wide, meets the site's own 11px floor, outside this brief — **flagged, not changed**.
+
+**Four probe errors of mine, reported.**
+1. I read the monitor's size **before scrolling to a dwell**, while the dolly was still at 0.88, and briefly concluded the column was too narrow. A scroll-linked transform has to be measured at the scroll position you mean.
+2. **CLS 0.2854 at 1440 was a stale-edge read** — §5.50 again. The crash and normal passes run first and hit the pre-fix chunk while the later passes got the new one, which is exactly why they improved and those two did not. Reproducing with the same timing after confirming the served chunk gave 0.0258.
+3. My spill probe's regex matched `rgba()` only, so when the gradient became `oklab()` it reported the old values and I briefly thought the deploy had not landed.
+4. I piped a probe through `grep`, which stripped the contents of two arrays and made two failing checks look empty.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -1262,7 +1339,7 @@ One continuous pinned scene. A generic GTA home-services business (**Northgate**
 
 ### `/about`, `/contact`, `*` (404)
 
-`/about` — **rebuilt in Session 18.** Monogram hero leading with "Small on *purpose*."; the **principles playground** (`components/about/PrinciplesTrack.tsx`, copy in `data/principles.ts`) — one 500vh pinned stage, four panels on a horizontal track driven by a single stepped scroll value, each with a live CSS/SVG/React demo and each carrying its own ground so the cream/alt/cream/dark rhythm survives; a **process line** that draws left→right with its nodes lighting as it reaches them (`ProcessTimeline`, normal flow, `--container-wide`); a full-width **founder section** whose mark holds the slot a photograph will take. Below 900px the track is a stack and the line runs vertical. `/contact` — 7-band editorial scroll with the designed form, Cal.com band; **Session 19's target and now the weakest page.** `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist").
+`/about` — **rebuilt again in Session 18c-1 as "inside the studio".** A dark blue-black world derived from the ages-well panel, scoped to `html[data-route="about"]` so the nav and footer take it too (`index.css`). Hero: **"You work directly with *the person who builds it*."**, the PU mark holding the photograph's slot under the studio's light, two lamps drifting behind it (`AmbientDrift`). Then **the desk** (`components/about/desk/`) — one 500vh pinned stage, ONE monitor, four full-scale screens that hand off under a scanline while the room takes each screen's colour; `GlowHorizon` separates the sections in place of `Chapter`. Below 900px the desk stacks as caption + a monitor-framed screen. `/contact` — 7-band editorial scroll with the designed form, Cal.com band; **Session 19's target and now the weakest page.** `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist").
 
 ### Image-usage map (rendered)
 
@@ -1419,6 +1496,14 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **50 · A 200 on the new asset does not mean the page is serving the new build.** *Cause:* polling `/assets/About-<newhash>.js` until 200 says the file is uploaded, not that the edge is handing out the HTML that references it. Two probes reported stale measurements against a "live" deploy. *Fix:* intercept requests and assert which chunk the page actually asks for before trusting any measurement taken after a push.
 
+**51 · Animating `top` on an overlay is a layout shift on every frame.** *Cause:* the monitor's hand-off scanline swept by animating `top` from -12% to 112%. `top` is a layout property, so each frame registered a shift — attribution put **0.1295 of 0.142 on that one span**. *Fix:* animate `y`, with `top` static. Note `y` as a percentage resolves against the ELEMENT'S OWN height, not its parent's, so a 16%-tall band crossing the full screen travels 775%.
+
+**52 · A lazy route mounts after the nav has already looked for dark surfaces.** *Cause:* `useDarkUnderNav` scans for `[data-tone="dark"]` on a rAF keyed to the pathname — which is already the new path while the route's chunk is still downloading. /about's wrapper was never seen and the Averr logo stayed dark on a near-black ground. *Fix:* the page publishes its own tone with `useSetNavDarkOverride`, which is what that override exists for.
+
+**53 · A glow wider than its box needs `overflow-x: clip` outside a sticky frame.** *Cause:* the monitor's light spill is 168% wide. Pinned, the sticky stage's `overflow: hidden` clipped it for free; stacked, nothing did, and /about scrolled horizontally — 469px at 375, 1833px at 1440 under reduced motion. *Fix:* `overflow-x: clip` on the stacked container — `clip`, not `hidden`, so the spill still bleeds vertically where it should. **Any reduced-motion path that reuses the mobile layout inherits the mobile layout's bugs at desktop width.**
+
+**54 · Measure a scroll-linked transform at the scroll position you mean.** *Cause:* I read the monitor's width before scrolling into the pin, while the dolly still held it at 0.88, and concluded the column was 8% too narrow. *Fix:* take the measurement at the dwell. A `getBoundingClientRect` includes the transform, which is the point.
+
 ---
 
 ## 6. DATA FACTS
@@ -1500,6 +1585,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 
 - ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
 - ~~**Session 17 — /services.**~~ **COMPLETE** (17 → 17c-5). The page is the build scene; see §3.
+- ~~**Session 18c-1 — /about "inside the studio".**~~ **DONE** (`5f0b0bc` … `5cea0e6`). The dark blue-black world, the clear hero, and the principle monitor. **Session 18c-2 is next:** the process light trail, founder credits and closer horizon — those sections currently work on the new ground with their colours restyled and no new mechanics.
+- **Founder photograph still absent** — `public/about/` does not exist. The mark holds the slot and no placeholder is used (§7.2).
 - ~~**Session 18 — /about ("proof of a person").**~~ **DONE** (`5b5ab00` … `6f256aa`). The principles playground, the drawn process line, the founder section. The PU mark still holds the photograph's slot and **no placeholder is used** — supply a photo and it drops in (§7.2).
 - ~~**Session 17i — the pass sheen + /services off the critical path.**~~ **DONE** (`a6d63af`, `84be54b`). Services route chunk **51.06 → 3.17 kB** gzip, /services LCP **2464 → 1932 ms**.
 - ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`).
