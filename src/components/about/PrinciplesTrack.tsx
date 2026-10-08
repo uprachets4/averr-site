@@ -6,7 +6,9 @@ import {
   useScroll,
   useTransform,
 } from "motion/react";
+import type { MotionValue } from "motion/react";
 import { duration, easing } from "../../lib/motion";
+import { ReadFill } from "../case-study/ReadFill";
 import { PRINCIPLES, type Principle, type PrincipleTone } from "../../data/principles";
 import TemplateToCrafted from "./demos/TemplateToCrafted";
 import DirectionSheet from "./demos/DirectionSheet";
@@ -45,6 +47,17 @@ const STOPS = [0, 0.08, 0.25, 0.42, 0.58, 0.75, 0.92, 1];
 const FRAMES = [0, 0, -100, -100, -200, -200, -300, -300];
 /** Where each panel sits still — the progress marks scroll to these. */
 const CENTRES = [0.04, 0.335, 0.665, 0.96];
+/**
+ * The slice of the track over which each panel's body fills itself. It
+ * starts as the panel arrives and finishes while it is still on its
+ * mark, so the reading never runs on a panel that is sliding away.
+ */
+const FILL: [number, number][] = [
+  [0, 0.07],
+  [0.25, 0.39],
+  [0.58, 0.72],
+  [0.91, 0.99],
+];
 
 const DEMOS = [TemplateToCrafted, DirectionSheet, MotionLanguage, AgesWell];
 
@@ -145,7 +158,13 @@ function TrackedPrinciples() {
           }}
         >
           {PRINCIPLES.map((p, i) => (
-            <Panel key={p.n} principle={p} active={active === i} index={i} />
+            <Panel
+              key={p.n}
+              principle={p}
+              active={active === i}
+              index={i}
+              track={scrollYProgress}
+            />
           ))}
         </motion.div>
 
@@ -221,13 +240,20 @@ function Panel({
   principle,
   active,
   index,
+  track,
 }: {
   principle: Principle;
   active: boolean;
   index: number;
+  track: MotionValue<number>;
 }) {
+  const reduce = !!useReducedMotion();
   const s = skin(principle.tone);
   const Demo = DEMOS[index];
+  // The body fills off the SAME scroll value that drives the track —
+  // the panel is pinned, so it is not moving through its own
+  // scrollport and useScroll on it would never progress.
+  const fill = useTransform(track, FILL[index], [0, 1], { clamp: true });
   return (
     <div
       style={{
@@ -250,12 +276,13 @@ function Panel({
           >
             {principle.title}
           </h2>
-          <p
+          <ReadFill
+            text={principle.body}
+            progress={fill}
+            reduce={reduce}
             className="type-body-lg measure-body"
-            style={{ color: s.muted, margin: 0 }}
-          >
-            {principle.body}
-          </p>
+            style={{ color: s.muted }}
+          />
         </div>
         <div className="pt-demo">
           <Demo active={active} dark={principle.tone === "dark"} />
@@ -271,43 +298,48 @@ function StackedPrinciples() {
   return (
     <section aria-label="How the studio works">
       {PRINCIPLES.map(function stack(p, i) {
-        const s = skin(p.tone);
-        const Demo = DEMOS[i];
-        return (
-          <div
-            key={p.n}
-            style={{
-              position: "relative",
-              background: s.bg,
-              padding: "88px 0",
-            }}
-          >
-            {p.tone === "dark" ? <div className="grain-dark" aria-hidden="true" /> : null}
-            <div
-              style={{
-                position: "relative",
-                maxWidth: "var(--container-wide)",
-                margin: "0 auto",
-              }}
-            >
-              <div className="type-eyebrow" style={{ color: s.muted }}>
-                Principle {p.n}
-              </div>
-              <h2 className="type-h2" style={{ color: s.ink, margin: "14px 0 18px" }}>
-                {p.title}
-              </h2>
-              <p className="type-body-lg" style={{ color: s.muted, margin: "0 0 30px" }}>
-                {p.body}
-              </p>
-              {/* `active` is true for all four here: nothing is scroll-driven,
-                  so every demo shows its settled state and stays interactive. */}
-              <div style={{ height: 440 }}>
-                <Demo active stacked dark={p.tone === "dark"} />
-              </div>
-            </div>
-          </div>
-        );
+        return <StackedPrinciple key={p.n} principle={p} index={i} />;
       })}
     </section>
+  );
+}
+
+function StackedPrinciple({ principle, index }: { principle: Principle; index: number }) {
+  const reduce = !!useReducedMotion();
+  const s = skin(principle.tone);
+  const Demo = DEMOS[index];
+  // Here the paragraph DOES move through the scrollport, so it reads off
+  // its own position.
+  const ref = useRef<HTMLParagraphElement | null>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 92%", "end 62%"] });
+
+  return (
+    <div style={{ position: "relative", background: s.bg, padding: "88px 0" }}>
+      {principle.tone === "dark" ? <div className="grain-dark" aria-hidden="true" /> : null}
+      <div
+        style={{ position: "relative", maxWidth: "var(--container-wide)", margin: "0 auto" }}
+      >
+        <div className="type-eyebrow" style={{ color: s.muted }}>
+          Principle {principle.n}
+        </div>
+        <h2 className="type-h2" style={{ color: s.ink, margin: "14px 0 18px" }}>
+          {principle.title}
+        </h2>
+        <div ref={ref} style={{ marginBottom: 30 }}>
+          <ReadFill
+            text={principle.body}
+            progress={scrollYProgress}
+            reduce={reduce}
+            className="type-body-lg"
+            style={{ color: s.muted }}
+          />
+        </div>
+        {/* `active` is true for all four here: nothing is scroll-driven,
+            so every demo shows its settled state and stays interactive. */}
+        <div style={{ height: 440 }}>
+          <Demo active stacked dark={principle.tone === "dark"} />
+        </div>
+      </div>
+    </div>
   );
 }
