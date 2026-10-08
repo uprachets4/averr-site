@@ -178,12 +178,12 @@ export default function ProcessTimeline() {
 
         .pl-text { display: flex; flex-direction: column; gap: 10px; padding-top: 26px; }
         .pl-n {
-          font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+          font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.08em;
           color: var(--about-body);
         }
         .pl-name { color: var(--about-ink); }
         .pl-week {
-          font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
+          font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.06em;
           color: ${LINE_TEXT};
         }
         .pl-body { color: var(--about-body); margin: 0; max-width: 40ch; }

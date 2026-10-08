@@ -121,6 +121,7 @@ export default function ScreenAges({ active: _active }: ScreenProps) {
         .sa-rule { display: block; width: 44px; height: 2px; margin: 14px 0; background: var(--about-glow); }
         @media (max-width: 900px) {
           .sa { padding: 16px; gap: 14px; }
+          .sa-range { height: 44px; }
           .sa-row { gap: 12px; }
           .sa-h { font-size: 16px; }
           .sa-inner { padding: 12px; }

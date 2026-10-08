@@ -248,6 +248,7 @@ export default function ScreenDirection({ active }: ScreenProps) {
         }
         .sd-foot { display: flex; }
         .sd-replay {
+          min-height: 44px;
           padding: 9px 18px; border-radius: 999px;
           border: 1px solid var(--about-hair-hi);
           background: transparent; color: var(--about-ink);

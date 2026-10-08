@@ -292,7 +292,13 @@ function Caption({
 
 function StackedDesk() {
   return (
-    <section aria-label="How the studio works" style={{ padding: "80px 0" }}>
+    /* overflow-x: clip, not hidden — the spill is MEANT to bleed past
+       the monitor vertically; only the horizontal leak is a bug, and
+       the pinned stage clips it for free where it is sticky. */
+    <section
+      aria-label="How the studio works"
+      style={{ padding: "80px 0", overflowX: "clip" }}
+    >
       {PRINCIPLES.map(function stack(p, i) {
         return <StackedPrinciple key={p.n} index={i} />;
       })}
