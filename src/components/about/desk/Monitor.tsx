@@ -54,13 +54,18 @@ export default function Monitor({
             {/* the hand-off: one bright line down the glass as the new
                 screen powers on. The screens underneath are opaque, so
                 the monitor is never blank during a change. */}
+            {/* TRANSFORM, not `top`. Animating `top` made every frame of
+                this sweep a layout shift and put 0.13 CLS on the page on
+                its own. `y` is a percentage of the element's OWN height
+                (16% of the screen), so crossing the screen plus its own
+                height takes 775%. */}
             {reduce ? null : (
               <motion.span
                 key={scanKey}
                 aria-hidden="true"
                 className="mon-scan"
-                initial={{ top: "-12%", opacity: 0 }}
-                animate={{ top: ["-12%", "112%"], opacity: [0, 1, 1, 0] }}
+                initial={{ y: "0%", opacity: 0 }}
+                animate={{ y: "775%", opacity: [0, 1, 1, 0] }}
                 transition={{ duration: 0.5, ease: ease.outQuart, times: [0, 0.12, 0.8, 1] }}
               />
             )}
@@ -147,7 +152,9 @@ export default function Monitor({
           position: absolute;
           left: 0;
           right: 0;
+          top: -12%;
           height: 16%;
+          will-change: transform;
           pointer-events: none;
           z-index: 7;
           background: linear-gradient(
