@@ -1,12 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "motion/react";
-import { ease } from "../lib/motion";
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { duration, ease, easing } from "../lib/motion";
+
+/**
+ * The process line — five stages on one line that draws as you reach it.
+ *
+ * Rebuilt in Session 18b. It used to be five cards with an SVG rule
+ * behind them, each card arriving on its own whileInView timer, so the
+ * rule and the cards told slightly different stories. Now one scroll
+ * value drives everything: the line's scaleX, which node is lit, and
+ * which step has spoken. The line reaching a node IS the node lighting.
+ *
+ * Normal flow, never sticky — the brief is a line you scroll past, not a
+ * stage you are held in. Below 900px the same line runs vertically.
+ */
 
 type Step = {
   n: string;
@@ -48,6 +55,8 @@ const STEPS: Step[] = [
   },
 ];
 
+const GOLD = "#B18544";
+
 export default function ProcessTimeline() {
   const reduce = useReducedMotion();
   const [isDesktop, setIsDesktop] = useState(true);
@@ -64,209 +73,132 @@ export default function ProcessTimeline() {
     };
   }, []);
 
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
+    target: ref,
+    offset: ["start 85%", "end 55%"],
   });
-  const dashOffset: MotionValue<number> = useTransform(
-    scrollYProgress,
-    [0.15, 0.6],
-    [1, 0]
-  );
+  // `easing.*` is a callable; the `ease.*` tuples throw here (§5.14).
+  const draw = useTransform(scrollYProgress, [0, 1], [0, 1], { ease: easing.outQuart });
+
+  // How many nodes the line has reached. Derived from the same value
+  // that draws the line, so the two can never disagree.
+  const [reached, setReached] = useState(reduce ? STEPS.length : 0);
+  useMotionValueEvent(draw, "change", function light(p) {
+    const n = STEPS.reduce((acc, _s, i) => (p >= i / (STEPS.length - 1) - 0.001 ? i + 1 : acc), 0);
+    setReached(n);
+  });
+
+  const vertical = !isDesktop;
+  const lit = reduce ? STEPS.length : reached;
 
   return (
-    <div ref={containerRef} style={{ position: "relative" }}>
-      {isDesktop ? (
-        <HorizontalTimeline
-          reduce={!!reduce}
-          dashOffset={dashOffset}
+    <div ref={ref} className={vertical ? "pl pl--v" : "pl"} style={{ position: "relative" }}>
+      {/* the rail, and the line that draws along it */}
+      <div className="pl-rail" aria-hidden>
+        <motion.div
+          className="pl-draw"
+          style={
+            reduce
+              ? { transform: vertical ? "scaleY(1)" : "scaleX(1)" }
+              : vertical
+                ? { scaleY: draw }
+                : { scaleX: draw }
+          }
         />
-      ) : (
-        <VerticalTimeline
-          reduce={!!reduce}
-          dashOffset={dashOffset}
-        />
-      )}
-    </div>
-  );
-}
+      </div>
 
-function HorizontalTimeline({
-  reduce,
-  dashOffset,
-}: {
-  reduce: boolean;
-  dashOffset: MotionValue<number>;
-}) {
-  return (
-    <div style={{ position: "relative" }}>
-      {/* Connecting line across the top of the number row */}
-      <svg
-        aria-hidden
-        viewBox="0 0 1000 4"
-        preserveAspectRatio="none"
-        style={{
-          position: "absolute",
-          left: "10%",
-          right: "10%",
-          top: 40,
-          width: "80%",
-          height: 4,
-          zIndex: 0,
-        }}
-      >
-        <motion.line
-          x1="0"
-          y1="2"
-          x2="1000"
-          y2="2"
-          stroke="var(--color-ink)"
-          strokeOpacity="0.4"
-          strokeWidth="2"
-          pathLength={1}
-          strokeDasharray={1}
-          style={{
-            strokeDashoffset: reduce ? 0 : dashOffset,
-          }}
-        />
-      </svg>
-
-      <div
-        style={{
-          position: "relative",
-          display: "grid",
-          gridTemplateColumns: "repeat(5, 1fr)",
-          gap: 24,
-          zIndex: 1,
-        }}
-      >
+      <ol className="pl-steps">
         {STEPS.map(function drawStep(step, i) {
-          return <StepCard key={step.n} step={step} index={i} reduce={reduce} />;
+          const on = i < lit;
+          return (
+            <li key={step.n} className={on ? "pl-step pl-step--on" : "pl-step"}>
+              <span className="pl-node" aria-hidden />
+              <motion.div
+                className="pl-text"
+                initial={false}
+                animate={{ opacity: on ? 1 : 0, y: on || reduce ? 0 : 14 }}
+                transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart }}
+              >
+                <span className="pl-n">{step.n}</span>
+                <span className="type-h3 pl-name">{step.name}</span>
+                <span className="pl-week">{step.duration}</span>
+                <p className="type-body pl-body">{step.body}</p>
+              </motion.div>
+            </li>
+          );
         })}
-      </div>
+      </ol>
+
+      <style>{`
+        .pl { max-width: var(--container-wide); margin: 0 auto; }
+
+        .pl-rail {
+          position: absolute;
+          left: 10%; width: 80%;
+          top: 7px; height: 2px;
+          background: rgba(20,20,18,0.14);
+          border-radius: 2px;
+        }
+        .pl-draw {
+          width: 100%; height: 100%;
+          background: ${GOLD};
+          border-radius: 2px;
+          transform-origin: left center;
+          will-change: transform;
+        }
+
+        .pl-steps {
+          position: relative;
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 24px;
+          list-style: none;
+          margin: 0; padding: 0;
+        }
+        .pl-step { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+
+        .pl-node {
+          width: 16px; height: 16px; border-radius: 50%;
+          background: var(--color-bg-alt);
+          border: 2px solid rgba(20,20,18,0.18);
+          /* the node sits centred on its column, on the rail */
+          margin-left: calc(50% - 8px);
+          transition: border-color ${duration.base}s ease, background ${duration.base}s ease,
+                      box-shadow ${duration.base}s ease;
+        }
+        .pl-step--on .pl-node {
+          border-color: ${GOLD};
+          background: ${GOLD};
+          box-shadow: 0 0 0 5px rgba(177,133,68,0.16);
+        }
+
+        .pl-text { display: flex; flex-direction: column; gap: 10px; padding-top: 26px; }
+        .pl-n {
+          font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+          color: var(--color-muted-2);
+        }
+        .pl-name { color: var(--color-ink); }
+        .pl-week {
+          font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
+          color: ${GOLD};
+        }
+        .pl-body { color: var(--color-ink-soft); margin: 0; max-width: 40ch; }
+
+        /* ── the same line, running down ── */
+        .pl--v .pl-rail {
+          left: 7px; width: 2px;
+          top: 8px; height: calc(100% - 16px);
+        }
+        .pl--v .pl-draw { transform-origin: center top; }
+        .pl--v .pl-steps {
+          grid-template-columns: 1fr;
+          gap: 44px;
+        }
+        .pl--v .pl-step { flex-direction: row; align-items: flex-start; gap: 22px; }
+        .pl--v .pl-node { margin-left: 0; flex: 0 0 16px; }
+        .pl--v .pl-text { padding-top: 0; margin-top: -3px; }
+      `}</style>
     </div>
-  );
-}
-
-function VerticalTimeline({
-  reduce,
-  dashOffset,
-}: {
-  reduce: boolean;
-  dashOffset: MotionValue<number>;
-}) {
-  return (
-    <div style={{ position: "relative", paddingLeft: 44 }}>
-      {/* Left connecting line */}
-      <svg
-        aria-hidden
-        viewBox="0 0 4 1000"
-        preserveAspectRatio="none"
-        style={{
-          position: "absolute",
-          left: 20,
-          top: 40,
-          bottom: 40,
-          width: 4,
-          height: "calc(100% - 80px)",
-          zIndex: 0,
-        }}
-      >
-        <motion.line
-          x1="2"
-          y1="0"
-          x2="2"
-          y2="1000"
-          stroke="var(--color-ink)"
-          strokeOpacity="0.4"
-          strokeWidth="2"
-          pathLength={1}
-          strokeDasharray={1}
-          style={{
-            strokeDashoffset: reduce ? 0 : dashOffset,
-          }}
-        />
-      </svg>
-
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 48,
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        {STEPS.map(function drawStep(step, i) {
-          return <StepCard key={step.n} step={step} index={i} reduce={reduce} />;
-        })}
-      </div>
-    </div>
-  );
-}
-
-function StepCard({
-  step,
-  index,
-  reduce,
-}: {
-  step: Step;
-  index: number;
-  reduce: boolean;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-15% 0px" }}
-      transition={{
-        duration: reduce ? 0.001 : 0.6,
-        ease: ease.outQuart,
-        delay: reduce ? 0 : 0.15 + index * 0.12,
-      }}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 14,
-        paddingTop: 20,
-      }}
-    >
-      <div
-        className="type-display-l"
-        style={{
-          color: "var(--color-ink)",
-          opacity: 0.25,
-          lineHeight: 1,
-        }}
-      >
-        {step.n}
-      </div>
-      <div
-        className="type-h2"
-        style={{
-          color: "var(--color-ink)",
-          margin: 0,
-        }}
-      >
-        {step.name}
-      </div>
-      <div
-        className="type-eyebrow"
-        style={{ color: "#B18544" }}
-      >
-        {step.duration}
-      </div>
-      <p
-        className="type-body"
-        style={{
-          color: "var(--color-ink)",
-          maxWidth: "40ch",
-          margin: 0,
-        }}
-      >
-        {step.body}
-      </p>
-    </motion.div>
   );
 }

@@ -316,12 +316,14 @@ function HowWeWorkBand() {
       style={{
         position: "relative",
         backgroundColor: "var(--color-bg-alt)",
-        padding: "160px 40px",
+        /* the gutter comes from --container-wide now, so the process
+           line can run the full width the brief asks for */
+        padding: "160px 0",
         scrollMarginTop: 96,
       }}
     >
       <div className="grain-light" aria-hidden="true" />
-      <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 2 }}>
+      <div style={{ maxWidth: "var(--container-wide)", margin: "0 auto", position: "relative", zIndex: 2 }}>
         <div style={{ textAlign: "center", marginBottom: 72 }}>
           <motion.div
             initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
