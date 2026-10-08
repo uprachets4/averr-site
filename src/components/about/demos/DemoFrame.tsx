@@ -70,7 +70,9 @@ export default function DemoFrame({
   return (
     <div
       style={{
-        height: "100%",
+        // sized by its content, not by the slot: the four demos have
+        // different natural heights and a fixed frame left each one
+        // floating in 100-140px of dead space
         display: "flex",
         flexDirection: "column",
         border: `1px solid ${c.line}`,

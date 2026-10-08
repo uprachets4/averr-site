@@ -66,7 +66,7 @@ export default function MotionLanguage({ dark }: DemoProps) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          gap: 34,
+          gap: 48,
         }}
       >
         {/* (a) the real CTA */}
@@ -87,6 +87,9 @@ export default function MotionLanguage({ dark }: DemoProps) {
 
         {/* (b) the same distance, two curves */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <span style={mono(c.muted)}>
+            Same distance, same time — a different sentence
+          </span>
           <div style={{ display: "flex", gap: 8 }}>
             {(Object.keys(CURVES) as Mode[]).map((m) => {
               const on = mode === m;
@@ -114,6 +117,14 @@ export default function MotionLanguage({ dark }: DemoProps) {
                 </button>
               );
             })}
+          </div>
+
+          {/* quarter ticks, so the difference between the curves is
+              read off the track rather than felt */}
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "0 8px" }}>
+            {[0, 1, 2, 3, 4].map((q) => (
+              <span key={q} style={{ width: 1, height: 7, background: c.line }} />
+            ))}
           </div>
 
           <div

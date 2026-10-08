@@ -133,7 +133,9 @@ export default function DirectionSheet({ active, dark }: DemoProps) {
 
         {/* ── spacing ── */}
         <Group label="Spacing" c={c}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+          {/* Read as a ruler across the sheet rather than a stack of bars:
+              stacked, it left the whole right half of the frame empty. */}
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 14, height: 120 }}>
             {STEPS.map((s, i) => {
               const p = piece(SWATCHES.length + 2 + i);
               return (
@@ -142,16 +144,21 @@ export default function DirectionSheet({ active, dark }: DemoProps) {
                   initial={p.initial}
                   animate={shown ? { opacity: 1, y: 0, rotate: 0 } : undefined}
                   transition={p.transition}
-                  style={{ display: "flex", alignItems: "center", gap: 10 }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
                 >
                   <span
                     style={{
                       display: "block",
-                      width: s,
-                      height: 8,
+                      width: 16,
+                      height: Math.max(4, s * 0.72),
                       borderRadius: 2,
                       background: c.gold,
-                      opacity: 0.55 + i * 0.09,
+                      opacity: 0.5 + i * 0.1,
                     }}
                   />
                   <span style={mono(c.muted)}>{s}</span>

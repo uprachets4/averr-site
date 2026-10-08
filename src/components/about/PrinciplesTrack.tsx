@@ -206,7 +206,9 @@ function TrackedPrinciples() {
           align-items: center;
           padding-bottom: 76px;
         }
-        .pt-demo { min-width: 0; height: min(60vh, 540px); }
+        /* The frames size to their content; the cap is a guard for a
+           short viewport, not the working height. */
+        .pt-demo { min-width: 0; align-self: center; max-height: min(74vh, 600px); overflow: hidden; }
         @media (max-width: 1200px) {
           .pt-panel { gap: 44px; }
         }
