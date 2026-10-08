@@ -135,7 +135,10 @@ function PinnedDesk() {
         style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}
       >
         <div className="desk">
+          <div className="desk-caption">
           <Caption index={active} progress={fills[active]} reduce={false} />
+
+          </div>
 
           <div className="desk-screen">
             <Monitor
@@ -201,6 +204,17 @@ function PinnedDesk() {
           padding-bottom: 68px;
         }
         .desk-screen { min-width: 0; }
+        /* The four captions differ in height by up to 123px, and a
+           centred column meant every hand-off moved them — 0.026 CLS
+           across a traversal. The box reserves the tallest, and the
+           captions start at the same y instead of being centred, so the
+           eyebrow no longer jumps between principles either. */
+        .desk-caption {
+          min-width: 0;
+          min-height: 460px;
+          display: flex;
+          align-items: flex-start;
+        }
         .desk-slot { position: absolute; inset: 0; }
 
         .desk-marks {
