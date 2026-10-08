@@ -7,7 +7,7 @@ import ProcessTimeline from "../components/ProcessTimeline";
 import { CharReveal, CharRevealInView } from "../components/CharReveal";
 import GlowHorizon from "../components/about/GlowHorizon";
 import AmbientDrift from "../components/about/AmbientDrift";
-import PrinciplesTrack from "../components/about/PrinciplesTrack";
+import PrincipleDesk from "../components/about/desk/PrincipleDesk";
 import FounderStatement from "../components/about/FounderStatement";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useSetNavDarkOverride } from "../lib/navTone";
@@ -885,7 +885,7 @@ export default function About() {
        is the surface rather than each band declaring it separately. */
     <div data-tone="dark">
       <MonogramHero />
-      <PrinciplesTrack />
+      <PrincipleDesk />
       {/* There is no surface change to reveal here, so the boundaries
           are light rather than Chapter's clip-path slabs. */}
       <GlowHorizon />
