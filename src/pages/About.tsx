@@ -6,6 +6,7 @@ import MonogramMark from "../components/MonogramMark";
 import ProcessTimeline from "../components/ProcessTimeline";
 import { CharReveal, CharRevealInView } from "../components/CharReveal";
 import GlowHorizon from "../components/about/GlowHorizon";
+import AmbientDrift from "../components/about/AmbientDrift";
 import PrinciplesTrack from "../components/about/PrinciplesTrack";
 import FounderStatement from "../components/about/FounderStatement";
 import { useDeclarePageEndTone } from "../lib/pageTone";
@@ -31,29 +32,9 @@ function MonogramHero() {
       }}
       className="about-hero"
     >
-      {/* Warm gradient wash — slow rotation */}
-      <motion.div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          width: "90vmin",
-          height: "90vmin",
-          marginTop: "-45vmin",
-          marginLeft: "-45vmin",
-          background:
-            "radial-gradient(circle at 50% 50%, rgba(61,107,255,0.20), transparent 60%)",
-          opacity: 0.85,
-          pointerEvents: "none",
-        }}
-        animate={reduce ? undefined : { rotate: 360 }}
-        transition={{
-          duration: 90,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-      />
+      {/* The light in the room: two lamps drifting on long, unequal
+          loops. Paused while the hero is off screen. */}
+      <AmbientDrift />
 
       <div
         className="grain-dark"
@@ -197,7 +178,50 @@ function MonogramHero() {
           The Studio · Founder-led
         </motion.div>
 
-        <MonogramMark variant="hero" />
+        {/* No founder photograph exists in the repo, so the mark holds
+            the slot — and earns it: it draws in parch, then the studio's
+            light comes up behind and on it. drop-shadow on the SVG and a
+            radial glow behind it; no filter touches any text. */}
+        <div style={{ position: "relative", display: "grid", placeItems: "center" }}>
+          <motion.span
+            aria-hidden
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              duration: reduce ? 0 : duration.slow * 2,
+              delay: reduce ? 0 : 1.8,
+              ease: ease.inOut,
+            }}
+            style={{
+              position: "absolute",
+              width: 380,
+              height: 380,
+              borderRadius: "50%",
+              background:
+                "radial-gradient(circle at 50% 50%, rgba(61,107,255,0.30) 0%, rgba(124,92,255,0.16) 38%, transparent 68%)",
+              pointerEvents: "none",
+            }}
+          />
+          <motion.div
+            initial={{ filter: "drop-shadow(0 0 0 rgba(61,107,255,0))" }}
+            animate={{
+              filter: reduce
+                ? "drop-shadow(0 0 18px rgba(61,107,255,0.45)) drop-shadow(0 0 46px rgba(124,92,255,0.30))"
+                : [
+                    "drop-shadow(0 0 0 rgba(61,107,255,0))",
+                    "drop-shadow(0 0 18px rgba(61,107,255,0.45)) drop-shadow(0 0 46px rgba(124,92,255,0.30))",
+                  ],
+            }}
+            transition={{
+              duration: reduce ? 0 : duration.slow * 2,
+              delay: reduce ? 0 : 1.8,
+              ease: ease.inOut,
+            }}
+            style={{ position: "relative" }}
+          >
+            <MonogramMark variant="hero" />
+          </motion.div>
+        </div>
 
         <motion.div
           initial={{ opacity: 1, y: reduce ? 0 : 12 }}
@@ -240,12 +264,14 @@ function MonogramHero() {
           <CharReveal
             paint
             delay={reduce ? 0 : 2.2}
-            segments={[{ text: "Small on " }, { text: "purpose.", accent: true }]}
+            segments={[
+              { text: "You work directly with " },
+              { text: "the person who builds it.", accent: true },
+            ]}
           />
         </h1>
 
-        {/* The old headline, kept verbatim as the subhead so no copy is
-            lost. LCP element on mobile. */}
+        {/* Kept verbatim. LCP element on mobile. */}
         <motion.p
           initial={{ opacity: 1, y: reduce ? 0 : 12 }}
           animate={{ y: 0 }}
