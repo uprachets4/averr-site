@@ -157,7 +157,8 @@ export default function MonogramMark({ variant = "hero", className }: Props) {
       style={{
         position: "relative",
         display: "inline-block",
-        color: "var(--color-ink)",
+        // the mark inherits its surface: parch inside the studio
+        color: "var(--mark-ink, var(--color-ink))",
         ...sizeStyle,
       }}
     >

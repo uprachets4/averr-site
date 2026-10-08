@@ -31,6 +31,7 @@ function MonogramHero() {
         justifyContent: "center",
       }}
       className="about-hero"
+      data-tone="dark"
     >
       {/* The light in the room: two lamps drifting on long, unequal
           loops. Paused while the hero is off screen. */}
@@ -151,17 +152,32 @@ function MonogramHero() {
         transition={{ duration: 45, repeat: Infinity, ease: ease.inOut }}
       />
 
+      {/* Two columns, because the mark takes the slot a photograph
+          would take — and because centred under a 560px mark, the
+          headline sat below the fold, which is no use to a hero whose
+          whole job is being understood. */}
       <div
+        className="about-hero__grid"
         style={{
           position: "relative",
           zIndex: 2,
-          maxWidth: 1000,
+          maxWidth: "var(--container-wide)",
           margin: "0 auto",
+          width: "100%",
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1.05fr) minmax(0, 0.95fr)",
+          alignItems: "center",
+          gap: 64,
+        }}
+      >
+      <div
+        className="about-hero__copy"
+        style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-          gap: 32,
+          alignItems: "flex-start",
+          textAlign: "left",
+          gap: 28,
         }}
       >
         <motion.div
@@ -178,50 +194,6 @@ function MonogramHero() {
           The Studio · Founder-led
         </motion.div>
 
-        {/* No founder photograph exists in the repo, so the mark holds
-            the slot — and earns it: it draws in parch, then the studio's
-            light comes up behind and on it. drop-shadow on the SVG and a
-            radial glow behind it; no filter touches any text. */}
-        <div style={{ position: "relative", display: "grid", placeItems: "center" }}>
-          <motion.span
-            aria-hidden
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              duration: reduce ? 0 : duration.slow * 2,
-              delay: reduce ? 0 : 1.8,
-              ease: ease.inOut,
-            }}
-            style={{
-              position: "absolute",
-              width: 380,
-              height: 380,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle at 50% 50%, rgba(61,107,255,0.30) 0%, rgba(124,92,255,0.16) 38%, transparent 68%)",
-              pointerEvents: "none",
-            }}
-          />
-          <motion.div
-            initial={{ filter: "drop-shadow(0 0 0 rgba(61,107,255,0))" }}
-            animate={{
-              filter: reduce
-                ? "drop-shadow(0 0 18px rgba(61,107,255,0.45)) drop-shadow(0 0 46px rgba(124,92,255,0.30))"
-                : [
-                    "drop-shadow(0 0 0 rgba(61,107,255,0))",
-                    "drop-shadow(0 0 18px rgba(61,107,255,0.45)) drop-shadow(0 0 46px rgba(124,92,255,0.30))",
-                  ],
-            }}
-            transition={{
-              duration: reduce ? 0 : duration.slow * 2,
-              delay: reduce ? 0 : 1.8,
-              ease: ease.inOut,
-            }}
-            style={{ position: "relative" }}
-          >
-            <MonogramMark variant="hero" />
-          </motion.div>
-        </div>
 
         <motion.div
           initial={{ opacity: 1, y: reduce ? 0 : 12 }}
@@ -311,9 +283,65 @@ function MonogramHero() {
         </motion.div>
       </div>
 
+        {/* No founder photograph exists in the repo, so the mark holds
+            the slot — and earns it: it draws in parch, then the studio's
+            light comes up behind and on it. drop-shadow on the SVG and a
+            radial glow behind it; no filter touches any text. */}
+        <div
+          className="about-hero__mark"
+          style={{ position: "relative", display: "grid", placeItems: "center" }}
+        >
+          <motion.span
+            aria-hidden
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              duration: reduce ? 0 : duration.slow * 2,
+              delay: reduce ? 0 : 1.8,
+              ease: ease.inOut,
+            }}
+            style={{
+              position: "absolute",
+              width: 380,
+              height: 380,
+              borderRadius: "50%",
+              background:
+                "radial-gradient(circle at 50% 50%, rgba(61,107,255,0.30) 0%, rgba(124,92,255,0.16) 38%, transparent 68%)",
+              pointerEvents: "none",
+            }}
+          />
+          <motion.div
+            initial={{ filter: "drop-shadow(0 0 0 rgba(61,107,255,0))" }}
+            animate={{
+              filter: reduce
+                ? "drop-shadow(0 0 18px rgba(61,107,255,0.45)) drop-shadow(0 0 46px rgba(124,92,255,0.30))"
+                : [
+                    "drop-shadow(0 0 0 rgba(61,107,255,0))",
+                    "drop-shadow(0 0 18px rgba(61,107,255,0.45)) drop-shadow(0 0 46px rgba(124,92,255,0.30))",
+                  ],
+            }}
+            transition={{
+              duration: reduce ? 0 : duration.slow * 2,
+              delay: reduce ? 0 : 1.8,
+              ease: ease.inOut,
+            }}
+            style={{ position: "relative" }}
+          >
+            <MonogramMark variant="hero" />
+          </motion.div>
+        </div>
+      </div>
+
       <style>{`
         @media (max-width: 900px) {
           .about-hero { min-height: 90vh; }
+          .about-hero__grid {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 36px;
+          }
+          /* the mark leads on a narrow screen, as it always did */
+          .about-hero__mark { order: -1; }
+          .about-hero__mark > div:last-child > div { width: clamp(200px, 54vw, 300px) !important; }
         }
       `}</style>
     </section>
@@ -829,7 +857,11 @@ export default function About() {
   }, []);
 
   return (
-    <>
+    /* One dark surface for the whole route: the nav watches
+       [data-tone="dark"] against a 1px band at its own bottom edge, and
+       every section here stands on the same ground, so the page itself
+       is the surface rather than each band declaring it separately. */
+    <div data-tone="dark">
       <MonogramHero />
       <PrinciplesTrack />
       {/* There is no surface change to reveal here, so the boundaries
@@ -840,6 +872,6 @@ export default function About() {
       <FounderBand />
       <GlowHorizon />
       <ClosingCTA />
-    </>
+    </div>
   );
 }

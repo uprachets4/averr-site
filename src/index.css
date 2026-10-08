@@ -242,6 +242,8 @@ html[data-route="about"] {
   --color-dark-alt: var(--about-surface);
   --color-muted-l: var(--about-body);
   --nav-dark-bar: rgba(10, 13, 20, 0.78);
+  /* the monogram is drawn on a dark ground here, so it draws in parch */
+  --mark-ink: var(--about-ink);
 
   /* read-fill's unread words are near-invisible at 0.22 on a ground
      this dark, so the floor is raised for this route only */
