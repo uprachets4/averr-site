@@ -232,7 +232,12 @@ function MonogramHero() {
             rule; its place in the ladder is kept because the monogram
             drawing above it is the non-text entrance these were always
             waiting on. type-accent nests INSIDE the size class (§5.33). */}
-        <h1 className="type-display-2xl" style={{ color: "var(--about-ink)", margin: 0 }}>
+        <h1
+          /* display-l, not 2xl: 2xl was sized for a three-word line and
+             this sentence is nine words, which ran 900px tall. */
+          className="type-display-l"
+          style={{ color: "var(--about-ink)", margin: 0 }}
+        >
           <CharReveal
             paint
             delay={reduce ? 0 : 2.2}
