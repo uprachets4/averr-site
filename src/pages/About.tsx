@@ -461,18 +461,6 @@ function FounderBand() {
             <FounderChips reduce={!!reduce} />
             <FounderLinks />
 
-            {/* kept verbatim from the old card — the brief changed one
-                sentence of the bio and nothing else */}
-            <motion.p
-              initial={{ opacity: reduce ? 1 : 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-15% 0px" }}
-              transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart, delay: reduce ? 0 : 0.4 }}
-              className="type-small"
-              style={{ color: "var(--color-muted)", fontStyle: "italic", marginTop: 10 }}
-            >
-              Grid absorbs future collaborators without a rewrite.
-            </motion.p>
           </motion.div>
         </div>
       </div>

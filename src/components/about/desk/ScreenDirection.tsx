@@ -34,7 +34,17 @@ const MOVES = [
   "Type that paints at first frame",
 ];
 
+const FACES = [
+  { id: "geist", label: "Geist", family: "var(--font-display)", weight: 500 },
+  { id: "cormorant", label: "Cormorant", family: '"Cormorant Garamond", Georgia, serif', weight: 600 },
+] as const;
+
 export default function ScreenDirection({ active }: ScreenProps) {
+  // the sheet is not a picture of a decision — making one here changes
+  // the page beside it
+  const [accent, setAccent] = useState(SWATCHES[3].value);
+  const [face, setFace] = useState<(typeof FACES)[number]["id"]>("geist");
+  const chosen = FACES.find((f) => f.id === face)!;
   const reduce = useReducedMotion();
   const [run, setRun] = useState(0);
   const [played, setPlayed] = useState(false);
@@ -78,9 +88,16 @@ export default function ScreenDirection({ active }: ScreenProps) {
                   transition={p.transition}
                   className="sd-sw"
                 >
-                  <span className="sd-chip" style={{ background: s.value }} />
+                  <button
+                    type="button"
+                    className={accent === s.value ? "sd-pick sd-pick--on" : "sd-pick"}
+                    aria-pressed={accent === s.value}
+                    aria-label={`Use ${s.name} as the accent`}
+                    onClick={() => setAccent(s.value)}
+                  >
+                    <span className="sd-chip" style={{ background: s.value }} />
+                  </button>
                   <span className="sd-mono">{s.name}</span>
-                  <span className="sd-mono sd-dim">{s.value}</span>
                 </motion.div>
               );
             })}
@@ -113,14 +130,19 @@ export default function ScreenDirection({ active }: ScreenProps) {
               );
             })}
           </div>
-          <motion.p
-            initial={piece(SWATCHES.length + 2).initial}
-            animate={shown ? settle : undefined}
-            transition={piece(SWATCHES.length + 2).transition}
-            className="sd-line"
-          >
-            Sound that knows <span className="type-accent">where it is</span>.
-          </motion.p>
+          <div className="sd-faces">
+            {FACES.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                className={face === f.id ? "sd-face sd-face--on" : "sd-face"}
+                aria-pressed={face === f.id}
+                onClick={() => setFace(f.id)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </section>
 
         {/* ── spacing ── */}
@@ -145,8 +167,24 @@ export default function ScreenDirection({ active }: ScreenProps) {
           </div>
         </section>
 
-        {/* ── signature moves ── */}
+        {/* ── the decision, applied ── */}
         <section className="sd-cell">
+          <h4 className="sd-label">Applied, live</h4>
+          <div className="sd-mini">
+            <span className="sd-mini-eyebrow" style={{ color: accent }}>Field recordings</span>
+            <span
+              className="sd-mini-h"
+              style={{ fontFamily: chosen.family, fontWeight: chosen.weight, fontStyle: face === "cormorant" ? "italic" : "normal" }}
+            >
+              Sound that knows where it is.
+            </span>
+            <span className="sd-mini-rule" style={{ background: accent }} />
+            <span className="sd-mini-cta" style={{ background: accent }}>Hear it</span>
+          </div>
+        </section>
+
+        {/* ── signature moves ── */}
+        <section className="sd-cell sd-cell--moves">
           <h4 className="sd-label">Signature moves</h4>
           <ul className="sd-moves">
             {MOVES.map((m, i) => {
@@ -158,7 +196,7 @@ export default function ScreenDirection({ active }: ScreenProps) {
                   animate={shown ? settle : undefined}
                   transition={p.transition}
                 >
-                  <span className="sd-tick" />
+                  <span className="sd-tick" style={{ background: accent }} />
                   {m}
                 </motion.li>
               );
@@ -245,6 +283,39 @@ export default function ScreenDirection({ active }: ScreenProps) {
           width: 7px; height: 7px; border-radius: 50%;
           background: var(--about-glow); flex: 0 0 7px;
           box-shadow: 0 0 0 3px rgba(61,107,255,0.18);
+        }
+        .sd-pick {
+          padding: 0; border: none; background: none; cursor: pointer;
+          border-radius: 10px; line-height: 0;
+          min-width: 44px; min-height: 44px; display: grid; place-items: center;
+          transition: box-shadow ${duration.fast}s ease;
+        }
+        .sd-pick--on { box-shadow: 0 0 0 2px var(--about-ink); }
+        .sd-pick:focus-visible { outline: 2px solid var(--about-glow-text); outline-offset: 2px; }
+        .sd-faces { display: flex; gap: 8px; margin-top: 12px; }
+        .sd-face {
+          min-height: 44px; padding: 9px 15px; border-radius: 999px;
+          border: 1px solid var(--about-hair-hi); background: transparent;
+          color: var(--about-ink); cursor: pointer;
+          font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.04em;
+          transition: background ${duration.fast}s ease, border-color ${duration.fast}s ease;
+        }
+        .sd-face--on { background: var(--about-ink); color: var(--about-ground); border-color: var(--about-ink); }
+        .sd-face:focus-visible { outline: 2px solid var(--about-glow-text); outline-offset: 2px; }
+        .sd-mini {
+          border: 1px solid var(--about-hair); border-radius: 8px;
+          padding: 15px; display: flex; flex-direction: column; gap: 9px;
+          background: rgba(160,186,255,0.04);
+        }
+        .sd-mini-eyebrow {
+          font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.09em;
+          text-transform: uppercase;
+        }
+        .sd-mini-h { font-size: 21px; line-height: 1.12; color: var(--about-ink); }
+        .sd-mini-rule { display: block; width: 40px; height: 2px; }
+        .sd-mini-cta {
+          align-self: flex-start; padding: 8px 15px; border-radius: 999px;
+          font-size: 13px; font-weight: 500; color: var(--about-ground);
         }
         .sd-foot { display: flex; }
         .sd-replay {

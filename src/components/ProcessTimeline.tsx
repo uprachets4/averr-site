@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { duration, ease, easing } from "../lib/motion";
 
 /**
@@ -92,6 +92,9 @@ export default function ProcessTimeline() {
 
   const vertical = !isDesktop;
   const lit = reduce ? STEPS.length : reached;
+  // one stage open at a time; the body lives in the panel now, so the
+  // line reads as five labels until you ask one of them a question
+  const [open, setOpen] = useState<number | null>(null);
 
   return (
     <div ref={ref} className={vertical ? "pl pl--v" : "pl"} style={{ position: "relative" }}>
@@ -121,10 +124,33 @@ export default function ProcessTimeline() {
                 animate={{ opacity: on ? 1 : 0, y: on || reduce ? 0 : 14 }}
                 transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart }}
               >
-                <span className="pl-n">{step.n}</span>
-                <span className="type-h3 pl-name">{step.name}</span>
-                <span className="pl-week">{step.duration}</span>
-                <p className="type-body pl-body">{step.body}</p>
+                <button
+                  type="button"
+                  className="pl-head"
+                  aria-expanded={open === i}
+                  aria-controls={`pl-panel-${step.n}`}
+                  onClick={() => setOpen((o) => (o === i ? null : i))}
+                >
+                  <span className="pl-n">{step.n}</span>
+                  <span className="type-h3 pl-name">{step.name}</span>
+                  <span className="pl-week">{step.duration}</span>
+                  <span className="pl-chev" aria-hidden>{open === i ? "–" : "+"}</span>
+                </button>
+                <AnimatePresence initial={false}>
+                  {open === i ? (
+                    <motion.div
+                      id={`pl-panel-${step.n}`}
+                      key="panel"
+                      initial={reduce ? false : { height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={reduce ? undefined : { height: 0, opacity: 0 }}
+                      transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <p className="type-body pl-body">{step.body}</p>
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
               </motion.div>
             </li>
           );
@@ -175,6 +201,39 @@ export default function ProcessTimeline() {
         }
 
         .pl-text { display: flex; flex-direction: column; gap: 10px; padding-top: 26px; }
+        .pl-head {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          grid-template-areas: "n chev" "name chev" "week chev";
+          align-items: center;
+          gap: 8px 10px;
+          width: 100%;
+          min-height: 44px;
+          background: none; border: none; padding: 4px 0; cursor: pointer;
+          text-align: left; font: inherit; color: inherit;
+        }
+        .pl-head .pl-n { grid-area: n; }
+        .pl-head .pl-name { grid-area: name; }
+        .pl-head .pl-week { grid-area: week; }
+        .pl-chev {
+          grid-area: chev;
+          font-family: var(--font-mono); font-size: 18px; line-height: 1;
+          color: var(--color-muted-2);
+          width: 28px; height: 28px; display: grid; place-items: center;
+          border: 1px solid rgba(20,20,18,0.18); border-radius: 50%;
+          transition: color ${duration.fast}s ease, border-color ${duration.fast}s ease;
+        }
+        .pl-head:hover .pl-chev { color: var(--color-ink); border-color: var(--color-ink); }
+        .pl-head:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; border-radius: 6px; }
+        /* the stage the line has just reached breathes until you open it */
+        .pl-step--on .pl-node { animation: pl-pulse 2.6s ease-in-out infinite; }
+        @keyframes pl-pulse {
+          0%, 100% { box-shadow: 0 0 0 5px rgba(177,133,68,0.16); }
+          50%      { box-shadow: 0 0 0 9px rgba(177,133,68,0.06); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .pl-step--on .pl-node { animation: none; }
+        }
         .pl-n {
           font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.08em;
           color: var(--color-muted-2);

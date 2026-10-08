@@ -65,8 +65,15 @@ export default function FlyIntoMark({
     };
   }, []);
 
-  useMotionValueEvent(progress, "change", function fly(p) {
+  // the subscription only fires on CHANGE, so the path would have no
+  // transform at all until the first scroll — write the start state once
+  useEffect(function prime() {
     if (reduce) return;
+    apply(progress.get());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce]);
+
+  function apply(p: number) {
     const t = Math.max(0, Math.min(1, (p - FROM) / (TO - FROM)));
     // exponential, so the last stretch accelerates the way flying into
     // something does rather than creeping to the edge
@@ -81,6 +88,10 @@ export default function FlyIntoMark({
     }
     const done = t >= 1;
     setReleased((was) => (was === done ? was : done));
+  }
+
+  useMotionValueEvent(progress, "change", function fly(p) {
+    if (!reduce) apply(p);
   });
 
   return (
