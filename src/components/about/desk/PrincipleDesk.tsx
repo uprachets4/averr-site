@@ -233,21 +233,20 @@ function PinnedDesk() {
         }
         .desk-mark__bar {
           display: block; width: 32px; height: 2px; border-radius: 2px;
-          background: var(--about-hair-hi);
+          background: rgba(237,233,226,0.22);
           transition: background ${duration.base}s ease, width ${duration.base}s ease,
                       box-shadow ${duration.base}s ease;
         }
         .desk-mark--on .desk-mark__bar {
-          background: var(--about-glow);
+          background: var(--color-parch);
           width: 46px;
-          box-shadow: 0 0 10px rgba(61,107,255,0.7);
         }
         .desk-mark__n {
           font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.08em;
-          color: var(--about-body); transition: color ${duration.base}s ease;
+          color: var(--color-muted-l); transition: color ${duration.base}s ease;
         }
-        .desk-mark--on .desk-mark__n { color: var(--about-ink); }
-        .desk-mark:focus-visible { outline: 2px solid var(--about-glow-text); outline-offset: 2px; border-radius: 8px; }
+        .desk-mark--on .desk-mark__n { color: var(--color-parch); }
+        .desk-mark:focus-visible { outline: 2px solid var(--color-parch); outline-offset: 2px; border-radius: 8px; }
 
         @media (max-width: 1200px) { .desk { gap: 3%; } }
       `}</style>
@@ -280,12 +279,12 @@ function Caption({
           transition={{ duration: duration.base, ease: ease.outQuart }}
           style={{ display: "flex", flexDirection: "column", gap: 18 }}
         >
-          <span className="type-eyebrow" style={{ color: "var(--about-glow-text)" }}>
+          <span className="type-eyebrow" style={{ color: "var(--color-muted-l)" }}>
             Principle {p.n}
           </span>
           <h2
             className="type-display-l"
-            style={{ color: "var(--about-ink)", margin: 0 }}
+            style={{ color: "var(--color-parch)", margin: 0 }}
           >
             {p.title}
           </h2>
@@ -294,7 +293,7 @@ function Caption({
             progress={progress}
             reduce={reduce}
             className="type-body"
-            style={{ color: "var(--about-body)", maxWidth: "40ch" }}
+            style={{ color: "var(--color-muted-l)", maxWidth: "40ch" }}
           />
         </motion.div>
       </AnimatePresence>
@@ -338,10 +337,10 @@ function StackedPrinciple({ index }: { index: number }) {
         marginBottom: index === PRINCIPLES.length - 1 ? 0 : 76,
       }}
     >
-      <span className="type-eyebrow" style={{ color: "var(--about-glow-text)" }}>
+      <span className="type-eyebrow" style={{ color: "var(--color-muted-l)" }}>
         Principle {p.n}
       </span>
-      <h2 className="type-h2" style={{ color: "var(--about-ink)", margin: "12px 0 14px" }}>
+      <h2 className="type-h2" style={{ color: "var(--color-parch)", margin: "12px 0 14px" }}>
         {p.title}
       </h2>
       <div ref={ref} style={{ marginBottom: 24 }}>
@@ -350,7 +349,7 @@ function StackedPrinciple({ index }: { index: number }) {
           progress={scrollYProgress}
           reduce={reduce}
           className="type-body"
-          style={{ color: "var(--about-body)" }}
+          style={{ color: "var(--color-muted-l)" }}
         />
       </div>
       {/* the same monitor, at column width, with no dolly and no

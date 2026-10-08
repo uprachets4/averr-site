@@ -55,10 +55,8 @@ const STEPS: Step[] = [
   },
 ];
 
-/* On /about the line is lit by the studio; the token falls back to
-   the site gold anywhere else this component is ever used. */
-const LINE = "var(--about-glow, #B18544)";
-const LINE_TEXT = "var(--about-glow-text, #B18544)";
+const LINE = "#B18544";
+const LINE_TEXT = "#B18544";
 
 export default function ProcessTimeline() {
   const reduce = useReducedMotion();
@@ -140,7 +138,7 @@ export default function ProcessTimeline() {
           position: absolute;
           left: 10%; width: 80%;
           top: 7px; height: 2px;
-          background: var(--about-hair);
+          background: rgba(20,20,18,0.14);
           border-radius: 2px;
         }
         .pl-draw {
@@ -163,8 +161,8 @@ export default function ProcessTimeline() {
 
         .pl-node {
           width: 16px; height: 16px; border-radius: 50%;
-          background: var(--about-surface);
-          border: 2px solid var(--about-hair-hi);
+          background: var(--color-bg-alt);
+          border: 2px solid rgba(20,20,18,0.18);
           /* the node sits centred on its column, on the rail */
           margin-left: calc(50% - 8px);
           transition: border-color ${duration.base}s ease, background ${duration.base}s ease,
@@ -173,20 +171,20 @@ export default function ProcessTimeline() {
         .pl-step--on .pl-node {
           border-color: ${LINE};
           background: ${LINE};
-          box-shadow: 0 0 0 5px rgba(61,107,255,0.22);
+          box-shadow: 0 0 0 5px rgba(177,133,68,0.16);
         }
 
         .pl-text { display: flex; flex-direction: column; gap: 10px; padding-top: 26px; }
         .pl-n {
           font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.08em;
-          color: var(--about-body);
+          color: var(--color-muted-2);
         }
-        .pl-name { color: var(--about-ink); }
+        .pl-name { color: var(--color-ink); }
         .pl-week {
           font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.06em;
           color: ${LINE_TEXT};
         }
-        .pl-body { color: var(--about-body); margin: 0; max-width: 40ch; }
+        .pl-body { color: var(--color-muted-2); margin: 0; max-width: 40ch; }
 
         /* ── the same line, running down ── */
         .pl--v .pl-rail {

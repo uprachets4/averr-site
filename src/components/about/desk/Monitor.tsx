@@ -39,7 +39,7 @@ export default function Monitor({
   children: ReactNode;
 }) {
   return (
-    <div className="mon" style={{ ["--spill" as string]: spill }}>
+    <div className="mon studio-screen" style={{ ["--spill" as string]: spill }}>
       {/* the room, lit by whatever is on the screen */}
       <span className="mon-spill" aria-hidden="true" />
 

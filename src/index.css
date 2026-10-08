@@ -197,36 +197,30 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   The /about world — "inside the studio"
+   The studio's SCREEN palette — LOCAL TO THE MONITOR ONLY
    ───────────────────────────────────────────────────────────────
-   Derived from the "A site that ages well" panel, which is the one
-   screen on the site that already had this atmosphere:
+   LOCKED RULE (18d): an element the owner likes is kept and applied
+   LOCALLY. It is never extrapolated into a page or site palette
+   without an explicit instruction. 18c-1 took the blue/violet of ONE
+   panel — "A site that ages well" — and made it /about's whole
+   ground. That broke the site's cream/ink chapter rhythm and was
+   rejected outright.
 
-     the panel's violet  #7C5CFF  hue 252°
-     the panel's cyan    #2BD4D9  hue 182°
-     the panel's ground  #141412  hue  60°, lum 7%
+   So these tokens are scoped to .studio-screen, which is the monitor
+   and nothing else. The page around it uses the site's tokens like
+   every other page. Derivation, kept because it is still true of the
+   screens: the panel's violet is --about-glow-2 verbatim; --about-glow
+   sits at hue 226, between that violet (252) and the panel's cyan
+   (182), at full saturation.
 
-   --about-glow sits at hue 226° — on the panel's own hue ramp,
-   between its violet and its cyan, at full saturation. The ground
-   and surfaces are that same hue family at the panel ground's
-   lightness. Measured against --about-ground:
-
-     parch           #EDE9E2  16.06:1   headlines
-     body            #9AA6C6   8.00:1   body (6.91:1 on surface-2)
-     glow-text       #6E90FF   6.57:1   the blue when it is type
-     glow            #3D6BFF   4.39:1   FILLS AND RULES ONLY — under AA
-     glow-2          #7C5CFF   4.47:1   FILLS AND RULES ONLY — under AA
-
-   The two glows pass the 3:1 UI boundary but miss 4.5:1 body text,
-   so anything readable in blue uses --about-glow-text instead.
-
-   Scoped to html[data-route="about"], which About.tsx sets on mount,
-   so the nav and the footer — which live outside the route's own
-   DOM — take the world too. Overriding --color-dark here is
-   deliberate: every dark surface on this route (Chapter, the footer,
-   the principle panel) becomes the studio's ground for free.
+   Measured against --about-ground (the SCREEN's ground, not the page's):
+     ink        #EDE9E2  16.06:1
+     body       #9AA6C6   8.00:1
+     glow-text  #6E90FF   6.57:1
+     glow       #3D6BFF   4.39:1  fills and rules only — under AA
+     glow-2     #7C5CFF   4.47:1  fills and rules only — under AA
    ═══════════════════════════════════════════════════════════════ */
-html[data-route="about"] {
+.studio-screen {
   --about-ground: #0A0D14;
   --about-surface: #111624;
   --about-surface-2: #171D2E;
@@ -237,23 +231,7 @@ html[data-route="about"] {
   --about-body: #9AA6C6;
   --about-hair: rgba(141, 162, 214, 0.18);
   --about-hair-hi: rgba(141, 162, 214, 0.34);
-
-  --color-dark: var(--about-ground);
-  --color-dark-alt: var(--about-surface);
-  --color-muted-l: var(--about-body);
-  --nav-dark-bar: rgba(10, 13, 20, 0.78);
-  /* the monogram is drawn on a dark ground here, so it draws in parch */
-  --mark-ink: var(--about-ink);
-
-  /* read-fill's unread words are near-invisible at 0.22 on a ground
-     this dark, so the floor is raised for this route only */
-  --rf-floor: 0.46;
-
-  background-color: var(--about-ground);
 }
-html[data-route="about"] body { background: var(--about-ground); }
-/* the world is lit, not dusty */
-html[data-route="about"] .grain-dark { opacity: 0.04; }
 
 /* Reset */
 * { box-sizing: border-box; margin: 0; padding: 0; }
