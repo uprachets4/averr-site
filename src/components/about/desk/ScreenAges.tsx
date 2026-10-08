@@ -73,7 +73,8 @@ export default function ScreenAges({ active: _active }: ScreenProps) {
           font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.04em;
           color: var(--about-body);
         }
-        .sa-row { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; min-width: 0; }
+        /* the row takes the slack rather than leaving it under the slider */
+        .sa-row { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; min-width: 0; }
         .sa-control { display: flex; flex-direction: column; gap: 9px; }
         .sa-readout { display: flex; align-items: baseline; justify-content: space-between; }
         .sa-year {
@@ -83,10 +84,10 @@ export default function ScreenAges({ active: _active }: ScreenProps) {
         .sa-range:focus-visible { outline: 2px solid var(--about-glow-text); outline-offset: 4px; border-radius: 4px; }
         .sa-scale { display: flex; justify-content: space-between; }
 
-        .sa-mock { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+        .sa-mock { display: flex; flex-direction: column; gap: 9px; min-width: 0; min-height: 0; }
         .sa-frame {
           position: relative; border-radius: 10px; overflow: hidden;
-          aspect-ratio: 4 / 3;
+          flex: 1; min-height: 0;
           border: 1px solid var(--about-hair);
           transition: filter ${duration.base}s ease;
         }

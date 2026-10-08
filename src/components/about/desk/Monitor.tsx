@@ -39,15 +39,9 @@ export default function Monitor({
   children: ReactNode;
 }) {
   return (
-    <div className="mon">
+    <div className="mon" style={{ ["--spill" as string]: spill }}>
       {/* the room, lit by whatever is on the screen */}
-      <span
-        className="mon-spill"
-        aria-hidden="true"
-        style={{
-          background: `radial-gradient(ellipse at 50% 46%, ${spill} 0%, transparent 62%)`,
-        }}
-      />
+      <span className="mon-spill" aria-hidden="true" />
 
       <motion.div className="mon-body" style={{ scale: dolly, rotateX: tilt }}>
         <div className="mon-bezel">
@@ -72,7 +66,6 @@ export default function Monitor({
             )}
           </div>
         </div>
-        <span className="mon-foot" aria-hidden="true" />
       </motion.div>
 
       <style>{`
@@ -83,17 +76,24 @@ export default function Monitor({
           place-items: center;
           perspective: 1500px;
         }
+        /* the wide halo: the room itself taking the screen's colour */
         .mon-spill {
           position: absolute;
           left: 50%;
           top: 50%;
           transform: translate(-50%, -50%);
-          width: 128%;
-          height: 124%;
+          width: 168%;
+          height: 165%;
           pointer-events: none;
-          opacity: 0.5;
-          transition: background ${duration.slow}s ease;
           z-index: 0;
+          background: radial-gradient(
+            ellipse at 50% 46%,
+            color-mix(in oklab, var(--spill) 42%, transparent) 0%,
+            color-mix(in oklab, var(--spill) 20%, transparent) 26%,
+            color-mix(in oklab, var(--spill) 7%, transparent) 48%,
+            transparent 70%
+          );
+          transition: background ${duration.slow}s ease;
         }
         .mon-body {
           position: relative;
@@ -113,11 +113,15 @@ export default function Monitor({
             #0D1220 100%
           );
           border: 1px solid var(--about-hair-hi);
-          /* the lit top edge, and the weight underneath */
+          /* the lit top edge, the weight underneath, and the bloom the
+             screen throws onto the wall right behind it */
           box-shadow:
             inset 0 1px 0 rgba(197, 214, 255, 0.16),
             inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+            0 0 90px -10px color-mix(in oklab, var(--spill) 55%, transparent),
+            0 0 190px 10px color-mix(in oklab, var(--spill) 24%, transparent),
             0 40px 90px -30px rgba(0, 0, 0, 0.8);
+          transition: box-shadow ${duration.slow}s ease;
         }
         .mon-screen {
           position: relative;
@@ -155,21 +159,10 @@ export default function Monitor({
             transparent 100%
           );
         }
-        .mon-foot {
-          display: block;
-          width: 22%;
-          height: 10px;
-          margin: 0 auto;
-          border-radius: 0 0 8px 8px;
-          background: linear-gradient(180deg, var(--about-surface) 0%, #080B12 100%);
-          border: 1px solid var(--about-hair);
-          border-top: none;
-        }
         @media (max-width: 900px) {
           .mon-bezel { padding: 9px; border-radius: 14px; }
           .mon-screen { border-radius: 8px; height: 420px; }
-          .mon-foot { display: none; }
-        }
+          }
       `}</style>
     </div>
   );

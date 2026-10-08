@@ -8,10 +8,14 @@ export type ScreenProps = {
   dark?: boolean;
 };
 
-/** The colour each screen lights the room with. */
-export const SPILLS = [
-  "rgba(61, 107, 255, 0.30)",
-  "rgba(124, 92, 255, 0.30)",
-  "rgba(43, 212, 217, 0.24)",
-  "rgba(124, 92, 255, 0.32)",
-];
+/**
+ * The colour each screen lights the room with — its own dominant tone.
+ * Solid here; the alphas are mixed in CSS so one value can drive both
+ * the wide halo and the tight bloom on the bezel.
+ *
+ *   01 the crafted page's accent          electric blue
+ *   02 the direction sheet's two glows    their midpoint
+ *   03 the track and the dot              the panel's cyan
+ *   04 the ages-well gradient's violet    violet
+ */
+export const SPILLS = ["#3D6BFF", "#5B74FF", "#2BD4D9", "#7C5CFF"];
