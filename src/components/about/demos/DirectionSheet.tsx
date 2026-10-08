@@ -60,23 +60,14 @@ export default function DirectionSheet({ active, dark }: DemoProps) {
         style={{
           flex: 1,
           minWidth: 0,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          gap: 26,
+          /* Two columns, two rows. Stacked, the three groups overflowed
+             the frame and left the sheet's whole right half empty. */
+          display: "grid",
+          gridTemplateColumns: "auto minmax(0, 1fr)",
+          alignContent: "center",
+          gap: "28px 44px",
         }}
       >
-        {/* Palette and type share a row: stacking all three groups
-            overflowed the frame by 2px at 1440×900 and would have
-            clipped badly on a short laptop. */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "26px 40px",
-            alignItems: "flex-start",
-          }}
-        >
         {/* ── palette ── */}
         <Group label="Palette" c={c}>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -129,13 +120,11 @@ export default function DirectionSheet({ active, dark }: DemoProps) {
             })}
           </div>
         </Group>
-        </div>
 
         {/* ── spacing ── */}
         <Group label="Spacing" c={c}>
-          {/* Read as a ruler across the sheet rather than a stack of bars:
-              stacked, it left the whole right half of the frame empty. */}
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 14, height: 120 }}>
+          {/* A ruler, not a stack of bars down the left edge. */}
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 16, height: 116 }}>
             {STEPS.map((s, i) => {
               const p = piece(SWATCHES.length + 2 + i);
               return (
@@ -154,8 +143,8 @@ export default function DirectionSheet({ active, dark }: DemoProps) {
                   <span
                     style={{
                       display: "block",
-                      width: 16,
-                      height: Math.max(4, s * 0.72),
+                      width: 26,
+                      height: Math.max(4, s * 0.7),
                       borderRadius: 2,
                       background: c.gold,
                       opacity: 0.5 + i * 0.1,
@@ -179,7 +168,9 @@ export default function DirectionSheet({ active, dark }: DemoProps) {
           }}
           className="ds-replay"
           style={{
-            alignSelf: "flex-start",
+            // the fourth cell of the grid, sitting on the ruler's baseline
+            justifySelf: "start",
+            alignSelf: "end",
             padding: "8px 16px",
             borderRadius: 999,
             border: `1px solid ${c.line}`,
