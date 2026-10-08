@@ -7,6 +7,7 @@ import ProcessTimeline from "../components/ProcessTimeline";
 import { CharReveal, CharRevealInView } from "../components/CharReveal";
 import Chapter from "../components/Chapter";
 import PrinciplesTrack from "../components/about/PrinciplesTrack";
+import FounderStatement from "../components/about/FounderStatement";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -413,144 +414,104 @@ function FounderBand() {
       style={{
         position: "relative",
         backgroundColor: "var(--color-bg)",
-        padding: "160px 40px 96px",
+        padding: "200px 0 140px",
       }}
     >
       <div className="grain-light" aria-hidden="true" />
 
       <div
-        style={{
-          position: "relative",
-          zIndex: 2,
-          maxWidth: 900,
-          margin: "0 auto",
-          textAlign: "center",
-        }}
+        className="founder-band"
+        style={{ position: "relative", zIndex: 2, maxWidth: "var(--container-wide)", margin: "0 auto" }}
       >
         <motion.div
           initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-20% 0px" }}
-          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
+          transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart }}
           className="type-eyebrow"
-          style={{
-            color: "var(--color-ink-soft)",
-            marginBottom: 40,
-          }}
+          style={{ color: "var(--color-muted)", marginBottom: 56 }}
         >
-          Who's behind this
+          Who{String.fromCharCode(39)}s behind this
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-15% 0px" }}
-          transition={{
-            duration: reduce ? 0 : 0.7,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 0.1,
-          }}
-          style={{
-            maxWidth: 720,
-            margin: "0 auto",
-            padding: 40,
-            border: "1px solid rgba(20,20,18,0.08)",
-            borderRadius: 12,
-            background: "var(--color-bg)",
-            boxShadow: "0 12px 40px rgba(20,20,18,0.06)",
-          }}
-        >
-          <div
-            className="founder-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
-              gap: 48,
-              alignItems: "start",
-              textAlign: "left",
-            }}
+        <div className="founder-row">
+          {/* The mark holds the slot a photograph will take. No
+              placeholder stands in for a photo that does not exist. */}
+          <motion.div
+            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-15% 0px" }}
+            transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart }}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <FounderMark />
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 20,
-              }}
-            >
-              <h2
-                className="type-h2"
-                style={{
-                  color: "var(--color-ink)",
-                  margin: 0,
-                }}
-              >
-                Prachets Upadhyay
-              </h2>
-              <div
-                className="type-eyebrow"
-                style={{ color: "var(--color-ink-soft)" }}
-              >
-                Founder + Design Engineer
-              </div>
-              <p
-                className="type-body"
-                style={{
-                  color: "var(--color-ink)",
-                  maxWidth: "60ch",
-                  margin: 0,
-                }}
-              >
-                Toronto-based design engineer with a background spanning B2B
-                SaaS sales at Google, frontend development, and AI workflow
-                automation. Previously co-founded KlaasX Edutech (15-person
-                team, 150+ institutions). Started Averr Studios to build the
-                kind of client websites that actually earn their portfolio
-                slot.
-              </p>
-              <FounderChips reduce={!!reduce} />
-              <FounderLinks />
-            </div>
-          </div>
-        </motion.div>
+            <FounderMark />
+          </motion.div>
 
-        <motion.p
-          initial={{ opacity: reduce ? 1 : 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-15% 0px" }}
-          transition={{
-            duration: reduce ? 0 : 0.6,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 0.4,
-          }}
-          className="type-small"
-          style={{
-            color: "var(--color-ink-soft)",
-            fontStyle: "italic",
-            marginTop: 28,
-          }}
-        >
-          Grid absorbs future collaborators without a rewrite.
-        </motion.p>
+          <motion.div
+            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-15% 0px" }}
+            transition={{
+              duration: reduce ? 0 : duration.slow,
+              ease: ease.outQuart,
+              delay: reduce ? 0 : 0.1,
+            }}
+            style={{ display: "flex", flexDirection: "column", gap: 18, minWidth: 0 }}
+          >
+            <h2 className="type-display-l" style={{ color: "var(--color-ink)", margin: 0 }}>
+              Prachets Upadhyay
+            </h2>
+            <div className="type-eyebrow" style={{ color: "var(--color-muted)" }}>
+              Founder + Design Engineer
+            </div>
+
+            <FounderStatement />
+
+            <FounderChips reduce={!!reduce} />
+            <FounderLinks />
+
+            {/* kept verbatim from the old card — the brief changed one
+                sentence of the bio and nothing else */}
+            <motion.p
+              initial={{ opacity: reduce ? 1 : 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, margin: "-15% 0px" }}
+              transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart, delay: reduce ? 0 : 0.4 }}
+              className="type-small"
+              style={{ color: "var(--color-muted)", fontStyle: "italic", marginTop: 10 }}
+            >
+              Grid absorbs future collaborators without a rewrite.
+            </motion.p>
+          </motion.div>
+        </div>
       </div>
+
+      <style>{`
+        .founder-row {
+          display: grid;
+          grid-template-columns: 300px minmax(0, 1fr);
+          gap: 80px;
+          align-items: start;
+        }
+        @media (max-width: 900px) {
+          .founder-row { grid-template-columns: 1fr; gap: 44px; }
+        }
+      `}</style>
     </section>
   );
 }
 
+/**
+ * The slot a photograph will take. Until a real one exists the mark
+ * holds it — a greyed-out silhouette or a stock face would be a lie
+ * about what the studio has, so there is no placeholder.
+ */
 function FounderMark() {
   return (
     <div
       style={{
         position: "relative",
-        width: 240,
-        height: 240,
+        width: 300,
+        height: 300,
         background: "var(--color-bg)",
         border: "1px solid rgba(20,20,18,0.10)",
         borderRadius: 24,
@@ -676,65 +637,24 @@ function FounderChip({
 
 function FounderLinks() {
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: 24,
-        flexWrap: "wrap",
-        marginTop: 8,
-      }}
-    >
-      <UnderlineLink
-        href="https://www.linkedin.com/in/prachetsupadhyay"
-        label="LinkedIn"
-      />
-      <UnderlineLink
-        href="https://prachetsupadhyay.com"
-        label="Portfolio"
-      />
+    <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 6, marginLeft: -12 }}>
+      <MagneticCTA
+        variant="text"
+        size="sm"
+        to="https://www.linkedin.com/in/prachetsupadhyay"
+        ariaLabel="LinkedIn profile, opens in a new tab"
+      >
+        LinkedIn
+      </MagneticCTA>
+      <MagneticCTA
+        variant="text"
+        size="sm"
+        to="https://prachetsupadhyay.com"
+        ariaLabel="Portfolio, opens in a new tab"
+      >
+        Portfolio
+      </MagneticCTA>
     </div>
-  );
-}
-
-function UnderlineLink({ href, label }: { href: string; label: string }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onMouseEnter={function h() {
-        setHovered(true);
-      }}
-      onMouseLeave={function h() {
-        setHovered(false);
-      }}
-      className="type-small"
-      style={{
-        position: "relative",
-        color: "var(--color-ink)",
-        textDecoration: "none",
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-      }}
-    >
-      {label}
-      <span aria-hidden>↗</span>
-      <span
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: -3,
-          height: 1,
-          background: "currentColor",
-          transform: `scaleX(${hovered ? 1 : 0})`,
-          transformOrigin: "left",
-          transition: `transform ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
-        }}
-      />
-    </a>
   );
 }
 

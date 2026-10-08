@@ -125,7 +125,7 @@ export function ReadFill({
   emphasis?: string;
   className?: string;
   style?: React.CSSProperties;
-  as?: "p" | "div";
+  as?: "p" | "div" | "h3";
 }) {
   const attach = useFillVar(progress, reduce);
   const lit = useLitOnce(progress, reduce);
