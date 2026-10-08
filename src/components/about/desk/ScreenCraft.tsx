@@ -187,8 +187,13 @@ export default function ScreenCraft({ active }: ScreenProps) {
 }
 
 /**
- * The page itself, twice. Same boxes in the same places; only the
- * treatment differs, which is the whole argument.
+ * The page itself, twice — SAME COPY, same boxes, same places. Only the
+ * treatment differs: the face, the weight, the tracking, the accent, the
+ * corner radius, the eyebrow's spacing.
+ *
+ * Giving the halves different words made the seam read as corruption
+ * ("We provide quality solu|where it is."). Identical content is also
+ * the sharper argument: nothing changed except the craft.
  */
 function Page({ crafted }: { crafted?: boolean }) {
   // the template half is grey-on-cream at AA, not a pale skeleton
@@ -223,7 +228,7 @@ function Page({ crafted }: { crafted?: boolean }) {
 
       <div className="pg-hero" style={{ marginTop: crafted ? 30 : 20 }}>
         <span className="pg-eyebrow" style={{ color: accent, letterSpacing: crafted ? "0.1em" : "0.02em" }}>
-          {crafted ? "Field recordings" : "WELCOME TO OUR WEBSITE"}
+          Field recordings
         </span>
         <span
           className="pg-h"
@@ -231,45 +236,37 @@ function Page({ crafted }: { crafted?: boolean }) {
             color: ink,
             fontFamily: crafted ? "var(--font-display)" : "var(--font-body)",
             fontWeight: crafted ? 500 : 700,
-            fontSize: crafted ? 38 : 30,
+            fontSize: 34,
             letterSpacing: crafted ? "-0.02em" : "0",
-            lineHeight: crafted ? 1.06 : 1.25,
+            lineHeight: crafted ? 1.08 : 1.1,
           }}
         >
           {crafted ? (
             <>Sound that knows <span className="type-accent">where it is</span>.</>
           ) : (
-            <>We provide quality solutions for your business needs</>
+            <>Sound that knows where it is.</>
           )}
         </span>
         <span className="pg-sub" style={{ color: soft, maxWidth: crafted ? "58%" : "88%" }}>
-          {crafted
-            ? "A catalogue of location recordings, licensed by the minute, built for people who score to picture."
-            : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. We are passionate about delivering value to our customers every day."}
+          A catalogue of location recordings, licensed by the minute, built
+          for people who score to picture.
         </span>
-        <div className="pg-btns" style={{ marginTop: crafted ? 18 : 12 }}>
+        <div className="pg-btns" style={{ marginTop: 16 }}>
           <span className="pg-cta" style={{ background: ink, color: "#F4F0E6", borderRadius: crafted ? 999 : 3 }}>
-            {crafted ? "Hear the catalogue" : "Learn more"}
+            Hear the catalogue
           </span>
           <span className="pg-cta" style={{ border: `1px solid ${soft}`, color: ink, borderRadius: crafted ? 999 : 3 }}>
-            {crafted ? "How licensing works" : "Contact us"}
+            How licensing works
           </span>
         </div>
       </div>
 
-      <div className="pg-cards" style={{ marginTop: crafted ? 26 : 18, gap: crafted ? 14 : 8 }}>
-        {(crafted
-          ? [
-              { n: "01", t: "Coastal", d: "47 recordings · Atlantic" },
-              { n: "02", t: "Interior", d: "63 recordings · rooms" },
-              { n: "03", t: "Transit", d: "38 recordings · rail" },
-            ]
-          : [
-              { n: "", t: "Our Services", d: "Lorem ipsum dolor sit amet" },
-              { n: "", t: "Our Mission", d: "Consectetur adipiscing elit" },
-              { n: "", t: "Our Team", d: "Sed do eiusmod tempor" },
-            ]
-        ).map((c, i) => (
+      <div className="pg-cards" style={{ marginTop: 24, gap: 14 }}>
+        {[
+          { n: "01", t: "Coastal", d: "47 recordings · Atlantic" },
+          { n: "02", t: "Interior", d: "63 recordings · rooms" },
+          { n: "03", t: "Transit", d: "38 recordings · rail" },
+        ].map((c, i) => (
           <div
             key={i}
             className="pg-card"
