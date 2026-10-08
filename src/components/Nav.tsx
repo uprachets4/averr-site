@@ -394,7 +394,8 @@ export default function Nav() {
       }
     : navDark
     ? {
-        backgroundColor: "rgba(20, 20, 18, 0.72)",
+        // routes with their own dark world set --nav-dark-bar (see /about)
+        backgroundColor: "var(--nav-dark-bar, rgba(20, 20, 18, 0.72))",
         backdropFilter: "blur(12px) saturate(1.4)",
         WebkitBackdropFilter: "blur(12px) saturate(1.4)",
         borderBottomColor: "rgba(237, 233, 226, 0.08)",

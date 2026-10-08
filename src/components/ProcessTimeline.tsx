@@ -55,7 +55,10 @@ const STEPS: Step[] = [
   },
 ];
 
-const GOLD = "#B18544";
+/* On /about the line is lit by the studio; the token falls back to
+   the site gold anywhere else this component is ever used. */
+const LINE = "var(--about-glow, #B18544)";
+const LINE_TEXT = "var(--about-glow-text, #B18544)";
 
 export default function ProcessTimeline() {
   const reduce = useReducedMotion();
@@ -137,12 +140,12 @@ export default function ProcessTimeline() {
           position: absolute;
           left: 10%; width: 80%;
           top: 7px; height: 2px;
-          background: rgba(20,20,18,0.14);
+          background: var(--about-hair);
           border-radius: 2px;
         }
         .pl-draw {
           width: 100%; height: 100%;
-          background: ${GOLD};
+          background: ${LINE};
           border-radius: 2px;
           transform-origin: left center;
           will-change: transform;
@@ -160,30 +163,30 @@ export default function ProcessTimeline() {
 
         .pl-node {
           width: 16px; height: 16px; border-radius: 50%;
-          background: var(--color-bg-alt);
-          border: 2px solid rgba(20,20,18,0.18);
+          background: var(--about-surface);
+          border: 2px solid var(--about-hair-hi);
           /* the node sits centred on its column, on the rail */
           margin-left: calc(50% - 8px);
           transition: border-color ${duration.base}s ease, background ${duration.base}s ease,
                       box-shadow ${duration.base}s ease;
         }
         .pl-step--on .pl-node {
-          border-color: ${GOLD};
-          background: ${GOLD};
-          box-shadow: 0 0 0 5px rgba(177,133,68,0.16);
+          border-color: ${LINE};
+          background: ${LINE};
+          box-shadow: 0 0 0 5px rgba(61,107,255,0.22);
         }
 
         .pl-text { display: flex; flex-direction: column; gap: 10px; padding-top: 26px; }
         .pl-n {
           font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
-          color: var(--color-muted-2);
+          color: var(--about-body);
         }
-        .pl-name { color: var(--color-ink); }
+        .pl-name { color: var(--about-ink); }
         .pl-week {
           font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
-          color: ${GOLD};
+          color: ${LINE_TEXT};
         }
-        .pl-body { color: var(--color-ink-soft); margin: 0; max-width: 40ch; }
+        .pl-body { color: var(--about-body); margin: 0; max-width: 40ch; }
 
         /* ── the same line, running down ── */
         .pl--v .pl-rail {

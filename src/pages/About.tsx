@@ -5,7 +5,7 @@ import MagneticCTA from "../components/MagneticCTA";
 import MonogramMark from "../components/MonogramMark";
 import ProcessTimeline from "../components/ProcessTimeline";
 import { CharReveal, CharRevealInView } from "../components/CharReveal";
-import Chapter from "../components/Chapter";
+import GlowHorizon from "../components/about/GlowHorizon";
 import PrinciplesTrack from "../components/about/PrinciplesTrack";
 import FounderStatement from "../components/about/FounderStatement";
 import { useDeclarePageEndTone } from "../lib/pageTone";
@@ -22,7 +22,7 @@ function MonogramHero() {
       style={{
         position: "relative",
         overflow: "hidden",
-        backgroundColor: "var(--color-bg)",
+        backgroundColor: "var(--about-ground)",
         minHeight: "100vh",
         padding: "120px 40px 80px",
         display: "flex",
@@ -43,7 +43,7 @@ function MonogramHero() {
           marginTop: "-45vmin",
           marginLeft: "-45vmin",
           background:
-            "radial-gradient(circle at 50% 50%, rgba(237,233,226,0.6), transparent 60%)",
+            "radial-gradient(circle at 50% 50%, rgba(61,107,255,0.20), transparent 60%)",
           opacity: 0.85,
           pointerEvents: "none",
         }}
@@ -56,7 +56,7 @@ function MonogramHero() {
       />
 
       <div
-        className="grain-light"
+        className="grain-dark"
         aria-hidden="true"
         style={{ opacity: 0.05 }}
       />
@@ -72,7 +72,7 @@ function MonogramHero() {
           width: 32,
           height: 32,
           borderRadius: "50%",
-          border: "1px solid var(--color-ink)",
+          border: "1px solid var(--about-ink)",
           opacity: 0.25,
           pointerEvents: "none",
         }}
@@ -92,7 +92,7 @@ function MonogramHero() {
           right: "8%",
           width: 24,
           height: 24,
-          border: "1px solid var(--color-parch)",
+          border: "1px solid var(--about-ink)",
           opacity: 0.4,
           pointerEvents: "none",
         }}
@@ -114,7 +114,7 @@ function MonogramHero() {
           height: 20,
           opacity: 0.2,
           pointerEvents: "none",
-          color: "var(--color-ink)",
+          color: "var(--about-ink)",
         }}
         animate={
           reduce
@@ -137,7 +137,7 @@ function MonogramHero() {
           left: "6%",
           width: 40,
           height: 2,
-          background: "var(--color-parch)",
+          background: "var(--about-ink)",
           opacity: 0.5,
           pointerEvents: "none",
         }}
@@ -158,7 +158,7 @@ function MonogramHero() {
           width: 8,
           height: 8,
           borderRadius: "50%",
-          background: "var(--color-ink)",
+          background: "var(--about-ink)",
           opacity: 0.3,
           pointerEvents: "none",
         }}
@@ -192,7 +192,7 @@ function MonogramHero() {
             delay: reduce ? 0 : 0.15,
           }}
           className="type-eyebrow"
-          style={{ color: "var(--color-ink-soft)" }}
+          style={{ color: "var(--about-body)" }}
         >
           The Studio · Founder-led
         </motion.div>
@@ -217,7 +217,7 @@ function MonogramHero() {
           <div
             className="type-h3"
             style={{
-              color: "var(--color-ink)",
+              color: "var(--about-ink)",
               letterSpacing: "0.15em",
               textTransform: "uppercase",
             }}
@@ -226,7 +226,7 @@ function MonogramHero() {
           </div>
           <div
             className="type-eyebrow"
-            style={{ color: "var(--color-ink-soft)" }}
+            style={{ color: "var(--about-body)" }}
           >
             Founder, Averr Studios · Envisioning Future
           </div>
@@ -236,7 +236,7 @@ function MonogramHero() {
             rule; its place in the ladder is kept because the monogram
             drawing above it is the non-text entrance these were always
             waiting on. type-accent nests INSIDE the size class (§5.33). */}
-        <h1 className="type-display-2xl" style={{ color: "var(--color-ink)", margin: 0 }}>
+        <h1 className="type-display-2xl" style={{ color: "var(--about-ink)", margin: 0 }}>
           <CharReveal
             paint
             delay={reduce ? 0 : 2.2}
@@ -255,7 +255,7 @@ function MonogramHero() {
             delay: reduce ? 0 : 2.7,
           }}
           className="type-body-lg"
-          style={{ color: "var(--color-muted)", maxWidth: "34ch", margin: 0 }}
+          style={{ color: "var(--about-body)", maxWidth: "34ch", margin: 0 }}
         >
           The studio for founders who care how they show up.
         </motion.p>
@@ -276,10 +276,10 @@ function MonogramHero() {
             marginTop: 16,
           }}
         >
-          <MagneticCTA to="/work" variant="primary">
+          <MagneticCTA to="/work" variant="primary" tone="dark">
             See the work
           </MagneticCTA>
-          <MagneticCTA to="/contact" variant="ghost">
+          <MagneticCTA to="/contact" variant="ghost" tone="dark">
             Book a call
           </MagneticCTA>
         </motion.div>
@@ -316,14 +316,14 @@ function HowWeWorkBand() {
       id="process"
       style={{
         position: "relative",
-        backgroundColor: "var(--color-bg-alt)",
+        backgroundColor: "var(--about-ground)",
         /* the gutter comes from --container-wide now, so the process
            line can run the full width the brief asks for */
         padding: "160px 0",
         scrollMarginTop: 96,
       }}
     >
-      <div className="grain-light" aria-hidden="true" />
+      <div className="grain-dark" aria-hidden="true" />
       <div style={{ maxWidth: "var(--container-wide)", margin: "0 auto", position: "relative", zIndex: 2 }}>
         <div style={{ textAlign: "center", marginBottom: 72 }}>
           <motion.div
@@ -333,7 +333,7 @@ function HowWeWorkBand() {
             transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
             className="type-eyebrow"
             style={{
-              color: "var(--color-muted)",
+              color: "var(--about-body)",
               marginBottom: 24,
             }}
           >
@@ -350,7 +350,7 @@ function HowWeWorkBand() {
             }}
             className="type-display-l"
             style={{
-              color: "var(--color-ink)",
+              color: "var(--about-ink)",
               margin: 0,
               maxWidth: 900,
               marginInline: "auto",
@@ -369,7 +369,7 @@ function HowWeWorkBand() {
             }}
             className="type-body"
             style={{
-              color: "var(--color-ink-soft)",
+              color: "var(--about-body)",
               marginTop: 24,
               maxWidth: 640,
               marginInline: "auto",
@@ -413,11 +413,11 @@ function FounderBand() {
     <section
       style={{
         position: "relative",
-        backgroundColor: "var(--color-bg)",
+        backgroundColor: "var(--about-ground)",
         padding: "200px 0 140px",
       }}
     >
-      <div className="grain-light" aria-hidden="true" />
+      <div className="grain-dark" aria-hidden="true" />
 
       <div
         className="founder-band"
@@ -429,7 +429,7 @@ function FounderBand() {
           viewport={{ once: true, margin: "-20% 0px" }}
           transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart }}
           className="type-eyebrow"
-          style={{ color: "var(--color-muted)", marginBottom: 56 }}
+          style={{ color: "var(--about-body)", marginBottom: 56 }}
         >
           Who{String.fromCharCode(39)}s behind this
         </motion.div>
@@ -457,10 +457,10 @@ function FounderBand() {
             }}
             style={{ display: "flex", flexDirection: "column", gap: 18, minWidth: 0 }}
           >
-            <h2 className="type-display-l" style={{ color: "var(--color-ink)", margin: 0 }}>
+            <h2 className="type-display-l" style={{ color: "var(--about-ink)", margin: 0 }}>
               Prachets Upadhyay
             </h2>
-            <div className="type-eyebrow" style={{ color: "var(--color-muted)" }}>
+            <div className="type-eyebrow" style={{ color: "var(--about-body)" }}>
               Founder + Design Engineer
             </div>
 
@@ -477,7 +477,7 @@ function FounderBand() {
               viewport={{ once: true, margin: "-15% 0px" }}
               transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart, delay: reduce ? 0 : 0.4 }}
               className="type-small"
-              style={{ color: "var(--color-muted)", fontStyle: "italic", marginTop: 10 }}
+              style={{ color: "var(--about-body)", fontStyle: "italic", marginTop: 10 }}
             >
               Grid absorbs future collaborators without a rewrite.
             </motion.p>
@@ -512,8 +512,8 @@ function FounderMark() {
         position: "relative",
         width: 300,
         height: 300,
-        background: "var(--color-bg)",
-        border: "1px solid rgba(20,20,18,0.10)",
+        background: "var(--about-surface)",
+        border: "1px solid var(--about-hair)",
         borderRadius: 24,
         overflow: "hidden",
         display: "flex",
@@ -593,10 +593,10 @@ function FounderChip({
         padding: "8px 14px",
         borderRadius: 100,
         border: hovered
-          ? "1px solid var(--color-ink)"
-          : "1px solid rgba(20,20,18,0.6)",
-        background: hovered ? "var(--color-ink)" : "transparent",
-        color: hovered ? "var(--color-parch)" : "var(--color-ink)",
+          ? "1px solid var(--about-ink)"
+          : "1px solid var(--about-body)",
+        background: hovered ? "var(--about-ink)" : "transparent",
+        color: hovered ? "var(--about-ground)" : "var(--about-ink)",
         cursor: enableTooltip ? "help" : "default",
         transform: hovered && !reduce ? "translateY(-2px)" : "translateY(0)",
         transitionProperty: "background-color, border-color, color, transform",
@@ -617,13 +617,13 @@ function FounderChip({
             top: "calc(100% + 8px)",
             left: "50%",
             transform: "translateX(-50%)",
-            background: "var(--color-bg)",
-            color: "var(--color-ink)",
-            border: "1px solid rgba(20,20,18,0.18)",
+            background: "var(--about-surface)",
+            color: "var(--about-ink)",
+            border: "1px solid var(--about-hair-hi)",
             borderRadius: 6,
             padding: "8px 12px",
             whiteSpace: "nowrap",
-            boxShadow: "0 8px 24px rgba(20,20,18,0.10)",
+            boxShadow: "0 8px 24px var(--about-hair)",
             pointerEvents: "none",
             zIndex: 10,
           }}
@@ -641,6 +641,7 @@ function FounderLinks() {
       <MagneticCTA
         variant="text"
         size="sm"
+        tone="dark"
         to="https://www.linkedin.com/in/prachetsupadhyay"
         ariaLabel="LinkedIn profile, opens in a new tab"
       >
@@ -649,6 +650,7 @@ function FounderLinks() {
       <MagneticCTA
         variant="text"
         size="sm"
+        tone="dark"
         to="https://prachetsupadhyay.com"
         ariaLabel="Portfolio, opens in a new tab"
       >
@@ -669,8 +671,8 @@ function ClosingCTA() {
       style={{
         position: "relative",
         overflow: "hidden",
-        backgroundColor: "var(--color-dark)",
-        color: "var(--color-parch)",
+        backgroundColor: "var(--about-ground)",
+        color: "var(--about-ink)",
         minHeight: "85vh",
         padding: "160px 40px",
         display: "flex",
@@ -692,7 +694,7 @@ function ClosingCTA() {
           marginTop: "-40vmin",
           marginLeft: "-40vmin",
           background:
-            "radial-gradient(circle at 50% 50%, rgba(237,233,226,0.15), transparent 60%)",
+            "radial-gradient(circle at 50% 50%, rgba(61,107,255,0.16), transparent 60%)",
           pointerEvents: "none",
         }}
         animate={
@@ -726,7 +728,7 @@ function ClosingCTA() {
           transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
           className="type-eyebrow"
           style={{
-            color: "var(--color-parch)",
+            color: "var(--about-ink)",
             opacity: 0.6,
             marginBottom: 32,
           }}
@@ -736,11 +738,11 @@ function ClosingCTA() {
 
         <div
           className="type-display-l"
-          style={{ color: "var(--color-parch)", marginBottom: 48 }}
+          style={{ color: "var(--about-ink)", marginBottom: 48 }}
         >
           <CharRevealInView
             text="Ready to build a site that earns its place?"
-            style={{ color: "var(--color-parch)" }}
+            style={{ color: "var(--about-ink)" }}
           />
         </div>
 
@@ -777,8 +779,19 @@ function ClosingCTA() {
    ═══════════════════════════════════════════════════════════════ */
 
 export default function About() {
-  // The closing CTA is dark, so the footer reveals over dark on this route.
+  // Every section on this route stands on the studio's ground, so the
+  // page still ends dark and the footer still reveals over dark.
   useDeclarePageEndTone("dark");
+
+  // The world is scoped to the document element, not to this subtree,
+  // because the nav and the footer live outside the route and have to
+  // take it too. index.css holds the tokens under this attribute.
+  useEffect(function enterTheStudio() {
+    document.documentElement.dataset.route = "about";
+    return function leave() {
+      delete document.documentElement.dataset.route;
+    };
+  }, []);
 
   useEffect(function scrollTopAndTitle() {
     window.scrollTo(0, 0);
@@ -793,13 +806,14 @@ export default function About() {
     <>
       <MonogramHero />
       <PrinciplesTrack />
-      <Chapter tone="cream-alt" from="dark">
-        <HowWeWorkBand />
-      </Chapter>
+      {/* There is no surface change to reveal here, so the boundaries
+          are light rather than Chapter's clip-path slabs. */}
+      <GlowHorizon />
+      <HowWeWorkBand />
+      <GlowHorizon tint="var(--about-glow-2)" />
       <FounderBand />
-      <Chapter tone="dark" from="cream">
-        <ClosingCTA />
-      </Chapter>
+      <GlowHorizon />
+      <ClosingCTA />
     </>
   );
 }

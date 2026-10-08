@@ -63,18 +63,17 @@ const DEMOS = [TemplateToCrafted, DirectionSheet, MotionLanguage, AgesWell];
 
 type Skin = { bg: string; ink: string; muted: string };
 
-function skin(tone: PrincipleTone): Skin {
-  if (tone === "dark") {
-    return {
-      bg: "var(--color-dark)",
-      ink: "var(--color-parch)",
-      muted: "var(--color-muted-l)",
-    };
-  }
+/**
+ * Inside the studio every panel stands on the same ground — the
+ * cream/alt/cream/dark rhythm the principles had belonged to a cream
+ * page. `tone` is kept on the data because the dark panel still wants
+ * its grain, and because the colour decision now lives in one place.
+ */
+function skin(_tone: PrincipleTone): Skin {
   return {
-    bg: tone === "alt" ? "var(--color-bg-alt)" : "var(--color-bg)",
-    ink: "var(--color-ink)",
-    muted: "var(--color-muted)",
+    bg: "var(--about-ground)",
+    ink: "var(--about-ink)",
+    muted: "var(--about-body)",
   };
 }
 
@@ -264,7 +263,7 @@ function Panel({
         background: s.bg,
       }}
     >
-      {principle.tone === "dark" ? <div className="grain-dark" aria-hidden="true" /> : null}
+      <div className="grain-dark" aria-hidden="true" />
       <div className="pt-panel">
         <div style={{ minWidth: 0 }}>
           <div className="type-eyebrow" style={{ color: s.muted }}>
@@ -285,7 +284,7 @@ function Panel({
           />
         </div>
         <div className="pt-demo">
-          <Demo active={active} dark={principle.tone === "dark"} />
+          <Demo active={active} dark />
         </div>
       </div>
     </div>
@@ -337,7 +336,7 @@ function StackedPrinciple({ principle, index }: { principle: Principle; index: n
         {/* `active` is true for all four here: nothing is scroll-driven,
             so every demo shows its settled state and stays interactive. */}
         <div style={{ height: 440 }}>
-          <Demo active stacked dark={principle.tone === "dark"} />
+          <Demo active stacked dark />
         </div>
       </div>
     </div>
