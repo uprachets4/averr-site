@@ -16,6 +16,7 @@ import ScreenDirection from "./ScreenDirection";
 import ScreenMotion from "./ScreenMotion";
 import ScreenAges from "./ScreenAges";
 import { SPILLS } from "./types";
+import FlyIntoMark from "./FlyIntoMark";
 
 /**
  * The desk — /about's signature.
@@ -134,6 +135,8 @@ function PinnedDesk() {
         aria-label="How the studio works"
         style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}
       >
+        {/* you arrive through the mark */}
+        <FlyIntoMark progress={approach} reduce={false}>
         <div className="desk">
           <div className="desk-caption">
           <Caption index={active} progress={fills[active]} reduce={false} />
@@ -173,6 +176,8 @@ function PinnedDesk() {
             </Monitor>
           </div>
         </div>
+
+        </FlyIntoMark>
 
         <div className="desk-marks">
           {PRINCIPLES.map((p, i) => (
