@@ -10,6 +10,7 @@ import AmbientDrift from "../components/about/AmbientDrift";
 import PrinciplesTrack from "../components/about/PrinciplesTrack";
 import FounderStatement from "../components/about/FounderStatement";
 import { useDeclarePageEndTone } from "../lib/pageTone";
+import { useSetNavDarkOverride } from "../lib/navTone";
 
 /* ═══════════════════════════════════════════════════════════════
    Band 1 — The Monogram Moment
@@ -851,6 +852,22 @@ export default function About() {
       delete document.documentElement.dataset.route;
     };
   }, []);
+
+  // /about is a lazy route, so it mounts AFTER the nav's observer has
+  // already scanned for [data-tone="dark"] — the scan is keyed on the
+  // pathname, which is already "/about" while the chunk is still in
+  // flight. The page therefore publishes its own tone, which is what
+  // this override exists for.
+  const setNavDark = useSetNavDarkOverride();
+  useEffect(
+    function tellTheNav() {
+      setNavDark(true);
+      return function restore() {
+        setNavDark(false);
+      };
+    },
+    [setNavDark]
+  );
 
   useEffect(function scrollTopAndTitle() {
     window.scrollTo(0, 0);
