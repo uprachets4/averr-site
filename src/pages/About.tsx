@@ -148,32 +148,20 @@ function MonogramHero() {
         transition={{ duration: 45, repeat: Infinity, ease: ease.inOut }}
       />
 
-      {/* Two columns, because the mark takes the slot a photograph
-          would take — and because centred under a 560px mark, the
-          headline sat below the fold, which is no use to a hero whose
-          whole job is being understood. */}
-      <div
-        className="about-hero__grid"
-        style={{
-          position: "relative",
-          zIndex: 2,
-          maxWidth: "var(--container-wide)",
-          margin: "0 auto",
-          width: "100%",
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1.05fr) minmax(0, 0.95fr)",
-          alignItems: "center",
-          gap: 64,
-        }}
-      >
+      {/* The original composition, which the owner liked: one centred
+          column, the mark leading it. */}
       <div
         className="about-hero__copy"
         style={{
+          position: "relative",
+          zIndex: 2,
+          maxWidth: 1000,
+          margin: "0 auto",
           display: "flex",
           flexDirection: "column",
-          alignItems: "flex-start",
-          textAlign: "left",
-          gap: 28,
+          alignItems: "center",
+          textAlign: "center",
+          gap: 30,
         }}
       >
         <motion.div
@@ -189,6 +177,11 @@ function MonogramHero() {
         >
           The Studio · Founder-led
         </motion.div>
+
+        {/* No founder photograph exists in the repo (public/about/ does
+            not exist), so the mark holds the hero and no placeholder is
+            used. It draws itself, then tilts toward the cursor. */}
+        <MonogramMark variant="hero" />
 
 
         <motion.div
@@ -284,65 +277,9 @@ function MonogramHero() {
         </motion.div>
       </div>
 
-        {/* No founder photograph exists in the repo, so the mark holds
-            the slot — and earns it: it draws in parch, then the studio's
-            light comes up behind and on it. drop-shadow on the SVG and a
-            radial glow behind it; no filter touches any text. */}
-        <div
-          className="about-hero__mark"
-          style={{ position: "relative", display: "grid", placeItems: "center" }}
-        >
-          <motion.span
-            aria-hidden
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              duration: reduce ? 0 : duration.slow * 2,
-              delay: reduce ? 0 : 1.8,
-              ease: ease.inOut,
-            }}
-            style={{
-              position: "absolute",
-              width: 380,
-              height: 380,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle at 50% 50%, rgba(61,107,255,0.30) 0%, rgba(124,92,255,0.16) 38%, transparent 68%)",
-              pointerEvents: "none",
-            }}
-          />
-          <motion.div
-            initial={{ filter: "drop-shadow(0 0 0 rgba(61,107,255,0))" }}
-            animate={{
-              filter: reduce
-                ? "drop-shadow(0 0 18px rgba(61,107,255,0.45)) drop-shadow(0 0 46px rgba(124,92,255,0.30))"
-                : [
-                    "drop-shadow(0 0 0 rgba(61,107,255,0))",
-                    "drop-shadow(0 0 18px rgba(61,107,255,0.45)) drop-shadow(0 0 46px rgba(124,92,255,0.30))",
-                  ],
-            }}
-            transition={{
-              duration: reduce ? 0 : duration.slow * 2,
-              delay: reduce ? 0 : 1.8,
-              ease: ease.inOut,
-            }}
-            style={{ position: "relative" }}
-          >
-            <MonogramMark variant="hero" />
-          </motion.div>
-        </div>
-      </div>
-
       <style>{`
         @media (max-width: 900px) {
           .about-hero { min-height: 90vh; }
-          .about-hero__grid {
-            grid-template-columns: minmax(0, 1fr);
-            gap: 36px;
-          }
-          /* the mark leads on a narrow screen, as it always did */
-          .about-hero__mark { order: -1; }
-          .about-hero__mark > div:last-child > div { width: clamp(200px, 54vw, 300px) !important; }
         }
       `}</style>
     </section>
@@ -747,7 +684,7 @@ function ClosingCTA() {
           marginTop: "-40vmin",
           marginLeft: "-40vmin",
           background:
-            "radial-gradient(circle at 50% 50%, rgba(61,107,255,0.16), transparent 60%)",
+            "radial-gradient(circle at 50% 50%, rgba(237,233,226,0.15), transparent 60%)",
           pointerEvents: "none",
         }}
         animate={

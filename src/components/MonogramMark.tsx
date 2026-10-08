@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
   useReducedMotion,
   useSpring,
+  useTransform,
+  type MotionValue,
 } from "motion/react";
 import { duration, ease, spring } from "../lib/motion";
 
@@ -27,7 +29,20 @@ type Props = {
  * All motion gated by useReducedMotion.
  */
 
-function StrokeDrawMark({ reduce }: { reduce: boolean }) {
+function StrokeDrawMark({
+  reduce,
+  lit,
+}: {
+  reduce: boolean;
+  /** -0.5 .. 0.5 — where the cursor sits across the mark. */
+  lit: MotionValue<number>;
+}) {
+  // The highlight rides ALONG the stroke on the side the cursor is on:
+  // a gradient stop offset rather than a shape laid over the mark, so
+  // it follows the outline exactly.
+  const uid = useId().replace(/:/g, "");
+  const mid = useTransform(lit, (v) => `${Math.max(0, Math.min(100, 50 + v * 110))}%`);
+  const litOpacity = useTransform(lit, (v) => Math.min(0.9, Math.abs(v) * 2.4));
   return (
     <div style={{ display: "block", width: "100%" }}>
       <svg
@@ -43,6 +58,24 @@ function StrokeDrawMark({ reduce }: { reduce: boolean }) {
           overflow: "visible",
         }}
       >
+        <defs>
+          <linearGradient id={`mark-lit-${uid}`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0" />
+            <motion.stop offset={mid} stopColor="currentColor" stopOpacity="1" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+
+        {/* The cursor highlight, riding the same outline. */}
+        <motion.path
+          d={MARK_PATH_D}
+          fill="none"
+          stroke={`url(#mark-lit-${uid})`}
+          strokeWidth={3}
+          fillRule="evenodd"
+          style={{ opacity: reduce ? 0 : litOpacity, pointerEvents: "none" }}
+        />
+
         {/* Stroke layer — draws in via pathLength + strokeDashoffset. */}
         <motion.path
           d={MARK_PATH_D}
@@ -102,22 +135,32 @@ export default function MonogramMark({ variant = "hero", className }: Props) {
   const reduce = useReducedMotion();
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  /* The mark TILTS toward the cursor rather than sliding after it:
+     rotateY follows the pointer's x, rotateX its y (inverted, so the
+     near edge comes forward), both capped at 6 degrees and both on
+     spring.soft. `lit` carries which side is nearest so the stroke can
+     highlight along it. */
+  const MAX_TILT = 6;
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
+  const rawLit = useMotionValue(0);
   const sX = useSpring(rawX, spring.soft);
   const sY = useSpring(rawY, spring.soft);
+  const sLit = useSpring(rawLit, spring.soft);
 
   function onMove(e: React.MouseEvent<HTMLDivElement>) {
     if (reduce || variant !== "hero" || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const px = (e.clientX - rect.left) / rect.width - 0.5;
     const py = (e.clientY - rect.top) / rect.height - 0.5;
-    rawX.set(px * 24);
-    rawY.set(py * 24);
+    rawX.set(px * 2 * MAX_TILT);
+    rawY.set(-py * 2 * MAX_TILT);
+    rawLit.set(px);
   }
   function onLeave() {
     rawX.set(0);
     rawY.set(0);
+    rawLit.set(0);
   }
 
   const [entered, setEntered] = useState(reduce ? true : false);
@@ -157,15 +200,17 @@ export default function MonogramMark({ variant = "hero", className }: Props) {
       style={{
         position: "relative",
         display: "inline-block",
-        // the mark inherits its surface: parch inside the studio
+        perspective: 900,
+        // the mark inherits its surface: parch where one is set
         color: "var(--mark-ink, var(--color-ink))",
         ...sizeStyle,
       }}
     >
       <motion.div
         style={{
-          x: applyParallax ? sX : 0,
-          y: applyParallax ? sY : 0,
+          rotateY: applyParallax ? sX : 0,
+          rotateX: applyParallax ? sY : 0,
+          transformPerspective: 900,
           width: "100%",
         }}
         animate={
@@ -180,7 +225,7 @@ export default function MonogramMark({ variant = "hero", className }: Props) {
         }}
       >
         {useStrokeDraw ? (
-          <StrokeDrawMark reduce={!!reduce} />
+          <StrokeDrawMark reduce={!!reduce} lit={sLit} />
         ) : (
           <motion.div
             initial={{
