@@ -12,6 +12,633 @@
 | | |
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
+| **Working branch** | `redesign-v2` (**~221 commits ahead of `main`** at the end of Session 18 — `git rev-list --count main..HEAD` for the exact number) |
+| **HEAD** | `6f256aa` — *18a-2 deviation fix: the principle bodies read-fill, as the brief asked*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
+| **Doc currency** | Written at the end of Session 18. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
+| **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
+| **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
+| **Dev server** | Test against the alias. **Never start dev servers with Bash** — and note that `preview_start` by name has started *another project's* dev server from inside this repo (§5.48), so the alias is the reliable path. |
+
+### Last verified bundle (build exit 0, unfiltered)
+
+```
+dist/index.html                    3.78 kB │ gzip:   1.51 kB  ← carries the route-chunk map
+dist/assets/index-*.css           42.33 kB │ gzip:   8.77 kB
+dist/assets/index-*.js           312.10 kB │ gzip:  97.73 kB  ← home + shell
+dist/assets/motion-*.js          162.61 kB │ gzip:  53.98 kB  ← the motion library, shared
+dist/assets/ServicesBuild-*.js   166.86 kB │ gzip:  40.73 kB  ← lazy, one viewport early (17i)
+dist/assets/CaseStudy-*.js        50.24 kB │ gzip:  12.40 kB
+dist/assets/Contact-*.js          43.92 kB │ gzip:  10.86 kB
+dist/assets/About-*.js            40.21 kB │ gzip:  10.58 kB  ← the playground + the line
+dist/assets/KickoffPass-*.js      29.68 kB │ gzip:   9.26 kB  ← lazy (17i)
+dist/assets/Work-*.js             22.46 kB │ gzip:   6.83 kB
+dist/assets/Services-*.js         10.04 kB │ gzip:   3.17 kB  ← was 51.06 before 17i
+dist/assets/NotFound-*.js          4.33 kB │ gzip:   1.70 kB
+dist/assets/MonogramMark-*.js      3.95 kB │ gzip:   1.86 kB
+dist/assets/businessDays-*.js      2.01 kB │ gzip:   0.92 kB
+dist/assets/ReadFill-*.js          1.42 kB │ gzip:   0.74 kB  ← shared by /about and the studies
+dist/assets/Cal.es-*.js            1.39 kB │ gzip:   0.75 kB  ← the embed, fetched on intent only
+dist/assets/SectionBoundary-*.js   0.45 kB │ gzip:   0.30 kB
+```
+
+Home's initial JS moved **151.59 → 152.53 kB gzip (+0.94)** in 19-pre-2:
+the generated screenshot manifest plus `prefetchRoute`. Well inside the
++12 kB gate.
+
+**Fonts are now part of the budget too** — they are preloaded, so they
+share the critical pipe with the entry chunk. `public/fonts` is **248 kB
+total**, down from 816 kB:
+
+```
+InterVariable.woff2          77 kB   (was 344)  not preloaded
+InterVariable-Italic.woff2   85 kB   (was 379)  not preloaded
+geist-latin-wght-normal      29 kB              PRELOADED
+cormorant-garamond-600-ital  23 kB              PRELOADED
+geist-mono-latin-wght        23 kB              not preloaded
+```
+
+Gate: **flag anything over +12 KB gzip JS in a single session.** **17c-2 changed how this is measured**: routes are code-split, so the number that matters is now **home's initial JS = 151.65 kB gzip** (the motion chunk folded back into index in 17c-2-fix once /services/next began sharing components with /services; one fewer boundary, marginally smaller), down from a single 199.70 kB bundle — **−46 kB on the landing route**. Total across all chunks is higher than the old single bundle (splitting has overhead), but no visitor downloads all of it. Judge future sessions on the initial figure for the route they touch, and on that route's own chunk.
+
+### Stack
+
+Vite + React + TypeScript · `react-router-dom` · **`motion` 12.43.0** (imported as `motion/react`) · Tailwind v4 (tokens live in `src/index.css`, utilities are hand-rolled `type-*` classes) · Vercel auto-deploy on branch push · Playwright (in `node_modules`) used for all DOM verification.
+
+---
+
+## 2. SESSION LOG (9-fix-c → 16-fix-2 + 15d)
+
+Every hash below verified against `git log`.
+
+**9-fix-c** `1b6f0dc` — Home surgical fixes: real CG Walls featured image replacing a placeholder, gradient section seams removed (CaseStudies + Manifesto merged into one dark chapter), on-dark contrast raised to AA, Writing nav link resolved. `Hero.tsx` was under a no-touch guard.
+
+**10** `40f7c13` — Type & scale system. Editorial display scale (`display-2xl` to 208px, `h2` to 56px), self-hosted Geist + Geist Mono (**zero Google Fonts requests**), `tnum` on stats, self-hosted Cormorant italic as the accent voice, wide/body measure tokens, `/process` → `/about#process`. Prachets amended the spec mid-session: keep Cormorant 500+600, drop the `opsz` axis, self-host Geist, leave `og-image.svg` alone.
+
+**10-fix** `083205b` — Hero 1440 regression (headline `display-xl` → `display-l`, **class swap only** — Hero.tsx was otherwise locked), mobile full-screen nav overlay with focus trap, dropped the unused Cormorant 500.
+
+**11** `784a593` — `<Chapter>` transition system: scroll-linked `clip-path` inset+radius expansion on every cream↔dark boundary. `MagneticCTA` gained an additive `tone="dark"` (replacing a `.cta-on-dark` `!important` override), single tab stop per CTA, desktop nav active state.
+
+**11-fix** `de837cf` — StorySoFar stages fit the pinned frame, nav prominence + Work count, home→/work+/services wayfinding, `ImageFrame` additive `tone`. Prachets pre-approved a pre-check: *if the "234px Gallery sliver" turns out to be empty padding, STOP and report* — it was a measurement artifact (real slides were 820–845px), reported not "fixed".
+
+**11-fix-2** `2d17870` — Chapter easing `outQuart` → `inOut` so the expansion lands mid-viewport.
+
+**12** `6adc93e` — Hero cinematic rebuild (Prachets explicitly unlocked `Hero.tsx`): split h1 at `display-2xl`, slab pill entrance, pinned scroll takeover where the pill's clip-path expands to a full dark frame carrying a 4-case-study reel, Toronto clock, unpinned fallbacks. `HeroSignature` and the client row were deleted.
+
+**12-fix** `f2dd291` — Tone-aware nav site-wide, mobile load film ×0.5 for LCP, **root-caused the frozen reel opacity** (see §5), deleted orphaned `HeroSignature`.
+
+**12-fix-2** `85840e2` + `6d9aeec` — Swept every scroll-linked opacity in a sticky frame onto the new shared `useScrollStyle` hook (34 hits → 0).
+
+**12-fix-3** `83d0a37` + `f86df6d` — Hero pill inside the container with balanced padding, reel pan retimed, /services Grow cards contained, /about numerals cleared of body copy; `useScrollStyle` changed to a **callback ref that writes on attach**, fixing a stuck `"serious."` clone.
+
+**13** `7169c2e` — Home rebuild: StorySoFar → three unpinned scenes, Pillars → three service doors with live hover previews, Numbers + CaseStudies stats → one dark **ProofLedger**. Prachets's rules: *no image repeats anywhere on home*, *nothing invented*.
+
+**14** `2db13ca` — /work rebuild ("The Vault"): hero, dark index chapter with full-width rows, cursor-follow preview with velocity tilt, URL-synced pillar filters with FLIP, /work-specific closer.
+
+**14-fix** `ba6f3f0` — Removed the non-selective pillar filters entirely, single-sourced headline figures into case-study data (home + /work read one field), status fallback for rows with no measured figure.
+
+**14-fix-2** `8fded56` — Fragment captions (SIFT's trailing period dropped; Prachets accepted home changing by that one character), status shown once (meta = year number only).
+
+**14-fix-3** `d04b44b` + **14-fix-3b** `d984ba0` — **All pricing removed site-wide** (timelines instead), /services gutter restored, /services hero `PillHl` → Cormorant accent, ledger dedupe (CG row), ILLUSTRATIVE labels on sample metrics, door previews clamped + enlarged + Grow mini dashboard. Prachets answered three questions: derive the pillar count word from data; use each section's own eyebrow as the rail label source; fold ScrollProgress into the rail.
+
+**15a** `4368c6a` `b2de080` `cd6b81d` `9f46983` — Case studies part 1: zoom-into-the-work hero with client-tint glow (additive `tint`), reading rail, word-level read-fill Context, pinned Approach with image wipes. Prachets chose: pinned split on **all four** studies (retiring the `text-then-image-full` render but keeping it in data/union), derive the "Two/Three pillars" count from data, rail labels = the sections' own eyebrows.
+
+**15b** `5e57481` `755955e` `cfde955` `0a96a72` `121b756` — Rail ≥1600 only, self-ticking "what we built" with live count, detail-zoom Signatures on additive `focal` points, figure-led Outcome, quiet "what's next", next-project finale replacing the shared `FinalCTA`. Prachets approved two image corrections: CapitalCommand's "operational truth" signature → `08-system-health`, SIFT's "sync engine" signature → `07-sources`.
+
+**15c** `aa8236a` `ade4646` `07ccb7c` `48d3b37` `a366fca` `5d5cb2e` `1b37a3a` `b6ae77a` — Fixed the blank CapitalCommand page (see §5), per-section `SectionBoundary`, Approach images at natural aspect, finale scrim, rail ≥1700, Context as statement+support with verbatim tint highlighters, labelled "what we built", lit "what's next" timeline. **Item 4 (zero image repeats) was reported BLOCKED** — the pool was empty.
+
+**15c-fix** `49e2b93` — Unblocked it: the hero's two back screens became **blurred, tinted depth copies of the front image**, and the front switched to `heroImage` (= `heroImages[0]`, used nowhere else). Zero rendered content repeats.
+
+**16** `f166859` `11c3fa7` `64e8bcd` — /work rebuild: vault doors, pinned project film, side index, clone-expand transition into case studies, mobile snap sections; row index + CursorPreview deleted. `64e8bcd` fixed two type errors that had been **pushed broken** because build output was being piped through `grep`.
+
+**16-fix-2** `f8b5c1c` — Doors open inside the pin; nav tone made honest via an out-of-clip marker.
+
+**16-fix** `6a530c3` — Compact dot index with hover-expand names, film screen back to ~64%, and the **unfiltered-build standing rule** adopted.
+
+**16-fix-2 + 15d** `f3957b0` `01da18e` `46b8f1e` `40219c6` `b2ce349` `3fd88ed` — Film: every project gets a dwell (CapitalCommand fixed), sequenced text transitions, measured name fitting → name moved to its own full-width row, doors became an overlay with project one behind them. Case studies: Approach outline-fill pillar names + statement/support + verbatim emphasis, the blank Approach frame fixed at its real cause, finale CTA moved below the image, and the frame's base layer marked `[data-frame-base]` for audits.
+
+**17** `08965f2` `a70693b` `9ef61fe` `c3c65d6` `eece7b5` `b1994b9` `ed4e054` `cd59093` `ca06bee` `8eba163` — **/services rebuild.** Split out of the 2169-line page into `src/data/servicesProcess.ts` + `src/components/services/{AutomatePipeline,NoList,KickoffCalendar,ServicesCloser}.tsx`.
+
+- *Pillars:* the Automate ambient gained illustrative task chips (New lead → Enriched → Draft ready → Sent → Logged) travelling the existing node path on a 6s loop, 3 in flight, nodes lighting as a chip arrives; hand-written rAF (see §5.15). The unsourced caption **"System average: 12h/week returned" was cut** (§7.11). Mood-board cards re-cut to each image's natural aspect — they were ~1.8:1 screenshots in a fixed 1.40 box under `object-fit: cover`, cropping ~23% off every one — and the stack fans ±6° on hover. "What's included" became chips that assemble, latched once, on both paths. The pillar rail meets the container edge at ≥1680, measured off a probe.
+- *The "no" list:* each line's refusal is struck as you read — a 2px parch rule drawn across a **verbatim** substring held in data, with `splitRefusal()` throwing in dev if it ever stops being one. The rule is a background with `box-decoration-break: clone`, not a positioned bar, so it draws correctly across phrases that wrap (§5.16).
+- *The calendar:* the three-column steps became 14 cells filling one at a time, each step card arriving as its own first day fills. Day 01 = Monday (what makes "3 business days" land on day 04 without crossing a weekend); step 03 spans days 08–12; 06/07 and 13/14 are quiet weekend cells; stamp reads `WITHIN 14 DAYS · KICKOFF` at day 12. Prachets ruled the mapping, and ruled **out** labelling day 05 "your decision" — only the steps' own copy appears.
+- *Closer:* a /services-specific dark closer replaced the shared `FinalCTA`; page end tone now `dark`. With ComingSoon's slab swapped for the Cormorant accent, **`PillHl` is now exactly home hero + home `FinalCTA` + the 404** (verified live: home 2, /nope 1, all other routes 0).
+- *Hero:* headline moved onto one `CharReveal` stagger with "One studio" as an accent segment, plus the home scroll cue.
+
+Prachets's rulings: 20 minutes is the canonical call length (a sweep found /contact and ComingSoon already agreeing — nothing changed); "fixed price" and "up to 15 pages" stay as scope promises, not prices.
+
+**17-fix** `a9ef74a` `4642136` `ea20a63` — `StackedPillar` (< 900px, and **any** width under reduced motion) rendered no ambient at all, so reduced-motion readers lost all three visuals instead of getting a real final state, and `AutomatePipeline`'s reduce branch was unreachable. `AmbientVisual` gained `frozen`, and `StaticAmbient` feeds it progress pinned at 1 so every scroll-linked transform resolves to its end value. The stills are **scaled** to the column, not reflowed — the compositions are authored in fixed px and a 0–400 SVG space and do not survive squeezing — and the ILLUSTRATIVE label is printed at full size *outside* the scaled box, because at 375 the still runs ~0.45 and a label inside it landed near 5px.
+
+**17-fix-2** — Two rulings from Prachets. (a) **Standing rule 18 is absolute** — commit + push per verified item; a brief's `Commit:` line is the report summary, not a squash target. Recorded in §4.18, §7.12 closed. (b) The scaled Automate still's ~6px labels at 375 were **a defect, not an acceptable thumbnail**. Below 900px that still is now a purpose-built **vertical** composition — the five nodes on a straight vertical line, each with its label at real `type-eyebrow` size and its resting chip beside it, ILLUSTRATIVE above. Not the desktop diagram shrunk. Design and Grow continue to scale.
+
+**17b** `10cd235` `9cf8ec5` — **/services leads with what we do.** Owner feedback: the page opened on three enormous pillar words with the services people actually buy reduced to chips, so a visitor could not tell what the studio sells. The hierarchy is inverted — services are the page, pillars are the labels they group under.
+
+- **`servicePillars.ts` is now the single source for /services *and* home.** `PILLAR_SERVICES` holds 16 services, each with `name`, `outcome`, `proof: string[]`, and `from` — the original "what's included" string it renders in plain language, kept unrendered so every line on the page traces to the claim it came from. `SERVICE_COUNT` is derived, so the hero's "16 WAYS WE HELP" cannot drift from the list.
+- **Grow went from 4 services to 6.** The four offered services described work the portfolio does not show; the work it *does* show had no line. Prachets ruled: keep all four, add **Local search** and **Outreach campaigns**, both traced to CG Walls' own copy (*"Google Business Profile optimization"*, *"Google Business Profile seeded with an authentic Brampton homeowner review"*, *"Realtor lead-gen infrastructure: scrapers that watch posting activity, AI email generator that references the specific listing"*, *"door-to-door playbook … tier-ranked by home era and density"*). **Reporting** also regained "Attribution".
+- **Proof links only where a study's own copy shows the service was delivered — 9 of 16.** Prachets tightened two of my pairings in review: **Workflow audit** lost its CG link (a reduced-hours figure is an outcome, not evidence an audit was delivered) and **Human review built in** lost CapitalCommand (product philosophy, not a review layer built for a team). A row with no verified pair renders **no chip and reserves no space** — the absence is intended.
+- **`ServiceIndex.tsx`** — grouped rows at `--container-wide`, pillar label + timeline per group, name `type-h2` left, outcome `type-body-lg` right, proof chips beneath. Hover/focus shifts the name +8px, lifts the outcome to full ink, and fades a 240px proof thumbnail into a third grid track that the copy can never reach (measured: 24–60px clear at every width). A sticky pillar switcher tracks the active group by IntersectionObserver, jumps on click, and fades out after the index; on mobile it becomes a scroll-snap chip row and the thumbnails are dropped.
+- **Hero:** "Here's *exactly* what we do." (Cormorant on "exactly"), GTA subhead, scroll cue kept.
+- **The pillar sequence became "How each one works."** — pillar word down from `display-xl` to `display-l`, and stage 2 now names the same services the index sells instead of the old internal phrasing. Stacked path mirrors it.
+- **Home doors** print their pillar's first four service names in mono under the promise, read from the same record. The preview clamp is unaffected — its 24px clearance is measured against the promise column's left edge, which the added lines do not move.
+
+**17c-1** `2902d5b` `35383eb` — **/services rebuild, part 1 of 3, on a hidden route.** Prachets rated 17b **1–2/10**: a flat list, then the same services repeated in the pinned section, and not cinematic. New concept: ONE continuous pinned scene where a generic business's site is visibly built as you scroll, each of the 16 services being the caption of the step happening on the canvas. **The story is the list** — no service is named twice on the page.
+
+- **Built on `/services/next`**, noindex and linked from nowhere. `/services` is untouched until 17c-3 swaps them; nothing half-built is ever visible on the live route. Only `App.tsx` changed outside the three new files.
+- **Pin math.** Beat = 65vh. Wrapper = `beats × 65vh + 100vh` per the n+1 rule (§5.4). Design's five beats: travel **325vh**, wrapper **425vh** (measured 3825px at 900vh viewport = 4.25×, sticky child exactly 1.00×). The 16-beat target with two 80vh chapter transitions is **1200vh travel / 1300vh wrapper**.
+- **Per-beat phases:** caption in 0–0.15, canvas build 0.05–0.40, **dwell 0.40–0.85** (29.25vh of hold, ruled up from 45% of a 55vh beat), caption out 0.85–1.00. Dwell midpoints at progress 0.125 / 0.325 / 0.525 / 0.725 / 0.925 — those are the screenshot positions.
+- **One continuous float drives caption, canvas and rail.** Nothing on a timer, nothing keyed on an index that flips independently (§5.13). The caption remounts only at a beat boundary, by which point the previous one has faded to 0 — sequenced, never overlapping. Every canvas scene stays mounted and crossfades, so there is never a frame with nothing to draw (§5.6).
+- **The rail is the index:** three chapters, sixteen ticks, hover shows the service name, click lands in that beat's dwell. Automate and Grow read "soon" with disabled ticks until 17c-2 (verified: 16 ticks, 5 enabled).
+- **Canvas** is CSS and inline SVG only — no screenshots, no brand marks, a non-Averr palette so it reads as someone else's business, and ILLUSTRATIVE on the surface throughout. A browser frame on `yourbusiness.ca`: wireframe recoloured by a dropped-in palette with the mark drawing itself → sections assembling top-down → the site becoming a dashboard → **a labelled specimen grid** → a version tag ticking with pulsing "+" marks.
+- Mobile and reduced motion drop the pin: one section per service, each canvas playing its beat once on entry or resting at its finished state.
+
+*A fix inside the session:* beat 4 first pulled the dashboard apart with x-offsets and floated three labels over it. On screen that read as a broken layout — sidebar slid out leaving a dead gutter, table past the frame edge, each label beside something it did not name. Rebuilt as real labelled specimens (button, card, input, tokens, spacing). **The DOM sweep passed it both times; only looking at the screenshot caught it.**
+
+**17c-2** `076af86` `b0abe23` `dd0f8ab` `9a1f3c4` `5e390f5` — **/services/next rebuilt at product fidelity.** Prachets rated 17c-1 **3–4/10**: the concept was right but the canvas read as a small pastel wireframe and every beat was the same toy window.
+
+- **A1 · route code-splitting.** Every route but home behind `React.lazy`; home stays eager as the LCP surface. Home's initial JS **199.70 → 153.46 kB gzip**. The Suspense fallback paints the page ground at a full viewport — a zero-height `main` is what makes the footer jump and the scroll lurch on a route change.
+- **A2 · `WindowChrome`** — a real application window at 62% of the container and up to 82vh (measured 821×738 at 1440, 886×813 at 1920): traffic lights, title/URL bar, a four-layer tinted shadow, a diagonal reflection. Hairlines are inset shadows, not 1px borders, so they stay hairlines at 2dppx.
+- **A3 · `GhostCursor`** — a pointer choreographed from the same scroll value as everything else, eased hops, a slow wobble, a press ripple. **Each screen reads the same local progress the cursor is keyed against**, so a click and its response cannot drift.
+- **A4 · `camera`** — per-beat push-ins scaling the window CONTENT toward a focal point via `transform-origin`. The chrome is outside the transform; scaling the window edges is what makes a mockup look like a zoomed screenshot rather than a camera move.
+- **A5** — only the active beat ±1 is mounted. **Zero long tasks >50ms** across a full scroll of the chapter, measured with a PerformanceObserver on the alias.
+- **B1–B5 · five genuinely different pieces of software**: a brand board (SVG logo, palette with hex, type specimen, business card and van decal that recolour when the cursor picks an accent); a local-business homepage that scrolls inside its own window (booking widget the cursor fills and submits, success toast); a **dark** analytics dashboard (date range switched 7d→30d with KPIs and chart responding, status pills, notifications); a component library (4 variants × 4 states, input states, token tables, a dark-mode toggle that re-themes in place); a release dashboard (changelog, score ring 72→98, Core Web Vitals turning green). All content invented and plausible for the GTA; ILLUSTRATIVE throughout.
+
+*Three fixes inside the session, all caught by looking rather than by the sweep:* the window **collapsed to its 38px title bar** (an auto-height wrapper; the absolutely-positioned screens contributed no height and `overflow:hidden` clipped everything — the DOM sweep read all five screens' text correctly the whole time); the **next screen ghosted through the current beat** at ~12% (crossfade began 0.42 of a beat early, now the last tenth); and screens were **still assembling during their own dwell** (layout now completes by local 0.40, leaving the dwell for the cursor's interaction).
+
+**Outstanding, not done:** mobile type. 176 text nodes inside the screens render below 11px at 375 — the fine print (mono labels at 8px, card descriptions at 9px). The headline content is legible, but this misses the brief's ≥11px requirement. The fix is mobile-specific simplified variants of the dense panels, not a uniform font bump, which would break the desktop density the screens depend on. **Carry into 17c-3.**
+
+**17c-2-fix** `6818f1e` `…` — audit of Prachets's screen recording at ~1680. Six items, all fixed and measured on the alias.
+
+1. **Caption collided with the window.** Measured: "Post-launch" rendered **562px inside a 461px column at 1680** — 101px of silent overflow, its right edge 682 against a window starting at 671; at 1920 it was 11px *inside* the window. My 17c-2 report of "gap 90px, no collision" had measured the h2's block box, which reports the column width no matter how far an inline-block word spills past it (§5.5). The name is now `type-h1` in a 30% column, **fitted by measuring the widest word**. After: worst gap **51 / 57 / 96 / 96px** at 1280 / 1440 / 1680 / 1920, zero overflow.
+2. **Window 62% → 66% of `--container-wide`**, 82vh → 84vh. Measured **66.0% of the container at every width**; as a share of *viewport* that is 60.7 / 60.7 / 56.5 / 49.5% — it falls on wide screens because the container caps at 1440, which is why the recording read it as small. The Releases screen was also filled out: eight changelog entries with tags and per-deploy timings, plus a ten-week deploy-history chart.
+3. **Camera → focus move.** Scale capped at **1.22** (from 1.5–1.6), transform origin at the focus rect's centre so the focused element cannot leave frame, and a four-band spotlight veils the surroundings at 0.66. Four bands rather than one masked overlay because `backdrop-filter` applies to what is *behind* an element — a single rect would blur the thing meant to stay sharp. **Any scale above 1 crops the frame edges; the veil is what makes the cropping read as background rather than damage.** It is mitigation, not elimination.
+4. **Transitions went grey.** Two causes, both found by looking: the incoming window was ramping up *semi-transparent* so the outgoing one read straight through it, offset; and the ILLUSTRATIVE label was rendered per layer, so two overlapped on every switch. The incoming window now becomes opaque almost immediately and **occludes** the outgoing one; the label moved to the stage.
+5. **Pin released into an empty viewport.** Scroll progress hits 1 exactly where the sticky unsticks, so the final beat's fade ran the window to zero while the stage was still pinned. The last beat's window and caption now **hold** to the end. `/services/next` continues into `NoList` → `KickoffCalendar` → `ServicesCloser`, the same components in the same order `/services` uses. Verified: **0 blank samples** at four offsets across the release.
+6. **"Northgate" vs the specified "Your Business".** 17c-2 used Northgate for realism and **did not report the substitution** — a deviation that should have been flagged. Prachets accepted it; it is now consistent (the URL bar had still read `yourbusiness.ca` while every window title said Northgate). **Standing instruction from this session: report every deviation from a brief, however small.**
+
+*Probe errors, mine:* the gap check first measured the **leftmost** frame rather than the active one — during a dwell the outgoing layer sits translated −6%, so it reported 4–5px gaps that did not exist. And the automated "empty area" heuristic scored the dense website screen at 66% empty by counting hits on large containers; fill was judged visually instead.
+
+**17c-3** `64fe34a` … `d5b675e` + the chapter-card fix — **Automate chapter, plus two rulings.**
+
+- **R1 · the scale push-in is gone.** At 1.6, 1.35 and 1.22 it cropped the frame's edges — arithmetic, not tuning: scaling content inside a fixed window always pushes some out. Focus is now carried entirely by the spotlight veil. Verified: **0 scaled content layers** at every beat, spotlight bands present on all ten.
+- **R2 · the build stage may exceed the 1440 container on /services/next only**, capped at 1680 with the normal gutter; columns 29/67. Measured window: **61.7% / 61.9% / 58.6% of viewport** at 1440 / 1680 / 1920 — the 1920 target of ≥58% is met. Caption gaps 151 / 226 / 268px. Every other surface keeps `--container-wide`.
+- **Slot space.** Beats are no longer evenly spaced, so scroll maps onto SLOTS: five Design beats at 65vh, an 80vh transition, five Automate beats at 65vh. **Travel 730vh, wrapper 830vh** (measured 8.30× viewport).
+- **T1 · the back-office reveal.** The Releases window slides left and shrinks to 0.86, revealing the time-audit app already behind it, then exits while the back office settles to centre. The pulled-aside window holds z-index 20 so it reads as the front window moving away. The chapter card ("CHAPTER 2 / Automate / What runs *behind* the site.") lands in the **back half** of the transition — shown from the start it was half-covered by the sliding window, which crosses the caption column.
+- **Five Automate screens**, each a different application: a time-audit heatmap with an automatable toggle and a ticking hours total; a navy agent console with a resolving run timeline, a streaming reply and a fit gauge; a dotted-grid workflow canvas with packets and a run log; an email-client approval inbox with a tracked-change diff; a serif docs runbook. Rail: 10 ticks enabled, Automate segment active.
+- **Mobile.** Every Automate screen ships a restructured `compact` variant — **all five measure exactly 11px minimum, 0 nodes under**. The five Design screens remain **7–8px** and have no compact variant; that is the gate on the swap session, unchanged.
+
+*Three bugs, and one of them was mine from a session earlier:*
+- **React #185, maximum update depth**, crashing the whole route at the last Design beat — no windows, no caption, the noindex meta gone with the unmounted tree. The caption fitter added in **17c-2-fix** kept its scale in state, measured the rendered word and divided by the current scale to recover the base width, with `scale` in its own deps; width does not scale perfectly linearly with font-size, so it oscillated forever. **It only fires when a word actually overflows, so a 30% column never tripped it and 17c-3's 29% column did immediately — it shipped latent for a session.** Rewritten with no state and no dependency on its own output.
+- **`tsc` exhausted its heap** (2GB, FATAL) on nested ternaries inside `useTransform` — TypeScript reconciling a union of tuple types across three transforms. Keyframes are now built as plain typed arrays first. Builds pass on the default heap.
+- **A 4.3-million-line file.** A python edit sliced `s[s.index(A):s.index(B)]` where B occurred *before* A, producing an empty string; `str.replace("", new)` inserts between every character. **Guard: assert the slice is non-empty and the indices are ordered before replacing.**
+
+**17c-4** `c3154e9` … — **Grow chapter, carry-over fixes, and a new standing rule.**
+
+- **All three chapters now run on one pinned stage: 16 beats, two 80vh transitions. Travel 1200vh, wrapper 1300vh** — exactly the figure the pin plan projected in 17c-1. Measured 13.00× viewport (1300vh *is* 13 viewports; an earlier probe expecting 14 was wrong arithmetic, not a wrong wrapper).
+- **C1 · the workflow canvas connectors are measured, not guessed.** They were cubic curves between percentage points with both control points on the source's y, which swung wide and never met the boxes. Each node now reports its own rect, the path leaves a real port on the right edge and arrives at one on the left, routed orthogonally with rounded corners, and the packets travel that exact polyline.
+- **C2 · the run-log spotlight is aligned** — the log is positioned in percentages so the rect names the same box. Verified sharp inside its own veil.
+- **Six Grow screens:** a Durham map with a results panel where Northgate climbs #7 → #2 on a layout spring while its review count ticks 38 → 212; an outreach sequence with merge-filled previews and replies landing; an ads manager with impressions/clicks/CTR/leads and two ad previews; an A/B test where B wins and expands; a content calendar with a draft dragged onto Thursday; and a monthly report with an SVG attribution flow from five channels into leads and booked jobs.
+- **No currency anywhere**, illustrative data included — which also removed the agent console's "$15–25K" budget band that 17c-3 had introduced in breach of the same rule.
+- **Mobile:** all six Grow screens measure exactly **11px minimum, 0 nodes under**. The five Design screens remain 7–8px and are still the swap-session gate.
+- **New standing rule §4.23 — crash-scroll.** See below; added after 17c-3.
+
+*A bug class worth naming, because it bit three times in one session:* **an SVG with a small viewBox stretched across a large panel scales its `<text>` with everything else.** The map's 8px labels rendered near 26px in a 300×220 viewBox under `preserveAspectRatio="slice"`, and the report's flow labels did the same at 7px in a 200-wide box. **Draw type as HTML at a real font size, or size the viewBox to the panel.** The map was rebuilt in positioned CSS; the report's two labels became spans.
+
+*Also mine:* the C2 screenshot first captured the approval inbox rather than the workflow canvas — slot-vs-beat indexing in the probe, the third time that specific confusion has produced a wrong reading. It did surface a real defect by accident (A4's focus rect was framing empty space below the diff), but the carry-over it was meant to verify went unverified until a second pass.
+
+*Honest limit:* the map is the weakest of the six. It now reads as a map — white streets, tinted blocks, an amber arterial, legible labels — but it is a stylised one, sparser than the report or the workflow canvas, both of which genuinely look like software.
+
+**17c-5** `…` — **the finale: the build page is now `/services`.**
+
+- **Design mobile variants** — the last five screens at 7–8px now have restructured single-column variants. **All sixteen screens measure 11px minimum, 0 nodes under, at 375.** The gate is closed.
+- **The map is real streets.** `src/data/osmOshawa.ts` — a committed Overpass extract over central Oshawa/Whitby, projected flat and simplified, **880 ways at 9.4 kB gzip** against a 60 kB budget. No tiles, no runtime API, no map library. **OpenStreetMap data is ODbL; "© OpenStreetMap contributors" renders inside the map window at 11px and must not be removed.** Styled in our palette with road weights by class — not a look-alike of any provider.
+- **The swap.** `/services` renders the build page; `/services/next`, its route, its lazy import and the client-side noindex are gone. Deleted with zero importers: `ServicesNext.tsx`, `ServiceIndex.tsx`, `AutomatePipeline.tsx`, and the old `Services.tsx` in full. Title and meta description updated and restored on unmount.
+- **Verified on the alias:** all 16 captions correct · **all 16 rail jumps correct** · both chapter cards · 3-speed crash-scroll at 1440/1920/375 both directions with **0 console and 0 React errors** · 0 long tasks on a full scroll · 0 ViewTimeline on sticky descendants · no `$` strings · PillHl home 2 / 404 1 / services 0 · 375: 16 frames, **0 nodes under 11px**, zero overflow · all three chapter anchors on cold loads · a real door click from home.
+
+**Mobile lab numbers (390×844, 4× CPU throttle, ~1.6 Mbps) — one of these is bad:**
+
+| | |
+|---|---|
+| CLS | **0.001** |
+| TBT proxy | **174 ms** over 4 long tasks |
+| **LCP** | **4884 ms** — element `P.type-body-lg`, the hero subhead |
+
+**The LCP element is gated behind its own entrance delay.** The hero subhead animates in at `delay: 1.1`, so it cannot paint before 1.1s, and under throttle the whole chain stretches. The route also costs a lazy-load round trip. **This pattern is on every page hero, not just this one** — it is a ship-pass item, and the cheapest fix is to let the LCP text paint immediately and animate something else.
+
+*Four wrong guesses in a row on one bug, worth recording as method:* the chapter anchors appeared to fail on `#automate` and `#grow`. I changed the scroll to instant, then added retries, then fixed a guard that was cancelling those retries — all without evidence. **Instrumenting the scroll position took one run and showed the anchors had worked the whole time**: final y 4653, caption "Workflow audit". The probe was reusing one page across `#design → #automate → #grow`, and a hash-only change is a same-document navigation, so React never remounted. It did surface one real edge — clicking `/services#grow` while already on `/services` did nothing — now fixed by taking the hash from `useLocation`. **Instrument before the second guess.**
+
+**19-pre** `f47c12d` … `341a231` — **Site-wide LCP. Every hero's LCP element now paints at first render, and the font loading was rebuilt around it.** Nine commits.
+
+*The ruling (Prachets):* **the LCP element must PAINT at first render.** Its entrance becomes transform-only — y 8px → 0, `duration.base`, `ease.outQuart`, from 0ms. Every other hero element keeps its choreography. Target: **mobile lab LCP < 2.5 s on every route.**
+
+**The LCP element per route** (390×844, 4× CPU, ~1.6 Mbps), and what it was hiding behind:
+
+| Route | LCP element | Was | Now |
+|---|---|---|---|
+| `/` | `P.type-body-lg` hero kicker | delay 0.675 (mobile film) | painted |
+| `/work` | `IMG` first preview | `loading="lazy"`, faded `whileInView` | eager, `fetchPriority=high`, painted |
+| 4 case studies | `P.type-body-lg` subhead | delay 0.75 | painted |
+| careerclarity-ai | `P` body copy | delay 1.2 | painted |
+| `/services` | `P.type-body-lg` subhead | **delay 1.1** | painted |
+| `/about` | `SPAN.type-display-l` CharReveal | **delay 2.2** + per-char fade | painted (`paint` prop) |
+| `/contact` | `P.type-body-lg` subhead | **delay 1.6** | painted |
+| 404 | `H1.type-display-l` | delay 0.3 | painted (its pill keeps delay 0.9) |
+
+**`CharReveal` gained a `paint` prop.** It keeps every character at opacity 1 from the first frame, drops the per-char stagger, and animates y only. Reserved for an LCP element — do not sprinkle it; the stagger is the component's reason to exist.
+
+**Retiming alone did not reach the target, and the measurement said why.** After the choreography fixes every route still sat at 2.5–3.4 s, with first contentful paint pinned at ~2.2 s. The waterfall: **the 344 kB `InterVariable.woff2` preload was racing the 151 kB entry chunk for the pipe.** The JS took 1826 ms to arrive instead of the ~760 ms it needs alone. Three changes followed, each measured:
+
+1. **Subset the Inter variable fonts** — 344 → 77 kB and 379 → 85 kB, both axes kept, every codepoint the original covered from our source charset still covered. `tools/subset-inter.py` records the range and is idempotent.
+2. **Preload Geist only, not Inter.** A preload is a *high-priority* request; preloading 106 kB of fonts alongside the JS cost ~370 ms of FCP to save a swap on body copy. Geist carries every display headline and is 29 kB, so it keeps its preload.
+3. **A metric-matched fallback for Inter** (`'Inter Fallback'`, `size-adjust: 97.22%` measured from the site's own body copy, vertical overrides from Inter's hhea), so the swap cannot reflow.
+
+**`/work` was mounting the desktop film on phones.** `useMedia` started at `false` and only read `matchMedia` in an effect, so every phone visit rendered the whole `ProjectFilm` first — its four preview images have no `loading` attribute, so **431 kB was requested on the critical path and then thrown away**. `/work`'s own LCP image finished behind three images no one would ever see. Fixed by reading `matchMedia` in the `useState` initialiser, the way `Nav.tsx` already did.
+
+**Results — mobile lab, 390×844, 4× CPU, ~1.6 Mbps/150 ms:**
+
+| Route | LCP before | LCP after | CLS before → after |
+|---|---|---|---|
+| `/` | 4060 | **2264** | 0 → 0 |
+| `/work` | 4908 | **3384** ✗ | **0.054 → 0.016** |
+| cg-walls | 3804 | **2304** | 0.004 → 0 |
+| capitalcommand | 3876 | **2344** | 0 → 0 |
+| sift | 3824 | **2356** | 0.004 → 0 |
+| cadencestack | 3892 | **2368** | 0.005 → 0 |
+| careerclarity-ai | 4440 | **2244** | 0 → 0 |
+| `/services` | 5052 | **2792** ✗ | 0.001 → 0.001 |
+| `/about` | 2680 | **2252** | 0 → 0 |
+| `/contact` | 4940 | **2284** | 0 → 0 |
+| 404 | 3548 | **2184** | 0 → 0 |
+
+**9 of 11 routes under 2.5 s. Two are not, and neither can be fixed by choreography:**
+
+- **`/work` 3384.** The LCP element is an `<img>` that React has to render before the browser can even request it — it cannot paint at first render by construction. It is requested at ~2.3 s and is 86 kB. The fixes are a smaller preview (it renders ~358 px wide from a 1400 px source) or prerendering. **Both are owner calls — see §7.**
+- **`/services` 2792.** FCP is 1928; the gap is the lazy route chunk, a second round trip after the entry chunk plus the heaviest first render on the site. A build-time path→chunk map injecting `modulepreload` would recover most of it. **Not attempted — it is a build-pipeline change, not hero choreography.**
+
+**The real floor is first contentful paint at ~1.9 s**, and it is the SPA boot: HTML round trip (~330 ms) + 151 kB entry chunk (~1100 ms) + React mount at 4× CPU (~450 ms). Nothing in the hero can paint before that. **Prerendering the shell is the only lever left** — logged in §8.
+
+**Reduced motion:** unchanged, verified — character opacity 1 and no transform at every sampled instant on `/`, `/about`, `/services`.
+
+**Verified on the alias:** build exit **0** unfiltered · frames at 0/300/800/1500 ms on all eight hero types, visually reviewed · opacity census of every hero text node at each frame · CLS attributed to its source node, not just totalled · **zero horizontal overflow at 375 on all 11 routes** (`scrollWidth` 375 everywhere) · **3-speed crash-scroll at 1440/1920/375, both directions — 33 route-runs, 0 console errors, 0 React errors, every route alive.**
+
+*Two probe notes.* **A crash-scroll piped through `tail` shows nothing until it ends** — I lost 45 minutes watching an empty file before rewriting it to log per route. It is a ~25-minute run; log every route as it finishes. And **`1920 /work` recorded 946 s against 38 s at 1440** — not reproducible: a fresh pass is 5.8 s with one 59 ms long task, and the per-step cost is identical at both widths. Recorded as an unexplained outlier, not diagnosed.
+
+**19-pre-2** `e521774` … `895313d` — **Prachets's four rulings on 19-pre.** Three commits.
+
+**1 · Every hero text element paints at first render.** Not just the LCP one. Each starts at opacity 1 and animates the transform only — y 12 → 0, `duration.base`, `ease.outQuart` — and **keeps its original stagger offset**, so the offsets now describe the order the lines TRAVEL in rather than the order they appear in. A hero still reads top → bottom with nothing hidden.
+
+- `LineReveal` gains `paint`: the mask goes with the fade, because a line sitting 110% below its own clipping box is not on screen. The clip is dropped with it or it would crop the painted line.
+- `CharReveal`'s `paint` now **keeps the per-character stagger** (19-pre had zeroed it), so a painted headline still reads as a reveal.
+- Non-text keeps what it had: the home **slab** (still the signature), the Toronto clock — which got its own fade so the eyebrow beside it could paint — the scroll cues, the monogram, and the accent bounce on /nope and the coming-soon page, which was already a transform.
+- Home's kicker gets its `1.35 / 0.55` place in the ladder back. 19-pre had deleted it when the element became painted; with everything painted it is needed again.
+
+*Verified per-frame on the alias*, sampling every animation frame from mount: **every line at opacity 1.00 the whole time**, travelling strictly in order — "The studio for" 0.35 → "businesses that want to" 0.43 → "look" 0.65 → "serious." 0.80 → kicker 1.35 → CTAs 1.43/1.51 at 1440, the same order at half speed on 390. The only thing that *appears* on screen is the slab.
+
+**2 · WebP derivatives, site-wide.** `tools/derive-screenshots.mjs` emits 640/960/1280 and the natural width for every capture under `public/work/`, **never upscaling** (a 1400px source emits 640/960/1280/1400). **Outputs are committed** rather than generated by a Vite plugin, so the build stays a plain `vite build` with no image toolchain in it — re-run the script after adding a screenshot. It also writes `src/data/screenshots.ts` with each file's intrinsic size and available widths.
+
+`<Screenshot>` is now the one way a screenshot is rendered: a `<picture>` with the WebP `srcset`, the original JPEG as the fallback `<img>`, and the intrinsic `width`/`height` always set. Three places animate the `<img>` itself (the Signatures push-in, the open-transition clone) and take a `<WebpSource>` beside it instead. The duplicated `w`/`h` in `workIndex` is gone — **one generated source of truth**, because two hand-maintained copies of the same number is how they drift.
+
+| Route (390×844, full scroll) | image bytes before | after | |
+|---|---|---|---|
+| `/work` | 303 kB | **100 kB** | **−67%** |
+| `/work/cadencestack` | 256 kB | **101 kB** | **−61%** |
+| `/work/sift` | 189 kB | **82 kB** | **−56%** |
+
+**3 · The route chunk is preloaded for the path being loaded.** `tools/route-preload.ts` reads the bundle at build time, resolves each route to its chunk **plus that chunk's static imports**, and writes the map into `index.html`. A tiny inline script — no modules, no imports, so it can run before the entry script — matches `location.pathname` and appends `<link rel="modulepreload">`, so the two downloads overlap instead of queueing. The same map is left on `window` for `src/lib/prefetchRoute.ts`, which warms a route on nav-link hover, focus or touch (`rel="prefetch"` there, not `modulepreload`: the visitor has not committed to going yet).
+
+**4 · Prerendering is deferred to the Ship pass** — §8.
+
+### Mobile lab, 3-run median (390×844, 4× CPU, ~1.6 Mbps/150 ms)
+
+| Route | 19-pre | 19-pre-2 | CLS | |
+|---|---|---|---|---|
+| `/` | 2264 | **1904** | 0.000 | |
+| `/work` | 3384 | **2320** | 0.016 | was the worst route |
+| cg-walls | 2304 | **2048** | 0.008 | |
+| capitalcommand | 2344 | **2072** | 0.000 | |
+| sift | 2356 | **2084** | 0.009 | |
+| cadencestack | 2368 | **2080** | 0.000 | |
+| careerclarity-ai | 2244 | **2008** | 0.001 | |
+| `/services` | 2792 | **2228** | 0.001 | the chunk preload |
+| `/about` | 2252 | **2016** | 0.000 | |
+| `/contact` | 2284 | **2056** | 0.000 | |
+| 404 | 2184 | **1904** | 0.000 | |
+
+**All eleven routes under 2.5 s.** First contentful paint is now 1644–1856 ms.
+
+**Verified on the alias:** build exit **0** unfiltered · per-animation-frame ladder on home at 1440 and 390 · frame montages at 0.30–1.5 s, visually reviewed · image bytes counted per route over a full scroll · CLS attributed to its source node under a *gentle* scroll · **reduced motion clean on all 8 hero routes** (final state at 900 ms, no fades, no offsets) · **zero horizontal overflow at 375 on all 11 routes** · **3-speed crash-scroll at 1440/1920/375, both directions — 33 route-runs, 0 console errors, 0 React errors, every route alive.** The 946 s `1920 /work` outlier logged in 19-pre ran **53 s** here, confirming it was environmental.
+
+*A measurement correction that matters more than the numbers.* **Every single-pass figure in this project, 19-pre's "after" table included, was measuring a cold edge cache.** The first pass over a freshly deployed asset set is consistently 300–600 ms slower than the second and third; 19-pre-2's first pass read `/` at 2504 ms and the median is 1904 ms. **Measure three passes and take the median** — one pass straight after a deploy is a worst case, not a result.
+
+**17d** `608a0c6` … `d925553` — **Owner recording audit: /services quality plus two site-wide fixes.** Twelve commits.
+
+**1 · The captions were in beat space, not slot space.** `BuildCaption` read `position` — a SLOT float — against `beat.index`. The two agree only for Design: the first chapter transition displaces every later beat by one slot and the second by two. So on every Automate and Grow beat the fade window `[i+0.85, i+1]` was already behind the playhead, `useTransform` clamped to its end value, and **the caption sat at opacity 0 for the whole beat.** That is the empty caption column in the recording — **§5's own slot-vs-beat trap, in the one place nobody had checked.** The caption is now visible for the whole beat bar a 7% swap at each edge, the first beat does not fade in at all (its slot starts at position 0, while the stage is already on screen during the lead-in), and the two per-element entrances are gone: they were wall-clock delays inside a scroll-driven scene, so a quick scroll left the outcome and chips still fading in several beats later. **Verified: all 16 beats show name + outcome at 10 of 10 samples.**
+
+**2 · The spotlight had two faults.** `backdrop-filter: blur(2px)` ran inside a transformed ancestor, where Chromium composites the band as an **opaque fill** rather than failing quietly — that is the white box over the Approvals diff. The old comment called it free because it "costs nothing where it works"; **a filter documented as unreliable in the exact context it runs in is not free.** And one fixed near-black tint sat over every screen, which on a light screen is a grey wash over cream. The scrim is now the screen's **own** surface: light screens fade toward their paper at 0.55, dark ones deepen toward their ink at 0.5. **Verified: 18/18 veils screen-tinted, zero backdrop-filter anywhere, nothing covered.**
+
+**3 · Density and scale.** Measured before: **base type 7.5–10.5px, minimum 7px, blank regions up to 39%** of the window. Now: **base 13px and minimum 11px on every screen at both 1440 and 1680.** 174 font sizes were raised by a codemod that reads each style object — anything in a mono object floors at 11px, anything else lands at 13px unless it was already a heading — and five screens were rebuilt by hand:
+
+| Screen | Was | Now |
+|---|---|---|
+| Agent console | one reply line above ~500px of nothing | four streamed paragraphs + a "sources used" block |
+| Workflow canvas | small nodes, a floating log card | 148px node cards with icon/name/status, graph spans the canvas, full-width log strip |
+| Approvals | 4 stubs, short draft | 6 threads with previews, 268px list, draft fills the pane |
+| A/B test | five grey bars per variant | two real landing pages — nav, hero, proof row, postal-code form, services strip |
+| Content calendar | 8 entries, 7.5px day numbers | 20 entries across most weekdays at 11px, composer with body copy, hashtags, channels |
+
+Plus the time audit (heatmap rows were a fixed 22px, so it sat in the top third — now stretches), the runbook (gained the right rail a docs site has, a costs section and a change log) and outreach (10 prospects, and the rest of the sequence under the email preview).
+
+**Six screens are still over the 15% blank target** and are listed in §7. **The van decal's phone number** was SVG `<text>` at 7 units in a stretched viewBox — the §5 SVG-text gotcha again — and was removed rather than enlarged; the same number already sits at 11px on the business card above it.
+
+**4 · The nav CTA.** Not a tone bug — a **cross-fade collision**. Background and colour ran the same duration from opposite ends, so they met in the middle: 175ms into a tone flip the pill was `rgb(133,131,127)` and the label `rgb(127,125,119)` — **1.09:1**. Two opposite ramps over one duration always cross; arithmetic, not tuning. The colour now **steps once at the halfway point**, and the ramp uses `ease.inOut` because it is the only token that is point-symmetric (`[0.65,0,0.35,1]`), so it is exactly half way at exactly half time **in both directions**. Worst contrast through a flip is now **3.56:1**, and the settled states were never the problem. **Verified: 50 settled samples and 174 continuous-scroll samples across 5 routes, zero blank frames.**
+
+**5 · The home ledger** lost the CareerClarity row — an unverified "student throughput" figure for an unreleased product — and was deliberately **not** repadded. Four rows remain (SIFT 42%, and the three studio figures), count-up resolves, hairline gaps even.
+
+**6 · The home CTAs** have their `spring.snappy` back, on the transform only: they stay painted at opacity 1 from the first frame per the hero LCP rule, so the bounce is motion on something already on screen.
+
+**Verified on the alias:** build exit **0** unfiltered · caption sampling 10 points × 16 beats · spotlight veil and backdrop-filter audited per beat with screenshots · density and type measured at **1440 and 1680** with dwell screenshots reviewed one by one · nav CTA pixel-tested at 50 settled and 174 continuous points with dark-state screenshots · ledger rows, figures and spacing · **zero horizontal overflow at 375 on all 11 routes, scrolled** · **3-speed crash scroll at 1440/1920/375 on /, /work, a case study, /services, /about — 15 route-runs, 0 console errors, 0 React errors** · **mobile LCP median of 3: home 1964 ms, /services 2240 ms, both under 2.5 s**, CLS 0.000/0.001.
+
+*Three probe errors of mine, all caught before they reached a number in this log.* A caption baseline of "0/160" was measured against a **Vercel Security Checkpoint 403** page — §5.22, tripped by my own polling. Twice, a density sample for the **last beat** landed on the kickoff calendar **below** the stage, because the final caption keeps its text after the pin releases and the sticky frame still reports a positive top; the probe now requires the frame to sit near the top of the viewport. And the first font-size census read the **modal size including mono labels** as "base", which is not what the brief means by base UI text — it now reads the modal of non-mono text and judges mono by the 11px floor.
+
+**17e** `aae26c8` … `ccd4c1f` — **/services: the 14-day calendar becomes "Pick the day you call us."** Seven commits.
+
+*Owner feedback:* the calendar was accurate and inert — fourteen cells filling as you scrolled past, which the reader had to decode before it said anything. It is replaced by one question and the reader's own dates.
+
+**Pre-flight, as asked.** The booking tool is **Cal.com**, link `prachets/discoverycall`, embedded on /contact via `@calcom/embed-react`. **It does support a date parameter** — both the embed `config` and the hosted page take `date` and `month`. /services' CTA previously pointed at `/contact` with no parameter. The calendar sat in the `cream-warm` chapter between `NoList` and `ServicesCloser`, under `//_05 · how to start` and the h2 "Three steps. Two weeks to kickoff, max." **Only `Services.tsx` imported it.**
+
+**What it is now.** A strip of the next 21 days from today in **America/Toronto**; weekend chips are quieter and disabled; the default is the next business day (today, when today is one). A lens glides between chips on `spring.soft`. Pointer drag, click/tap, and the keyboard all drive it — arrows skip weekends, Home/End jump to the first and last selectable day — with `role="radiogroup"` and an `aria-live` sentence. Three nodes on a line show **Discovery call** (the pick, "20 minutes"), **Proposal** (+3 business days) and **Kickoff** (+14 calendar days, the bound, in the Cormorant accent). Digits roll on an odometer, the nodes shift as the segment lengths change, and the line redraws. The old h2 survives verbatim as the closing line, so **no copy was lost and no new promise was made** — the only facts used are the 20-minute call, 3 business days, 14 days, preview URLs from day one.
+
+**The CTA carries the date.** "Book {Weekday}'s call" → `/contact?date=YYYY-MM-DD`, and Contact passes it to both the Cal embed config and the hosted-page fallback link. **Verified end to end:** `?date=2026-10-09` produces `…/embed?layout=month_view&date=2026-10-09&month=2026-10`; a malformed value is ignored; no page errors.
+
+**The date maths is its own tested module.** `src/lib/businessDays.ts` carries civil dates **pinned to midday UTC** and read only through UTC getters, so a DST boundary cannot move "add 14 days" onto the day before. `tools/business-days.test.ts` runs on node's own test runner with no new dependency — **`npm run test:dates`, 8 passing**: a Friday pick, a +3 that crosses a weekend, a month boundary, a year boundary, a leap day, the weekend rules and ISO round-tripping.
+
+**⚠ There is no holiday calendar.** Only Saturday and Sunday are skipped, so a proposal due three business days after a pick that straddles a statutory holiday will read one working day early. The page only ever promises "3 business days", which is the same promise the old calendar made — but it is a real limitation and a holiday list is the fix if it ever matters.
+
+**Five sampled picks, all correct:**
+
+| Call | Proposal (+3 business) | Kickoff (+14 calendar) |
+|---|---|---|
+| Tue Oct 6 | Fri Oct 9 | Tue Oct 20 |
+| Wed Oct 7 | Mon Oct 12 | Wed Oct 21 |
+| Thu Oct 8 | Tue Oct 13 | Thu Oct 22 |
+| **Fri Oct 9** | **Wed Oct 14** | **Fri Oct 23** |
+| Mon Oct 12 | Thu Oct 15 | Mon Oct 26 |
+
+**Deleted:** `KickoffCalendar.tsx` (zero importers verified) plus `CALENDAR_DAYS`, `WEEKDAY_HEADERS`, `WEEKEND_DAYS`, `KICKOFF_STAMP`, `KICKOFF_STAMP_DAY` and the `dayStart`/`dayEnd` fields on `ProcessStep`, none of which anything else read. `STEPS` stays — `ProcessTimeline` and `AutomateScreens` use it.
+
+**Verified on the alias:** build exit **0** unfiltered · default selection = next business day · 21 chips, 6 weekend chips disabled and a weekend click ignored · keyboard, pointer drag and tap all select · `aria-live` announces the full sentence, and each node carries its own date as `sr-only` text because the odometer renders all ten glyphs · CTA date param correct after arrow, Home/End and tap · **reduced motion: both the digit column and the line segment compute `transform: none`** · mobile 375: strip scrolls with `scroll-snap-type: x`, minimum font **13px**, document width 375 · **zero horizontal overflow at 375 on all 11 routes** · **3-speed crash scroll on /services at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2388 ms, home 1876 ms**, CLS 0.001/0.000.
+
+*Four faults found by looking at the screenshots rather than the numbers.* The kickoff node sat flush against the container edge and its date read as clipped. All 21 chips did not fit at 1680 — the strip ran ~400px past the container and cut the last one. **`type-accent` was on the same element as `type-h2`**, and its `font-size: 1.12em` resolves against the PARENT's size, so the kickoff date rendered at about a third of the other two — it must nest INSIDE. And the odometer's clipped columns were as wide as the widest glyph, so a two-digit date read "Wed 1 4"; each column is now sized by an invisible copy of its own digit, because Cormorant has no tabular figures and a fixed `1ch` advance did not fix the accented date.
+
+**One deviation from the brief:** the eyebrow reads **`//_05 · TRY IT`**, not bare "TRY IT" — the site's section eyebrows all carry the `//_NN ·` prefix and this section was `//_05 · how to start`. Say the word and it drops to "TRY IT".
+
+**One cosmetic nit left:** the accented kickoff date still shows a hair more space between its two digits than the sans dates do. It is Cormorant italic's own side bearings, not a layout bug, and it is far better than it was.
+
+**17f** `b6ea58f` … `231f1f2` — **"Your project start pass".** Five commits.
+
+*Owner verdict on 17e: concept right, presentation 4/10, and the kickoff date was clipped.* This is the centrepiece version: two questions that build one artefact.
+
+### Pre-flight, as asked
+
+| | |
+|---|---|
+| Cal.com `?notes=` prefill | **Supported** — survives the redirect and reaches the embed |
+| Cal.com `?date=` | **Works** — applied, then stripped from the visible URL by Cal's router |
+| Weekend availability | **Saturday and Sunday both showed slots** when checked |
+| **Event duration** | **"Discovery Call 30m"** — the site says **20 minutes** everywhere. See §7. |
+
+### The date rules changed
+
+**Weekends are bookable.** The call may be any day. Only the proposal count skips non-working days, and it now skips **Ontario's nine statutory holidays** as well as weekends — a static 2026–2027 table in `businessDays.ts`, which closes the no-holiday-calendar limitation 17e logged.
+
+**It needed two anchors, and a test caught it.** A call ON a business day counts from the day after (Monday → Thursday). A call on a weekend or a holiday counts the following business day as day one (Saturday → Wednesday). Without the second anchor a Saturday call would have landed *later* than the Monday after it, which is not a promise anyone would make out loud. **12 tests passing, up from 8.**
+
+**Eight picks on the alias, all correct** (Thanksgiving is Mon Oct 12 2026):
+
+| Call | Proposal | Kickoff |
+|---|---|---|
+| Wed Oct 7 | Tue Oct 13 | Wed Oct 21 |
+| Thu Oct 8 | Wed Oct 14 | Thu Oct 22 |
+| Fri Oct 9 | Thu Oct 15 | Fri Oct 23 |
+| **Sat Oct 10** | **Thu Oct 15** | Sat Oct 24 |
+| **Sun Oct 11** | **Thu Oct 15** | Sun Oct 25 |
+| **Mon Oct 12 (Thanksgiving)** | **Thu Oct 15** | Mon Oct 26 |
+| Tue Oct 13 | Fri Oct 16 | Tue Oct 27 |
+| Wed Oct 14 | Mon Oct 19 | Wed Oct 28 |
+
+### What it is
+
+A **28-day wheel** that centres its selection, scales and fades neighbours by distance (transform and opacity only), marks today, labels weekends "Weekend call" and **names the holiday on the day itself** — "THANKSGIVING" appears under Oct 12. Drag with momentum, click, arrows, Home/End; `role="listbox"` with `aria-activedescendant` and an `aria-live` sentence.
+
+The **pass** is a 560px card on the new `--surface-elevated` token with a three-layer tinted shadow: Averr mark, "PROJECT START PASS", the business name at `type-h1`, three rows, a radial-gradient perforation, a barcode drawn deterministically from the name and the day, a pass number (`AV-1006-NR`), and a **READY TO BOOK** stamp that lands once per completion. On change the dates roll, a sheen sweeps and the card settles through ≤3°; on desktop it tilts ≤4° toward the cursor.
+
+**The kickoff date is MEASURED**, not hoped for — the line is measured against the card's inner width and the font scaled to fit, one pass, reset-measure-write. **Verified unclipped at 1280 / 1440 / 1680 / 1920 / 375** with a 32-character business name: right edge 932 vs 1195, 1114 vs 1348, 1300 vs 1526, 1420 vs 1646, 144 vs 333.
+
+**Privacy.** The business name is component state only — **no storage, no analytics, no fetch**. It rides to /contact as `notes`, which is the field Cal.com prefills from, and **never as `name`**, which belongs to a person. **Verified end to end:** `/contact?date=2026-10-10&notes=Northgate%20Renovations` produces `…/embed?layout=month_view&date=2026-10-10&month=2026-10&notes=Northgate+Renovations`.
+
+**Verified on the alias:** build exit **0** unfiltered · 8 picks correct incl. Sat, Sun, a holiday and a holiday straddle · weekends selectable · **kickoff unclipped at all five widths** · name typing updates pass, pass number and CTA · the stamp fires on completion and resets when the name is cleared · keyboard, drag and touch all select · `aria-live` announces · **zero horizontal overflow at 375**, minimum font **13px** · **reduced motion: the sheen is absent and the stamp simply appears** · **3-speed crash scroll on /services at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2236 ms (was 2388), home 1872 ms**, CLS 0.001/0.000. The section's code was NOT lazy-loaded — the Services chunk grew 44.15 → 45.75 kB gzip and LCP did not regress, so the extra boundary would have bought nothing.
+
+*Four faults the screenshots caught, not the numbers.* The wheel read as a stub — the opacity falloff hit zero four days out and the track was anchored left, so the selection sat against the edge; it now centres and keeps six days legible. **Cormorant's italic figures draw outside a 1em line box**, so the odometer window clipped them and leaked the tail of the digit above as a stray stroke over "Sat 24"; window and cells are 1.35em with the strip lifted by half the extra leading. At 375 the pass rows' fixed 132px label column squeezed the date onto two lines and pushed it under the "20 MIN" meta; below 1024 the row is a grid with the label on its own line. And the mobile wheel showed two days at a 104px cell, now 82px and five.
+
+**Deviations.** `--surface-elevated` **did not exist** — I added it to `index.css` as `#FBF9F4`, paper rather than white, so the card sits in the same family as `--color-bg`. The "mid-typing" screenshot is the **completed** state rather than a true mid-keystroke frame; the stamp moment and mid-typing are therefore one capture, not two.
+
+**17g** `267c248` … `b51fa7d` — **A guided conversation, an obvious date control, and a pass that confirms.** Five commits.
+
+*Owner audit of 17f:* the name question was missed — a faint mono label over a pale underline reads as a caption, not an action; the date wheel could not be changed by clicking; the call is 30 minutes; and a booked pass should show the booked time.
+
+### Pre-flight
+
+| | |
+|---|---|
+| Booking event | **`bookingSuccessfulV2`**. Only **`startTime`** is read. The deprecated `bookingSuccessful` carries `organizer.name` and `.email`; V2 carries **no attendee identity at all**, which is why it is used. |
+| Modal | `cal("modal", { calLink, config })`, taking the same `date` / `month` / `notes` prefill. |
+| Loader | The embed is **dynamic-imported on first intent**. It is now its own **1.39 kB** chunk and `app.cal.com` is not contacted until hover, focus or click — **measured: 0 cal.com requests before the CTA, 87 after.** |
+| "20" mentions | **Six**, all corrected (below). |
+
+### 1 · Thirty minutes, site-wide
+
+| File | Before → after |
+|---|---|
+| `ServicesCloser.tsx:97` | "Twenty minutes, no deck" → **"Thirty minutes, no deck"** |
+| `servicesProcess.ts:39` | "20 minutes. No slide deck." → **"30 minutes."** |
+| `KickoffPass.tsx` | `meta="20 min"` → **`"30 min"`** |
+| `ComingSoon.tsx:110` | "a 20-minute call" → **"a 30-minute call"** |
+| `Contact.tsx:1096` | "Book a 20-minute intro call." → **"30-minute"** |
+| `businessDays.ts:178` | the doc comment naming the facts |
+
+**Zero remaining.** This closes the owner item 17f opened.
+
+### 2 · The conversation
+
+Each step carries a mono "STEP n OF 2" over the question at **`type-h3` in ink**, never the muted token — measured at **14.15:1**. The name input is a real field: elevated fill, 12px radius, `type-h2` text at **17.53:1**, a 2px focus ring, **93px tall**. An animated placeholder types and deletes three example names with a blinking caret once the section is in view, **stops the moment the field is focused**, and is replaced by a static placeholder under reduced motion. Nothing is autofocused. At ≥2 characters Step 1 takes a tick and dims to 0.62 while Step 2 goes to full emphasis — **Step 2 is never locked.** The pass's empty name slot carries a **pulsing dashed outline** until a name is typed, so both columns point at the same first action.
+
+### 3 · The date control
+
+Centre day at `type-display-l` with **52px arrows**, clickable dimmed neighbours, swipe, arrow keys, Home/End, and a **month popover** (this month and next, past days disabled, Escape and outside-click close with focus returned to the trigger). Range **today → +60 days**. Weekends and holidays are named on the day itself.
+
+| | |
+|---|---|
+| initial | Tuesday, Oct 6 · **Today** |
+| next arrow | Wednesday, Oct 7 |
+| neighbour click | Thursday, Oct 8 |
+| ArrowRight | Friday, Oct 9 |
+| End | Saturday, Dec 5 · **Weekend call** |
+| Home | Tuesday, Oct 6 |
+| popover | 31 days, 5 disabled, October 2026; Escape returns focus to "Pick another date" |
+
+### 4 · In-page booking
+
+The CTA opens the Cal modal. **Measured end to end:** `/embed?layout=month_view&date=2026-10-07&month=2026-10&notes=Northgate+Renovations&embedType=modal` — the chosen day preselected and the business name in notes. Embed failure falls back to `/contact?date=…&notes=…`; /contact is unchanged.
+
+### 5 · Booked → CONFIRMED
+
+A 180° `rotateY` flip (instant under reduced motion — `transform: none` measured) to a back face carrying **"Wed, Oct 7 · 2:30 PM ET · 30 MIN"**, the proposal and kickoff **recomputed from the booked day** (Oct 7 → proposal Tue Oct 13, past Thanksgiving; kickoff Wed Oct 21), the inbox line, a green CONFIRMED stamp, and aria-live **"Booked: Wednesday, October 7 at 2:30 PM Eastern."** The CTA becomes a quiet "Book another call" and the date control is disabled showing "Booked: Wed, Oct 7".
+
+**Verified with a simulated event, not a real booking.** `?simulateBooking=<ISO>` sets component state and nothing else — no request, no storage. **It is reachable on a deployment when typed by hand**, which is a deliberate trade so the flip could be verified on the alias; the dev-only `CustomEvent` path exists too. See §7.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · Q1 **14.15:1**, input text **17.53:1**, field outline composited **4.02:1** against the fill and **3.25:1** against the warm ground · animated placeholder runs, stops on focus, absent under reduced motion · pulsing slot before typing · step progression with tick · date control by arrow, neighbour, keyboard, Home/End and popover · range limits · weekend and holiday labels · **0 cal.com requests before intent** · modal on the selected date with notes · the flip in both motion modes · mobile 375: **no control under 44px**, minimum font **13px**, field full-width, **zero overflow** · **crash scroll 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2336 ms, home 1876 ms**, CLS 0.001/0.000 · **12 date tests passing**.
+
+*Three faults the screenshots caught, not the numbers.* **The booking CTA was 700px below the fold** in the empty state: `.kp2-pass` sets `position: relative` later in the same stylesheet at the same specificity, so it beat `.kp2-face--back`, the back face sat in normal flow and the card measured 1267px instead of 613. Then **the CONFIRMED stamp and barcode were clipped** — the back face is taller than the front, and `inset: 0` clipped it to the front's height; the face that is NOT showing is now the one taken out of flow. And **a confirmed pass was still pulsing the dashed "fill this in" slot** when no name had been typed.
+
+*One measurement error of mine, reported:* I first read the field outline as 17.53:1 by substituting alpha 1 into the `rgba` — that measures the ink, not the border. Composited properly, `--hair-hi` is **1.47:1** and fails WCAG 1.4.11; the border is now `rgba(20,20,18,0.55)`.
+
+**Deviations.** There is **no `--border` token** — §5.23 records that `--color-border` does not exist — and `--hair-hi` fails 3:1, so the field, the arrows and the "pick another date" control use a literal `rgba(20,20,18,0.55)`. The eyebrow remains **`//_05 · TRY IT`** rather than bare "TRY IT", keeping the site's `//_NN ·` section convention. And the simulated-booking harness is reachable in production via an explicit query param, as above.
+
+**17g-fix** — **five display fixes from the 17g recording.** One commit.
+
+**1 · The odometer is gone.** Per-digit rolling columns leaked their neighbours AT REST: "Oct 12" showed the leading 1 as a bar with stray strokes, and a pass row read "Monday, Oct 1g". **A column of ten glyphs clipped to a line box is always one mis-measured pixel away from showing the next one** — no amount of padding fixes the class of bug. `DateToken` replaces it everywhere (main date, both pass rows, the kickoff line): the whole string slides out at y −40% while the new one slides in from +40%, opacity and transform only, `duration.base` / `ease.outQuart`, instant under reduced motion. **The clip box is measured from the font's real ink**, via canvas `actualBoundingBoxAscent`/`Descent` on the string plus every digit in the element's own computed font, re-measured after `document.fonts.ready`; the padding that gives Cormorant's italic room is cancelled by an equal negative margin so nothing moves.
+
+*Verified:* 10 consecutive dates covering **digits 0–9**, in both faces — **every token holds exactly one layer at rest and no ink falls outside its measured box.** Zoomed crops at 1440 and 1680 show complete glyphs.
+
+**2 · The animated example reads as a placeholder.** It was dark and full-size and looked like a typed value while the pass still said "Your business". It is now prefixed **"e.g. "**, in `--color-muted-2` — **3.49:1 on the field, against ink's 17.53:1 for typed text** — with the blinking caret at the **start** of the field where a cursor would actually be, rather than trailing the example.
+
+**3 · One contextual tag.** The date repeated under the main date is gone. Above: the weekday. Below: a single outlined pill, shown only when it says something — **Today / Tomorrow / Weekend call / the holiday name** — in a row whose height is reserved. *Verified across six consecutive days: the tag row stays 28px and the date's y never moves.*
+
+**4 · Arrows and neighbours.** The reel is a grid, so the three numerals share one baseline row instead of being centred by box, with the weekday and tag in their own rows. **Measured clear space between each arrow and its neighbouring numeral: 28px at 1280, 1440, 1680 and 1920** — above the 24px asked for.
+
+**5 · `?simulateBooking` is dev and preview only.** Active on localhost and `*.vercel.app`; inert anywhere else, so nothing on averrstudios.com can make the pass claim a booking that does not exist. **Closes §7.12.**
+
+**Verified on the alias:** build exit **0** unfiltered · the digit sweep above · placeholder vs typed captured side by side · tag and baseline measurements above · mobile 375: minimum font **13px**, **no control under 44px**, zero overflow · reduced motion: the animated example is absent, the static placeholder serves, and every token computes `transform: none` · **crash scroll 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2408 ms, home 1880 ms**, CLS 0.001/0.000 · 12 date tests passing.
+
+*One probe error of mine, reported:* the first artefact audit selected three hosts that contain no `DateToken` and scored their zero layers as failures — "10 frames with artefacts" when the real tokens were all clean. The selector now requires a host to contain a sizer span.
+
+**17h** — **the /services screens that were still over the blank target.** Seven commits. Carry-forward from 17d (§7.14), not a new brief.
+
+**All sixteen screens now meet every density gate at BOTH widths: base 13px, minimum 11px, no flat region over 15% of the window — 17/17 at 1440 and 17/17 at 1680.**
+
+| Screen | before → after (1680) | what it needed |
+|---|---|---|
+| Brand & design direction | 24.2 → **7.0** | a Lockups row, taller photography, and a yard sign in Applications |
+| Human review built in | 21.9 → **10** | a sign-off and attachments on the draft, a status row under the thread list |
+| Paid ads | 20 → **6.6** | sitelinks, a second ad variant and the keywords buying the clicks |
+| Product & SaaS interfaces | 18.8 → **10.9** | eight job rows instead of five |
+| Design systems | 18.3 → **6.1** | filled/disabled input states, a select, a textarea, a checkbox, twelve tokens |
+| Landing pages | 16.4 → **13.1** | a review line where `margin-top: auto` had left 200px of dead page |
+
+**⚠ A number in 17d's entry was wrong.** It listed **Reporting at 28.8 / 30** as one of the six failing screens. Measured correctly it is **8.4 / 7.8 and was never failing** — the sample had landed on the kickoff section *below* the released pin, the same leak flagged in 17d's own probe notes. The guard now requires the **stage grid itself** to be on screen, not just a stale frame rect. Only five of the six were real, plus Landing pages.
+
+*Two faults of mine in this session.* I added the design-system checkbox tick at **10px**, in the very session enforcing the 11px floor — caught by a probe that scans every scroll position rather than one sample per beat, because the tick only renders once a step completes. And on the brand board I **raised the wrong heights first**: the flat region was the right column below the van decal, not the bottom strip; raising the lockups and photography changed the measurement by nothing. Looking at the screenshot found it in one pass.
+
+**Verified on the alias:** build exit **0** unfiltered · density and type at 1440 and 1680 with dwell screenshots reviewed one by one · **no sub-11px text anywhere on the stage, scanned at every scroll position** · mobile 375 across a full scroll: screen minimum **11px**, max `scrollWidth` **375** · **3-speed crash scroll at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2464 ms, home 1940 ms**, CLS 0.001/0.000 · 12 date tests passing. The Services chunk grew 49.92 → **51.06 kB** gzip (+1.14).
+
+**17i** — **the pass sheen, and /services off the critical path.** Two commits, plus a doc commit that unblocked §7.2 and §7.3.
+
+**1 · The sheen sweeps behind the type.** It was a full-bleed gradient over the whole card, so it washed across the glyphs. The sweep now renders first at `z-index: 0` and everything readable is wrapped in `.kp2-above` at `z-index: 1`. *Verified: `sheenZ "0"`, `typeZ "1"`, and a screenshot taken mid-sweep shows the type solid.*
+
+**2 · The build stage and the start pass load off the critical path.** `/services` is a lazy route, so its LCP element — the hero subhead — could not paint until the whole route chunk had downloaded and executed, and every session had been adding to that chunk. New `components/LazyBelowFold.tsx` defers a section's code behind an `IntersectionObserver` with **`rootMargin: "100% 0px"`**, so the import resolves one full viewport early and the swap is never seen; the placeholder holds the section's real height in the section's own ground colour, so a mistimed swap still cannot shift anything on screen. Without `IntersectionObserver` the section loads immediately rather than never, and a failed chunk still renders.
+
+| | before | after |
+|---|---|---|
+| `Services` route chunk | 51.06 kB gzip | **3.17 kB gzip** |
+| `ServicesBuild` (own chunk) | — | 40.73 kB gzip |
+| `KickoffPass` (own chunk) | — | 9.26 kB gzip |
+| **/services mobile LCP** | **2464 ms** | **1932 ms** (target was ≤2300) |
+
+*Verified:* build exit **0** unfiltered · home unchanged at **1856 ms** · **no pop-in** — the stage is mounted at scroll 0 and the pass mounts at y=12150 with its top still 1884px below the fold · 3-speed crash scroll at 1440/1920/375 clean.
+
+*The recurring trap, hit again and reported.* The first LCP pass after the deploy read **2772 ms** with runs spread 1928–3008 — a cold edge cache on a fresh deployment. Five warm passes gave **1932 ms**. **Never take the first timing after a deploy.**
+
+*One CLS finding, investigated rather than assumed.* A full-page scroll of /services accumulates **~0.09** cumulative CLS. It is identical at two scroll speeds and no single shift exceeds 0.023, so it is the pinned stage's own scroll-linked animation, not the lazy swap. **Load-window CLS stays 0.001.**
+
+---
+
+**SESSION 18 — /about, "proof of a person".** Seven commits (`5b5ab00` … `6f256aa`). The page was a monogram hero, four stacked full-height principle bands, a process timeline, and a founder card in a box. It is now a hero that leads with a line, **a principles playground**, a process line that draws as you reach it, and a founder section built like a person rather than a business card.
+
+### 18a-1 · The mark draws on its own timing, the hero leads with a line
+
+`MonogramMark` already stroke-drew a real SVG path — this was a retiming, not a new mechanism. It now runs on motion tokens (`duration.slow × 2`, `ease.inOut`), which the **hero LCP rule** permits because the mark is not text.
+
+The headline is new: **"Small on *purpose*."** at `type-display-2xl`, painted from the first frame (`CharReveal paint`), with the accent nested *inside* the size class per §5.33. **The old headline is kept verbatim as the subhead** — "The studio for founders who care how they show up." — so no copy was lost. The ladder keeps its original top→bottom order; the only timed waits are on the non-text mark.
+
+### 18a-2 · The principles playground (the page signature)
+
+Four panels on **one horizontal track driven by a single scroll value**. `components/about/PrinciplesTrack.tsx`; the copy moved to `data/principles.ts` **byte-identical**, extracted by script rather than retyped.
+
+- The wrapper is **500vh** — four panels of travel plus the extra viewport the **n+1 rule** wants — so panel 04 gets real pinned time instead of sliding past as the sticky lets go. *Measured: wrapper 4500px, travel 3600px = exactly 400vh, sticky pinned (`top: 0`) at all four marks.*
+- `x` is **stepped, not linear**: each panel holds for most of its slot and the move between is eased through `easing.inOut`. A linear map would put every panel on its mark for one instant. *Measured dwell plateaus across the track:* `0.00–0.10 → 0vw`, `0.25–0.40 → −1vw`, `0.60–0.75 → −2vw`, `0.95–1.00 → −3vw`, snapping to exactly 0 / −1440 / −2880 / −4320 px.
+- **Each panel carries its own ground**, so the cream / alt / cream / dark rhythm the four principles always had survives the rebuild — and the stage still hands the next chapter a dark edge, which is what `Chapter from="dark"` downstream expects. *Measured: `#F4F0E6` / `#EDE9E2` / `#F4F0E6` / `#141412`, panel 04 with `grain-dark`, ink `--color-parch`, muted `--color-muted-l`.*
+- The only scroll-linked style inside the sticky frame is the track's transform. **Zero ViewTimeline on any stage descendant**, measured.
+- A progress row of four marks sits under the stage; clicking one scrolls to that panel. *Measured: clicking 03 landed at y=4033 against an expected 4033, x=−2vw, active mark 2.*
+- **Below 900px and under reduced motion the track becomes a stack**: `position: static`, no track, all four headings present, every demo still interactive.
+
+**The four demos are live things built from CSS, SVG and state — there are no images in any of them.**
+
+| | demo | works by |
+|---|---|---|
+| 01 | a grey template card **rebuilding into a crafted one** — mono eyebrow, display headline with the accent voice, gold rule, set body, ink CTA. The crafted content is always in flow and the slabs are absolute over it, so the card is exactly as tall in both states | hover, focus **and** click-to-pin |
+| 02 | a **direction sheet assembling** — five real tokens with their names, a Geist and a Cormorant italic specimen, a 4→128 spacing ruler; pieces arrive staggered and snap on a spring | plays on arrival, **Replay** by mouse or keyboard |
+| 03 | the site's own **MagneticCTA** labelled "Try me", beside a dot crossing a track under **linear vs the site's outQuart** | both halves are buttons |
+| 04 | two mini sites and a **2026 → 2029 slider**: the trend-led one desaturates, grows a "2026 TREND" tag and its type drifts off-era; the one built on fundamentals is wired to nothing | drag **and** arrow keys |
+
+*Verified by mouse and by keyboard, each one:* 01 Template → hover → Crafted → away → Template, keyboard focus → Crafted with a 2px focus ring, Enter pins it · 02 settles on arrival, and 120ms into a replay the swatch opacities read `0.42, 0.12, 0, 0, 0` — the stagger — from both a click and a keypress · 03 **the dot at ~330ms sits at 185px on linear and 471px on eased**, segments toggle by click and by Enter · 04 three `ArrowRight` presses reach 2029, the trend-led half changes and **the "built to last" half is byte-identical** across a full snapshot of every descendant's box, colour, filter, size, tracking and shadow.
+
+**Two defects the probe caught, not the eye.** The direction sheet **overflowed its frame by 2px** at 1440×900 — harmless to look at, but it would have clipped the spacing scale outright on a short laptop. And the panel-04 mockups carried **9px and 10px labels**, under the site's 11px floor. Both fixed in their own commit.
+
+**A density pass after reading the screenshots.** Every frame was a fixed 538px tall for demos whose natural heights run 200–420, so each one floated in 100–140px of dead space; frames now size to their content under a cap that only bites on a short viewport. The direction sheet became a **two-by-two composition** — palette beside type, ruler beside Replay — because the ruler alone still left the sheet's right half empty. *Measured after: frame heights 360 / 433 / 383 / 449, **clip 0 on every panel at both 1440×900 and 1440×700**, minimum font 11px.*
+
+**⚠ A deviation of mine, fixed in `6f256aa`.** The brief said the principle bodies read-fill; I shipped them as static paragraphs. They now fill — but **a pinned panel cannot read off its own position**, because it is not moving through its own scrollport, so each body fills off **the same scroll value that drives the track**, over the slice where its panel is arriving and sitting still: `[0, 0.07]`, `[0.25, 0.39]`, `[0.58, 0.72]`, `[0.91, 0.99]`. *Measured: each body runs 0 → 0.50 → 1.00 across its own window and finishes before the next begins; words reach opacity 1.* Stacked, the paragraph does move through the scrollport and reads off its own position.
+
+*The reading I took, stated:* **read-fill is applied to bodies, not headings.** It is a paragraph mechanism — index.css describes it as words brightening as *the paragraph* crosses the reading line — and a display headline sitting at 0.22 opacity is not what it is for. The founder statement is the exception, because the brief named it.
+
+### 18b-1 · The five stages become one line
+
+`ProcessTimeline` was five cards with an SVG rule behind them, each card arriving on its own `whileInView` timer — so the rule and the cards told slightly different stories about where you were. **One scroll value now drives the line's `scaleX`, which node is lit, and which step has spoken.** The line reaching a node *is* the node lighting.
+
+*Verified:* `position: relative`, **never sticky** · width **1325px at 1440 = exactly `--container-wide`** (the band's horizontal padding went so the gutter comes from the token) · nodes light in strict order `00000 → 11000 → 11100 → 11110 → 11111` with each step's text fading up behind its own node · week labels **verbatim** — Week 1, Week 1-2, Week 2-3, Week 3, Week 3-4 — in **Geist Mono 12px** · 375: the same line runs **vertical**, rail 2×994px, no overflow · reduced motion: `scaleX(1)`, all five lit, all text at opacity 1.
+
+### 18b-2 · The founder
+
+The card inside a centred 900px column became a full-width row. *Verified:* the mark holds the photograph's slot at **300px on the left** (grid `300px / 944.8px`), the name is **`type-display-l` at 100.8px**, the role line sits under it, and **the band contains zero `<img>` elements — there is still no placeholder photo.** Links are **MagneticCTA text variants** carrying `target="_blank"` and `rel="noopener noreferrer"`.
+
+The bio splits into **the statement it makes** (an `h3`) and **the support behind it** (body), each filling on its own scroll range so the statement finishes before the support starts. *Both verbatim against the brief, string-compared:*
+
+> **Statement:** "Toronto-based design engineer with a background spanning B2B SaaS sales within Google's extended workforce program, frontend development, and AI workflow automation."
+> **Support:** "Previously co-founded KlaasX Edutech (15-person team, 150+ institutions). Started Averr Studios to build the kind of client websites that actually earn their portfolio slot."
+
+*Measured:* `--p` runs 0 → 0.99 → 1 as the section crosses the reading line, word opacity 0.22 → 1; under reduced motion `--p` is 1 and every word is at opacity 1 on arrival.
+
+### 18b-3 · The closer
+
+Unchanged, and confirmed: **`ClosingCTA` exists only in `About.tsx`** — it is /about's own, not a shared component — and `useDeclarePageEndTone("dark")` is in place, so the footer still reveals over dark on this route.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **/about mobile LCP median of 3 = 2044 ms** (baseline 2004 ms), FCP 1716 ms, **load-window CLS 0.0000**, LCP element the hero name block · **3-speed crash scroll at 1440 / 1920 / 375, both directions — CLS 0 (0.0001 at 375), worst single shift 0.0001, zero console errors, zero React errors** · **zero ViewTimeline on sticky descendants** · reduced motion has real final states everywhere · minimum font **11px** across the stage at every scroll position.
+
+**Site-wide sweep, all ten routes at 375:** zero horizontal overflow anywhere · **PillHl inventory unchanged — home 2, /nope 1, zero elsewhere** · **zero `# AVERR STUDIOS v2 — HANDOFF V3
+
+**Written:** 2026-09-29 · **Supersedes:** everything after Session 9 in `HANDOFF.md` / `REDESIGN-HANDOFF.md`
+**Audience:** a fresh Claude Code session with no memory of this project. This file is your only memory. Read it all before touching anything.
+
+> Note on naming: the sessions referred to a file called `AVERR-V2-MASTER-HANDOFF.md`. **No file by that name exists in the repo.** The pre-Session-9 documents are `HANDOFF.md` (root, dated July 2026), `REDESIGN-HANDOFF.md` (root), and `docs/00-master-reference.md` … `docs/03-build-status.md`. Those remain valid for project identity, brand, and pre-v2 history. **This file is authoritative for everything from Session 9-fix-c onward** and supersedes them on any conflict.
+
+---
+
+## 1. STATE
+
+| | |
+|---|---|
+| **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~110 commits ahead of `main`** at the end of Session 17-fix — `git rev-list --count main..HEAD` for the exact number) |
 | **HEAD** | `f9452c0` — *"17h: a third application fills the brand board's right column"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
 | **Doc currency** | Written at the end of Session 17h. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
@@ -536,6 +1163,24 @@ Build exit **0** unfiltered · Q1 **14.15:1**, input text **17.53:1**, field out
 
 **Verified on the alias:** build exit **0** unfiltered · density and type at 1440 and 1680 with dwell screenshots reviewed one by one · **no sub-11px text anywhere on the stage, scanned at every scroll position** · mobile 375 across a full scroll: screen minimum **11px**, max `scrollWidth` **375** · **3-speed crash scroll at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2464 ms, home 1940 ms**, CLS 0.001/0.000 · 12 date tests passing. The Services chunk grew 49.92 → **51.06 kB** gzip (+1.14).
 
+ on any route** · zero page errors.
+
+Bundle: `About` **40.21 kB / 10.58 kB gzip**; a shared `ReadFill` chunk (1.42 / 0.74 kB) is now pulled by /about as well as the case studies.
+
+**Deviations, all small, all reported.**
+1. **Read-fill on bodies, not headings** — the reading above. The founder statement is the stated exception.
+2. **"Grid absorbs future collaborators without a rewrite." is kept verbatim** under the founder links. It reads oddly beside the new layout, but the copy rule says only the listed sentence changes — **flagging it rather than cutting it.**
+3. The How-we-work band's padding went from `160px 40px` to `160px 0` so the process line can actually be `--container-wide`; the gutter now comes from the token.
+4. The founder card's box, border and shadow are gone in favour of a full-width row, reading "larger section" as the brief's intent.
+5. Each principle panel keeps its own ground rather than the stage sharing one — not asked for, but it preserves the locked cream/alt/cream/dark rhythm and the dark edge the next chapter needs.
+
+**Five probe errors of mine, reported.**
+1. `preview_start {name: "averr-dev"}` started **another project's dev server** (`job-command-center` on :3000) twice; fell back to the alias, which is this project's standard path anyway.
+2. I piped a capture script through `head -3`. **SIGPIPE killed it mid-run**, I then read a screenshot left over from the previous run and concluded a deploy had not landed. Reading the DOM showed the change was live all along.
+3. I piped a build through `tail`, which breaks the unfiltered-build rule; re-ran it unfiltered for a true exit code.
+4. One founder read-fill sample read `--p: 0` because it sampled immediately after `scrollIntoView`, before the scroll handler had run. A proper trace showed the mechanism working.
+5. A probe run immediately after a push reported stale frame heights, and another returned zero `.read-fill` nodes — both an edge still serving the previous build. **An asset returning 200 does not mean the page is serving it:** intercept the request and check which chunk the page actually asks for.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -617,7 +1262,7 @@ One continuous pinned scene. A generic GTA home-services business (**Northgate**
 
 ### `/about`, `/contact`, `*` (404)
 
-`/about` — monogram hero, 4 principles with distinct numeral choreography, 5-step process timeline, founder card. `/contact` — 7-band editorial scroll with the designed form, Cal.com band. `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist"). `/about` and `/contact` are **Session 18/19 targets** and are the weakest pages now.
+`/about` — **rebuilt in Session 18.** Monogram hero leading with "Small on *purpose*."; the **principles playground** (`components/about/PrinciplesTrack.tsx`, copy in `data/principles.ts`) — one 500vh pinned stage, four panels on a horizontal track driven by a single stepped scroll value, each with a live CSS/SVG/React demo and each carrying its own ground so the cream/alt/cream/dark rhythm survives; a **process line** that draws left→right with its nodes lighting as it reaches them (`ProcessTimeline`, normal flow, `--container-wide`); a full-width **founder section** whose mark holds the slot a photograph will take. Below 900px the track is a stack and the line runs vertical. `/contact` — 7-band editorial scroll with the designed form, Cal.com band; **Session 19's target and now the weakest page.** `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist").
 
 ### Image-usage map (rendered)
 
@@ -764,6 +1409,16 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **45 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
 
+**46 · A pinned element cannot read-fill off its own position.** *Cause:* a panel held by a sticky stage is not moving through its own scrollport, so `useScroll` on it never progresses and `--p` stays 0 forever. *Fix:* derive the fill from the SAME scroll value that drives the stage, mapped to the slice where that panel is arriving and sitting on its mark. Stacked or in normal flow, the element does move through the scrollport and can read off itself.
+
+**47 · A fixed-height demo frame leaves dead space you will not notice in the DOM.** *Cause:* four demos whose natural heights ran 200–420px all got a 538px slot, so each floated in 100–140px of nothing. Every probe passed — clipping was zero, fonts were legal — because emptiness is not a measurement any gate takes. *Fix:* size the frame to its content under a cap that only bites on a short viewport, and **read the screenshots**; a clip of 0 does not mean the composition is right.
+
+**48 · `preview_start` by name can start another project's dev server.** *Cause:* from inside this repo, `{name: "averr-dev"}` twice started `job-command-center` on :3000. The name resolved against a different `launch.json`. *Fix:* verify against the alias, which is this project's standard verification path anyway.
+
+**49 · Piping a probe through `head` kills it mid-run.** *Cause:* `node .probe.mjs | head -3` closes the pipe after three lines and SIGPIPE ends the script, so the captures it was about to take never happen. I then read the previous run's screenshots and concluded a deploy had not landed. *Fix:* never pipe a probe or a build — the same rule that already covers `tail` (§5) and `grep`. Run it unfiltered and read the output.
+
+**50 · A 200 on the new asset does not mean the page is serving the new build.** *Cause:* polling `/assets/About-<newhash>.js` until 200 says the file is uploaded, not that the edge is handing out the HTML that references it. Two probes reported stale measurements against a "live" deploy. *Fix:* intercept requests and assert which chunk the page actually asks for before trusting any measurement taken after a push.
+
 ---
 
 ## 6. DATA FACTS
@@ -845,7 +1500,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 
 - ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
 - ~~**Session 17 — /services.**~~ **COMPLETE** (17 → 17c-5). The page is the build scene; see §3.
-- **Session 18 — /about ("proof of a person").** Interactive principle track, PU monogram → founder photo transition, drawn process line. **UNBLOCKED** — the mark stands in for the photo until one exists, and no placeholder is used.
+- ~~**Session 18 — /about ("proof of a person").**~~ **DONE** (`5b5ab00` … `6f256aa`). The principles playground, the drawn process line, the founder section. The PU mark still holds the photograph's slot and **no placeholder is used** — supply a photo and it drops in (§7.2).
+- ~~**Session 17i — the pass sheen + /services off the critical path.**~~ **DONE** (`a6d63af`, `84be54b`). Services route chunk **51.06 → 3.17 kB** gzip, /services LCP **2464 → 1932 ms**.
 - ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`).
 - ~~**Session 19-pre-2 — Prachets's four rulings.**~~ **DONE** (`e521774` … `895313d`). **All eleven routes under 2.5 s.** See §2.
 - ~~**Session 17h — the remaining /services density debt.**~~ **DONE.** All sixteen screens meet base 13px, min 11px and ≤15% blank at 1440 and 1680. §7.14 closed.
