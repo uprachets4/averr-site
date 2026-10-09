@@ -182,7 +182,15 @@ export default function MonogramMark({ variant = "hero", className }: Props) {
 
   const sizeStyle: React.CSSProperties =
     variant === "hero"
-      ? { width: "clamp(320px, 45vw, 560px)", height: "auto" }
+      ? {
+          /* Sized by viewport HEIGHT, not width: the hero's job is to
+             get the h1 fully on screen, and a 45vw mark put it below
+             the fold on every short viewport. The width follows the
+             mark's own 327:454 aspect. */
+          height: "clamp(180px, 34vh, 420px)",
+          width: "auto",
+          aspectRatio: "327 / 454",
+        }
       : variant === "signature"
         ? { width: "100%", height: "auto" }
         : { width: 160, height: "auto" };

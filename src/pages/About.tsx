@@ -24,7 +24,7 @@ function MonogramHero() {
         overflow: "hidden",
         backgroundColor: "var(--color-bg)",
         minHeight: "100vh",
-        padding: "120px 40px 80px",
+        padding: "clamp(88px, 11vh, 120px) 40px clamp(64px, 8vh, 80px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -161,7 +161,7 @@ function MonogramHero() {
           flexDirection: "column",
           alignItems: "center",
           textAlign: "center",
-          gap: 30,
+          gap: "clamp(14px, 2.4vh, 30px)",
         }}
       >
         <motion.div
