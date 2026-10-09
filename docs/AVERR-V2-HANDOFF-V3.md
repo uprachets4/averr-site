@@ -12,9 +12,9 @@
 | | |
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
-| **Working branch** | `redesign-v2` (**~231 commits ahead of `main`** at the end of Session 18c-1 — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `5cea0e6` — *18c-1c fix: the caption stops moving the page*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 18c-1. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
+| **HEAD** | `f7c2fed` — *18d-4 fix: the direction sheet fits the glass again*. **This is the last commit that changed code.** The commits after it touch only this file — run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 18d. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -30,7 +30,7 @@ dist/assets/motion-*.js          162.61 kB │ gzip:  53.98 kB  ← the motion l
 dist/assets/ServicesBuild-*.js   166.86 kB │ gzip:  40.73 kB  ← lazy, one viewport early (17i)
 dist/assets/CaseStudy-*.js        50.24 kB │ gzip:  12.40 kB
 dist/assets/Contact-*.js          43.92 kB │ gzip:  10.86 kB
-dist/assets/About-*.js            59.88 kB │ gzip:  13.92 kB  ← the studio: the desk + four screens
+() => "dist/assets/About-*.js            61.05 kB │ gzip:  14.80 kB  ← the hero, the fly-in, the desk"
 dist/assets/KickoffPass-*.js      29.68 kB │ gzip:   9.26 kB  ← lazy (17i)
 dist/assets/Work-*.js             22.46 kB │ gzip:   6.83 kB
 dist/assets/Services-*.js         10.04 kB │ gzip:   3.17 kB  ← was 51.06 before 17i
@@ -1258,6 +1258,87 @@ Bundle: `About` **59.88 kB / 13.92 kB gzip** (was 44.93 / 11.53 before the desk)
 3. My spill probe's regex matched `rgba()` only, so when the gradient became `oklab()` it reported the old values and I briefly thought the deploy had not landed.
 4. I piped a probe through `grep`, which stripped the contents of two arrays and made two failing checks look empty.
 
+**SESSION 18d — /about reworked: the site palette restored, and made cinematic.** Nine commits (`72fb655` … `f7c2fed`). Owner verdict on 18c-1 was **0/10, for breaking the colour system.**
+
+### What went wrong, and the rule that comes out of it
+
+The owner liked the dark ground and blue/violet screen of **one panel** — "A site that ages well". 18c-1 took that and made it the whole of /about's palette: a blue-black document ground, blue tokens overriding `--color-dark`, the chapter rhythm replaced with glow horizons. Nothing asked for that.
+
+> **LOCKED RULE (18d).** An element the owner likes is **kept and applied LOCALLY**. It is **never extrapolated into a page or site palette** without an explicit instruction. Every page follows the site's cream/ink chapter rhythm and tokens.
+
+This is recorded in §4 and at the top of the token block in `index.css`.
+
+### 1 · Palette restore
+
+The ground tokens are gone from the document and scoped to **`.studio-screen`, which is the monitor and nothing else**. The screens and the ages-well demo keep exactly the look the owner liked; the page around them is the site's.
+
+*Measured per section, on the live page, at 1440 and 375 — identical at both:*
+
+| section | ground | token |
+|---|---|---|
+| hero | `rgb(244, 240, 230)` | `--color-bg` |
+| the desk | `rgb(20, 20, 18)` | `--color-dark` |
+| process | `rgb(237, 233, 226)` | `--color-bg-alt` |
+| founder | `rgb(244, 240, 230)` | `--color-bg` |
+| closer | `rgb(20, 20, 18)` | `--color-dark` |
+
+`Chapter`'s clip-path slabs are back at the boundaries; `GlowHorizon` and `AmbientDrift` are deleted. Grain is site-standard. The nav takes its tone from `Chapter`'s own `data-tone="dark"` again instead of a route-wide override, and `--rf-floor` is back to the site default on cream.
+
+**A scripted audit for any blue outside the monitor** found exactly two, both mine from 18c-1, and both removed: the radial glow behind the hero mark, and the closer's accent wash (back to warm parch). The remaining hits were false positives — the grain's SVG data-URI contains `http://www`, whose digits my colour regex read as an rgb triple.
+
+### 2 · The hero
+
+The original composition, restored: one centred column on cream, the mark drawing itself, then the name and role, the headline, the subhead and both CTAs. Copy is 18c-1's — **"You work directly with *the person who builds it*."** — and still paints at the first frame.
+
+**New: the mark tilts toward the cursor.** `rotateY` follows the pointer's x and `rotateX` its y inverted so the near edge comes forward, both capped at **6°**, both on `spring.soft`. *Measured: ±0.0796 in the rotateY slot at 0.88 across (≈4.6°), identity at centre.* The stroke highlights along the nearest side by moving a gradient stop **along the outline** rather than laying a shape over it — *measured 0.9 at either edge, 0 at centre.* None of it under reduced motion.
+
+**ASSET RULE — there is still no founder photograph.** `public/about/` does not exist. The mark holds the hero and **no placeholder is used**.
+
+### 3 · Fly into the mark
+
+Scrolling out of the hero, the monogram scales up until its counter is larger than the viewport and the principle stage is seen **through the mark's own shape**; once the shape clears the screen the mask comes off.
+
+A real **SVG `clipPath` with the real path** — not a raster mask — so the edge stays crisp where a bitmap would turn to mush. The transform is written onto the path with `setAttribute` from a scroll subscription: React state would re-render the stage every frame, and motion's `style` cannot interpolate a transform *string*. One attribute write per frame.
+
+*Six-frame sequence measured across the approach:* scale **2.25 → 4.44 → 8.76 → 17.29 → 26**, clip `url(#…)` for frames 1–5 and `none` at frame 6, the screen opaque at every frame, **zero long tasks**, zero page errors. Reduced motion: `clip-path: none`.
+
+### 4 · The monitor, more interactive
+
+Kept from 18c-1: the large monitor, the dolly-in, full-scale screens, scanline hand-offs, sequenced captions — now on a **dark ink chapter like home's takeover**, with the colour carried by the screen content and the spill local to the monitor.
+
+- **01 is drag-to-compare.** The same landing page built twice, cut at the handle. *Verified: the arrival sweep settles at 46; a pointer drag → 78; two ArrowLefts → 70; Home/End jump to the ends; the clip tracks exactly (`inset(0 29.94% 0 0)` at 70). By touch at 375: 40 → 65.* Only `clip-path` changes, so the drag cannot reflow. **The template half is real grey type (`#5A5A55`) on a light page (`#F4F0E6`) at AA with a 13px floor** — at monitor size the old pale skeleton read as broken rather than as a template.
+- **02 recolours live.** The swatches are buttons and the specimens a Geist/Cormorant toggle; both drive a mini crafted page beside them. *Verified: clicking swatch 5 moved the accent and rule to `rgb(124,92,255)`; Enter on Cormorant switched the face to Cormorant Garamond italic.*
+- **03** unchanged. **04** keeps exactly the look the owner liked; *2029 via arrow keys still changes only the trend half (`saturate(0.22)` vs `none`).*
+
+### 5 · The process line
+
+Each stage is a real button with `aria-expanded` and `aria-controls`, opening its own copy and week label, **one at a time**. *Verified: all five closed initially; clicking 02 opens only 02 with the right panel id; Enter on 04 closes 02 and opens 04.* The stage the line has just reached pulses softly, and not at all under reduced motion.
+
+### 6 · Founder and closer
+
+Both back on the site palette. The corrected Google bio sentence stays verbatim; **"Grid absorbs future collaborators without a rewrite." is deleted**, as asked. The founder keeps its full-width row.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **/about mobile LCP median of 3, warm = 2080 ms** (FCP 1748, load-window CLS 0.0000, LCP element the h1) · **3-speed crash scroll at 1440 / 1920 / 375, both directions — CLS 0 everywhere (0.0001 at 375), zero overflow, zero errors** · **site-wide sweep, all ten routes at 375: zero overflow, PillHl unchanged (home 2, /nope 1), zero `$`** · 375: stage minimum font **13px**, **zero desk controls under 44px** · reduced motion: stage static, no scanlines, no fly-in mask, no node pulse.
+
+**On the LCP number, honestly:** three attempts gave medians of 2080, **6200** and 2080. The middle one is discarded as environmental, not a regression — its FCP was **5968 ms**, so the page had not begun painting on time, and `curl` against the alias during that window showed TTFB swinging from 0.09 s to 2.4 s. The 2080 ms figure reproduced on two independent attempts with FCP ~1745 both times.
+
+Bundle: `About` **61.05 kB / 14.80 kB gzip**.
+
+**Deviations, all reported.**
+1. **The hero headline sits below the fold at 1440×900.** The mark is `clamp(320px, 45vw, 560px)` — 564×784 — which is the size it has always been, so the restored composition inherently runs past the fold. I restored it faithfully rather than quietly shrinking it; say the word and I will trim the mark.
+2. **Both halves of the drag comparison carry the same copy.** Different copy made the seam read as corruption ("We provide quality solu|where it is."). Identical content, differing only in face, weight, tracking, accent and radius, is legible and is the sharper argument.
+3. **"Signature moves" is gone from screen 02.** It was my own addition in 18c-1, not part of the brief's sheet, and five cells no longer fit the glass once the live page was added.
+4. **03 still shows linear and eased simultaneously** rather than behind a toggle (carried from 18c-1, which the brief said to keep as built).
+5. The **global footer** still carries 11–12px text and the nav/footer links are under 44px — pre-existing, site-wide, outside this brief. Flagged, not changed.
+6. No founder photograph exists, so the photo paths in items 2 and 6 (tall frame, parallax) are **not built**. They are the only parts of the brief not implemented, and they are blocked on the asset.
+
+**Probe errors of mine, reported.**
+1. I measured the mark's tilt through `.about-hero svg`, which matched an **ambient fragment**, not the monogram — it reported "no transform" and I briefly thought the tilt was dead. Targeting by `aria-label` showed it working.
+2. My spill probe's regex still only matches `rgba()`, so `oklab()` gradients read as `rgba(0,0,0,0)`. Cosmetic, but it has now misled me twice; the attribution probes are the ones to trust.
+3. I piped a probe through `grep` again and hid the contents of two arrays.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -1339,7 +1420,7 @@ One continuous pinned scene. A generic GTA home-services business (**Northgate**
 
 ### `/about`, `/contact`, `*` (404)
 
-`/about` — **rebuilt again in Session 18c-1 as "inside the studio".** A dark blue-black world derived from the ages-well panel, scoped to `html[data-route="about"]` so the nav and footer take it too (`index.css`). Hero: **"You work directly with *the person who builds it*."**, the PU mark holding the photograph's slot under the studio's light, two lamps drifting behind it (`AmbientDrift`). Then **the desk** (`components/about/desk/`) — one 500vh pinned stage, ONE monitor, four full-scale screens that hand off under a scanline while the room takes each screen's colour; `GlowHorizon` separates the sections in place of `Chapter`. Below 900px the desk stacks as caption + a monitor-framed screen. `/contact` — 7-band editorial scroll with the designed form, Cal.com band; **Session 19's target and now the weakest page.** `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist").
+`/about` — **on the site palette, reworked in Session 18d.** A cream hero with the centred PU mark drawing itself and tilting toward the cursor; a **fly-into-the-mark** transition (`desk/FlyIntoMark.tsx`, a real SVG clipPath) into **the desk** (`components/about/desk/`) — one 500vh pinned stage on a dark ink chapter, ONE monitor, four full-scale screens that hand off under a scanline. **Blue/violet lives only inside `.studio-screen`, the monitor.** Then the clickable process line (cream-alt), the founder (cream) and the closer (dark), with `Chapter`'s clip-path slabs at every boundary. Below 900px the desk stacks as caption + monitor-framed screen and the drag handle works by touch. `/contact` — 7-band editorial scroll with the designed form, Cal.com band; **Session 19's target and now the weakest page.** `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist").
 
 ### Image-usage map (rendered)
 
@@ -1365,6 +1446,8 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **PALETTE SCOPE (18d, after a 0/10).** An element the owner likes is **kept and applied LOCALLY**. It is **never extrapolated into a page or site palette** without an explicit instruction. 18c-1 took the blue/violet of one panel — "A site that ages well" — and made it the whole of /about's ground, replacing the cream/ink chapter rhythm. Every page follows the site's tokens and chapter rhythm; a liked treatment stays inside the element it belongs to (on /about: `.studio-screen`, which is the monitor and nothing else).
 1. **`type-*` utility classes only.** No per-page inline font sizes. Tiers: `display-2xl`, `display-xl`, `display-l`, `h1`, `h2`, `h3`, `body-lg`, `body`, `small`, `eyebrow`, plus `type-accent` (Cormorant italic).
 2. **Motion tokens only** — `src/lib/motion.ts` (`duration`, `ease`, `easing`, `spring`). No ad-hoc durations or beziers.
 3. **`useReducedMotion` everywhere**, with a real final state (not just "no animation").
@@ -1504,6 +1587,14 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **54 · Measure a scroll-linked transform at the scroll position you mean.** *Cause:* I read the monitor's width before scrolling into the pin, while the dolly still held it at 0.88, and concluded the column was 8% too narrow. *Fix:* take the measurement at the dwell. A `getBoundingClientRect` includes the transform, which is the point.
 
+**55 · A liked element is not a palette.** *Cause:* the owner praised one panel's blue/violet and I rebuilt a whole page's ground from it. *Fix:* the locked rule in §4 — keep it local, scope its tokens to the element (`.studio-screen`), and leave the page on the site's own rhythm. **Ask before generalising a treatment.**
+
+**56 · Two halves of a before/after slider need the SAME content.** *Cause:* the drag comparison gave each half its own copy, so the seam read as corruption — "We provide quality solu|where it is." *Fix:* identical content in identical boxes, differing only in treatment. It is legible and it is the stronger argument, because nothing changed except the craft.
+
+**57 · Adding a cell to a fixed-height screen silently stacks the others.** *Cause:* the direction sheet gained a live mini page, making five cells where four fit; the grid ran past the glass and PALETTE landed on the header while Replay landed on a list item. Every probe passed — clipping was 0 because the flex children overlapped rather than overflowed. *Fix:* **read the screenshot.** A clip of 0 does not mean the composition is intact.
+
+**58 · `querySelector` inside a section can match decoration.** *Cause:* I measured the hero mark's tilt through `.about-hero svg`, which matched an ambient brand fragment that happens to come first in the DOM; it reported no transform and I briefly concluded the tilt was dead. *Fix:* target by `aria-label` or another identity the decoration cannot share.
+
 ---
 
 ## 6. DATA FACTS
@@ -1585,6 +1676,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 
 - ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
 - ~~**Session 17 — /services.**~~ **COMPLETE** (17 → 17c-5). The page is the build scene; see §3.
+- ~~**Session 18d — /about reworked onto the site palette.**~~ **DONE** (`72fb655` … `f7c2fed`). The palette restore, the restored centred hero with cursor tilt, the fly-into-the-mark transition, drag-to-compare, click-to-recolour, the clickable process line. **18c-1's palette is reverted; its LOCKED RULE is in §4.**
+- **Blocked on the founder photograph:** the tall-frame photo composition and its parallax (18d items 2 and 6) are the only parts of that brief not built. `public/about/` does not exist; the mark holds the hero and no placeholder is used.
 - ~~**Session 18c-1 — /about "inside the studio".**~~ **DONE** (`5f0b0bc` … `5cea0e6`). The dark blue-black world, the clear hero, and the principle monitor. **Session 18c-2 is next:** the process light trail, founder credits and closer horizon — those sections currently work on the new ground with their colours restyled and no new mechanics.
 - **Founder photograph still absent** — `public/about/` does not exist. The mark holds the slot and no placeholder is used (§7.2).
 - ~~**Session 18 — /about ("proof of a person").**~~ **DONE** (`5b5ab00` … `6f256aa`). The principles playground, the drawn process line, the founder section. The PU mark still holds the photograph's slot and **no placeholder is used** — supply a photo and it drops in (§7.2).
