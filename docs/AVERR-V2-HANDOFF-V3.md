@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `f7c2fed` — *18d-4 fix: the direction sheet fits the glass again*. **This is the last commit that changed code.** The commits after it touch only this file — run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 18d. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **HEAD** | the 18d fold ruling — run `git log --oneline -1` for the exact hash. The commits after the last code change touch only this file. |
+| **Doc currency** | Written at the end of Session 18d, including the fold ruling. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -1338,6 +1338,55 @@ Bundle: `About` **61.05 kB / 14.80 kB gzip**.
 1. I measured the mark's tilt through `.about-hero svg`, which matched an **ambient fragment**, not the monogram — it reported "no transform" and I briefly thought the tilt was dead. Targeting by `aria-label` showed it working.
 2. My spill probe's regex still only matches `rgba()`, so `oklab()` gradients read as `rgba(0,0,0,0)`. Cosmetic, but it has now misled me twice; the attribution probes are the ones to trust.
 3. I piped a probe through `grep` again and hid the contents of two arrays.
+
+
+### 18d ruling · the h1 must clear the fold
+
+Two commits (`7c3b4ed`, `f155a0f`). The mark was
+`clamp(320px, 45vw, 560px)`: **width**-driven, so it grew with the window and
+pushed the headline off screen on every short viewport. It is **height**-driven
+now — `clamp(180px, 34vh, 420px)`, width following the mark's own 327:454
+aspect — and the hero's top padding and column gap moved onto vh clamps
+(`clamp(88px, 11vh, 120px)`, `clamp(14px, 2.4vh, 30px)`) so the rhythm tightens
+with the viewport instead of holding at 120px and 30px.
+
+*Measured on the live page — the h1's bottom edge against the viewport:*
+
+| viewport | mark | h1 top → bottom | verdict |
+|---|---|---|---|
+| 1440 × 900 | 222 × 308 | 546 → **749** | **PASS**, 151px clear |
+| 1366 × 768 | 190 × 263 | 480 → **673** | **PASS**, 95px clear |
+| 1280 × 720 | 178 × 247 | 458 → **639** | **PASS**, 81px clear |
+| 390 × 844 | 208 × 289 | 528 → **651** | **PASS** — the ruling asked only for the first line (bottom 573); the whole h1 fits |
+
+The subhead is also above the fold at all three desktop sizes (831 / 749 / 710).
+**The CTAs are not** (909 / 823 / 784) — the ruling did not ask for them, so they
+are left below the fold rather than compressing the ladder further.
+
+**A second fault the resize exposed.** The fly-in's start scale was pinned to the
+old 560px mark, so the shape you flew into was no longer the shape you had been
+looking at — it began mid-air at roughly 2.5× the mark. It derives from the same
+clamp now, off the viewport height, so the two cannot drift apart again.
+*Re-verified: the start scale is **0.674 = 308/454**, exactly the rendered mark
+height at 1440×900.*
+
+*Six-frame fly sequence re-run at the new size:* scale **0.674 → 0.97 → 2.42 →
+6.03 → 15.03 → 26**, clip `url(#…)` for frames 1–5 and `none` at frame 6, the
+screen opaque at every frame, **zero long tasks**, zero page errors, reduced
+motion unmasked. **Crispness:** a crop of the mask edge at **scale 11.96 with
+deviceScaleFactor 2** shows a clean vector curve — no raster softening, no
+stair-stepping. The draw and the cursor tilt key off the rendered box and needed
+no change.
+
+**/about mobile LCP unchanged: median of 3, warm = 2080 ms**, runs
+`[2080, 2080, 2084]`, FCP 1744, load-window CLS 0.0000. The tightness of these
+three also settles the open question from 18d's entry: the 6200 ms median there
+was environmental, not a regression.
+
+*One probe artifact, reported:* the fold probe counts "49 lines" for the h1
+because `range.getClientRects()` returns one rect per character — `CharReveal`
+wraps every glyph in its own span. The top and bottom edges it reports are
+correct; the line count is not, and is ignored above.
 
 ---
 
