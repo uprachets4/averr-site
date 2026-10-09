@@ -32,8 +32,17 @@ const CY = VB_H / 2;
 /** Where the fly-in starts and finishes within the approach. */
 const FROM = 0.12;
 const TO = 0.92;
-/** Scale at the start — the mark at roughly its hero size. */
-const S0 = 560 / VB_W;
+/**
+ * Scale at the start — the mark at EXACTLY its hero size, so the shape
+ * you fly into is the shape you were just looking at. The hero mark is
+ * height-driven, clamp(180px, 34vh, 420px), so this has to follow the
+ * viewport rather than being a constant: it was pinned to the old
+ * 560px-wide mark and no longer matched anything.
+ */
+function startScale(vh: number) {
+  const markH = Math.min(Math.max(180, vh * 0.34), 420);
+  return markH / VB_H;
+}
 /** Scale at the end — the shape is well clear of the viewport. */
 const S1 = 26;
 
@@ -77,8 +86,9 @@ export default function FlyIntoMark({
     const t = Math.max(0, Math.min(1, (p - FROM) / (TO - FROM)));
     // exponential, so the last stretch accelerates the way flying into
     // something does rather than creeping to the edge
-    const s = S0 * Math.pow(S1 / S0, t);
     const { w, h } = size.current;
+    const s0 = startScale(h || window.innerHeight);
+    const s = s0 * Math.pow(S1 / s0, t);
     const el = pathRef.current;
     if (el && w) {
       el.setAttribute(
