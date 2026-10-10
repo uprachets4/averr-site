@@ -4,6 +4,12 @@ import { easing } from "../../lib/motion";
 import { ReadFill } from "../case-study/ReadFill";
 
 /**
+ * NOT RENDERED since 18e — the founder section is credits now. This
+ * file is kept deliberately: it holds the canonical bio sentences the
+ * credit lines are sourced from, including the Google wording ruled on
+ * in 18b, so the provenance of every credit line stays checkable and
+ * the copy can be restored verbatim if the credits are reverted.
+ *
  * The founder bio, read the way the case studies are read.
  *
  * The statement is the first sentence and carries the section; the rest
