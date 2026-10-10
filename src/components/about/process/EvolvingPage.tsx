@@ -142,27 +142,31 @@ export default function EvolvingPage({
         animate={{ opacity: stage === 0 ? 1 : 0 }}
         transition={t}
       >
-        {SKETCH.map((d, i) => (
-          <motion.path
-            key={i}
-            d={d}
-            fill="none"
-            stroke={INK}
-            strokeWidth={1.6}
-            strokeLinecap="round"
-            pathLength={1}
-            strokeDasharray={1}
-            style={{
-              // drawn by scroll, not by a timer
-              strokeDashoffset: reduce
-                ? 0
-                : stage === 0
-                  ? Math.max(0, 1 - Math.max(0, within * 1.5 - i * 0.06))
-                  : 0,
-              opacity: 0.75,
-            }}
-          />
-        ))}
+        {SKETCH.map((d, i) => {
+          // A PLAIN path, not motion.path: motion owns stroke-dasharray
+          // and stroke-dashoffset whenever `pathLength` is set on one of
+          // its SVG components, and it was overwriting this every frame
+          // — the offset sat at 1 forever and nothing ever drew.
+          const drawn = reduce
+            ? 1
+            : stage === 0
+              ? Math.max(0, Math.min(1, within * 1.9 - i * 0.045))
+              : 1;
+          return (
+            <path
+              key={i}
+              d={d}
+              fill="none"
+              stroke={INK}
+              strokeWidth={1.6}
+              strokeLinecap="round"
+              pathLength={1}
+              strokeDasharray={1}
+              strokeDashoffset={1 - drawn}
+              opacity={0.72}
+            />
+          );
+        })}
       </motion.svg>
 
       {/* ── Direction: the decisions, beside the sketch ── */}
