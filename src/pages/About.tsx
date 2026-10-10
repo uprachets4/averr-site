@@ -7,7 +7,8 @@ import ProcessScene from "../components/about/process/ProcessScene";
 import { CharReveal, CharRevealInView } from "../components/CharReveal";
 import Chapter from "../components/Chapter";
 import PrincipleDesk from "../components/about/desk/PrincipleDesk";
-import FounderStatement from "../components/about/FounderStatement";
+import FounderCredits from "../components/about/FounderCredits";
+import SignatureMark from "../components/about/SignatureMark";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -425,84 +426,15 @@ function FounderBand() {
           Who{String.fromCharCode(39)}s behind this
         </motion.div>
 
-        <div className="founder-row">
-          {/* The mark holds the slot a photograph will take. No
-              placeholder stands in for a photo that does not exist. */}
-          <motion.div
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-15% 0px" }}
-            transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart }}
-          >
-            <FounderMark />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-15% 0px" }}
-            transition={{
-              duration: reduce ? 0 : duration.slow,
-              ease: ease.outQuart,
-              delay: reduce ? 0 : 0.1,
-            }}
-            style={{ display: "flex", flexDirection: "column", gap: 18, minWidth: 0 }}
-          >
-            <h2 className="type-display-l" style={{ color: "var(--color-ink)", margin: 0 }}>
-              Prachets Upadhyay
-            </h2>
-            <div className="type-eyebrow" style={{ color: "var(--color-muted)" }}>
-              Founder + Design Engineer
-            </div>
-
-            <FounderStatement />
-
+        <FounderCredits>
+          <div style={{ display: "flex", flexDirection: "column", gap: 18, marginTop: 30 }}>
             <FounderChips reduce={!!reduce} />
             <FounderLinks />
-
-          </motion.div>
-        </div>
+          </div>
+        </FounderCredits>
       </div>
 
-      <style>{`
-        .founder-row {
-          display: grid;
-          grid-template-columns: 300px minmax(0, 1fr);
-          gap: 80px;
-          align-items: start;
-        }
-        @media (max-width: 900px) {
-          .founder-row { grid-template-columns: 1fr; gap: 44px; }
-        }
-      `}</style>
     </section>
-  );
-}
-
-/**
- * The slot a photograph will take. Until a real one exists the mark
- * holds it — a greyed-out silhouette or a stock face would be a lie
- * about what the studio has, so there is no placeholder.
- */
-function FounderMark() {
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: 300,
-        height: 300,
-        background: "var(--color-bg)",
-        border: "1px solid rgba(20,20,18,0.10)",
-        borderRadius: 24,
-        overflow: "hidden",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 24,
-      }}
-    >
-      <MonogramMark variant="mini" />
-    </div>
   );
 }
 
@@ -698,6 +630,9 @@ function ClosingCTA() {
           textAlign: "center",
         }}
       >
+        {/* the page opened on the mark drawing; it closes on it too */}
+        <SignatureMark />
+
         <motion.div
           initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
           whileInView={{ opacity: 1, y: 0 }}
