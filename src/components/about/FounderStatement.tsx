@@ -23,6 +23,14 @@ import { ReadFill } from "../case-study/ReadFill";
  * their own scrollport.
  */
 
+/**
+ * SUPERSEDED IN PART. The 18e ruling re-worded the Google fact to
+ * "B2B SaaS for Google" wherever it is RENDERED — which is the SALES
+ * credit line. The sentence below is left exactly as it was because
+ * this file's whole job is to record what the bio said; if it is ever
+ * restored, the Google clause must be brought in line with that ruling
+ * rather than copied as-is.
+ */
 export const FOUNDER_STATEMENT =
   "Toronto-based design engineer with a background spanning B2B SaaS sales within Google's extended workforce program, frontend development, and AI workflow automation.";
 

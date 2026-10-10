@@ -15,7 +15,11 @@ import { duration, ease, easing } from "../../lib/motion";
  *   CO-FOUNDED   ← "Previously co-founded KlaasX Edutech (15-person
  *                   team, 150+ institutions)."
  *   SALES        ← "...B2B SaaS sales within Google's extended
- *                   workforce program..."
+ *                   workforce program...", RE-WORDED BY OWNER RULING
+ *                   (18e) to "B2B SaaS for Google": name Google, and
+ *                   "for", not "at". This is the one line whose
+ *                   wording is the owner's rather than the bio's; the
+ *                   fact behind it is unchanged.
  *   CRAFT        ← "Toronto-based design engineer with a background
  *                   spanning ... frontend development, and AI workflow
  *                   automation."
@@ -27,7 +31,7 @@ import { duration, ease, easing } from "../../lib/motion";
 export const CREDITS: { label: string; line: string }[] = [
   { label: "Founder", line: "Averr Studios" },
   { label: "Co-founded", line: "KlaasX Edutech · 15-person team · 150+ institutions" },
-  { label: "Sales", line: "B2B SaaS within Google's extended workforce program" },
+  { label: "Sales", line: "B2B SaaS for Google" },
   { label: "Craft", line: "Design engineering, frontend, AI workflow automation" },
   { label: "Based", line: "Toronto" },
 ];
