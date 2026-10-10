@@ -53,12 +53,13 @@ export default function EvolvingPage({
   const designed = stage >= 1;
   const built = stage >= 2;
   const refining = stage === 3;
-  const refined = stage >= 3;
   const shipped = stage >= 4;
 
   // Refine: pins land, then resolve one by one, then the score settles
-  const resolved = refined ? Math.min(PINS.length, Math.floor(within * 5.2)) : 0;
-  const score = refined ? Math.round(72 + (98 - 72) * Math.min(1, within * 1.25)) : 72;
+  // Refine resolves as you scroll through it; Ship inherits the finished
+  // page rather than whatever Refine happened to be mid-way through
+  const resolved = shipped ? PINS.length : refining ? Math.min(PINS.length, Math.floor(within * 5.2)) : 0;
+  const score = shipped ? 98 : refining ? Math.round(72 + (98 - 72) * Math.min(1, within * 1.25)) : 72;
   // Build: the code types itself as you scroll
   const codeChars = built && stage === 2 ? Math.floor(within * 1.15 * CODE.join("\n").length) : CODE.join("\n").length;
 
@@ -278,8 +279,12 @@ export default function EvolvingPage({
         .ep-ct { font-family: var(--font-display); font-weight: 500; font-size: 16px; color: ${INK}; }
         .ep-cd { font-size: 13px; color: ${SOFT}; }
 
-        .ep-sketch { position: absolute; inset: 26px 30px; width: calc(100% - 60px); height: calc(100% - 52px); }
+        /* decorative overlays NEVER take the pointer — this one sat over
+           the whole page at opacity 0 and made Build's live buttons
+           unhoverable and unclickable */
+        .ep-sketch { pointer-events: none; position: absolute; inset: 26px 30px; width: calc(100% - 60px); height: calc(100% - 52px); }
         .ep-direction {
+          pointer-events: none;
           position: absolute; right: 30px; top: 26px; width: 168px;
           display: flex; flex-direction: column; gap: 7px;
           background: var(--color-bg); border: 1px solid rgba(20,20,18,0.12);
@@ -300,7 +305,7 @@ export default function EvolvingPage({
           color: #C9D4E6; white-space: pre-wrap; word-break: break-word;
         }
 
-        .ep-pin { position: absolute; display: flex; align-items: center; gap: 7px; z-index: 4; }
+        .ep-pin { pointer-events: none; position: absolute; display: flex; align-items: center; gap: 7px; z-index: 4; }
         .ep-pin-dot {
           width: 24px; height: 24px; border-radius: 50%; flex: 0 0 24px;
           display: grid; place-items: center;
@@ -319,6 +324,7 @@ export default function EvolvingPage({
         .ep-pin--done .ep-pin-note { opacity: 0.45; text-decoration: line-through; }
 
         .ep-score {
+          pointer-events: none;
           position: absolute; right: 30px; bottom: 26px; z-index: 4;
           display: flex; align-items: baseline; gap: 8px;
           background: var(--color-bg); border: 1px solid rgba(20,20,18,0.14);
