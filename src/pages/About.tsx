@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { duration, ease } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import MonogramMark from "../components/MonogramMark";
-import ProcessTimeline from "../components/ProcessTimeline";
+import ProcessScene from "../components/about/process/ProcessScene";
 import { CharReveal, CharRevealInView } from "../components/CharReveal";
 import Chapter from "../components/Chapter";
 import PrincipleDesk from "../components/about/desk/PrincipleDesk";
@@ -309,9 +309,8 @@ function HowWeWorkBand() {
       style={{
         position: "relative",
         backgroundColor: "var(--color-bg-alt)",
-        /* the gutter comes from --container-wide now, so the process
-           line can run the full width the brief asks for */
-        padding: "160px 0",
+        /* the scene is a pinned stage, so the band pads only above it */
+        padding: "160px 0 0",
         scrollMarginTop: 96,
       }}
     >
@@ -371,7 +370,7 @@ function HowWeWorkBand() {
           </motion.p>
         </div>
 
-        <ProcessTimeline />
+        <ProcessScene />
       </div>
     </section>
   );
