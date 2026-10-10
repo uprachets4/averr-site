@@ -86,7 +86,7 @@ export default function SiteWindow({
           height: 30px; padding: 0 12px;
           border-radius: 999px; border: 1px solid rgba(20,20,18,0.12);
         }
-        .sw-lock { font-size: 11px; line-height: 1; }
+        .sw-lock { font-size: 13px; line-height: 1; }
         .sw-host {
           font-family: var(--font-mono); font-size: 13px;
           color: var(--color-ink); white-space: nowrap;

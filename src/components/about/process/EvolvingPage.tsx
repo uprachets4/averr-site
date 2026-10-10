@@ -348,6 +348,9 @@ export default function EvolvingPage({
           text-transform: uppercase; color: ${SOFT};
         }
         @media (max-width: 900px) {
+          /* these are genuinely pressable from Build onward, so they are
+             real controls and take a real touch target */
+          .ep-cta, .ep-ghost { min-height: 44px; padding: 12px 18px; }
           .ep-page { padding: 14px 15px; }
           .ep-nav, .ep-row { display: none; }
           .ep-hero { grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
