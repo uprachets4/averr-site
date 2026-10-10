@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { motion, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { ReadFill } from "../case-study/ReadFill";
 import { duration, ease, easing } from "../../lib/motion";
 
 /**
@@ -28,6 +29,14 @@ import { duration, ease, easing } from "../../lib/motion";
  * Each line masks up as the scroll reaches it, one at a time.
  */
 
+/**
+ * The one statement the credits keep, verbatim from FOUNDER_SUPPORT's
+ * second sentence — extracted from the source rather than retyped. The
+ * other bio sentences stay retired; their facts are in the lines below.
+ */
+export const FOUNDER_LINE =
+  "Started Averr Studios to build the kind of client websites that actually earn their portfolio slot.";
+
 export const CREDITS: { label: string; line: string }[] = [
   { label: "Founder", line: "Averr Studios" },
   { label: "Co-founded", line: "KlaasX Edutech · 15-person team · 150+ institutions" },
@@ -49,6 +58,13 @@ export default function FounderCredits({ children }: { children?: React.ReactNod
     clamp: true,
   });
 
+  // the statement reads itself as it crosses the reading line
+  const stmtRef = useRef<HTMLDivElement | null>(null);
+  const stmt = useScroll({ target: stmtRef, offset: ["start 88%", "end 60%"] });
+  const stmtP = useTransform(stmt.scrollYProgress, [0, 1], [0, 1], {
+    ease: easing.outQuart,
+  });
+
   return (
     <div ref={ref} className="fc">
       <div className="fc-mark">
@@ -62,6 +78,15 @@ export default function FounderCredits({ children }: { children?: React.ReactNod
 
       <div className="fc-credits">
         <h2 className="type-display-l fc-name">Prachets Upadhyay</h2>
+        <div ref={stmtRef} className="fc-statement">
+          <ReadFill
+            text={FOUNDER_LINE}
+            progress={stmtP}
+            reduce={reduce}
+            className="type-h3"
+            style={{ color: "var(--color-ink)", maxWidth: "26ch" }}
+          />
+        </div>
         <ol className="fc-list">
           {CREDITS.map((c, i) => (
             <CreditLine key={c.label} credit={c} index={i} reduce={reduce} />
@@ -90,13 +115,15 @@ export default function FounderCredits({ children }: { children?: React.ReactNod
           padding: 12%;
           overflow: hidden;
         }
-        .fc-name { color: var(--color-ink); margin: 0 0 36px; }
+        .fc-name { color: var(--color-ink); margin: 0 0 20px; }
+        .fc-statement { margin: 0 0 36px; }
         .fc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
         @media (max-width: 900px) {
           .fc { grid-template-columns: 1fr; gap: 34px; }
           .fc-mark { position: static; }
           .fc-plate { aspect-ratio: 5 / 4; padding: 9%; }
-          .fc-name { margin-bottom: 24px; }
+          .fc-name { margin-bottom: 14px; }
+          .fc-statement { margin-bottom: 26px; }
         }
       `}</style>
     </div>
