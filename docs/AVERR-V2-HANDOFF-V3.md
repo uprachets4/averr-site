@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `915d9ec` — *18e: keep the bio copy as the credits' provenance record*. Run `git log --oneline -1` for the exact hash; the commits after the last code change touch only this file. |
-| **Doc currency** | Written at the end of Session 18e. |
+| **HEAD** | the 18e rulings — run `git log --oneline -1` for the exact hash. The commits after the last code change touch only this file. |
+| **Doc currency** | Written at the end of Session 18e, including its rulings. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -1449,6 +1449,62 @@ Bundle: `About` **78.71 kB / 18.88 kB gzip**.
 3. I reported the founder credits as "never revealing" off a probe that used `scrollIntoView` and measured 400ms later — the page sets `scroll-behavior: smooth`, so the scroll had not settled. A proper trace showed the reveal and the push-in working. **See §5.61.**
 4. The stale-edge trap bit twice more before I wrote `.await.mjs`, which polls until the PAGE requests the expected chunk rather than until the asset returns 200.
 
+
+### 18e rulings · the SALES wording and the statement line
+
+Two commits (`63d177e`, `22f520c`).
+
+**1 · "B2B SaaS for Google".** The SALES credit line was "B2B SaaS within Google's
+extended workforce program"; the owner's ruling is to name Google directly, and
+"for", not "at".
+
+*A full-site search for the old wording found exactly two occurrences and no others:*
+
+| where | before | after |
+|---|---|---|
+| `FounderCredits.tsx` — the rendered SALES line | "B2B SaaS within Google's extended workforce program" | **"B2B SaaS for Google"** |
+| `FounderStatement.tsx` — `FOUNDER_STATEMENT`, **not rendered** since 18e | "…B2B SaaS sales within Google's extended workforce program…" | **unchanged**, now annotated as superseded |
+
+Checked and clean: the meta description, `og:description` and `twitter:description`
+in `index.html` mention no such thing, and **there is no JSON-LD on the site at
+all** (`ld+json` appears nowhere in `index.html` or `src/`). Every other "Google"
+in the codebase is a Google *product* in the services and case-study copy — Google
+Business Profile, Google Ads, Google Jobs, Google reviews — plus two font-loading
+comments in `index.css`. None of them touch the founder's role, so none were
+changed. *Verified on the alias: "extended workforce" appears nowhere in the
+rendered page at 1440 or 375.*
+
+The unrendered bio constant is deliberately left verbatim — recording what the bio
+said is that file's entire job — and now carries a note that the Google clause is
+superseded and must be brought in line if the sentence is ever restored. **This is
+the one credit line whose wording is the owner's rather than the bio's**, and the
+component says so next to the source quote.
+
+**2 · One statement line returns.** Under the name, above the credit lines:
+
+> "Started Averr Studios to build the kind of client websites that actually earn
+> their portfolio slot."
+
+*Source:* `FOUNDER_SUPPORT`'s second sentence. **Extracted from the source by
+script rather than retyped**, and it matches the ruling's text character for
+character. At `type-h3` with read-fill — *measured 28px at 1440, 22px at 375,
+`--p` reaching 1*. The other bio sentences stay retired; their facts are carried
+by the credit lines, and `FounderStatement.tsx` remains the provenance record.
+
+*Deviation:* it renders as a **paragraph carrying the type-h3 size, not a real
+`<h3>`** — it is a sentence, not a heading for the list beneath it.
+
+**3 · Deviations accepted** by the owner and now closed: the indicative Direction
+wireframe, the transform/opacity Design resolve, and `ProcessTimeline.tsx` being
+deleted.
+
+*Verified on the alias:* build exit **0** unfiltered · screenshots at 1440 and 375 ·
+**3-speed crash scroll on /about at 1440 / 1920 / 375, both directions — max CLS
+0.0042, zero overflow, zero errors** · all five credit lines read
+`Averr Studios` / `KlaasX Edutech · 15-person team · 150+ institutions` /
+`B2B SaaS for Google` / `Design engineering, frontend, AI workflow automation` /
+`Toronto`.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -1792,7 +1848,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 
 - ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
 - ~~**Session 17 — /services.**~~ **COMPLETE** (17 → 17c-5). The page is the build scene; see §3.
-- ~~**Session 18e — /about's second half.**~~ **DONE** (`822eeca` … `915d9ec`). The "one site, idea to live" process scene, the founder credits and the signature closer. **OPEN RULING:** the founder bio's two sentences and the role line are no longer rendered — the credits layout has no place for them. The Google wording survives in the SALES credit line; `FounderStatement.tsx` is kept unrendered as the provenance record so the copy can be restored verbatim in one move.
+- ~~**Session 18e — /about's second half.**~~ **DONE** (`822eeca` … `915d9ec`). The "one site, idea to live" process scene, the founder credits and the signature closer. **Settled by the 18e rulings:** one statement line is restored verbatim under the name ("Started Averr Studios…"); the other bio sentences stay retired with their facts in the credit lines, and the SALES line is now "B2B SaaS for Google" by owner ruling. `FounderStatement.tsx` stays as the provenance record.
 - ~~**Session 18d — /about reworked onto the site palette.**~~ **DONE** (`72fb655` … `f7c2fed`). The palette restore, the restored centred hero with cursor tilt, the fly-into-the-mark transition, drag-to-compare, click-to-recolour, the clickable process line. **18c-1's palette is reverted; its LOCKED RULE is in §4.**
 - **Blocked on the founder photograph:** the tall-frame photo composition and its parallax (18d items 2 and 6) are the only parts of that brief not built. `public/about/` does not exist; the mark holds the hero and no placeholder is used.
 - ~~**Session 18c-1 — /about "inside the studio".**~~ **DONE** (`5f0b0bc` … `5cea0e6`). The dark blue-black world, the clear hero, and the principle monitor. **Session 18c-2 is next:** the process light trail, founder credits and closer horizon — those sections currently work on the new ground with their colours restyled and no new mechanics.
