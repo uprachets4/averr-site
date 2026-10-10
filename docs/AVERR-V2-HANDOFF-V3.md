@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | the 18d fold ruling — run `git log --oneline -1` for the exact hash. The commits after the last code change touch only this file. |
-| **Doc currency** | Written at the end of Session 18d, including the fold ruling. |
+| **HEAD** | `915d9ec` — *18e: keep the bio copy as the credits' provenance record*. Run `git log --oneline -1` for the exact hash; the commits after the last code change touch only this file. |
+| **Doc currency** | Written at the end of Session 18e. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -30,7 +30,7 @@ dist/assets/motion-*.js          162.61 kB │ gzip:  53.98 kB  ← the motion l
 dist/assets/ServicesBuild-*.js   166.86 kB │ gzip:  40.73 kB  ← lazy, one viewport early (17i)
 dist/assets/CaseStudy-*.js        50.24 kB │ gzip:  12.40 kB
 dist/assets/Contact-*.js          43.92 kB │ gzip:  10.86 kB
-() => "dist/assets/About-*.js            61.05 kB │ gzip:  14.80 kB  ← the hero, the fly-in, the desk"
+() => "dist/assets/About-*.js            78.71 kB │ gzip:  18.88 kB  ← hero, fly-in, desk, process scene, credits"
 dist/assets/KickoffPass-*.js      29.68 kB │ gzip:   9.26 kB  ← lazy (17i)
 dist/assets/Work-*.js             22.46 kB │ gzip:   6.83 kB
 dist/assets/Services-*.js         10.04 kB │ gzip:   3.17 kB  ← was 51.06 before 17i
@@ -1388,6 +1388,67 @@ because `range.getClientRects()` returns one rect per character — `CharReveal`
 wraps every glyph in its own span. The top and bottom edges it reports are
 correct; the line count is not, and is ignored above.
 
+**SESSION 18e — /about's second half.** Seven commits (`822eeca` … `915d9ec`). The post-pin sections were still basic: a line with labels, a bio block, a plain closer.
+
+### 1 · The process becomes "one site, idea to live"
+
+A pinned 100vh stage on the process chapter's existing cream-alt ground, holding **ONE browser window** in which a fictional local bakery's homepage rises in fidelity. It is the same page and the same chrome throughout, so every hand-off is a change of treatment, never a cut to a different site. All React/CSS/SVG; no images; an ILLUSTRATIVE label in the window.
+
+| stage | what the window does |
+|---|---|
+| Direction | hand-drawn SVG strokes draw themselves over a greyed page, beside a palette/type panel |
+| Design | the sketch clears and the page resolves — display face, gold eyebrow, the Cormorant accent, real art |
+| Build | a code panel slides in and types, and the page's two buttons become **genuinely pressable** |
+| Refine | four review pins land with notes, resolve one by one into green ticks, speed score counts 72 → 98 |
+| Ship | the URL bar turns green, the host becomes the real domain, a Live badge and a launch pulse |
+
+**ONE scroll value drives all of it** — which stage is active, the playhead, and every sub-animation that would otherwise want a timer: the stroke draw, the typing, the pins, the score. *Measured at 1440: wrapper 6.0vh, travel 5.0vh (five stages plus the n+1 viewport), sticky pinned at all five dwells, playhead at exactly 0 / 265 / 530 / 795 / 1060px. At 1920: 0 / 288 / 576 / 864 / 1152.* Each stage label is a button that scrolls to its own window — *clicking 05 landed at exactly 10061 against an expected 10061* — and the stage's verbatim body swaps out-then-in beneath.
+
+*Morph frames between Design and Build:* the page's opacity stays 1 and its logo text is unchanged throughout while the code panel slides in — **no cut, no blank frame.**
+
+*Build's buttons:* hovering the CTA moves it `rgb(20,20,18)` → `rgb(177,133,68)` and it takes focus. **Names, bodies and week labels are byte-identical**, extracted by script into `process/steps.ts`. Below 900px and under reduced motion: five stacked blocks, each showing the window at that stage's completed state, each playing its change once on entry.
+
+### 2 · The founder becomes credits
+
+A sticky split on cream. Left: **no photograph exists in the repo** (`public/about/` does not exist), so the mark holds the slot at plate size with the slow push-in a photo would have had — *measured scale 1.023 → 1.06 across the section* — and **no placeholder is used**. Right: the name at display-l, then five credit lines, each masking up out of its own box as the scroll reaches it, one at a time, with a rule drawing under it. *Measured: lines 1–3 revealed with 4–5 still masked mid-rise at the same scroll position.* Then the chips and the MagneticCTA links.
+
+**Every line → its source sentence:**
+
+| line | source |
+|---|---|
+| FOUNDER · Averr Studios | "Started Averr Studios to build the kind of client websites that actually earn their portfolio slot." + the role line "Founder + Design Engineer" |
+| CO-FOUNDED · KlaasX Edutech · 15-person team · 150+ institutions | "Previously co-founded KlaasX Edutech (15-person team, 150+ institutions)." |
+| SALES · B2B SaaS within Google's extended workforce program | "…B2B SaaS sales within Google's extended workforce program…" |
+| CRAFT · Design engineering, frontend, AI workflow automation | "Toronto-based design engineer with a background spanning … frontend development, and AI workflow automation." |
+| BASED · Toronto | "Toronto-based design engineer…" |
+
+**No new claims.** The sources are written into `FounderCredits.tsx` as well, so they stay checkable.
+
+### 3 · The closer signs off on the mark
+
+Above the existing eyebrow, the mark draws once more: **stroke only, parch, 2px, 1.6s on ease.inOut**, triggered once on entry, with a warm glow carried by a drop-shadow on the SVG and **no filter on any text**. The page now opens and closes on the same mark. Copy and CTAs unchanged.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **/about mobile LCP median of 3, warm = 2220 ms** `[2200, 2220, 2240]`, FCP 1872, load-window CLS 0.0008 · **3-speed crash scroll at 1440 / 1920 / 375, both directions — max CLS 0.0042, zero overflow, zero errors** · **palette audit: nothing off-palette anywhere outside the window and the monitor** · site-wide sweep, ten routes at 375: zero overflow, PillHl unchanged, zero `$` · 375: the new sections' minimum font **13px**, no control under 44px, five stacked windows, not pinned · reduced motion: stacked, no scanlines, no fly-in mask.
+
+Bundle: `About` **78.71 kB / 18.88 kB gzip**.
+
+**⚠ The biggest deviation — a copy removal worth a ruling.** The credits layout the brief specifies (mark, name, credit lines, chips, links) leaves no place for the bio paragraphs, so **the two bio sentences and the role line are no longer rendered**. The Google wording ruled on in 18b survives inside the SALES line and KlaasX inside CO-FOUNDED, but "Toronto-based design engineer with a background spanning…" and "Started Averr Studios to build the kind of client websites that actually earn their portfolio slot." are gone **as sentences**. `FounderStatement.tsx` is deliberately kept though unrendered, as the canonical provenance record, so the copy can be restored verbatim in one move. **Say the word and the bio goes back under the credits.**
+
+**Other deviations.**
+1. **The Direction wireframe is indicative, not a trace.** Its SVG is stretched over the window with `preserveAspectRatio="none"`, so the strokes sit near, not exactly on, the elements beneath.
+2. **Design's "snap" is a transform/opacity resolve, not a true FLIP.** The sketch clears while the page comes up to full fidelity; nothing measures a first/last box.
+3. **`ProcessTimeline.tsx` is deleted.** The clickable expanding stage line built in 18d item 5 is superseded wholesale by this scene — its accordion no longer exists.
+4. The stage body copy sits under the window rather than under the rail, which reads better at this size.
+5. The bakery's two buttons take a 44px touch target on mobile — they are genuinely pressable from Build onward, so they are treated as real controls rather than excused as illustration.
+
+**Probe errors of mine, reported.**
+1. **The Direction sketch never drew, and I nearly shipped it.** `motion.path` takes ownership of `stroke-dasharray`/`stroke-dashoffset` the moment `pathLength` is set on it, so it overwrote the style prop every frame and the offset sat at 1 forever. The same `within` value was driving the typing and the pins correctly, which is what proved the value was fine and the element was not. A plain `<path>` fixed it. **See §5.59.**
+2. **The sketch overlay ate the pointer.** It spans the page at opacity 0 from Design onward but still took pointer events, so Build's "live" buttons could not be hovered or clicked at all — the whole point of that stage. Playwright surfaced it as a hover timeout naming the SVG as interceptor. **See §5.60.**
+3. I reported the founder credits as "never revealing" off a probe that used `scrollIntoView` and measured 400ms later — the page sets `scroll-behavior: smooth`, so the scroll had not settled. A proper trace showed the reveal and the push-in working. **See §5.61.**
+4. The stale-edge trap bit twice more before I wrote `.await.mjs`, which polls until the PAGE requests the expected chunk rather than until the asset returns 200.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -1469,7 +1530,7 @@ One continuous pinned scene. A generic GTA home-services business (**Northgate**
 
 ### `/about`, `/contact`, `*` (404)
 
-`/about` — **on the site palette, reworked in Session 18d.** A cream hero with the centred PU mark drawing itself and tilting toward the cursor; a **fly-into-the-mark** transition (`desk/FlyIntoMark.tsx`, a real SVG clipPath) into **the desk** (`components/about/desk/`) — one 500vh pinned stage on a dark ink chapter, ONE monitor, four full-scale screens that hand off under a scanline. **Blue/violet lives only inside `.studio-screen`, the monitor.** Then the clickable process line (cream-alt), the founder (cream) and the closer (dark), with `Chapter`'s clip-path slabs at every boundary. Below 900px the desk stacks as caption + monitor-framed screen and the drag handle works by touch. `/contact` — 7-band editorial scroll with the designed form, Cal.com band; **Session 19's target and now the weakest page.** `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist").
+`/about` — **complete as of 18e.** A cream hero with the centred PU mark (height-driven, tilts toward the cursor); a **fly-into-the-mark** transition into **the desk** (`components/about/desk/`, one pinned stage, four full-scale screens, blue only inside `.studio-screen`); then **the process scene** (`components/about/process/`, a second pinned stage on cream-alt holding ONE browser window in which a bakery homepage rises in fidelity across the five stages); then **the founder as credits** (`FounderCredits.tsx`, sticky split, the mark with a push-in, five sourced credit lines); then the closer on dark, opening with the mark drawing once more (`SignatureMark.tsx`). `Chapter`'s clip-path slabs at every boundary. `/contact` — 7-band editorial scroll with the designed form, Cal.com band; **Session 19's target and now the weakest page.** `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist").
 
 ### Image-usage map (rendered)
 
@@ -1644,6 +1705,12 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **58 · `querySelector` inside a section can match decoration.** *Cause:* I measured the hero mark's tilt through `.about-hero svg`, which matched an ambient brand fragment that happens to come first in the DOM; it reported no transform and I briefly concluded the tilt was dead. *Fix:* target by `aria-label` or another identity the decoration cannot share.
 
+**59 · `motion.path` owns the dash properties once `pathLength` is set.** *Cause:* a scroll-driven stroke draw set `style={{ strokeDashoffset }}` on a `motion.path` that also had `pathLength={1}`. Motion implements path-length support by writing `stroke-dasharray` and `stroke-dashoffset` itself, so it overwrote the style every frame and the offset sat at 1 forever — nothing ever drew. *Fix:* a plain `<path>` with the dash attributes set directly, or motion's own `pathLength` animation prop — never both. **The tell:** the same scroll value was driving other things on the same screen correctly, which proves the value is fine and the element is not.
+
+**60 · A full-bleed decorative overlay eats the pointer at opacity 0.** *Cause:* the Direction wireframe SVG spans the whole page and fades out from Design onward, but opacity 0 is still hit-testable — so the Build stage's deliberately-live buttons could not be hovered or clicked at all. *Fix:* `pointer-events: none` on every decorative overlay. Playwright names the interceptor in its hover timeout, which is the fastest way to find it.
+
+**61 · `scrollIntoView` plus `scroll-behavior: smooth` invalidates an immediate measurement.** *Cause:* this site sets `scroll-behavior: smooth` on `html`, so a probe that calls `scrollIntoView` and reads 400ms later is measuring mid-flight. I reported the founder credits as "never revealing" on that basis; they were fine. *Fix:* scroll with `window.scrollTo` to a computed y and wait ~700ms, or assert the scroll position before measuring.
+
 ---
 
 ## 6. DATA FACTS
@@ -1725,6 +1792,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 
 - ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
 - ~~**Session 17 — /services.**~~ **COMPLETE** (17 → 17c-5). The page is the build scene; see §3.
+- ~~**Session 18e — /about's second half.**~~ **DONE** (`822eeca` … `915d9ec`). The "one site, idea to live" process scene, the founder credits and the signature closer. **OPEN RULING:** the founder bio's two sentences and the role line are no longer rendered — the credits layout has no place for them. The Google wording survives in the SALES credit line; `FounderStatement.tsx` is kept unrendered as the provenance record so the copy can be restored verbatim in one move.
 - ~~**Session 18d — /about reworked onto the site palette.**~~ **DONE** (`72fb655` … `f7c2fed`). The palette restore, the restored centred hero with cursor tilt, the fly-into-the-mark transition, drag-to-compare, click-to-recolour, the clickable process line. **18c-1's palette is reverted; its LOCKED RULE is in §4.**
 - **Blocked on the founder photograph:** the tall-frame photo composition and its parallax (18d items 2 and 6) are the only parts of that brief not built. `public/about/` does not exist; the mark holds the hero and no placeholder is used.
 - ~~**Session 18c-1 — /about "inside the studio".**~~ **DONE** (`5f0b0bc` … `5cea0e6`). The dark blue-black world, the clear hero, and the principle monitor. **Session 18c-2 is next:** the process light trail, founder credits and closer horizon — those sections currently work on the new ground with their colours restyled and no new mechanics.
