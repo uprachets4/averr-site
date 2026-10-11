@@ -26,9 +26,13 @@ import { vault } from "../data/workIndex";
  * hero paints behind the panel rather than after it lifts.
  */
 
-const COVER = 0.3;
-const HOLD = 0.1;
-const REVEAL = 0.3;
+/* 700ms nominal measured 876-971ms click→painted hero, over the 800ms
+   gate: AnimatePresence's mount costs ~60ms before the cover even
+   starts, and the destination still has to render. Trimmed to 540ms
+   nominal, which leaves real headroom for the route's own paint. */
+const COVER = 0.24;
+const HOLD = 0.06;
+const REVEAL = 0.24;
 
 const NAMES: Record<string, string> = {
   "/": "Home",
