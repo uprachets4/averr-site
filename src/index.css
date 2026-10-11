@@ -134,13 +134,22 @@
   --type-display-2xl-tracking: -0.055em;
   --type-display-2xl-leading: 0.88;
 
-  /* The home hero's own size (Session 21). The hero headline shares the
-     fold with a live scene in a 60/40 split, so it is sized to the TEXT
-     COLUMN rather than to the viewport: display-2xl (11vw → 158px at 1440)
-     makes "look serious." about 1050px wide, which no 60% column can hold.
-     7vw keeps the widest phrase inside the column at every width from 375
-     up, measured, and still reads as display type. */
-  --type-hero-size: clamp(44px, 7vw, 112px);
+  /* The home hero's own size (Session 21, resized by the 21 rulings).
+     It is driven by the CONTAINER, not by vw, because the thing that has
+     to fit is the widest phrase inside the headline's own column — and
+     --container-wide caps at 1440px while vw keeps going, so any vw clamp
+     is either too small below the cap or too big above it.
+
+     "look serious." measures 6.256 × the font size including the slab's
+     own padding. That ratio is a constant: measured 6.2560 at 1440,
+     6.2563 at 1920 and 6.2568 at 375. 6.36 is the same number with ~1.7%
+     of headroom, so the slab always lands inside its column.
+
+     Single column: the headline has the whole container, less 8%.
+     Two columns (1240 up): it has its 74fr share of the container less
+     the 40px gap. The upper bound never binds — the formula peaks at
+     ~162px once the container caps — and is there only as a backstop. */
+  --type-hero-size: clamp(44px, calc(var(--container-wide) * 0.92 / 6.36), 200px);
   --type-hero-weight: 500;
   --type-hero-tracking: -0.05em;
   --type-hero-leading: 0.92;
@@ -368,10 +377,24 @@ a { color: inherit; text-decoration: none; }
   gap: 44px;
   align-items: center;
 }
+/* The scene takes 26% of the container but never less than 280px — at
+   1024 a flat 26% is about 245px, which is not a window you can read a
+   screen in. The headline then gets whatever is left, which is why the
+   size below is a `min` of two branches: the 74% share above 1170, and
+   "the container minus the gap and the scene's floor" below it. They
+   meet exactly where the floor takes over, so the type scales smoothly
+   through the breakpoint instead of jumping. */
 @media (min-width: 1024px) {
+  :root {
+    --type-hero-size: clamp(
+      44px,
+      calc(min(var(--container-wide) * 0.74 - 40px, var(--container-wide) - 320px) / 6.36),
+      200px
+    );
+  }
   .hero-main {
-    grid-template-columns: minmax(0, 60fr) minmax(0, 40fr);
-    gap: 48px;
+    grid-template-columns: minmax(0, 1fr) max(280px, 26%);
+    gap: 40px;
   }
 }
 

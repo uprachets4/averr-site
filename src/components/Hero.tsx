@@ -76,34 +76,45 @@ const T_MOBILE: Film = {
 
 const MOBILE_QUERY = "(max-width: 767px)";
 const SHORT_QUERY = "(max-height: 699px)";
+/** Below this the hero is one column: headline, then the scene under the
+ *  CTAs. A pinned frame is 100vh and clips, and a stacked composition at
+ *  this type size does not fit inside one — at 1024×768 the headline's
+ *  first line was 53px ABOVE the viewport. So the hero stops pinning
+ *  exactly where it stops being two columns, and the page scrolls. */
+const FLAT_QUERY = "(max-width: 1023px)";
 
-/** Desktop, tall enough, motion welcome → the pinned takeover runs. */
+/** Wide enough for two columns, tall enough, motion welcome → the pinned
+ *  takeover runs. */
 function useHeroMode() {
   const reduce = useReducedMotion();
   const [narrow, setNarrow] = useState(false);
+  const [flat, setFlat] = useState(false);
   const [short, setShort] = useState(false);
 
   useEffect(function watch() {
-    const mq = window.matchMedia(MOBILE_QUERY);
-    const sq = window.matchMedia(SHORT_QUERY);
-    function onMq(e: MediaQueryListEvent) {
-      setNarrow(e.matches);
-    }
-    function onSq(e: MediaQueryListEvent) {
-      setShort(e.matches);
-    }
-    setNarrow(mq.matches);
-    setShort(sq.matches);
-    mq.addEventListener("change", onMq);
-    sq.addEventListener("change", onSq);
+    const queries: Array<[string, (v: boolean) => void]> = [
+      [MOBILE_QUERY, setNarrow],
+      [FLAT_QUERY, setFlat],
+      [SHORT_QUERY, setShort],
+    ];
+    const offs = queries.map(function bind([q, set]) {
+      const mq = window.matchMedia(q);
+      function on(e: MediaQueryList | MediaQueryListEvent) {
+        set(e.matches);
+      }
+      on(mq);
+      mq.addEventListener("change", on);
+      return function off() {
+        mq.removeEventListener("change", on);
+      };
+    });
     return function cleanup() {
-      mq.removeEventListener("change", onMq);
-      sq.removeEventListener("change", onSq);
+      for (const off of offs) off();
     };
   }, []);
 
   return {
-    pinned: !narrow && !short && !reduce,
+    pinned: !flat && !short && !reduce,
     reduce: !!reduce,
     film: narrow ? T_MOBILE : T_DESKTOP,
   };
@@ -375,6 +386,31 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
   // copy of the active phrase.
   const phrase = useHeroPhrase(frameRef, engaged);
 
+  /* The cue lives at the bottom-left of the frame, and the headline grew
+     into it: at 1280×720 "SCROLL" landed on top of the primary CTA. It is
+     decorative, so it gives way — but on measurement rather than on a
+     guessed height breakpoint, because what collides is the copy's real
+     height at that width, not the viewport. */
+  const copyRef = useRef<HTMLDivElement | null>(null);
+  const [cueFits, setCueFits] = useState(true);
+  useLayoutEffect(function watchCue() {
+    function check() {
+      const frame = frameRef.current;
+      const copy = copyRef.current;
+      if (!frame || !copy) return;
+      const CUE = 28 + 40 + 20; // bottom offset + the rule's height + clearance
+      setCueFits(copy.getBoundingClientRect().bottom <= frame.getBoundingClientRect().bottom - CUE);
+    }
+    check();
+    const ro = new ResizeObserver(check);
+    if (frameRef.current) ro.observe(frameRef.current);
+    if (copyRef.current) ro.observe(copyRef.current);
+    document.fonts?.ready.then(check).catch(function ignore() {});
+    return function off() {
+      ro.disconnect();
+    };
+  }, []);
+
   useMotionValueEvent(scrollYProgress, "change", function onP(p) {
     setEngaged(p > 0.001);
   });
@@ -483,7 +519,7 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
       >
         <HeroGround />
 
-        <div style={{ position: "relative", zIndex: 1, width: "100%" }}>
+        <div ref={copyRef} style={{ position: "relative", zIndex: 1, width: "100%" }}>
           <HeroComposition
             skip={skip}
             pillRef={pillRef}
@@ -493,7 +529,7 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
           />
         </div>
 
-        <ScrollCue skip={skip} hidden={engaged} film={film} />
+        <ScrollCue skip={skip} hidden={engaged || !cueFits} film={film} />
 
         {/* The dark layer. At p=0 its clip is exactly the pill, so it IS the
             pill; by p=0.5 it is the whole frame. */}
