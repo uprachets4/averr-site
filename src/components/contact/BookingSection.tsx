@@ -106,8 +106,13 @@ export default function BookingSection() {
           color: var(--color-ink); text-decoration: underline; text-underline-offset: 3px;
           display: inline-block; padding: 13px 6px; margin: -13px -6px;
         }
+        /* Cal's mobile layout stacks the month and the day list and
+           settles at ~1433px at 375 — measured. Reserving only 560 let
+           the iframe grow 680px after mounting and shove the whole
+           brief section up: 0.91 CLS on a fast scroll. The reserve is
+           the real height now, so nothing below it can move. */
         @media (max-width: 1023px) {
-          .bk-body, .bk-wait { min-height: 560px; }
+          .bk-body, .bk-wait { min-height: 1460px; }
         }
       `}</style>
     </div>
