@@ -1,4 +1,6 @@
-import AverrMark from "./AverrMark";
+import FooterMark from "./FooterMark";
+import MagneticCTA from "./MagneticCTA";
+import TorontoClock from "./TorontoClock";
 import Chapter from "./Chapter";
 import { usePageEndTone } from "../lib/pageTone";
 
@@ -19,12 +21,6 @@ const CONTACT_LINKS = [
   { label: "Instagram", href: "https://www.instagram.com/averrstudios" },
 ];
 
-const LEGAL_LINKS = [
-  { label: "Privacy", href: "/privacy" },
-  { label: "Cookies", href: "/cookies" },
-  { label: "Terms", href: "/terms" },
-];
-
 const YEAR = new Date().getFullYear();
 
 export default function Footer() {
@@ -42,37 +38,36 @@ export default function Footer() {
         padding: "60px 40px 40px",
         borderTop: "1px solid rgba(20,20,18,0.10)",
         fontFamily: "var(--font-body)",
-        fontSize: 13,
+        fontSize: 14,
         color: "var(--color-muted)",
       }}
     >
+      {/* ── the invitation, and what time it is here ── */}
+      <div className="ft-top">
+        <MagneticCTA to="/contact" variant="primary">
+          Start a project
+        </MagneticCTA>
+        <div className="ft-now">
+          <span>Currently answering: same-day, Toronto time.</span>
+          <TorontoClock style={{ color: "var(--color-ink)" }} />
+        </div>
+      </div>
+
+      {/* ── the wordmark the page rises into ── */}
+      <div className="ft-wrap">
+        <FooterMark />
+      </div>
+
       <div
         style={{
           maxWidth: 1200,
           margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "2fr 1fr 1fr 1fr",
+          gridTemplateColumns: "1fr 1fr 1fr",
           gap: 40,
         }}
         className="footer-grid"
       >
-        {/* Brand column */}
-        <div>
-          <div style={{ color: "var(--color-ink)", marginBottom: 20 }}>
-            <AverrMark variant="footer" />
-          </div>
-          <div
-            style={{
-              maxWidth: 320,
-              lineHeight: 1.55,
-              color: "var(--color-muted)",
-            }}
-          >
-            A boutique design studio in Toronto. Building the websites,
-            AI systems, and marketing engines for businesses that expect craft.
-          </div>
-        </div>
-
         {/* Studio column */}
         <FooterColumn title="Studio" links={STUDIO_LINKS} />
 
@@ -94,31 +89,13 @@ export default function Footer() {
           justifyContent: "space-between",
           flexWrap: "wrap",
           gap: 16,
-          fontSize: 12,
-          color: "var(--color-muted-2)",
+          fontSize: 13,
+          color: "var(--color-muted)",
         }}
       >
         <div>© {YEAR} Averr Studios · Toronto</div>
-        <div style={{ display: "flex", gap: 16 }}>
-          {LEGAL_LINKS.map((link, i) => (
-            <a
-              key={link.label}
-              href={link.href}
-              style={{ color: "inherit", textDecoration: "none" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "var(--color-ink)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "var(--color-muted-2)";
-              }}
-            >
-              {link.label}
-              {i < LEGAL_LINKS.length - 1 && (
-                <span style={{ marginLeft: 16, color: "var(--color-muted-2)" }}>·</span>
-              )}
-            </a>
-          ))}
-        </div>
+        <div>Toronto & the GTA</div>
+      
       </div>
 
       {/* Responsive: collapse to 2 columns on mobile */}
@@ -130,6 +107,21 @@ export default function Footer() {
         }
       `}</style>
     </div>
+      <style>{`
+        .ft-top {
+          max-width: 1200px; margin: 0 auto;
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 24px; flex-wrap: wrap;
+        }
+        .ft-now {
+          display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+          font-size: 14px; color: var(--color-muted);
+        }
+        .ft-wrap { max-width: 1200px; margin: 0 auto; }
+        @media (max-width: 760px) {
+          .ft-top { flex-direction: column; align-items: flex-start; gap: 16px; }
+        }
+      `}</style>
     </Chapter>
   );
 }

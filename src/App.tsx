@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from "react-router-dom";
+import RouteWipe from "./components/RouteWipe";
 import { Suspense, lazy, useEffect } from "react";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
@@ -54,6 +55,7 @@ function App() {
     <PageToneProvider>
       <NavToneProvider>
         <ScrollToTop />
+        <RouteWipe />
         <AmbientEnvironment />
         <Nav />
         <main id="main" style={{ position: "relative", zIndex: 1 }}>

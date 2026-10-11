@@ -2,211 +2,113 @@ import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { duration, ease } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
-import PillHl from "../components/PillHl";
+import MonogramMark from "../components/MonogramMark";
+import { CharReveal } from "../components/CharReveal";
 
+/**
+ * 404.
+ *
+ * PillHl is HOME ONLY from Session 20 — the hero and FinalCTA, nowhere
+ * else — so the slab that used to sit on "doesn't exist" is gone and
+ * the Cormorant accent carries "Yet." instead.
+ *
+ * The mark draws, the headline paints at the first frame per the hero
+ * LCP rule, and the four routes are offered as rows rather than a grid
+ * of cards: this page's whole job is to be left quickly.
+ */
 
-const EMAIL_ADDR = "prachets@averrstudios.com";
-
-const LINKS = [
-  { label: "//_home", to: "/", text: "Averr Studios — front door" },
-  { label: "//_work", to: "/work", text: "The work we've shipped" },
-  { label: "//_contact", to: "/contact", text: "Book a call or send a note" },
+const ROUTES = [
+  { to: "/work", label: "Work", line: "Four projects, start to finish." },
+  { to: "/services", label: "Services", line: "Design, Automate, Grow." },
+  { to: "/about", label: "About", line: "The studio, and who runs it." },
+  { to: "/contact", label: "Contact", line: "Book a call or send a brief." },
 ];
 
 export default function NotFound() {
   const reduce = useReducedMotion();
 
-  useEffect(function updateTitle() {
+  useEffect(function title() {
     const prev = document.title;
-    document.title = "404 — Averr Studios";
+    document.title = "Not found — Averr Studios";
     return function restore() {
       document.title = prev;
     };
   }, []);
 
   return (
-    <section
-      style={{
-        position: "relative",
-        overflow: "hidden",
-        backgroundColor: "var(--color-bg)",
-        minHeight: "100vh",
-        padding: "160px 40px 80px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(ellipse 1400px 900px at 30% 30%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 70%, rgba(232,225,208,0.35), transparent 60%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div className="grain-light" aria-hidden="true" />
+    <section className="nf">
+      <div className="grain-light" aria-hidden="true" style={{ opacity: 0.05 }} />
 
-      <div
-        style={{
-          position: "relative",
-          zIndex: 2,
-          maxWidth: 1000,
-          margin: "0 auto",
-          width: "100%",
-        }}
-      >
-        <motion.div
-          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 0.1 }}
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-muted)",
-            marginBottom: 32,
-          }}
-        >
-          //_404 · wrong door
-        </motion.div>
+      <div className="nf-in">
+        <div className="nf-mark" aria-hidden="true">
+          <MonogramMark variant="hero" />
+        </div>
 
-        {/* LCP element on mobile — painted at first render, transform only.
-            The pill inside keeps its own entrance. */}
-        <motion.h1
-          initial={{ opacity: 1, y: reduce ? 0 : 8 }}
-          animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart }}
-          className="type-display-l"
-          style={{
-            color: "var(--color-ink)",
-            marginBottom: 32,
-            maxWidth: 900,
-          }}
-        >
-          You've hit a page that{" "}
-          <motion.span
-            initial={{ opacity: 1, scale: reduce ? 1 : 0.85 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: reduce ? 0 : 0.5, ease: ease.bounce, delay: reduce ? 0 : 0.9 }}
-            style={{ display: "inline-block" }}
-          >
-            <PillHl>doesn't exist</PillHl>
-          </motion.span>.
-        </motion.h1>
+        {/* painted at the first frame; the entrance is transform-only */}
+        <h1 className="type-display-l nf-h">
+          <CharReveal
+            paint
+            delay={reduce ? 0 : 1.1}
+            segments={[{ text: "This page doesn't exist. " }, { text: "Yet.", accent: true }]}
+          />
+        </h1>
 
         <motion.p
-          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+          className="nf-sub"
+          initial={{ opacity: 1, y: reduce ? 0 : 10 }}
           animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 1.2 }}
-          style={{
-            fontSize: 19,
-            lineHeight: 1.6,
-            color: "var(--color-muted)",
-            maxWidth: 640,
-            marginBottom: 64,
-          }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 1.4 }}
         >
-          Might be a mistyped URL. Might be a link that went stale. Either way,
-          easiest path back is one of these:
+          Here's where the good stuff is:
         </motion.p>
 
-        <motion.div
-          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
+        <motion.ul
+          className="nf-list"
+          initial={{ opacity: 1, y: reduce ? 0 : 10 }}
           animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 1.5 }}
-          className="recovery-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 32,
-            paddingTop: 32,
-            paddingBottom: 40,
-            borderTop: "1px solid rgba(20,20,18,0.10)",
-            borderBottom: "1px solid rgba(20,20,18,0.10)",
-          }}
+          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 1.6 }}
         >
-          {LINKS.map((link) => (
-            <div key={link.to}>
-              <div
-                className="type-eyebrow"
-                style={{
-                  color: "var(--color-muted-2)",
-                  marginBottom: 12,
-                }}
-              >
-                {link.label}
-              </div>
-              <MagneticCTA to={link.to} variant="text" size="md" icon={null}>
-                {link.text}
+          {ROUTES.map((r) => (
+            <li key={r.to} className="nf-row">
+              <MagneticCTA to={r.to} variant="text" size="lg" ariaLabel={`${r.label} — ${r.line}`}>
+                {r.label}
               </MagneticCTA>
-            </div>
+              <span className="nf-line">{r.line}</span>
+            </li>
           ))}
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 1.8 }}
-          style={{
-            marginTop: 32,
-            fontSize: 14,
-            lineHeight: 1.6,
-            color: "var(--color-muted-2)",
-            maxWidth: 720,
-          }}
-        >
-          If a specific page sent you here that shouldn't have — email{" "}
-          <a
-            href={`mailto:${EMAIL_ADDR}`}
-            style={{
-              color: "var(--color-muted)",
-              textDecoration: "underline",
-              textUnderlineOffset: 3,
-            }}
-          >
-            {EMAIL_ADDR}
-          </a>{" "}
-          and I'll fix the link.
-        </motion.p>
+        </motion.ul>
       </div>
 
       <style>{`
-        .recovery-link {
-          position: relative;
-          display: inline-block;
-          font-family: var(--font-display);
-          font-weight: 500;
-          font-size: 18px;
-          letter-spacing: -0.015em;
-          color: var(--color-ink);
-          text-decoration: none;
-          line-height: 1.35;
+        .nf {
+          position: relative; overflow: hidden;
+          background: var(--color-bg);
+          min-height: 100vh;
+          padding: clamp(104px, 14vh, 168px) 0 clamp(72px, 10vh, 120px);
+          display: flex; align-items: center;
         }
-        .recovery-link::after {
-          content: '';
-          position: absolute;
-          left: 0;
-          right: 0;
-          bottom: -4px;
-          height: 1px;
-          background: currentColor;
-          transform: scaleX(0);
-          transform-origin: left;
-          transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        .nf-in {
+          position: relative; z-index: 2;
+          max-width: var(--container-wide); margin: 0 auto; width: 100%;
         }
-        .recovery-link:hover::after,
-        .recovery-link:focus-visible::after {
-          transform: scaleX(1);
+        .nf-mark { width: clamp(90px, 13vh, 150px); margin-bottom: clamp(22px, 3vh, 38px); }
+        .nf-mark > div { width: 100% !important; }
+        .nf-h { color: var(--color-ink); margin: 0; max-width: 20ch; }
+        .nf-sub {
+          margin: clamp(18px, 2.4vh, 28px) 0 clamp(28px, 4vh, 44px);
+          font-size: 18px; line-height: 1.6; color: var(--color-muted);
         }
-        @media (max-width: 720px) {
-          .recovery-grid {
-            grid-template-columns: 1fr !important;
-            gap: 24px !important;
-          }
+        .nf-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+        .nf-row {
+          display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap;
+          padding: 16px 0; border-top: 1px solid rgba(20,20,18,0.12);
+        }
+        .nf-row:last-child { border-bottom: 1px solid rgba(20,20,18,0.12); }
+        .nf-line { font-size: 15px; color: var(--color-muted); }
+        @media (max-width: 760px) {
+          .nf-row { gap: 4px; flex-direction: column; align-items: flex-start; }
         }
       `}</style>
     </section>
   );
 }
-
