@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | the 18e rulings — run `git log --oneline -1` for the exact hash. The commits after the last code change touch only this file. |
-| **Doc currency** | Written at the end of Session 18e, including its rulings. |
+| **HEAD** | `ff01a34` — *19 fix: the scroll cue sits clear of the path cards*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 19. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -29,7 +29,7 @@ dist/assets/index-*.js           312.10 kB │ gzip:  97.73 kB  ← home + shell
 dist/assets/motion-*.js          162.61 kB │ gzip:  53.98 kB  ← the motion library, shared
 dist/assets/ServicesBuild-*.js   166.86 kB │ gzip:  40.73 kB  ← lazy, one viewport early (17i)
 dist/assets/CaseStudy-*.js        50.24 kB │ gzip:  12.40 kB
-dist/assets/Contact-*.js          43.92 kB │ gzip:  10.86 kB
+dist/assets/Contact-*.js          34.81 kB │ gzip:   9.49 kB  ← the Cal embed is its own chunk now
 () => "dist/assets/About-*.js            78.71 kB │ gzip:  18.88 kB  ← hero, fly-in, desk, process scene, credits"
 dist/assets/KickoffPass-*.js      29.68 kB │ gzip:   9.26 kB  ← lazy (17i)
 dist/assets/Work-*.js             22.46 kB │ gzip:   6.83 kB
@@ -1505,6 +1505,86 @@ deleted.
 `B2B SaaS for Google` / `Design engineering, frontend, AI workflow automation` /
 `Toronto`.
 
+**SESSION 19 — /contact rebuilt: "see your reply before you send".** Five commits (`7143d8d` … `ff01a34`).
+
+### The locked-rule violation the pre-flight found
+
+The Budget shape dropdown carried **"Under $5K", "$5K–$10K", "$10K–$25K", "$25K+"** — five `$` live on /contact, against the locked no-prices rule, for however long it had been there. It never surfaced because `CustomSelect` only mounts its options while the listbox is open and `.sweep.mjs` read `innerText`.
+
+**Owner ruling: no pricing or budget talk at all.** The field is deleted outright rather than reworded. It could not be its own commit — the file holding it, `ContactForm.tsx`, is deleted wholesale by the rebuild.
+
+**The blind spot is closed.** `.money.mjs` opens every combobox, `aria-haspopup`, `details`, `summary` and `select` on every route before scanning. *Site-wide result, with collapsed controls opened: **0** literal currency strings across all ten routes.* A broader pass (also matching `budget`, `pricing`, `\d+K`) returns 11 lines, every one of them a client's situation in case-study narrative ("zero ad budget", "transparent pricing", SIFT's own `/pricing` route) or the home page's `48.2K` impressions metric — no Averr price claim anywhere.
+
+### Copy truth-check — every promise to its source
+
+| rendered | source |
+|---|---|
+| h1 "Let's build something that earns its place." | unchanged from the old hero |
+| lede "Every good client project has started here…" | unchanged |
+| path 01 "Book a 30-minute call" / "Pick a time now — no sales script." | the booking band's "Book a 30-minute intro call." and "No sales script." |
+| path 02 "Send a brief" / "Write it here and we reply within 24 hours." | the dark band's "24 hours. Every message." |
+| "24 hours. Every message." + its two support lines | **kept verbatim**, now the statement between the paths and the booking |
+| booking eyebrow/h2/sub | unchanged from the old booking band |
+| "Tell us what you're building." / "Two minutes. No captcha. We read every one." | unchanged from the old form band |
+| timeline helper "Soft launch. Hard deadline. 'Figuring it out.'…" | the "Rough timeline." tip, verbatim |
+| message helpers (two lines) | the "What you're building." and "Links to anything." tips, verbatim |
+| preview next step "I read every message myself and reply within 24 hours — usually with a follow-up question or two, sometimes with a rough proposal." | the dark band's own support line |
+| preview per-pillar lines | each pillar's first service `outcome` in `servicePillars.ts` |
+| "The other three ways." | unchanged |
+| Service area "Toronto & the GTA" | the meta description ("across the GTA"), surfaced by ruling 3 |
+| Response time "Within 24 hours" | the dark band |
+| receipt "A reply from Prachets within 24 hours." | the dark band |
+| "Talk soon." closer | unchanged |
+
+**Dropped:** the "Budget shape." tip has no home, because there is no budget field and no budget talk. **No phone** exists anywhere on the site, so none is shown. Instagram was in the old direct band and is dropped in favour of the service area and response time, which the ruling asked for.
+
+### The chip → payload mapping
+
+`projectType` still goes to the inbox in its old vocabulary so the email format does not change, and the full selection rides along as `services`:
+
+| chips | `projectType` sent |
+|---|---|
+| Design (alone or with others) | `new-site` |
+| Automate only | `automation` |
+| Grow only | `other` |
+| Not sure yet / nothing | `other` |
+
+### What it does now
+
+**Two paths** under the h1, typographic, each scrolling to its section. **The booking** is framed in the site's window chrome and mounts one viewport early — *measured: **0** cal.com requests on load, 86 once the section is reached* — or immediately when the URL carries `?date`. **The old empty-cream-box render is fixed**: the iframe paints at 570px on desktop and 1433px at 375.
+
+**The `/services` handoff is intact:** `/contact?date=2026-11-12&notes=Harbourview%20Bakehouse` loads Cal immediately, the date reaches the embed, and the business field is prefilled "Harbourview Bakehouse".
+
+**The brief** is the signature. The form is conversational — name, email, business, "What do you need?" chips (the three pillars, each expandable to its real services, plus Not sure yet), a rough timeline, and the message — and beside it **the reply composes live**. *Verified across four input combinations:* empty shows a quiet "e.g."; a name alone gives "Hi Sam,"; adding email and business fills To and "Re: Harbourview Bakehouse"; two pillars produce "Thanks for reaching out about design and automation for Harbourview Bakehouse." followed by a line per pillar.
+
+**Submit** folds the draft away into an Outbox tab and raises a Received receipt in its place — *measured: draft opacity 1 → 0.00 with a 3D fold transform, outbox 0 → 1, receipt 0.91, carrying "Oct 10, 2026, 11:23 p.m. · Toronto", the business, the needs and the next step.* **Reduced motion: the draft keeps an identity transform and the receipt simply appears.**
+
+**Failures never render the server's words.** *Verified: the mocked failure shows only "Something went wrong on our side. Email us directly and we'll reply within 24 hours." plus a mailto prefilled with everything typed; `serverWordsLeaked: false`.* The raw error is console-logged on localhost and `*.vercel.app` only. **The missing-`RESEND_API_KEY` 500 takes this same path** — the visitor no longer sees "Please set RESEND_API_KEY in Vercel", which is what the old form rendered verbatim. Setting the key remains an owner item.
+
+**NO REAL SENDS this session.** `?mockSend=1` (and `?mockFail=1`) route the submit at a local mock with no network; the harness is inert off localhost and `*.vercel.app`, the same guard `?simulateBooking` uses. The live endpoint was never called.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **/contact mobile LCP median of 3, warm = 2076 ms** `[2056, 2076, 2148]`, FCP 1732, load-window CLS 0.0000 — *better than the 2104 ms baseline* · **3-speed crash scroll at 1440 / 1920 / 375, both directions — worst CLS 0.079 at 375 crash, zero overflow, zero errors** · site-wide sweep: zero overflow on all ten routes, PillHl unchanged, zero `$` · **palette audit: nothing off-palette on /contact** · 375: the preview sits below the form and is not sticky, minimum font **13px**, no control I added under 44px · **keyboard-only completion works** — tab reaches every chip and its expander, Enter toggles, and submit returns the receipt.
+
+Bundle: `Contact` **43.92 → 34.81 kB** (10.86 → 9.49 gzip), with `CalEmbed` split to its own 2.21 kB chunk.
+
+**Three CLS faults, each found by attribution.**
+1. **0.91 at 375.** The Cal iframe settles at **1433px** on mobile against a 560px reserve — it grew 680px after mounting and shoved the brief section up 439px. The reserve is the measured height now.
+2. **Still 0.157.** Cal grows its iframe in *steps* as it hydrates, and in normal flow every step shifted everything after it. The reserve defines the layout and the embed is absolutely positioned inside it, so the iframe can resize freely.
+3. The hero's scroll cue landed on the path cards' bottom edge — the hero used to end in a paragraph.
+
+**Deviations.**
+1. **A timeline field was added.** It did not exist before. The brief listed timeline as a field and ruling 4 asked the "Rough timeline." tip to sit under a matching field — there was none, so one was made. Free text, optional.
+2. **Instagram is dropped** from the direct row to make space for the service area and response time the ruling asked for. It still exists in the footer.
+3. **The budget removal is not its own commit**, because its file is deleted by the rebuild.
+4. `ContactForm.tsx` and the four helper-card components are deleted.
+
+**Probe errors of mine, reported.**
+1. `.sweep.mjs`'s blind spot — the `$` finding above. It reported /contact clean every session.
+2. `.await.mjs` was hard-coded to watch `/about`'s chunk; pointed at /contact it polled the wrong page for ten minutes. It takes a route now.
+3. My first commit attempt staged both items at once and had to be unwound.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -1586,7 +1666,7 @@ One continuous pinned scene. A generic GTA home-services business (**Northgate**
 
 ### `/about`, `/contact`, `*` (404)
 
-`/about` — **complete as of 18e.** A cream hero with the centred PU mark (height-driven, tilts toward the cursor); a **fly-into-the-mark** transition into **the desk** (`components/about/desk/`, one pinned stage, four full-scale screens, blue only inside `.studio-screen`); then **the process scene** (`components/about/process/`, a second pinned stage on cream-alt holding ONE browser window in which a bakery homepage rises in fidelity across the five stages); then **the founder as credits** (`FounderCredits.tsx`, sticky split, the mark with a push-in, five sourced credit lines); then the closer on dark, opening with the mark drawing once more (`SignatureMark.tsx`). `Chapter`'s clip-path slabs at every boundary. `/contact` — 7-band editorial scroll with the designed form, Cal.com band; **Session 19's target and now the weakest page.** `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist").
+`/about` — **complete as of 18e.** A cream hero with the centred PU mark (height-driven, tilts toward the cursor); a **fly-into-the-mark** transition into **the desk** (`components/about/desk/`, one pinned stage, four full-scale screens, blue only inside `.studio-screen`); then **the process scene** (`components/about/process/`, a second pinned stage on cream-alt holding ONE browser window in which a bakery homepage rises in fidelity across the five stages); then **the founder as credits** (`FounderCredits.tsx`, sticky split, the mark with a push-in, five sourced credit lines); then the closer on dark, opening with the mark drawing once more (`SignatureMark.tsx`). `Chapter`'s clip-path slabs at every boundary. `/contact` — **rebuilt in Session 19.** A cream hero with the h1 and **two path cards** (book / brief); the dark "24 hours. Every message." statement; the **booking** framed in the site's window chrome, mounting one viewport early and preserving the `?date` / `?notes` handoff (`components/contact/BookingSection.tsx` + a lazy `CalEmbed` chunk); **the brief** — a conversational form whose answers compose a reply beside it live, folding into an Outbox and returning a Received receipt on submit (`BriefSection.tsx`, `ReplyPreview.tsx`); the direct row with email, LinkedIn, service area and response time; the dark "Talk soon." closer. **No budget field and no `$` anywhere.** `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist").
 
 ### Image-usage map (rendered)
 
@@ -1767,6 +1847,12 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **61 · `scrollIntoView` plus `scroll-behavior: smooth` invalidates an immediate measurement.** *Cause:* this site sets `scroll-behavior: smooth` on `html`, so a probe that calls `scrollIntoView` and reads 400ms later is measuring mid-flight. I reported the founder credits as "never revealing" on that basis; they were fine. *Fix:* scroll with `window.scrollTo` to a computed y and wait ~700ms, or assert the scroll position before measuring.
 
+**62 · `innerText` cannot see a collapsed listbox.** *Cause:* the no-"$" sweep read `document.body.innerText`, and `CustomSelect` only mounts its options while open — so five "$" price bands sat on /contact and were reported clean every session. *Fix:* `.money.mjs` opens every `[role=combobox]`, `[aria-haspopup]`, `details`, `summary` and `select` on every route before scanning. **Any content-rule sweep has to open what the page hides.**
+
+**63 · A third-party iframe grows in STEPS, and every step is a layout shift.** *Cause:* Cal's embed settles at 570px on desktop but **1433px at 375**, and it gets there in stages as it hydrates. Reserving the right height was necessary but not sufficient — in normal flow each stage still moved everything below it (0.91 CLS at 375, then 0.157 after the reserve was corrected). *Fix:* reserve the measured height on the container AND take the embed out of flow inside it (`position: absolute; inset: 0`), so the iframe can resize freely and nothing below can move. **Measure the settled height per breakpoint; do not guess one number.**
+
+**64 · A probe hard-coded to one route will happily poll the wrong page.** *Cause:* `.await.mjs` watched `/assets/About*` on `/about`; pointed at a /contact deploy it waited ten minutes against a page that would never request that chunk. *Fix:* it takes a route and derives the asset prefix from the chunk name.
+
 ---
 
 ## 6. DATA FACTS
@@ -1863,7 +1949,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 17f — "Your project start pass".**~~ **DONE** (`b6ea58f` … `231f1f2`). Weekends bookable, Ontario stat holidays in the business-day count, kickoff clipping fixed.
 - ~~**Session 17e — /services kickoff section.**~~ **DONE** (`aae26c8` … `ccd4c1f`). The 14-day calendar is an interactive personal timeline; `KickoffCalendar` removed.
 - ~~**Session 17d — /services quality + two site-wide fixes.**~~ **DONE** (`608a0c6` … `d925553`). Captions, spotlight, density, nav CTA, ledger, hero CTAs. **Six screens remain over the blank target — §7.12.**
-- **Session 19 — /contact.** **UNBLOCKED** — its pre-flight captures the current state.
+- ~~**Session 19 — /contact.**~~ **DONE** (`7143d8d` … `ff01a34`). Two paths, a lazy framed booking, the brief with its live reply preview, the Outbox fold and the Received receipt. **OWNER ITEM: `RESEND_API_KEY` is still unset** — the form's failure path is graceful now (one honest sentence plus a prefilled mailto, never the server's words), but no brief reaches the inbox until the key is set in Vercel.
 - **Session 20 — site-wide.** Page transitions using the slab wipe, footer redesign, home polish (richer door previews, reel hover, 404 pill).
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
 
