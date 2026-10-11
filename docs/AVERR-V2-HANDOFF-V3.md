@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `60b2bab` — *21-4 wire the fold: 60/40, the h1's whole sentence, the takeover*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 21. |
+| **HEAD** | `8f02bb1` — *21-6 the headline takes the column: 148px at 1440, measured*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of the Session 21 rulings. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -1777,6 +1777,97 @@ The fold now carries a sentence addressed to the reader, a slab that moves, thre
 
 ---
 
+**SESSION 21 RULINGS.** Two commits (`d6da1c7`, `8f02bb1`).
+
+### 1 · The headline takes the column — 147.9px at 1440
+
+`--type-hero-size` is now driven by **`--container-wide`**, not by `vw`. The thing that has to fit is the widest phrase inside the headline's own column, and the container caps at 1440px while `vw` keeps going — so every `vw` clamp is either too small below the cap or too big above it.
+
+```
+--type-hero-size: clamp(44px, calc(var(--container-wide) * 0.92 / 6.36), 200px);
+@media (min-width: 1024px) {
+  --type-hero-size: clamp(44px,
+    calc(min(var(--container-wide) * 0.74 - 40px, var(--container-wide) - 320px) / 6.36),
+    200px);
+}
+.hero-main { grid-template-columns: minmax(0, 1fr) max(280px, 26%); gap: 40px; }
+```
+
+**6.256 is a measured constant.** "look serious." occupies 6.256 × the font size including the slab's own padding: 6.2560 at 1440, 6.2563 at 1920, 6.2568 at 375. 6.36 is the same number with ~1.7% of headroom.
+
+The scene takes 26% but **never less than 280px** — a flat 26% leaves 245px at 1024, which is not a window you can read a screen in. The size is a `min()` of the 74% share and "container less the gap and the scene's floor"; the branches meet exactly where the floor takes over, so the type scales smoothly through it instead of stepping.
+
+*Measured, with "look serious." on one line inside the slab at every width:*
+
+| Viewport | Font | Slab | Column | Slack | h1 top…bottom | Scene | Overflow |
+|---|---|---|---|---|---|---|---|
+| 1920×1080 | **161.3** | 1008.8 | 1025.6 | 16.8 | 284…706 | 374.4 | none |
+| 1680×1050 | **161.3** | 1008.8 | 1025.6 | 16.8 | — …691 | 374.4 | none |
+| 1512×982 | 155.6 | 973.2 | 989.4 | 16.2 | — …651 | 361.7 | none |
+| 1440×900 | **147.9** | 925.0 | 940.4 | 15.4 | 208…602 | 344.4 | none |
+| 1366×768 | 139.9 | 875.4 | 890.0 | 14.6 | 153…527 | 326.7 | none |
+| 1280×720 | **130.7** | 817.8 | 831.4 | 13.6 | 143…493 | 306.2 | none |
+| 1240×800 | 126.4 | 791.0 | 804.2 | 13.2 | 188…528 | 296.6 | none |
+| 1024×768 | 97.8 | 611.9 | 622.1 | 10.2 | 208…476 | 280.0 | none |
+| 768×1024 | 102.2 | 639.4 | 706.5 | 67.1 | 154…419 | stacked | none |
+| 390×844 | 50.6 | 316.7 | 350.0 | 33.3 | 196…351 | stacked | none |
+| 375×812 | 48.5 | 303.1 | 335.0 | 31.9 | 196…346 | stacked | none |
+
+The h1 clears the 88px nav at every size (minimum top **143** at 1280×720) and the primary CTA is above the fold at all of them.
+
+**Two things the bigger type broke, both found by probe and fixed in the same commit:**
+
+1. **At 1024–1239 the h1's first line sat ABOVE the viewport** — top **−53** at 1024×768, −48 at 1152×864, −80 at 1239×800. A pinned frame is 100vh and clips, and a stacked composition at this type size does not fit in one. The hero now stops pinning exactly where it stops being two columns: `FLAT_QUERY` (`max-width: 1023px`) replaces the old 767px mobile threshold for the *pinning* decision. The film still switches at 767. **A stacked hero always scrolls.**
+2. **The SCROLL cue landed on the primary CTA at 1280×720.** It now yields on **measurement** — the copy block's bottom against the frame's bottom less 88px — not on a guessed height breakpoint, because what collides is the copy's real height at that width, not the viewport. It shows at 1920 (81px clear) and stands down at 1440, 1366 and 1280. *That is a real loss of the scroll affordance on a 900px-tall laptop, and it is the price of the larger headline.*
+
+### 2 · The navy agent screen stays
+
+Owner ruling: screen interiors carry their own colours, as on /services. No change. Recorded against the 18d locked palette rule — a screen's interior is not the page's palette.
+
+### 3 · Copy
+
+| Where | Now |
+|---|---|
+| Hero kicker | "We design premium websites, build AI automations, and run the marketing engines that grow businesses like yours across the GTA." |
+| Reel heading (`HeroReel.tsx`) | "Here's what that looks like." |
+| `index.html` `<meta name="description">` | "Averr Studios: we design premium websites, build AI automations, and run the marketing engines that grow businesses like yours across the GTA." |
+
+`og:description` and `twitter:description` did **not** quote the old kicker ("…for businesses that expect craft") and are untouched. All three verified in the DOM on the alias.
+
+### 4 · LCP, re-measured — and why the first number was wrong
+
+**The 600 ms was my harness, not the site.** Every run shared one `BrowserContext` and I navigated via `about:blank` between them, so runs 2 and 3 served the whole page out of the browser's memory cache and never touched the throttled network. "Warm" means a warm **edge**, not a warm browser.
+
+*Corrected: a fresh context per run, `Network.setCacheDisabled: true`, the edge warmed by a throwaway load that is not measured.*
+
+```
+viewport                          390 × 844, dpr 3, isMobile true, hasTouch true
+Emulation.setCPUThrottlingRate    rate: 4
+Network.emulateNetworkConditions  latency 150 ms · down 209,715 B/s (1.6 Mbps) · up 98,304 B/s
+Network.setCacheDisabled          true, fresh context per run
+edge                              warmed before the measured runs
+```
+
+| | Home `/` | /about (calibration) |
+|---|---|---|
+| **LCP median of 3** | **2000 ms** `[1976, 2000, 2016]` | 2168 ms `[2156, 2168, 2224]` |
+| LCP element | `P.type-body-lg` (the kicker) | `H1.type-display-l` |
+| **FCP median** | **2000 ms** | 1840 ms |
+| TTFB median | 87 ms | 109 ms |
+| CLS | 0.0001 | 0.0008 |
+
+**Throttle proof:** the 106,820-byte entry chunk took 1265 ms, ≈676 kbit/s effective against a 1.6 Mbps cap (the gap is the 150 ms RTT and queueing inside `duration`). Unthrottled on the same link it lands in ~50 ms.
+
+**Calibration:** /about reads 2168 ms here against the **2044–2096 ms** this document records for /about in Session 18 — the same regime, so the harness is now comparable with every previous figure. Home's 2000 ms sits against the **1872–1964 ms** recorded across Sessions 10–17.
+
+**On home, FCP == LCP in all three runs.** There is no earlier contentful paint: the app is client-rendered and the hero's text all paints in the same frame, which is what the hero LCP rule produces by design.
+
+### 5 · Re-verified after the resize
+
+Auto-cycle at 3.2/6.4/9.6s with the scene in step · stops on interaction (4 samples over 8s) · selectors, slab click and ←/→ all drive it · live region carries only user changes · console clean · **crash scroll at 1440, 390 and 375: zero console errors, zero React errors, max horizontal overflow 0 at every scroll position** · longest task 137 ms at 1440, 120 at 390, 74 at 375 (the hero's screen chunks, after LCP).
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -1882,6 +1973,9 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **A SCREEN'S INTERIOR IS NOT THE PAGE'S PALETTE (21 ruling).** /services' screens carry their own colours wherever they are reused — the navy agent console in the home hero is correct and stays. The 18d rule governs the PAGE: cream/ink chapter rhythm and tokens, with blue/violet confined to `.studio-screen`. A reused screen inside its own window frame is not an extrapolation.
+- **A PINNED HERO MUST FIT 100vh, SO IT ONLY PINS WHERE IT FITS (21 ruling).** A sticky 100vh frame clips. When the hero's composition stacks, it stops pinning — `FLAT_QUERY` is `max-width: 1023px`, the same breakpoint at which the hero stops being two columns. At 1024×768 before this, the headline's first line sat 53px above the viewport.
 
 - **A MEASURED BOX NEVER ANIMATES AS LAYOUT (21).** Anything whose width depends on its content — the hero's cycling slab is the case — is measured in the type it will actually render in, fixed at the widest, and animated on `scaleX`. A ruler that does not carry the rendering element's own classes is not a measurement: `.pill-hl__word` re-tracks text to `-0.015em` and measuring without it came out 8% short at every width.
 - **PillHl IS STILL HOME ONLY, AND STILL 2 (21).** The hero's pill is now `PhraseSlab`, which renders PillHl's own `.pill-hl--bare` classes rather than a copy of them. The measured `.pill-hl` inventory is unchanged: 2 on `/` (hero + FinalCTA), 0 on every other route.
@@ -2060,6 +2154,10 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **70 · `z-index: 1` on a shared class decides which of your two stacked copies wins.** *Cause:* `.pill-hl__word` carries `position: relative; z-index: 1`. The ink copy underneath therefore painted ON TOP of the absolutely positioned parch copy, and the words stayed ink over a dark slab. *Fix:* the reveal wrapper takes `z-index: 2`. **Reusing a class for its type brings its stacking with it.**
 
+**71 · A reused BrowserContext makes every throttled timing after the first a lie.** *Cause:* the Session 21 LCP harness measured three runs in ONE context, navigating via `about:blank` between them. Runs 2 and 3 served the page from the browser's memory cache and never touched the emulated network, so home read **600 ms** against a documented ~1,900 ms baseline for the same method. *Fix:* a fresh `BrowserContext` per run plus `Network.setCacheDisabled: true`, with the EDGE warmed by a throwaway load that is not measured. Home then read 2000 ms and /about 2168 ms, both in line with every prior session. **"Warm" means a warm edge, never a warm browser — and a number far better than the baseline is a bug report about your harness.**
+
+**72 · Growing the type is a layout change, not a type change.** *Cause:* raising the hero from 112px to 162px broke two things nowhere near the font declaration — the composition stopped fitting the pinned 100vh frame between 1024 and 1239 (h1 top −53px), and the absolutely positioned SCROLL cue ended up under the primary CTA at 1280×720. *Fix:* both, above. **After a size change, re-measure the things that are positioned against the frame rather than against the text.**
+
 ---
 
 ## 6. DATA FACTS
@@ -2159,6 +2257,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 19 — /contact.**~~ **DONE** (`7143d8d` … `ff01a34`). Two paths, a lazy framed booking, the brief with its live reply preview, the Outbox fold and the Received receipt. **OWNER ITEM: `RESEND_API_KEY` is still unset** — the form's failure path is graceful now (one honest sentence plus a prefilled mailto, never the server's words), but no brief reaches the inbox until the key is set in Vercel.
 - ~~**Session 20 — site-wide.**~~ **DONE** (`342ce75` … `54c6285`). Page transitions, the new footer, home's live door previews and reel hover, the new 404, PillHl home-only.
 - ~~**Session 21 — the home hero.**~~ **DONE** (`edd31d8` … `60b2bab`). The headline speaks to the business, the slab cycles three measured outcomes, the reader can drive it three ways, and /services' real screens run beside it after LCP. Home initial JS +2.92 kB gzip; mobile LCP 600ms.
+- ~~**Session 21 rulings.**~~ **DONE** (`d6da1c7`, `8f02bb1`). Headline 147.9px at 1440 measured to the column; kicker, reel heading and meta description rewritten; navy agent screen kept by ruling; home mobile LCP re-measured honestly at 2000 ms.
 - **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
 
