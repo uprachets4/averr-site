@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { easing } from "../lib/motion";
 import MonogramMark from "./MonogramMark";
@@ -19,6 +19,31 @@ import MonogramMark from "./MonogramMark";
 export default function FooterMark() {
   const reduce = !!useReducedMotion();
   const ref = useRef<HTMLDivElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const textRef = useRef<SVGTextElement | null>(null);
+
+  /* The viewBox is MEASURED from the glyphs, not guessed. A 420-unit box
+     around 237 units of ink made `meet` fit by height and the wordmark
+     filled less than half the container. Measuring the real ink — and
+     again once the webfont has loaded, because the fallback's metrics
+     are not Geist's — is the SVG-text rule applied properly. */
+  useEffect(function fitToInk() {
+    function fit() {
+      const t = textRef.current;
+      const svg = svgRef.current;
+      if (!t || !svg) return;
+      try {
+        const b = t.getBBox();
+        if (b.width > 0) svg.setAttribute("viewBox", `${b.x} ${b.y} ${b.width} ${b.height}`);
+      } catch { /* not laid out yet */ }
+    }
+    fit();
+    document.fonts?.ready.then(fit).catch(() => {});
+    window.addEventListener("resize", fit);
+    return function off() {
+      window.removeEventListener("resize", fit);
+    };
+  }, []);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start 95%", "end 85%"],
@@ -33,13 +58,15 @@ export default function FooterMark() {
       <div className="fm-mask">
         <motion.div className="fm-rise" style={{ y: reduce ? "0%" : y }}>
           <svg
+            ref={svgRef}
             className="fm-word"
-            viewBox="0 0 420 100"
+            viewBox="0 0 237 130"
             preserveAspectRatio="xMidYMid meet"
             role="img"
             aria-label="Averr Studios"
           >
             <text
+              ref={textRef}
               x="0"
               y="78"
               fontFamily="Geist, ui-sans-serif, system-ui, sans-serif"
