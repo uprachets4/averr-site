@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `ff01a34` — *19 fix: the scroll cue sits clear of the path cards*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 19. |
+| **HEAD** | `54c6285` — *20-2 fix: the wordmark actually spans the container*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 20. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -1585,6 +1585,84 @@ Bundle: `Contact` **43.92 → 34.81 kB** (10.86 → 9.49 gzip), with `CalEmbed` 
 2. `.await.mjs` was hard-coded to watch `/about`'s chunk; pointed at /contact it polled the wrong page for ten minutes. It takes a route now.
 3. My first commit attempt staged both items at once and had to be unwound.
 
+**SESSION 20 — site-wide finish.** Six commits (`342ce75` … `54c6285`).
+
+### 0 · /contact's timeline was already optional
+
+No validation entry, labelled "· optional". *Verified: submitting with the timeline empty returns the Received receipt with zero validation errors.*
+
+### 1 · Page transitions
+
+An ink panel sweeps up, names the destination in parch, and sweeps off the top — **490ms nominal** (cover 220, hold 50, reveal 220). It listens for clicks **at the document in the capture phase** rather than wrapping every `Link`, so the nav, the cards, MagneticCTA and the footer all get it without any call site knowing it exists. The route chunk is prefetched the moment the click is intercepted.
+
+*Measured, warm, hover-prefetched — click to a **painted** destination hero:*
+
+| | ms | |
+|---|---|---|
+| / → /services | 284 | PASS |
+| / → /work | 260 | PASS |
+| /services → /about | 264 | PASS |
+| /about → /contact | 613 | PASS |
+| /contact → /work | 279 | PASS |
+| /work → /about | 265 | PASS |
+
+*Six-frame sequences captured for three route pairs.* After each navigation: **title updated, focus on the new page's `h1`, the live region announcing the page name, scroll at 0** — all measured.
+
+**Exclusions, all verified false (no wipe):** `/work` → a case study, which keeps `OpenTransition`'s clone-expand (a capture listener would preempt its `onClick`); browser back; hash links; and reduced motion, which navigates instantly.
+
+### 2 · The footer
+
+A "Start a project" CTA and the existing "Currently answering: same-day, Toronto time." beside a **live Toronto clock**, then a **giant "Averr" rising out of a mask** on the footer's own scroll with the mark beside it, then three link columns and the © line. *Measured at 1440 / 1920 / 375: the wordmark's width equals its container's exactly at all three, the clock ticks, and the smallest footer text is **12px**.*
+
+**The Privacy / Cookies / Terms links are REMOVED.** `/privacy`, `/cookies` and `/terms` are **not routes in App.tsx and never have been** — all three have been 404ing for as long as the footer has existed. Omitted per the brief, and flagged rather than invented.
+
+### 3 · Home polish
+
+**The doors show the real work.** Each door's preview was a hand-made still; it now renders the **actual /services screens** for that pillar, cycling every 2.2s with the app-switch crossfade, in the `compact` layout those components already have. *Measured: home's initial JS is **160.0 kB** encoded and the previews contribute **nothing** to it — hovering a door pulls **+20.3 kB** on demand and mounts the live preview.* Everything inside is `aria-hidden`; the door's own copy stays the accessible content; touch keeps the still.
+
+**The reel attends to one card.** Lift and tilt already existed (capped at 3°). Added: keyboard focus gets the same lift, and the siblings recede. *Measured on hover: opacities `[1, 0.7, 0.7, 0.7]` with the hovered card lifted.* The dimming is CSS `:has()` on the row, so no hover state lives in React.
+
+### 4 · The 404
+
+*Verified:* h1 **"This page doesn't exist. Yet."** with the Cormorant accent on "Yet.", `opacity: 1` at first render, the subhead "Here's where the good stuff is:", and four rows — Work / Services / About / Contact — each with its one-line description. **`.pill-hl` count: 0.**
+
+**PillHl inventory, all ten routes: home 2, everywhere else 0.** It is home-only now.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **mobile LCP, median of 3, warm — every route passes:**
+
+| route | LCP | | route | LCP |
+|---|---|---|---|---|
+| / | 1916 | | /work/cg-walls-and-floors | 2092 |
+| /work | 2364 | | /work/capitalcommand | 2108 |
+| /services | 2012 | | /work/sift | 2116 |
+| /about | 2128 | | /work/cadencestack | 2124 |
+| /contact | 2060 | | /nope | 2016 |
+
+**Zero horizontal overflow at 375 on all ten routes.** Crash scroll, 3 speeds, both directions: **home** 0.037 worst at 1440 crash, 0.0017 at 375; **/nope** 0 everywhere. Both zero errors.
+
+**Two pre-existing defects found and fixed.**
+1. **/contact had no `<h1>` at all.** Its headline was a bare `CharReveal` span, so the page had no main heading — nothing for the transition to move focus to (it was landing on an `h2`) and nothing for a screen reader to land on.
+2. **The footer's three column titles were 11px**, under the brief's 12px floor.
+
+**Two of my own, found by measuring.**
+3. **The wipe missed the 800ms gate** at 700ms nominal (876–971ms measured), because `AnimatePresence` cost ~60ms mounting before the cover could start. The panel is **always mounted** now, inert at `inset(100%)` with `visibility: hidden`, and the timings are trimmed.
+4. **The wordmark filled under half the footer.** Its viewBox was 420 units around **237 units of ink**, so `preserveAspectRatio` fit it by height. The viewBox is measured from the glyphs' own bbox now and re-measured once the webfont loads, because the fallback's metrics are not Geist's.
+
+**Deviations.**
+1. **The reel's caption is not hidden-then-revealed.** The card's name and headline figure are already visible under every card; hiding them to reveal on hover would be worse for touch and for anyone scanning. The hover state is the lift, the tilt and the siblings receding.
+2. **Legal links removed** rather than pointed somewhere, because the routes do not exist.
+3. `ServicesBuild` split from 166.85 kB into a 17.04 kB shell plus three screen chunks (Build 45.41, Automate 38.01, Grow 67.29) now shared between /services and home's door previews.
+4. Crash scroll was run on **home and /nope** — the two most-changed routes — rather than all ten; /about, /contact and /services were crash-scrolled in their own sessions, but **not since the footer changed**.
+
+**Probe errors of mine, reported.**
+1. After making the panel always-mounted, my own probe still tested `querySelector(".rw")` for existence, so every exclusion read as a failure and every timing as a 30s timeout. It tests whether the panel is *active* now.
+2. My click-to-hero probe also waited for the panel to go fully inert, which is stricter than the gate. /contact read 945ms that way; the hero is **painted and inked at 612ms**.
+3. The first timing run clicked without hovering, so nothing was prefetched — the brief specifies prefetch on hover.
+4. A nav link named "Contact" does not exist (it is "Book a call"), which timed out one probe.
+5. Home's JS was first measured from `content-length`, which compressed responses omit — it read 0.0 kB. `encodedBodySize` from the Resource Timing API is the right source.
+
 ---
 
 ## 3. SITE MAP AS BUILT
@@ -1692,6 +1770,8 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **PillHl IS HOME ONLY (20).** The hero and FinalCTA, nowhere else. It was removed from the 404 in Session 20; the inventory is measured at 2 on `/` and 0 on every other route.
 
 - **PALETTE SCOPE (18d, after a 0/10).** An element the owner likes is **kept and applied LOCALLY**. It is **never extrapolated into a page or site palette** without an explicit instruction. 18c-1 took the blue/violet of one panel — "A site that ages well" — and made it the whole of /about's ground, replacing the cream/ink chapter rhythm. Every page follows the site's tokens and chapter rhythm; a liked treatment stays inside the element it belongs to (on /about: `.studio-screen`, which is the monitor and nothing else).
 1. **`type-*` utility classes only.** No per-page inline font sizes. Tiers: `display-2xl`, `display-xl`, `display-l`, `h1`, `h2`, `h3`, `body-lg`, `body`, `small`, `eyebrow`, plus `type-accent` (Cormorant italic).
@@ -1853,6 +1933,12 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **64 · A probe hard-coded to one route will happily poll the wrong page.** *Cause:* `.await.mjs` watched `/assets/About*` on `/about`; pointed at a /contact deploy it waited ten minutes against a page that would never request that chunk. *Fix:* it takes a route and derives the asset prefix from the chunk name.
 
+**65 · `AnimatePresence` costs a mount before your animation can start.** *Cause:* the page-transition panel was created on click, and the ~60ms React spent mounting it ran before the cover began — enough to push a 700ms transition to 876–971ms against an 800ms budget. *Fix:* keep the panel mounted and inert (`visibility: hidden`, fully inset) and animate it in place. **Anything on a latency budget should already exist when the clock starts.**
+
+**66 · An SVG text viewBox wider than its ink fits by the wrong axis.** *Cause:* "Averr" is 237 units of ink in a 420-unit viewBox, so `preserveAspectRatio="... meet"` scaled to fit the HEIGHT and the wordmark filled under half its container — while a width check still passed, because the SVG element was full width and only the glyphs inside were small. *Fix:* measure `getBBox()` and set the viewBox from it, re-measuring after `document.fonts.ready` because the fallback's metrics are not the webfont's. **Measure the element that holds the ink, not the box around it.**
+
+**67 · A page can have no `h1` and nothing will tell you.** *Cause:* /contact's headline was a `CharReveal` span with a display class. It looked like a heading, so nobody noticed there was no `h1` on the route — until the page transition tried to move focus to one and landed on an `h2`. *Fix:* wrap it. **A feature that needs the main heading is a good way to find out you never had one.**
+
 ---
 
 ## 6. DATA FACTS
@@ -1950,7 +2036,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 17e — /services kickoff section.**~~ **DONE** (`aae26c8` … `ccd4c1f`). The 14-day calendar is an interactive personal timeline; `KickoffCalendar` removed.
 - ~~**Session 17d — /services quality + two site-wide fixes.**~~ **DONE** (`608a0c6` … `d925553`). Captions, spotlight, density, nav CTA, ledger, hero CTAs. **Six screens remain over the blank target — §7.12.**
 - ~~**Session 19 — /contact.**~~ **DONE** (`7143d8d` … `ff01a34`). Two paths, a lazy framed booking, the brief with its live reply preview, the Outbox fold and the Received receipt. **OWNER ITEM: `RESEND_API_KEY` is still unset** — the form's failure path is graceful now (one honest sentence plus a prefilled mailto, never the server's words), but no brief reaches the inbox until the key is set in Vercel.
-- **Session 20 — site-wide.** Page transitions using the slab wipe, footer redesign, home polish (richer door previews, reel hover, 404 pill).
+- ~~**Session 20 — site-wide.**~~ **DONE** (`342ce75` … `54c6285`). Page transitions, the new footer, home's live door previews and reel hover, the new 404, PillHl home-only.
+- **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
 
 ---
