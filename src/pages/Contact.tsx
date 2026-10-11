@@ -83,18 +83,19 @@ function EditorialHero() {
           Start here
         </motion.div>
 
-        <CharReveal
-          text="Let's build something that earns its place."
-          paint
-          delay={reduce ? 0 : 0.4}
+        {/* a real <h1>: this was a bare CharReveal span, so /contact had
+            no main heading at all — nothing for the page transition to
+            move focus to, and nothing for a screen reader to land on. */}
+        <h1
           className="type-display-l"
-          style={{
-            color: "var(--color-ink)",
-            display: "block",
-            maxWidth: "24ch",
-            marginBottom: 40,
-          }}
-        />
+          style={{ color: "var(--color-ink)", margin: "0 0 40px", maxWidth: "24ch" }}
+        >
+          <CharReveal
+            text="Let's build something that earns its place."
+            paint
+            delay={reduce ? 0 : 0.4}
+          />
+        </h1>
 
         {/* LCP element on mobile. Painted from the first frame. */}
         <motion.p

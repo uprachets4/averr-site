@@ -138,7 +138,7 @@ function FooterColumn(props: FooterColumnProps) {
       <div
         style={{
           fontFamily: "var(--font-mono)",
-          fontSize: 11,
+          fontSize: 12,
           letterSpacing: "0.14em",
           textTransform: "uppercase",
           color: "var(--color-muted-2)",

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../lib/motion";
 import { prefetchRoute } from "../lib/prefetchRoute";
 import { vault } from "../data/workIndex";
@@ -30,9 +30,9 @@ import { vault } from "../data/workIndex";
    gate: AnimatePresence's mount costs ~60ms before the cover even
    starts, and the destination still has to render. Trimmed to 540ms
    nominal, which leaves real headroom for the route's own paint. */
-const COVER = 0.24;
-const HOLD = 0.06;
-const REVEAL = 0.24;
+const COVER = 0.22;
+const HOLD = 0.05;
+const REVEAL = 0.22;
 
 const NAMES: Record<string, string> = {
   "/": "Home",
@@ -57,6 +57,7 @@ export default function RouteWipe() {
   const location = useLocation();
   const reduce = useReducedMotion();
   const [covering, setCovering] = useState(false);
+  const [idle, setIdle] = useState(true);
   const [label, setLabel] = useState("");
   const [announce, setAnnounce] = useState("");
   const pending = useRef<string | null>(null);
@@ -102,6 +103,7 @@ export default function RouteWipe() {
         pending.current = to;
         setLabel(labelFor(url.pathname));
         armed.current = true;
+        setIdle(false);
         setCovering(true);
       }
 
@@ -116,6 +118,7 @@ export default function RouteWipe() {
   /* ── navigate once the panel is covering ───────────────────────── */
   const onCovered = useCallback(
     function covered() {
+      // fires at the end of both legs; only the cover leg navigates
       const to = pending.current;
       if (!to) return;
       pending.current = null;
@@ -131,6 +134,8 @@ export default function RouteWipe() {
       armed.current = false;
       setCovering(false);
       setAnnounce(labelFor(location.pathname));
+      // back to inert once the reveal has run
+      const hide = window.setTimeout(() => setIdle(true), (HOLD + REVEAL + 0.1) * 1000);
 
       // focus the new page's heading, so a keyboard reader lands on the
       // page rather than back at the top of the document
@@ -145,6 +150,7 @@ export default function RouteWipe() {
       }, (REVEAL + 0.05) * 1000);
       return function clear() {
         window.clearTimeout(t);
+        window.clearTimeout(hide);
       };
     },
     [location.pathname, location.search]
@@ -157,32 +163,33 @@ export default function RouteWipe() {
         {announce ? `${announce} — page loaded` : ""}
       </div>
 
-      <AnimatePresence>
-        {covering ? (
-          <motion.div
-            className="rw"
-            aria-hidden="true"
-            initial={{ clipPath: "inset(100% 0 0 0)" }}
-            animate={{ clipPath: "inset(0% 0 0 0)" }}
-            exit={{
-              clipPath: "inset(0 0 100% 0)",
-              transition: { duration: REVEAL, ease: ease.inOut, delay: HOLD },
-            }}
-            transition={{ duration: COVER, ease: ease.inOut }}
-            onAnimationComplete={onCovered}
-          >
-            <motion.span
-              className="rw-name type-display-l"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.22, ease: ease.outQuart, delay: 0.12 }}
-            >
-              {label}
-            </motion.span>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {/* ALWAYS MOUNTED. Mounting it on click cost ~60ms before the
+          cover could even start, which the 800ms click-to-hero budget
+          could not absorb. It sits inert at inset(100%) instead. */}
+      <motion.div
+        className="rw"
+        aria-hidden="true"
+        initial={false}
+        animate={{
+          clipPath: covering ? "inset(0% 0 0 0)" : "inset(100% 0 0 0)",
+        }}
+        transition={
+          covering
+            ? { duration: COVER, ease: ease.inOut }
+            : { duration: REVEAL, ease: ease.inOut, delay: HOLD }
+        }
+        onAnimationComplete={onCovered}
+        style={{ pointerEvents: "none", visibility: idle ? "hidden" : "visible" }}
+      >
+        <motion.span
+          className="rw-name type-display-l"
+          initial={false}
+          animate={{ opacity: covering ? 1 : 0, y: covering ? 0 : 8 }}
+          transition={{ duration: 0.18, ease: ease.outQuart, delay: covering ? 0.08 : 0 }}
+        >
+          {label}
+        </motion.span>
+      </motion.div>
 
       <style>{`
         .rw {
