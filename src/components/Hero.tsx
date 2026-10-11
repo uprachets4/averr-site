@@ -35,7 +35,7 @@ const EYEBROW = "A boutique studio · Toronto";
    next to the pillar each one belongs to, so the sentence and the scene
    beside it cannot drift apart. */
 const KICKER =
-  "Averr Studios designs premium websites, builds AI automations, and runs the marketing engines for small and mid-market businesses across the GTA.";
+  "We design premium websites, build AI automations, and run the marketing engines that grow businesses like yours across the GTA.";
 
 /* ── load choreography, seconds from mount (≈2.0s film) ────────────── */
 

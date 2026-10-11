@@ -29,7 +29,7 @@ export function ReelHeading() {
         //_SELECTED WORK
       </div>
       <h2 className="type-h2 measure-wide" style={{ color: "var(--color-parch)" }}>
-        This is what serious looks like.
+        Here's what that looks like.
       </h2>
     </>
   );
