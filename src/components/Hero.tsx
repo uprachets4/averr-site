@@ -10,7 +10,6 @@ import {
 } from "motion/react";
 import { duration, ease, spring } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
-import PillHl from "./PillHl";
 import LineReveal from "./LineReveal";
 import TorontoClock from "./TorontoClock";
 import Chapter from "./Chapter";
@@ -22,15 +21,19 @@ import HeroReelStatic, {
   ReelHeading,
 } from "./HeroReel";
 import { reelCards } from "../data/heroReel";
+import { H1_SENTENCE, LEAD_1, LEAD_2, PHRASES } from "./home/heroPhrases";
+import { useHeroPhrase, type HeroPhrase } from "./home/useHeroPhrase";
+import PhraseSlab from "./home/PhraseSlab";
+import PhraseSelectors from "./home/PhraseSelectors";
+import HeroScene from "./home/HeroScene";
 
 /* ── copy ──────────────────────────────────────────────────────────── */
 
 const EYEBROW = "A boutique studio · Toronto";
-const LEAD_1 = "The studio for";
-const LEAD_2 = "businesses that want to";
-const WORD_BIG = "look";
-// NBSP keeps the period inside the pill's line.
-const WORD_PILL = "serious.";
+/* The headline now speaks TO the business and its last line is an outcome
+   that cycles. The lines and the three outcomes live in home/heroPhrases.ts,
+   next to the pillar each one belongs to, so the sentence and the scene
+   beside it cannot drift apart. */
 const KICKER =
   "Averr Studios designs premium websites, builds AI automations, and runs the marketing engines for small and mid-market businesses across the GTA.";
 
@@ -140,11 +143,13 @@ function HeroComposition({
   pillRef,
   hidePillSurface,
   film = T_DESKTOP,
+  phrase,
 }: {
   skip: boolean;
   pillRef?: React.Ref<HTMLSpanElement>;
   hidePillSurface?: boolean;
   film?: Film;
+  phrase: HeroPhrase;
 }) {
   const reduce = useReducedMotion();
   const instant = reduce || skip;
@@ -195,89 +200,114 @@ function HeroComposition({
         </motion.div>
       </motion.div>
 
-      {/* One h1. Its accessible text is the whole sentence. */}
-      <h1 style={{ margin: 0 }}>
-        <span
-          className="type-h1"
-          style={{
-            display: "block",
-            maxWidth: "16ch",
-            color: "var(--color-ink)",
-            opacity: 0.72,
-          }}
-        >
-          <LineReveal paint delay={d(T.lead1)}>{LEAD_1}</LineReveal>
-          <LineReveal paint delay={d(T.lead2)}>{LEAD_2}</LineReveal>
-        </span>
+      {/* The fold: the claim on the left, the work running on the right.
+          One column below 1024, where the scene follows the CTAs. */}
+      <div className="hero-main">
+        <div>
+        {/* One h1. Its accessible text is the whole sentence — every outcome,
+            not whichever one happens to be on the slab, so a reader who
+            cannot see it cycling still gets the complete claim. The visible
+            lines are hidden from assistive tech because they would otherwise
+            read the sentence a second time, in pieces. */}
+        <h1 style={{ margin: 0 }}>
+          <span className="sr-only">{H1_SENTENCE}</span>
 
-        <span
-          className="type-display-2xl"
-          style={{ display: "block", color: "var(--color-ink)", marginTop: 8 }}
-        >
-          <LineReveal paint delay={d(T.big)}>
-            {WORD_BIG}
-          </LineReveal>
-        </span>
-
-        <span
-          className="type-display-2xl hero-pill-line"
-          style={{ display: "block", marginTop: 4 }}
-        >
-          {/* The word paints with the rest of the headline. The slab behind
-              it is not text and keeps its own entrance — it is the signature
-              moment of the page and nothing here touches it. */}
-          <LineReveal paint delay={d(T.pillWord)}>
-            <span ref={pillRef} style={{ display: "inline-block" }}>
-              <PillHl
-                entrance="slab"
-                delay={d(T.slab)}
-                speed={film.scale}
-                skip={instant}
-                surface={!hidePillSurface}
-              >
-                {WORD_PILL}
-              </PillHl>
+          <span aria-hidden="true">
+            <span
+              className="type-h1"
+              style={{
+                display: "block",
+                maxWidth: "20ch",
+                color: "var(--color-ink)",
+                opacity: 0.72,
+              }}
+            >
+              <LineReveal paint delay={d(T.lead1)}>{LEAD_1}</LineReveal>
             </span>
-          </LineReveal>
-        </span>
-      </h1>
 
-      {/* LCP element on mobile. Painted from the first frame, so the delay
-          below moves it but cannot hold up the paint. */}
-      <motion.p
-        initial={{ opacity: 1, y: instant ? 0 : 12 }}
-        animate={{ y: 0 }}
-        transition={{ duration: dur(duration.base), ease: ease.outQuart, delay: d(T.kicker) }}
-        className="type-body-lg measure-body"
-        style={{ color: "var(--color-muted)", margin: "28px 0 0" }}
-      >
-        {KICKER}
-      </motion.p>
+            <span
+              className="type-hero"
+              style={{ display: "block", color: "var(--color-ink)", marginTop: 8 }}
+            >
+              <LineReveal paint delay={d(T.big)}>{LEAD_2}</LineReveal>
+            </span>
 
-      {/* The CTAs keep their spring, but on the TRANSFORM only — they are
-          painted at opacity 1 from the first frame like the rest of the hero
-          text, so the bounce is motion on something already on screen. */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 28 }}>
-        <motion.div
-          initial={{ opacity: 1, y: instant ? 0 : 12, scale: instant ? 1 : 0.96 }}
-          animate={{ y: 0, scale: 1 }}
-          transition={instant ? { duration: 0 } : { delay: d(T.ctaPrimary), ...spring.snappy }}
-          style={{ display: "inline-flex" }}
+            <span className="type-hero" style={{ display: "block", marginTop: 4 }}>
+              {/* The words paint with the rest of the headline. The slab behind
+                  them is not text and keeps PillHl's own entrance — it is the
+                  signature moment of the page and nothing here touches it. */}
+              <LineReveal paint delay={d(T.pillWord)}>
+                <span ref={pillRef} style={{ display: "inline-block" }}>
+                  <PhraseSlab
+                    index={phrase.index}
+                    reduce={phrase.reduce}
+                    delay={d(T.slab)}
+                    speed={film.scale}
+                    skip={instant}
+                    surface={!hidePillSurface}
+                    onClick={function advance() {
+                      phrase.next(true);
+                    }}
+                  />
+                </span>
+              </LineReveal>
+            </span>
+          </span>
+        </h1>
+
+        {/* Only user-driven changes are announced; the auto-cycle would
+            otherwise talk over the reader every 3.2 seconds. */}
+        <p aria-live="polite" className="sr-only">
+          {phrase.announce}
+        </p>
+
+        <PhraseSelectors
+          index={phrase.index}
+          onChoose={function pick(i) {
+            phrase.choose(i, true);
+          }}
+        />
+
+        {/* LCP element on mobile. Painted from the first frame, so the delay
+            below moves it but cannot hold up the paint. */}
+        <motion.p
+          initial={{ opacity: 1, y: instant ? 0 : 12 }}
+          animate={{ y: 0 }}
+          transition={{ duration: dur(duration.base), ease: ease.outQuart, delay: d(T.kicker) }}
+          className="type-body-lg measure-body"
+          style={{ color: "var(--color-muted)", margin: "28px 0 0" }}
         >
-          <MagneticCTA to="/contact" variant="primary">
-            Book a discovery call
-          </MagneticCTA>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 1, y: instant ? 0 : 12, scale: instant ? 1 : 0.96 }}
-          animate={{ y: 0, scale: 1 }}
-          transition={instant ? { duration: 0 } : { delay: d(T.ctaSecondary), ...spring.snappy }}
-          style={{ display: "inline-flex" }}
-        >
-          <MagneticCTA to="/work" variant="ghost">
-            See our work
-          </MagneticCTA>
-        </motion.div>
+          {KICKER}
+        </motion.p>
+
+        {/* The CTAs keep their spring, but on the TRANSFORM only — they are
+            painted at opacity 1 from the first frame like the rest of the hero
+            text, so the bounce is motion on something already on screen. */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 28 }}>
+          <motion.div
+            initial={{ opacity: 1, y: instant ? 0 : 12, scale: instant ? 1 : 0.96 }}
+            animate={{ y: 0, scale: 1 }}
+            transition={instant ? { duration: 0 } : { delay: d(T.ctaPrimary), ...spring.snappy }}
+            style={{ display: "inline-flex" }}
+          >
+            <MagneticCTA to="/contact" variant="primary">
+              Book a discovery call
+            </MagneticCTA>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 1, y: instant ? 0 : 12, scale: instant ? 1 : 0.96 }}
+            animate={{ y: 0, scale: 1 }}
+            transition={instant ? { duration: 0 } : { delay: d(T.ctaSecondary), ...spring.snappy }}
+            style={{ display: "inline-flex" }}
+          >
+            <MagneticCTA to="/work" variant="ghost">
+              See our work
+            </MagneticCTA>
+          </motion.div>
+        </div>
+        </div>
+
+        <HeroScene index={phrase.index} />
       </div>
     </div>
   );
@@ -341,6 +371,9 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
 
   const [engaged, setEngaged] = useState(false);
   const setNavDark = useSetNavDarkOverride();
+  // Frozen while the takeover runs: the dark layer below carries its own
+  // copy of the active phrase.
+  const phrase = useHeroPhrase(frameRef, engaged);
 
   useMotionValueEvent(scrollYProgress, "change", function onP(p) {
     setEngaged(p > 0.001);
@@ -451,7 +484,13 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
         <HeroGround />
 
         <div style={{ position: "relative", zIndex: 1, width: "100%" }}>
-          <HeroComposition skip={skip} pillRef={pillRef} hidePillSurface={engaged} film={film} />
+          <HeroComposition
+            skip={skip}
+            pillRef={pillRef}
+            hidePillSurface={engaged}
+            film={film}
+            phrase={phrase}
+          />
         </div>
 
         <ScrollCue skip={skip} hidden={engaged} film={film} />
@@ -474,27 +513,32 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
           <ReelStage progress={scrollYProgress} headingY={headingY} />
         </motion.div>
 
-        {/* "serious." again, above the dark layer, so the word survives the
-            takeover. aria-hidden — the real one lives in the h1. */}
+        {/* The active phrase again, above the dark layer, so the words
+            survive the takeover. Whichever one the reader left on the slab
+            is the one that rises — the cycle is frozen from the moment the
+            takeover engages, so this cannot swap mid-flight. aria-hidden:
+            the real sentence lives in the h1. */}
         {engaged && rect ? (
           <span
             ref={seriousRef as React.Ref<HTMLSpanElement>}
             aria-hidden
-            className="type-display-2xl"
+            className="type-hero"
             style={{
               position: "absolute",
               zIndex: 3,
               top: rect.top,
               left: rect.left,
               pointerEvents: "none",
-              padding: "0.1em 0.75em 0.16em",
-              lineHeight: "var(--type-display-2xl-leading)",
+              // .pill-hl--bare's own padding, so the words land where they
+              // already are rather than a slab's width away.
+              padding: "0.1em 0.28em 0.16em",
+              lineHeight: "var(--type-hero-leading)",
               fontWeight: 500,
-              letterSpacing: "-0.015em",
+              letterSpacing: "var(--type-hero-tracking)",
               color: "var(--color-parch)",
             }}
           >
-            {WORD_PILL}
+            {PHRASES[phrase.index].text}
           </span>
         ) : null}
       </div>
@@ -700,9 +744,18 @@ export default function Hero() {
     );
   }
 
+  return <FlatHero skip={skip} film={film} />;
+}
+
+/** Phones, short windows and reduced motion: no takeover, same fold. */
+function FlatHero({ skip, film }: { skip: boolean; film: Film }) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const phrase = useHeroPhrase(sectionRef);
+
   return (
     <>
       <section
+        ref={sectionRef}
         style={{
           position: "relative",
           minHeight: "100vh",
@@ -714,7 +767,7 @@ export default function Hero() {
         }}
       >
         <HeroGround />
-        <HeroComposition skip={skip} film={film} />
+        <HeroComposition skip={skip} film={film} phrase={phrase} />
       </section>
 
       <Chapter tone="dark" from="cream">

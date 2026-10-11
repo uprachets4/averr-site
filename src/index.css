@@ -134,6 +134,17 @@
   --type-display-2xl-tracking: -0.055em;
   --type-display-2xl-leading: 0.88;
 
+  /* The home hero's own size (Session 21). The hero headline shares the
+     fold with a live scene in a 60/40 split, so it is sized to the TEXT
+     COLUMN rather than to the viewport: display-2xl (11vw → 158px at 1440)
+     makes "look serious." about 1050px wide, which no 60% column can hold.
+     7vw keeps the widest phrase inside the column at every width from 375
+     up, measured, and still reads as display type. */
+  --type-hero-size: clamp(44px, 7vw, 112px);
+  --type-hero-weight: 500;
+  --type-hero-tracking: -0.05em;
+  --type-hero-leading: 0.92;
+
   --type-display-xl-size: clamp(48px, 10vw, 160px);
   --type-display-xl-weight: 500;
   --type-display-xl-tracking: -0.045em;
@@ -344,12 +355,24 @@ a { color: inherit; text-decoration: none; }
     inset 0 1px 0 rgba(255,255,255,0.05),
     0 2px 8px rgba(20,20,18,0.15);
 }
-/* The hero's pill line is offset into the measure on desktop. Below 768 the
-   display-2xl floor (56px) makes "serious." wider than the remaining 62%, so
-   the offset is dropped rather than clipping the word. */
-.hero-pill-line { padding-left: 38%; }
-@media (max-width: 767px) {
-  .hero-pill-line { padding-left: 0; }
+/* The home hero's fold: the headline and the live scene share it.
+   Session 21. Single column on phones and tablets — the scene drops below
+   the CTAs as a column-width card — and a 60/40 split from 1024 up, where
+   `minmax(0, …)` stops the slab's measured box from widening the column
+   past its share. The old `.hero-pill-line` 38% indent went with the old
+   two-word headline: the staircase is now lead → "your business" → slab,
+   and an indent on a line holding "look serious." would overflow. */
+.hero-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 44px;
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .hero-main {
+    grid-template-columns: minmax(0, 60fr) minmax(0, 40fr);
+    gap: 48px;
+  }
 }
 
 /* Slab variant — same box as .pill-hl, but the surface is its own layer so
@@ -390,6 +413,36 @@ a { color: inherit; text-decoration: none; }
   -webkit-text-fill-color: transparent;
 }
 
+/* The home hero's cycling slab (Session 21) extends the slab variant above.
+   These rules live here rather than in a <style> inside the component,
+   because that component renders inside the <h1> and a <style> element there
+   lands in the heading's own textContent. */
+.ps { position: relative; isolation: isolate; cursor: pointer; }
+/* The ruler is laid out, so it has widths — but it is out of flow and
+   invisible, so it cannot affect the box it is measuring for. */
+.ps-ruler {
+  position: absolute; left: 0; top: 0;
+  visibility: hidden; pointer-events: none; white-space: nowrap;
+}
+.ps-ruler > span { display: inline-block; white-space: nowrap; }
+.ps-words { position: relative; z-index: 1; display: block; white-space: nowrap; }
+.ps-word { display: inline-block; white-space: nowrap; }
+/* The parch layer sits exactly over the ink one and is clipped to the
+   surface's right edge. The z-index is not decoration: .pill-hl__word
+   carries `z-index: 1`, so the ink copy inside this one would otherwise
+   paint on top of the parch copy and the words would stay ink over a dark
+   slab. */
+.ps-reveal { position: absolute; left: 0; top: 0; display: block; z-index: 2; }
+/* The ink copy is .pill-hl__word with the fill put back, so it is the SAME
+   type as the parch copy it sits under — carrying the class and overriding
+   only the paint. Without the class its tracking was the headline's -0.05em
+   against the word's -0.015em, and the two copies did not line up. */
+.ps-ink {
+  background: none;
+  color: var(--color-ink);
+  -webkit-text-fill-color: var(--color-ink);
+}
+
 /* Scoped so it cannot reach the slab variant's own children — it is
    specificity (0,1,1) and would otherwise beat .pill-hl__slab (0,1,0) and
    paint the slab with the parch TEXT gradient. */
@@ -424,6 +477,13 @@ a { color: inherit; text-decoration: none; }
     font-weight: var(--type-display-2xl-weight);
     letter-spacing: var(--type-display-2xl-tracking);
     line-height: var(--type-display-2xl-leading);
+  }
+  .type-hero {
+    font-family: var(--font-display);
+    font-size: var(--type-hero-size);
+    font-weight: var(--type-hero-weight);
+    letter-spacing: var(--type-hero-tracking);
+    line-height: var(--type-hero-leading);
   }
   .type-display-xl {
     font-family: var(--font-display);
