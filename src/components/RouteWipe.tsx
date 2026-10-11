@@ -135,7 +135,7 @@ export default function RouteWipe() {
       setCovering(false);
       setAnnounce(labelFor(location.pathname));
       // back to inert once the reveal has run
-      const hide = window.setTimeout(() => setIdle(true), (HOLD + REVEAL + 0.1) * 1000);
+      const hide = window.setTimeout(() => setIdle(true), (HOLD + REVEAL + 0.02) * 1000);
 
       // focus the new page's heading, so a keyboard reader lands on the
       // page rather than back at the top of the document
