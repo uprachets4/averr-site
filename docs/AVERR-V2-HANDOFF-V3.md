@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `54c6285` — *20-2 fix: the wordmark actually spans the container*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 20. |
+| **HEAD** | `60b2bab` — *21-4 wire the fold: 60/40, the h1's whole sentence, the takeover*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 21. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -1665,6 +1665,118 @@ Build exit **0** unfiltered · **mobile LCP, median of 3, warm — every route p
 
 ---
 
+**SESSION 21 — the flagship home hero.** Four commits (`edd31d8` … `60b2bab`).
+
+Owner verdict going in: the home hero is **4–5/10** — one static line, not interactive, and the message talks about businesses instead of to them.
+
+### 1 · The headline
+
+`src/components/home/heroPhrases.ts` owns it:
+
+| Line | Copy | Type |
+|---|---|---|
+| 1 | We're here to help | `type-h1`, ink at 0.72 |
+| 2 | your business | `type-hero`, ink |
+| 3 | *the slab* | `type-hero`, parch on `--color-dark` |
+
+| Slab phrase | Selector | Pillar | Scene |
+|---|---|---|---|
+| look serious. | DESIGN | design | `ScreenLocalSite` — northgate.ca |
+| get found. | GROW | grow | `ScreenMap` — Local search — Northgate |
+| run itself. | AUTOMATE | automate | `ScreenAgent` — Northgate Ops — Agent |
+
+`EYEBROW` and `KICKER` are unchanged. `WORD_BIG`/`WORD_PILL`/the old `LEAD_1`/`LEAD_2` are gone.
+
+**A new type step, `--type-hero` (`clamp(44px, 7vw, 112px)`).** The headline now shares the fold with the scene in a 60/40 split, so it is sized to the TEXT COLUMN rather than to the viewport. At `display-2xl` (11vw → 158px at 1440) "look serious." measures **~1050px**, which no 60% column can hold at any width. `.hero-pill-line`'s 38% indent went with the old two-word headline — the staircase is now lead → "your business" → slab, and an indent on a line holding "look serious." would overflow.
+
+### 2 · The slab is measured, and it is PillHl
+
+`PhraseSlab` renders `.pill-hl .pill-hl--bare` with `.pill-hl__slab` and `.pill-hl__word` — the same box, surface and gradient PillHl owns, so the signature pill still has one owner in the CSS. The `.pill-hl` DOM inventory on `/` is still **2** (hero + FinalCTA) and **0** elsewhere; the hero's is now PhraseSlab's.
+
+All three phrases are laid out once in a hidden ruler, re-measured after `document.fonts.ready` and on resize. The box is fixed at the widest and the surface animates on **scaleX**, never on layout width, so nothing above or below it reflows. The horizontal padding is read off the live element, so it is inside the ratio rather than fighting it.
+
+*Measured at 1440 — `box = widest word + padding`, `scaleX = padded ÷ widest`:*
+
+| Phrase | Word | +pad (56.4) | scaleX | Box |
+|---|---|---|---|---|
+| look serious. | 574.2 | 630.6 | 1.000 | 630.6 |
+| get found. | 461.7 | 518.1 | 0.822 | 630.6 |
+| run itself. | 421.0 | 477.4 | 0.757 | 630.6 |
+
+The box never changes. Measured `scaleX` matches the computed ratio to three places.
+
+**The entrance finally does what PillHl always said it did.** The words paint at the first frame in **ink**, legible on cream; a parch copy sits exactly on top and is revealed by a clip that tracks the surface, so the words turn parch as the slab passes under them. Traced at 150ms intervals: clip 100% hidden through 1200ms (the slab's delay), then 18.5% / 3.0% / 0.2% / 0% against slab scaleX 0.817 / 0.970 / 0.998 / 1 — in lockstep.
+
+### 3 · Who is driving
+
+`useHeroPhrase` auto-cycles at **3200ms**, and only while the hero is in view (IntersectionObserver, 0.25), the tab is visible, and motion is welcome. It stops **permanently** the first time the reader touches it — someone who has taken the wheel does not get it moved under them 3 seconds later. It also freezes while the pinned takeover runs, because the dark layer carries its own copy of the active phrase.
+
+Controls: the three selectors, a click on the slab itself, and ←/→/↑/↓ while the selector row has focus (bound to the row, not the window, so the page keeps its arrow keys).
+
+*Sampled every 800ms:* phrase changes at 3.2s, 6.4s, 9.6s, each with the scene title in step. After a click: four samples over 8s, no further change.
+
+### 4 · The live scene
+
+`HeroScene` reuses /services' real screens — reused, not rebuilt. Hydration waits for `requestIdleCallback` (2500ms timeout) **or** the first pointermove/scroll, so nothing is on the hero's critical path. `.hs-body` is a DEFINITE height (`min(46vh, 420px)`, 300px below 1024) with a reserve behind it, so the screens cannot shift the fold. The window leans ±6° toward the cursor on `spring.soft` and rests at `rotateX 4 / rotateY -8`; two ghost frames behind it carry the other two scenes' chrome.
+
+### 5 · Accessibility
+
+The `h1`'s accessible name is the **whole sentence** — "We're here to help your business look serious, get found, and run itself." — in an `.sr-only` span, with the visible lines `aria-hidden` so it is not read twice in pieces. A polite live region carries **only** user-driven changes, so the auto-cycle never talks over anyone. The selectors are `aria-pressed` toggle buttons, **not** a tablist: a tablist promises tab panels, and the scene is decorative and `aria-hidden`. *Deviation from the brief's "selectors", recorded.*
+
+### 6 · Numbers
+
+| | Before | After |
+|---|---|---|
+| Home initial JS | 101.83 kB gzip | **104.75 kB gzip** (+2.92, target ≤ +3) |
+| CSS | 8.94 kB gzip | 9.12 kB gzip |
+| Screen chunks in the initial payload | 0 | **0** (37.1 kB gzip, fetched after LCP) |
+
+*On the alias, 375×812, 1.6 Mbps / 150ms / 4× CPU, median of 3 warm:* **LCP 600ms** on `P.type-body-lg` (568 / 600 / 600).
+
+*First frame, measured as cumulative opacity:* lead 0.72 (its designed value), "your business" 1, slab words 1 in `rgb(20,20,18)`, kicker 1 — at 1920, 1440 and 375.
+
+*CLS through hydration:* **0.0001** at 1440, **0.0096** at 375 (attributed to `DIV.hs-win`).
+
+*h1 bottom vs viewport, and horizontal overflow:*
+
+| Viewport | h1 bottom | Slab box | Overflow |
+|---|---|---|---|
+| 1920×1080 | 654.5 | 700.7 in an 835.2 column | none |
+| 1440×900 | 552.7 | 630.6 in a 766.1 column | none |
+| 1280×720 | 450.0 | 560.5 in a 677.8 column | none |
+| 1024×768 | 435.3 | 448.4 in a 536.4 column | none |
+| 768×1024 | 357.6 | 336.3, single column | none |
+| 375×812 | 336.7 | 275.3, single column | none |
+
+*Crash scroll:* no console errors at 1440 or 375. Long tasks over 50ms: 51 and **147** at 1440, 79 at 375. The 147ms one is the hero's screen chunks evaluating after LCP; an idle yield between chunks did not split it, so it is one chunk's own work (GrowScreens is the largest at 67 kB raw). It is after LCP and off the interaction path — loading on demand instead would move it onto a click, which is worse.
+
+*Reduced motion:* no auto-cycle (same phrase after 8.5s), slab at its final scaleX, clip fully revealed, swaps instant. The window keeps its static `rotateX 4 / rotateY -8` rest pose — a transform, not an animation.
+
+### 7 · Honest reading
+
+The fold now carries a sentence addressed to the reader, a slab that moves, three ways to drive it, and the studio's actual work running beside it. It reads as the flagship. Two reservations, both for the owner:
+
+1. **The Automate screen is navy.** `ScreenAgent` is dark blue on /services and it comes across unchanged, so for a third of the cycle there is blue inside the hero window. The brief asked for these screens reused, and it is confined to the inside of the frame — the page palette is untouched — but it is the one place another page's colour lands on home. Swapping that screen is a one-line change if it is not wanted.
+2. **The headline is half its old size** (112px cap, was 208px). That is the price of the scene sharing the fold. Nothing else fits.
+
+### 8 · Copy that now reads wrong next to the new hero — candidates only, not changed
+
+1. **The kicker, directly under the h1:** "Averr Studios designs premium websites, builds AI automations, and runs the marketing engines for **small and mid-market businesses** across the GTA." The headline has just said "your business"; the next line goes back to talking about businesses in the third person.
+2. **The reel heading: "This is what serious looks like."** It was a callback to a hero that ended on "serious." The hero now ends on three things, so the line echoes one of them.
+3. **`PHRASES` vs `/services` pillar names.** The selectors say DESIGN / GROW / AUTOMATE, matching `servicePillars`; worth a check that the pillar blurbs still open the same way now that the hero makes the same three promises first.
+
+### 9 · My own errors this session, all found by probe
+
+1. The ruler measured the phrases **8% short** at every width, because `.pill-hl__word` re-tracks the text to `-0.015em` and the ruler was inheriting the headline's `-0.05em`. The slab was narrower than the word it held. Fix: the ruler carries the class it is measuring for.
+2. The ink copy and the parch copy had **different widths** for the same reason, so they did not overlay. Fix: `.ps-ink` is `.pill-hl__word` with the fill put back.
+3. The ink copy painted **on top of** the parch copy, because `.pill-hl__word` carries `z-index: 1` and the reveal wrapper had none. The words stayed ink over a dark slab.
+4. The reveal never ran at all until it was moved out of the `AnimatePresence` — see gotcha 68.
+5. The scene was **blank on a phone**: correct chrome, correct title, nothing inside — see gotcha 69.
+6. `mode="wait"` left the slab **standing empty for 300ms** between tokens. `popLayout` crosses them.
+7. I read a downsampled full-page screenshot and reported the active selector's label as invisible. It was there; 12px mono does not survive that scale. Zoom before calling something broken.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -1770,6 +1882,9 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **A MEASURED BOX NEVER ANIMATES AS LAYOUT (21).** Anything whose width depends on its content — the hero's cycling slab is the case — is measured in the type it will actually render in, fixed at the widest, and animated on `scaleX`. A ruler that does not carry the rendering element's own classes is not a measurement: `.pill-hl__word` re-tracks text to `-0.015em` and measuring without it came out 8% short at every width.
+- **PillHl IS STILL HOME ONLY, AND STILL 2 (21).** The hero's pill is now `PhraseSlab`, which renders PillHl's own `.pill-hl--bare` classes rather than a copy of them. The measured `.pill-hl` inventory is unchanged: 2 on `/` (hero + FinalCTA), 0 on every other route.
 
 - **PillHl IS HOME ONLY (20).** The hero and FinalCTA, nowhere else. It was removed from the 404 in Session 20; the inventory is measured at 2 on `/` and 0 on every other route.
 
@@ -1939,6 +2054,12 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **67 · A page can have no `h1` and nothing will tell you.** *Cause:* /contact's headline was a `CharReveal` span with a display class. It looked like a heading, so nobody noticed there was no `h1` on the route — until the page transition tried to move focus to one and landed on an `h2`. *Fix:* wrap it. **A feature that needs the main heading is a good way to find out you never had one.**
 
+**68 · `AnimatePresence initial={false}` silences every animation NESTED under it, not just its children's.** *Cause:* the hero slab's parch reveal was a `motion.span` inside the keyed word, and its `initial` clip-path was dropped on mount — so the parch copy was fully visible from frame one, covering the ink copy, and the sweep that was supposed to turn the words parch as the slab passed under them never ran. The trace showed the clip at its final value at 150ms with the surface still at scaleX 0. *Fix:* the clip rides a wrapper OUTSIDE the `AnimatePresence`, which is never remounted. **`initial={false}` is inherited context, not a prop on one element.**
+
+**69 · A lazy chunk inside an `AnimatePresence` blanks the whole scene when it suspends.** *Cause:* the hero's three screens were `lazy()` under one `Suspense fallback={null}`. Switching to a phrase whose chunk was not in yet suspended the subtree, and the fallback of null emptied the window — correct chrome, correct title, nothing inside. On a desktop over localhost the chunk arrived in milliseconds and it was never visible; on a phone it was a blank frame. *Fix:* fetch the modules into state and render from state, so a switch is a render and never a suspension, and a phrase whose chunk has not landed holds the previous screen. **A Suspense fallback of null inside a presence animation is a blank screen waiting for a slow network.**
+
+**70 · `z-index: 1` on a shared class decides which of your two stacked copies wins.** *Cause:* `.pill-hl__word` carries `position: relative; z-index: 1`. The ink copy underneath therefore painted ON TOP of the absolutely positioned parch copy, and the words stayed ink over a dark slab. *Fix:* the reveal wrapper takes `z-index: 2`. **Reusing a class for its type brings its stacking with it.**
+
 ---
 
 ## 6. DATA FACTS
@@ -2037,6 +2158,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 17d — /services quality + two site-wide fixes.**~~ **DONE** (`608a0c6` … `d925553`). Captions, spotlight, density, nav CTA, ledger, hero CTAs. **Six screens remain over the blank target — §7.12.**
 - ~~**Session 19 — /contact.**~~ **DONE** (`7143d8d` … `ff01a34`). Two paths, a lazy framed booking, the brief with its live reply preview, the Outbox fold and the Received receipt. **OWNER ITEM: `RESEND_API_KEY` is still unset** — the form's failure path is graceful now (one honest sentence plus a prefilled mailto, never the server's words), but no brief reaches the inbox until the key is set in Vercel.
 - ~~**Session 20 — site-wide.**~~ **DONE** (`342ce75` … `54c6285`). Page transitions, the new footer, home's live door previews and reel hover, the new 404, PillHl home-only.
+- ~~**Session 21 — the home hero.**~~ **DONE** (`edd31d8` … `60b2bab`). The headline speaks to the business, the slab cycles three measured outcomes, the reader can drive it three ways, and /services' real screens run beside it after LCP. Home initial JS +2.92 kB gzip; mobile LCP 600ms.
 - **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
 
@@ -2046,7 +2168,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 
 | Surface | Trajectory |
 |---|---|
-| Home | **2 → 4–5 → 6** |
+| Home | **2 → 4–5 → 6 → 4–5 (hero, 21 brief) → awaiting** |
 | Case studies | **2 → 4–5** |
 | /services | **4** |
 | /about | **4** |
