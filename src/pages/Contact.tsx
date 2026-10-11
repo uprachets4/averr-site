@@ -125,7 +125,9 @@ function EditorialHero() {
           transition={{ duration: reduce ? 0 : 0.6, delay: reduce ? 0 : 2.4 }}
           style={{
             position: "absolute",
-            bottom: -40,
+            /* the hero now ends in the two path cards, so the cue sits
+               clear of them rather than on their bottom edge */
+            bottom: -104,
             left: "50%",
             transform: "translateX(-50%)",
             display: "flex",
