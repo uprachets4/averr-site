@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import DoorPreviewLive from "./home/DoorPreviewLive";
+import type { PillarId } from "../data/servicePillars";
 import { Link } from "react-router-dom";
 import {
   motion,
@@ -410,7 +412,14 @@ function Door({
                 : { duration: duration.base, ease: ease.outQuart }
             }
           >
-            <Preview id={door.id} reduce={reduce} />
+            {/* the live miniature replaces the hand-made still while the
+                door is active; it is lazy, so home's initial JS is
+                unchanged, and it is only mounted while hovered/focused */}
+            {active && !mobile ? (
+              <DoorPreviewLive pillar={door.id as PillarId} />
+            ) : (
+              <Preview id={door.id} reduce={reduce} />
+            )}
           </motion.div>
         </div>
 

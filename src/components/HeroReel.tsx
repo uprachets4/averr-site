@@ -89,7 +89,12 @@ export function ReelCardTile({
       onMouseLeave={onLeave}
       onFocus={function focus() {
         onFocusCard?.(card.slug);
+        // keyboard focus gets the same state as hover, minus the
+        // cursor-following tilt it has no cursor for
+        if (!reduce) lift.set(-6);
       }}
+      onBlur={onLeave}
+      className="reel-card"
       aria-label={`${card.client} — case study`}
       style={{
         flex: `0 0 ${width}`,

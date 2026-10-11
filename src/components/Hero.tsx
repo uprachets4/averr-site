@@ -625,6 +625,7 @@ function ReelStage({
           x: rowX,
           y: cardsY,
         }}
+        className="reel-row"
       >
         {reelCards.map(function drawCard(card) {
           return (
@@ -633,6 +634,18 @@ function ReelStage({
             </li>
           );
         })}
+        {/* the reel attends to one card at a time: the others step back
+            rather than the hovered one shouting. :has() keeps this in CSS,
+            so no hover state has to live in React and re-render the row. */}
+        <style>{`
+          .reel-row :global(.reel-card) { transition: opacity ${duration.base}s ease; }
+          .reel-row:has(.reel-card:hover) .reel-card:not(:hover),
+          .reel-row:has(.reel-card:focus-visible) .reel-card:not(:focus-visible) { opacity: 0.7; }
+          @media (prefers-reduced-motion: reduce) {
+            .reel-row :global(.reel-card) { transition: none; }
+          }
+        `}</style>
+
         {/* A flex row's trailing padding is not counted in scrollWidth, so the
             pan stopped a gutter short and clipped the last card's tags. */}
         <li aria-hidden style={{ flex: "0 0 var(--gutter)" }} />
