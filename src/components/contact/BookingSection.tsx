@@ -99,7 +99,13 @@ export default function BookingSection() {
           font-family: var(--font-mono); font-size: 13px; color: var(--color-muted);
         }
         .bk-fallback { margin: 16px 0 0; font-size: 14px; color: var(--color-muted); }
-        .bk-fallback a { color: var(--color-ink); text-decoration: underline; text-underline-offset: 3px; }
+                /* an inline link in prose still needs a real tap target: padding
+           grows the hit area, the negative margin keeps the line where
+           it was */
+        .bk-fallback a {
+          color: var(--color-ink); text-decoration: underline; text-underline-offset: 3px;
+          display: inline-block; padding: 13px 6px; margin: -13px -6px;
+        }
         @media (max-width: 1023px) {
           .bk-body, .bk-wait { min-height: 560px; }
         }
