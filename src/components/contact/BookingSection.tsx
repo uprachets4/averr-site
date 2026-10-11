@@ -93,7 +93,13 @@ export default function BookingSection() {
         }
         /* a real height, so the embed has somewhere to paint and the
            reserve cannot shift anything when it arrives */
-        .bk-body { min-height: 640px; background: var(--color-bg); }
+        /* The reserve defines the layout and the embed is taken OUT OF
+           FLOW inside it. Cal grows its own iframe in steps as it
+           hydrates; in flow, every one of those steps was a layout
+           shift for everything after it. Absolutely positioned, the
+           iframe can resize all it likes and nothing moves. */
+        .bk-body { position: relative; min-height: 640px; background: var(--color-bg); }
+        .bk-body > * { position: absolute; inset: 0; overflow: auto; }
         .bk-wait {
           min-height: 640px; display: grid; place-items: center;
           font-family: var(--font-mono); font-size: 13px; color: var(--color-muted);

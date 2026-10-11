@@ -66,7 +66,7 @@ export default function CalEmbed() {
         <p>The booking calendar could not load here.</p>
         <a href={href} target="_blank" rel="noopener noreferrer">Book on Cal.com ↗</a>
         <style>{`
-          .ce-fail { display: grid; place-items: center; gap: 10px; min-height: 640px; text-align: center; }
+          .ce-fail { display: grid; place-items: center; gap: 10px; height: 100%; text-align: center; }
           .ce-fail p { margin: 0; font-size: 14px; color: var(--color-muted); }
           .ce-fail a { font-size: 14px; color: var(--color-ink); text-decoration: underline; text-underline-offset: 3px; }
         `}</style>
@@ -82,13 +82,13 @@ export default function CalEmbed() {
           empty cream box. */}
       <Cal
         calLink={CAL_LINK}
-        style={{ width: "100%", height: "100%", minHeight: 640, border: "none", overflow: "hidden" }}
+        style={{ width: "100%", height: "100%", border: "none" }}
         config={config}
       />
       {ready ? null : <span className="ce-wait">Loading times…</span>}
       <style>{`
-        .ce { position: relative; height: 100%; min-height: 640px; }
-        .ce :global(iframe) { height: 100% !important; min-height: 640px; }
+        .ce { position: relative; height: 100%; width: 100%; }
+        .ce iframe { height: 100% !important; width: 100% !important; }
         .ce-wait {
           position: absolute; inset: 0; display: grid; place-items: center;
           font-family: var(--font-mono); font-size: 13px; color: var(--color-muted);
