@@ -1,37 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useInView,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "motion/react";
-import Cal, { getCalApi } from "@calcom/embed-react";
-import { useSearchParams } from "react-router-dom";
-import { fromISO, toISO } from "../lib/businessDays";
-import {
-  Check,
-  Envelope,
-  InstagramLogo,
-  LinkedinLogo,
-} from "@phosphor-icons/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import { duration, ease } from "../lib/motion";
-import MagneticCTA from "../components/MagneticCTA";
 import MonogramMark from "../components/MonogramMark";
-import ContactForm from "../components/ContactForm";
-import Icon from "../components/icons/Icon";
+import PathCards from "../components/contact/PathCards";
+import BookingSection from "../components/contact/BookingSection";
+import BriefSection from "../components/contact/BriefSection";
+import DirectRow from "../components/contact/DirectRow";
 import { CharReveal, CharRevealInView } from "../components/CharReveal";
 import Chapter from "../components/Chapter";
 import { useDeclarePageEndTone } from "../lib/pageTone";
-
-const EMAIL_ADDR = "prachets@averrstudios.com";
-const CAL_LINK = "prachets/discoverycall";
-const CAL_FULL_URL = `https://cal.com/${CAL_LINK}`;
-const LINKEDIN_URL = "https://www.linkedin.com/in/prachetsupadhyay";
-const LINKEDIN_LABEL = "linkedin.com/in/prachetsupadhyay";
-const INSTAGRAM_URL = "https://instagram.com/averrstudios";
-const INSTAGRAM_LABEL = "@averrstudios";
 
 /* ═══════════════════════════════════════════════════════════════
    Band 1 — Editorial hero
@@ -139,6 +116,8 @@ function EditorialHero() {
           reply, a first call. Reach out with a brand new site, a redesign, or
           something we haven't figured out yet.
         </motion.p>
+
+        <PathCards />
 
         <motion.div
           initial={{ opacity: reduce ? 1 : 0 }}
@@ -369,813 +348,17 @@ function HourCountUp({ inView, reduce }: { inView: boolean; reduce: boolean }) {
    Band 3 — What helps us reply well (4 cards, distinct numeral choreo)
    ═══════════════════════════════════════════════════════════════ */
 
-type Helper = {
-  n: string;
-  title: string;
-  body: string;
-  variant: "stroke-fill" | "scale-up" | "skew-straighten" | "slow-rotate";
-};
-
-const HELPERS: Helper[] = [
-  {
-    n: "01",
-    title: "What you're building.",
-    body: "A sentence. A paragraph. A rough sketch. Anywhere in that range works.",
-    variant: "stroke-fill",
-  },
-  {
-    n: "02",
-    title: "Rough timeline.",
-    body: "Soft launch. Hard deadline. “Figuring it out.” Any of these tells us how to prioritize.",
-    variant: "scale-up",
-  },
-  {
-    n: "03",
-    title: "Budget shape.",
-    body: "A range, not an exact number. Helps us match scope to what's realistic — and tell you honestly if we're not the right fit.",
-    variant: "skew-straighten",
-  },
-  {
-    n: "04",
-    title: "Links to anything.",
-    body: "Inspiration, your current site, a notes doc, a Figma. Anything visual saves us 20 questions.",
-    variant: "slow-rotate",
-  },
-];
-
-function HelpersBand() {
-  const reduce = useReducedMotion();
-  return (
-    <section
-      style={{
-        position: "relative",
-        backgroundColor: "var(--color-bg-alt)",
-        minHeight: "100vh",
-        padding: "160px 40px",
-        display: "flex",
-        alignItems: "center",
-      }}
-      className="helpers-band"
-    >
-      <div className="grain-light" aria-hidden style={{ opacity: 0.04 }} />
-      <div style={{ position: "relative", zIndex: 2, maxWidth: 1200, margin: "0 auto", width: "100%" }}>
-        <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-15% 0px" }}
-          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{ color: "var(--color-ink-soft)", marginBottom: 32 }}
-        >
-          Helps us help you
-        </motion.div>
-
-        <div
-          className="type-display-l"
-          style={{ color: "var(--color-ink)", marginBottom: 24, maxWidth: "24ch" }}
-        >
-          <CharRevealInView
-            text="A few things that speed up the first reply."
-            style={{ color: "var(--color-ink)" }}
-          />
-        </div>
-
-        <motion.p
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-15% 0px" }}
-          transition={{ duration: reduce ? 0 : 0.6, ease: ease.outQuart, delay: reduce ? 0 : 1.4 }}
-          className="type-body-lg"
-          style={{ color: "var(--color-ink)", maxWidth: 640, marginBottom: 80 }}
-        >
-          You don't need to have all of these figured out. Whatever you can
-          share, share.
-        </motion.p>
-
-        <div
-          className="helpers-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 20,
-          }}
-        >
-          {HELPERS.map(function drawCard(h, i) {
-            return <HelperCard key={h.n} helper={h} index={i} />;
-          })}
-        </div>
-      </div>
-      <style>{`
-        @media (max-width: 900px) {
-          .helpers-band { min-height: 90vh; padding: 128px 24px; }
-          .helpers-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
-        }
-      `}</style>
-    </section>
-  );
-}
-
-function HelperCard({ helper, index }: { helper: Helper; index: number }) {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{
-        duration: reduce ? 0 : 0.6,
-        ease: ease.outQuart,
-        delay: reduce ? 0 : index * 0.12,
-      }}
-      style={{
-        position: "relative",
-        background: "var(--color-bg)",
-        border: "1px solid rgba(20,20,18,0.08)",
-        borderRadius: 12,
-        padding: "32px 28px",
-        overflow: "hidden",
-        minHeight: 240,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-end",
-      }}
-    >
-      <HelperNumeral
-        helper={helper}
-        scrollYProgress={scrollYProgress}
-        reduce={!!reduce}
-      />
-      <div style={{ position: "relative", zIndex: 2 }}>
-        <div
-          className="type-eyebrow"
-          style={{ color: "var(--color-ink-soft)", marginBottom: 12 }}
-        >
-          {helper.n}
-        </div>
-        <h3
-          className="type-h3"
-          style={{ color: "var(--color-ink)", marginBottom: 12 }}
-        >
-          {helper.title}
-        </h3>
-        <p
-          className="type-body"
-          style={{ color: "var(--color-ink)", margin: 0 }}
-        >
-          {helper.body}
-        </p>
-      </div>
-    </motion.div>
-  );
-}
-
-function HelperNumeral({
-  helper,
-  scrollYProgress,
-  reduce,
-}: {
-  helper: Helper;
-  scrollYProgress: MotionValue<number>;
-  reduce: boolean;
-}) {
-  const strokeFillOpacity = useTransform(scrollYProgress, [0.4, 0.7], [0, 0.18]);
-  const strokeOnlyOpacity = useTransform(
-    scrollYProgress,
-    [0.2, 0.4, 0.7],
-    [0, 0.35, 0]
-  );
-  const scale = useTransform(scrollYProgress, [0.15, 0.55], [0.6, 1]);
-  const skew = useTransform(scrollYProgress, [0.2, 0.8], [8, 0]);
-  const skewTransform = useTransform(skew, function map(v) {
-    return `skewY(${v}deg)`;
-  });
-
-  const base: React.CSSProperties = {
-    position: "absolute",
-    top: 12,
-    right: 20,
-    fontFamily: "var(--font-display), Georgia, serif",
-    fontSize: 120,
-    fontWeight: 700,
-    lineHeight: 1,
-    color: "var(--color-ink)",
-    pointerEvents: "none",
-    zIndex: 1,
-    userSelect: "none",
-  };
-
-  switch (helper.variant) {
-    case "stroke-fill":
-      return (
-        <svg
-          viewBox="0 0 200 140"
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: 12,
-            right: 20,
-            width: 140,
-            height: 100,
-            overflow: "visible",
-          }}
-        >
-          <motion.text
-            x="100"
-            y="120"
-            textAnchor="middle"
-            fontFamily="var(--font-display), Georgia, serif"
-            fontSize={140}
-            fontWeight={700}
-            fill="var(--color-ink)"
-            style={{ opacity: reduce ? 0.18 : strokeFillOpacity }}
-          >
-            {helper.n}
-          </motion.text>
-          <motion.text
-            x="100"
-            y="120"
-            textAnchor="middle"
-            fontFamily="var(--font-display), Georgia, serif"
-            fontSize={140}
-            fontWeight={700}
-            fill="transparent"
-            stroke="var(--color-ink)"
-            strokeWidth={1.5}
-            style={{ opacity: reduce ? 0 : strokeOnlyOpacity }}
-          >
-            {helper.n}
-          </motion.text>
-        </svg>
-      );
-    case "scale-up":
-      return (
-        <motion.div
-          aria-hidden
-          style={{
-            ...base,
-            opacity: 0.18,
-            scale: reduce ? 1 : scale,
-            transformOrigin: "top right",
-          }}
-        >
-          {helper.n}
-        </motion.div>
-      );
-    case "skew-straighten":
-      return (
-        <motion.div
-          aria-hidden
-          style={{
-            ...base,
-            opacity: 0.18,
-            transform: reduce ? "none" : (skewTransform as unknown as string),
-          }}
-        >
-          {helper.n}
-        </motion.div>
-      );
-    case "slow-rotate":
-      return (
-        <motion.div
-          aria-hidden
-          animate={reduce ? undefined : { rotate: 360 }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-          style={{ ...base, opacity: 0.18 }}
-        >
-          {helper.n}
-        </motion.div>
-      );
-  }
-}
-
 /* ═══════════════════════════════════════════════════════════════
    Band 4 — The designed form
    ═══════════════════════════════════════════════════════════════ */
-
-function FormBand() {
-  const reduce = useReducedMotion();
-  return (
-    <section
-      style={{
-        position: "relative",
-        backgroundColor: "var(--color-bg-alt)",
-        borderTop: "1px solid rgba(20,20,18,0.08)",
-        minHeight: "100vh",
-        padding: "160px 40px",
-      }}
-      className="form-band"
-    >
-      <div className="grain-light" aria-hidden style={{ opacity: 0.04 }} />
-      <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 2 }}>
-        <div
-          className="form-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "0.9fr 1.1fr",
-            gap: 80,
-            alignItems: "start",
-          }}
-        >
-          <div>
-            <motion.div
-              initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-15% 0px" }}
-              transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
-              className="type-eyebrow"
-              style={{ color: "var(--color-ink-soft)", marginBottom: 32 }}
-            >
-              The form
-            </motion.div>
-
-            <div
-              className="type-display-l"
-              style={{ color: "var(--color-ink)", marginBottom: 32, maxWidth: "16ch" }}
-            >
-              <CharRevealInView
-                text="Tell us what you're building."
-                style={{ color: "var(--color-ink)" }}
-              />
-            </div>
-
-            <motion.p
-              initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-15% 0px" }}
-              transition={{ duration: reduce ? 0 : 0.6, ease: ease.outQuart, delay: reduce ? 0 : 1.2 }}
-              className="type-body-lg"
-              style={{ color: "var(--color-ink)", marginBottom: 40 }}
-            >
-              Two minutes. No captcha. We read every one.
-            </motion.p>
-
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-              {[
-                "We never share your email",
-                "We never send marketing",
-                "We only reply to what you actually ask",
-              ].map(function draw(text, i) {
-                return (
-                  <motion.li
-                    key={text}
-                    initial={{ opacity: reduce ? 1 : 0, x: reduce ? 0 : -8 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-10% 0px" }}
-                    transition={{
-                      duration: reduce ? 0 : 0.5,
-                      ease: ease.outQuart,
-                      delay: reduce ? 0 : 1.5 + i * 0.08,
-                    }}
-                    className="type-small"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                      color: "var(--color-ink-soft)",
-                    }}
-                  >
-                    <CheckGlyph />
-                    {text}
-                  </motion.li>
-                );
-              })}
-            </ul>
-          </div>
-
-          <div>
-            <ContactForm />
-          </div>
-        </div>
-      </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .form-band { min-height: 90vh; padding: 128px 24px; }
-          .form-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
-        }
-      `}</style>
-    </section>
-  );
-}
-
-function CheckGlyph() {
-  return <Icon glyph={Check} size="sm" weight="regular" />;
-}
 
 /* ═══════════════════════════════════════════════════════════════
    Band 5 — Or reach directly (3 cards)
    ═══════════════════════════════════════════════════════════════ */
 
-type DirectCard = {
-  key: string;
-  label: string;
-  detail: string;
-  glyph: "email" | "linkedin" | "instagram";
-  action: () => void;
-};
-
-function DirectBand() {
-  const reduce = useReducedMotion();
-  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
-
-  const cards: DirectCard[] = [
-    {
-      key: "email",
-      label: "Email",
-      detail: EMAIL_ADDR,
-      glyph: "email",
-      action: function copy() {
-        void navigator.clipboard?.writeText(EMAIL_ADDR).catch(function fallback() {
-          window.location.href = `mailto:${EMAIL_ADDR}`;
-        });
-      },
-    },
-    {
-      key: "linkedin",
-      label: "LinkedIn",
-      detail: LINKEDIN_LABEL,
-      glyph: "linkedin",
-      action: function openTab() {
-        window.open(LINKEDIN_URL, "_blank", "noopener,noreferrer");
-      },
-    },
-    {
-      key: "instagram",
-      label: "Instagram",
-      detail: INSTAGRAM_LABEL,
-      glyph: "instagram",
-      action: function openTab() {
-        window.open(INSTAGRAM_URL, "_blank", "noopener,noreferrer");
-      },
-    },
-  ];
-
-  return (
-    <section
-      style={{
-        position: "relative",
-        backgroundColor: "var(--color-bg)",
-        minHeight: "100vh",
-        padding: "160px 40px",
-        display: "flex",
-        alignItems: "center",
-        borderTop: "1px solid rgba(20,20,18,0.08)",
-      }}
-      className="direct-band"
-    >
-      <div className="grain-light" aria-hidden style={{ opacity: 0.04 }} />
-      <div style={{ maxWidth: 1200, margin: "0 auto", width: "100%", position: "relative", zIndex: 2 }}>
-        <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-15% 0px" }}
-          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{ color: "var(--color-ink-soft)", marginBottom: 32 }}
-        >
-          Or reach directly
-        </motion.div>
-
-        <div
-          className="type-display-l"
-          style={{ color: "var(--color-ink)", marginBottom: 64, maxWidth: "16ch" }}
-        >
-          <CharRevealInView
-            text="The other three ways."
-            style={{ color: "var(--color-ink)" }}
-          />
-        </div>
-
-        <div
-          className="direct-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 20,
-          }}
-        >
-          {cards.map(function drawCard(c, i) {
-            return (
-              <DirectCardTile
-                key={c.key}
-                card={c}
-                index={i}
-                showCopied={copiedIdx === i}
-                onClick={function h() {
-                  c.action();
-                  if (c.glyph === "email") {
-                    setCopiedIdx(i);
-                    window.setTimeout(function clear() {
-                      setCopiedIdx(null);
-                    }, 1500);
-                  }
-                }}
-              />
-            );
-          })}
-        </div>
-      </div>
-      <style>{`
-        @media (max-width: 900px) {
-          .direct-band { min-height: 90vh; padding: 128px 24px; }
-          .direct-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
-        }
-      `}</style>
-    </section>
-  );
-}
-
-function DirectCardTile({
-  card,
-  index,
-  showCopied,
-  onClick,
-}: {
-  card: DirectCard;
-  index: number;
-  showCopied: boolean;
-  onClick: () => void;
-}) {
-  const reduce = useReducedMotion();
-  const [hovered, setHovered] = useState(false);
-  return (
-    <motion.button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={function h() {
-        setHovered(true);
-      }}
-      onMouseLeave={function h() {
-        setHovered(false);
-      }}
-      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{
-        duration: reduce ? 0 : 0.6,
-        ease: ease.outQuart,
-        delay: reduce ? 0 : index * 0.1,
-      }}
-      style={{
-        appearance: "none",
-        textAlign: "left",
-        background: "var(--color-bg-alt)",
-        border: "1px solid rgba(20,20,18,0.10)",
-        borderRadius: 12,
-        padding: "32px 28px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 20,
-        cursor: "pointer",
-        color: "var(--color-ink)",
-        transform: hovered && !reduce ? "translateY(-4px)" : "translateY(0)",
-        boxShadow: hovered
-          ? "0 12px 32px rgba(20,20,18,0.10)"
-          : "0 0 0 rgba(20,20,18,0)",
-        transition: `transform 300ms cubic-bezier(${ease.outQuart.join(",")}), box-shadow 300ms cubic-bezier(${ease.outQuart.join(",")})`,
-        position: "relative",
-      }}
-    >
-      <DirectGlyph type={card.glyph} />
-      <div
-        className="type-eyebrow"
-        style={{ color: "var(--color-ink-soft)" }}
-      >
-        {card.label}
-      </div>
-      <div
-        className="type-h3"
-        style={{ color: "var(--color-ink)", wordBreak: "break-all" }}
-      >
-        {card.detail}
-      </div>
-      {showCopied ? (
-        <motion.div
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="type-small"
-          style={{
-            position: "absolute",
-            top: 12,
-            right: 12,
-            background: "var(--color-ink)",
-            color: "var(--color-parch)",
-            padding: "4px 10px",
-            borderRadius: 999,
-          }}
-        >
-          Copied ✓
-        </motion.div>
-      ) : null}
-    </motion.button>
-  );
-}
-
-function DirectGlyph({ type }: { type: DirectCard["glyph"] }) {
-  if (type === "email") {
-    return <Icon glyph={Envelope} size="xl" weight="regular" />;
-  }
-  if (type === "linkedin") {
-    return <Icon glyph={LinkedinLogo} size="xl" weight="regular" />;
-  }
-  return <Icon glyph={InstagramLogo} size="xl" weight="regular" />;
-}
-
 /* ═══════════════════════════════════════════════════════════════
    Band 6 — Book a call (Cal.com)
    ═══════════════════════════════════════════════════════════════ */
-
-function BookingBand() {
-  const reduce = useReducedMotion();
-  const [calReady, setCalReady] = useState(false);
-
-  /**
-   * /services' kickoff picker sends the day the reader chose as ?date=.
-   * Cal.com's embed takes `date` and `month` in its config, and its
-   * hosted page takes the same as query params, so the chosen day is
-   * already selected whichever of the two the reader ends up on.
-   * A malformed or past value is simply ignored.
-   */
-  const [params] = useSearchParams();
-  const picked = (function readDate() {
-    const raw = params.get("date");
-    if (!raw) return null;
-    const d = fromISO(raw);
-    return d ? toISO(d) : null;
-  })();
-  // Cal's PrefillAndIframeAttrsConfig is an index signature of strings
-  // plus a typed `layout`; building the object in one literal keeps it
-  // assignable instead of widening to a union of two shapes.
-  // The pass also sends the business name as `notes`, which is the field
-  // Cal.com prefills from that param. It is never put in `name`.
-  const notes = (params.get("notes") || "").slice(0, 60).trim();
-  const calConfig: React.ComponentProps<typeof Cal>["config"] = {
-    layout: "month_view",
-    ...(picked ? { date: picked, month: picked.slice(0, 7) } : {}),
-    ...(notes ? { notes } : {}),
-  };
-  const calHref = (function hosted() {
-    const q = new URLSearchParams();
-    if (picked) q.set("date", picked);
-    if (notes) q.set("notes", notes);
-    const s = q.toString();
-    return s ? `${CAL_FULL_URL}?${s}` : CAL_FULL_URL;
-  })();
-
-  useEffect(function initCal() {
-    let cancelled = false;
-    (async function boot() {
-      try {
-        const cal = await getCalApi({});
-        if (cancelled) return;
-        cal("ui", {
-          hideEventTypeDetails: false,
-          theme: "light",
-        });
-        setCalReady(true);
-      } catch (err) {
-        if (typeof console !== "undefined") {
-          console.warn("Cal.com not embedded — using external link fallback", err);
-        }
-      }
-    })();
-    return function cleanup() {
-      cancelled = true;
-    };
-  }, []);
-
-  return (
-    <section
-      style={{
-        position: "relative",
-        backgroundColor: "var(--color-bg-alt)",
-        minHeight: "100vh",
-        padding: "160px 40px",
-      }}
-      className="booking-band"
-    >
-      <div className="grain-light" aria-hidden style={{ opacity: 0.04 }} />
-      {/* Ambient dot pattern behind embed */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage:
-            "radial-gradient(circle, rgba(20,20,18,0.08) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-          opacity: 0.5,
-          pointerEvents: "none",
-        }}
-      />
-
-      <div style={{ position: "relative", zIndex: 2, maxWidth: 1000, margin: "0 auto", textAlign: "center" }}>
-        <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-15% 0px" }}
-          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{ color: "var(--color-ink-soft)", marginBottom: 32 }}
-        >
-          Skip the back and forth
-        </motion.div>
-
-        <div
-          className="type-display-l"
-          style={{ color: "var(--color-ink)", marginBottom: 24, maxWidth: "20ch", marginInline: "auto" }}
-        >
-          <CharRevealInView
-            text="Book a 30-minute intro call."
-            style={{ color: "var(--color-ink)" }}
-          />
-        </div>
-
-        <motion.p
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-15% 0px" }}
-          transition={{ duration: reduce ? 0 : 0.6, ease: ease.outQuart, delay: reduce ? 0 : 1.2 }}
-          className="type-body-lg"
-          style={{
-            color: "var(--color-ink)",
-            marginTop: 24,
-            marginBottom: 56,
-            maxWidth: 640,
-            marginInline: "auto",
-          }}
-        >
-          No sales script. We'll ask what you're building and figure out if
-          we're the right fit — same call.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 0.97 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-10% 0px" }}
-          transition={{ duration: reduce ? 0 : 0.7, ease: ease.outQuart }}
-          style={{
-            maxWidth: 900,
-            margin: "0 auto",
-            background: "var(--color-bg)",
-            border: "1px solid rgba(20,20,18,0.15)",
-            borderRadius: 16,
-            padding: 32,
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            className="grain-light"
-            aria-hidden
-            style={{ opacity: 0.04, borderRadius: 16 }}
-          />
-          {calReady ? (
-            <Cal
-              calLink={CAL_LINK}
-              style={{
-                width: "100%",
-                minHeight: 640,
-                border: "none",
-              }}
-              config={calConfig}
-            />
-          ) : (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 20,
-                padding: "48px 0",
-              }}
-            >
-              <p className="type-body" style={{ color: "var(--color-ink)" }}>
-                Open the calendar in a new tab to book.
-              </p>
-              <MagneticCTA to={calHref} variant="primary">
-                Book on Cal.com ↗
-              </MagneticCTA>
-            </div>
-          )}
-        </motion.div>
-      </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .booking-band { min-height: 90vh; padding: 128px 24px; }
-        }
-      `}</style>
-    </section>
-  );
-}
 
 /* ═══════════════════════════════════════════════════════════════
    Band 7 — Closing warmth (dark)
@@ -1306,19 +489,68 @@ export default function Contact() {
 
   return (
     <>
+      {/* the hero now carries the two paths */}
       <EditorialHero />
+
+      {/* "24 hours. Every message." — kept verbatim, now the statement
+          between choosing a path and taking one */}
       <Chapter tone="dark" from="cream">
         <PromiseBand />
       </Chapter>
-      <Chapter tone="cream-alt" from="dark">
-        <HelpersBand />
+
+      <Chapter tone="cream" from="dark">
+        <section id="book" className="ct-band" aria-labelledby="book-h">
+          <div className="ct-head">
+            <span className="type-eyebrow ct-eyebrow">Skip the back and forth</span>
+            <h2 id="book-h" className="type-display-l ct-h">Book a 30-minute intro call.</h2>
+            <p className="ct-sub">
+              No sales script. We'll ask what you're building and figure out if
+              we're the right fit — same call.
+            </p>
+          </div>
+          <BookingSection />
+        </section>
       </Chapter>
-      <FormBand />
-      <DirectBand />
-      <BookingBand />
-      <Chapter tone="dark" from="cream-alt">
+
+      <section id="brief" className="ct-band ct-band--alt" aria-labelledby="brief-h">
+        <div className="ct-head">
+          <span className="type-eyebrow ct-eyebrow">The brief</span>
+          <h2 id="brief-h" className="type-display-l ct-h">Tell us what you're building.</h2>
+          <p className="ct-sub">Two minutes. No captcha. We read every one.</p>
+        </div>
+        <BriefSection />
+      </section>
+
+      <section className="ct-band" aria-labelledby="direct-h">
+        <div className="ct-head">
+          <span className="type-eyebrow ct-eyebrow">Or reach directly</span>
+          <h2 id="direct-h" className="type-display-l ct-h">The other three ways.</h2>
+        </div>
+        <DirectRow />
+      </section>
+
+      <Chapter tone="dark" from="cream">
         <ClosingBand />
       </Chapter>
+
+      <style>{`
+        .ct-band {
+          position: relative;
+          background: var(--color-bg);
+          padding: clamp(96px, 12vh, 150px) 0;
+        }
+        .ct-band--alt { background: var(--color-bg-alt); }
+        .ct-head {
+          max-width: var(--container-wide); margin: 0 auto;
+          padding-bottom: clamp(32px, 5vh, 56px);
+        }
+        .ct-eyebrow { color: var(--color-muted); display: block; margin-bottom: 18px; }
+        .ct-h { color: var(--color-ink); margin: 0; max-width: 20ch; }
+        .ct-sub {
+          margin: 18px 0 0; font-size: 16px; line-height: 1.6;
+          color: var(--color-muted); max-width: 52ch;
+        }
+      `}</style>
     </>
   );
 }
