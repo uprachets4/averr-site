@@ -42,13 +42,16 @@ export default function ChapterRail() {
     function read() {
       raf.current = 0;
       const mid = window.innerHeight * 0.45;
+      /* Fall back to the LAST chapter the reader has passed, not to the
+         first: at the very bottom of the page no chapter contains the
+         midpoint any more and the rail jumped back to chapter one. */
       let found = 0;
       let isDark = false;
       CHAPTERS.forEach(function each(c, i) {
         const el = document.getElementById(c.id);
         if (!el) return;
         const r = el.getBoundingClientRect();
-        if (r.top <= mid && r.bottom > mid) {
+        if (r.top <= mid) {
           found = i;
           isDark = el.dataset.tone === "dark";
         }
