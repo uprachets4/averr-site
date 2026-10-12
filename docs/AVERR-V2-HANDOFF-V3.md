@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `73dce33` — *22-C2 close the gap between chapters 4 and 5*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 22. |
+| **HEAD** | `1f96a2e` — *23 the hero rebuilt from real work: a dark room you fly through*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 23. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -2104,6 +2104,119 @@ Two honest reservations: **chapter 3 is the least cinematic of the five** — it
 
 ---
 
+**SESSION 23 — the hero rebuilt from real work.** One commit (`1f96a2e`).
+
+Owner verdict on Session 22: **−1/10.** Root cause accepted: the 21b generated-site concept produced template-looking output, and the scroll-fill blew one of those templates up to full screen — greyed, with "SAMPLE" reviews — as the flagship's first impression, into a dead black frame.
+
+### 1 · Removed, zero importers verified
+
+The site generator and its seven presets (`home/sketch/`), the slab text field (`NameField`), the placeholder cycle, the "TYPE YOUR BUSINESS NAME" hint, `SketchWindow`, the scroll-fill/dissolve, and the app-root name context (`lib/businessName.tsx`).
+
+**The `?notes` handoff is untouched and still works** — it is a URL parameter, independent of the context. `/contact`'s brief and `/services`' start pass went back to seeding from `?notes` alone. Nothing else needed the context, so it is gone rather than left as a provider nothing writes to.
+
+### 2 · The field
+
+Sixteen planes in one `preserve-3d` scene at `perspective: 1400px`. **Every one is real:** twelve existing case-study captures through the WebP pipeline, four live /services screen components. No WebGL, no canvas, no generated sites, no stock, no placeholders.
+
+| Plane | Source | Screen x / y / w | z |
+|---|---|---|---|
+| CG Walls & Floors | `cgwalls/hero.jpg` | 82 / 48 / 38 | **+80** |
+| SIFT | `sift/01-command-overview.jpg` | 76 / 90 / 25 | −59 |
+| CapitalCommand | `capitalcommand/01-overview.jpg` | 90 / 13 / 24 | −198 |
+| Marketing websites | `ScreenLocalSite` (live) | 64 / 7 / 15 | −337 |
+| SIFT | `sift/04-pipeline.jpg` | 14 / 95 / 18 | −476 |
+| AI agents | `ScreenAgent` (live) | 89 / 78 / 16 | −615 |
+| CadenceStack | `cadencestack/01-command-center.jpg` | 94 / 34 / 20 | −754 |
+| CG Walls & Floors | `cgwalls/gallery.jpg` | 31 / 96 / 12 | −893 |
+| CapitalCommand | `capitalcommand/03-markets.jpg` | 74 / −3 / 12 | −1032 |
+| CadenceStack | `cadencestack/04-performance-analytics.jpg` | 98 / 49 / 12 | −1171 |
+| Local search | `ScreenMap` (live) | 70 / 95 / 11 | −1310 |
+| SIFT | `sift/08-command-insights.jpg` | 47 / 7 / 10 | −1449 |
+| Brand & design direction | `ScreenBrandBoard` (live) | 4 / 86 / 12 | −1588 |
+| CG Walls & Floors | `cgwalls/gallery2.jpg` | 84 / 97 / 10 | −1727 |
+| CapitalCommand | `capitalcommand/05-signal-desk.jpg` | 80 / 58 / 9 | −1866 |
+| CadenceStack | `cadencestack/08-post-database.jpg` | 63 / 33 / 9 | −2000 |
+
+**THE PLAN IS SCREEN-SPACE.** `translateZ` moves a plane toward the perspective origin and shrinks it, so authoring layout coordinates put far planes in the middle of the frame — six to eight sat on the headline at every width. `HeroField` divides each plane's x/y/w by its own foreshortening `k = 1400 / (1400 − z)`, so `fieldPlan.ts` reads as the composition you actually see.
+
+**The z ladder is EVEN**, +80 down to −2000 at about 139px a rung. Clustered depths left a stretch of the fly-through with nothing at a visible distance and the frame emptied out at 45% of the pin — the exact fault from Session 22.
+
+Motion: each plane drifts 2–5px on its own 18–31s loop; the whole scene breathes ±1.5° over 40s; the cursor steers yaw ±10° and pitch ±7° on `spring.soft`. All of it stops when the hero is out of view or under reduced motion.
+
+Hover or focus pulls a plane forward (`translateZ +120`, `scale 1.04`), dims the siblings to 0.55 and shows its label. **Verified by focus:** SIFT reads "SIFT · 42% ATS-score improvement average after AI resume rewrite", siblings at 0.55/0.51, click lands on `/work/sift`.
+
+### 3 · The slab
+
+`PillHl` gained an `invert` variant — a parch surface with ink text. The dark-on-dark default disappeared entirely on this ground, and the slab is the page's signature. PillHl inventory on home is still 2 (this and Ch5's closer).
+
+### 4 · The headline, measured
+
+The size is bound by the longer line, "Your next customer is", at ~9.8 × the font size inside a safe zone of 55% of the container:
+
+| Viewport | Font | Lead lines | Planes over the copy | CTA bottom |
+|---|---|---|---|---|
+| 1280×720 | 53.3 | 1 | **CLEAR** | 542 |
+| 1366×768 | 56.8 | 1 | **CLEAR** | 571 |
+| 1440×900 | 66.6 | 1 | **CLEAR** | 649 |
+| 1680×1050 | 77.7 | 1 | **CLEAR** | 735 |
+| 1920×1080 | 79.9 | 1 | **CLEAR** | 752 |
+
+### 5 · The fly-through, every 5%
+
+One scroll value pushes the scene +2400px. The copy lifts and goes by 20%; the vignette goes with it; the landing — CG Walls' real hero capture, full bleed — comes up from 40% and is solid by 66%, while the field only starts leaving at 58%. **They overlap by 18 points of the pin, so there is never an empty frame between them.** Traced at every 5% at 1440 and 1920: planes visible 16 → 11 → 3 → 2, landing 0 → 0.19 → 0.58 → 1. **No blank frame and no black frame at any sample.**
+
+**Long tasks over 50ms during a fly-through: 0 at 1440, one 54ms at 1920.**
+
+### 6 · Numbers
+
+| | S22 | S23 |
+|---|---|---|
+| Home initial JS | 94.31 kB gzip | **91.52 kB gzip** (−2.79) |
+| Mobile LCP (alias, standard harness) | 1788 ms | **1772 ms** `[1764, 1772, 1776]` |
+| FCP | 1788 | 1704 ms |
+| CLS (load) | 0.0006 | 0.0026 |
+
+*First frame:* every hero text element at opacity 1 at 1440 and 375, 16 planes present (6 on mobile).
+
+*Crash scroll, three speeds, both directions:*
+
+| | CLS load | CLS total | overflow | longtasks>50 | errors |
+|---|---|---|---|---|---|
+| 1440×900 | 0.0001 | 0.0002 | **0** | none | none |
+| 1920×1080 | 0 | 0.0001 | **0** | 54 ms | none |
+| 375×812 | 0.003 | 0.0032 | **0** | none | none |
+
+*Mobile 375:* six planes, not pinned, zero overflow. *Reduced motion:* not pinned, scene animation `none`, plane animation `none`.
+
+### 7 · Quality gate — honest critique
+
+**At rest, 1440 and 1920.** This clears the bar the previous two attempts did not. The parch slab on near-black is the strongest typographic moment the site has had — ink on warm parch at 67–80px, and it reads as a deliberate inversion rather than a highlighter. The room genuinely reads as a room: CG Walls' site is the lit focal plane with real renovation photography inside it, SIFT's console and the navy agent panel sit at believable distances, and the hairline on every plane means the far ones are screens at depth rather than smudges. The composition is asymmetric with a clear focal hierarchy and the headline column is completely clear. Against Linear it holds on contrast confidence and dark-surface craft; against Vercel it holds on ambient motion.
+
+**Mid-hover.** The pull-forward and the sibling dim work, and the label with the verified figure is the right amount of information. Weaker than the rest: the label is small type below a plane that may be near the frame edge, so it can sit half out of frame on the right-hand planes.
+
+**Fly-through, six frames.** The opening third is the best part — the room rushes and the near planes sweep convincingly. **The middle is too dim.** Between roughly 40% and 60% the frame is legible but sits at perhaps half the brightness it should, so a stretch that ought to be the most cinematic reads as murky. The landing itself is clean and the hand-off to the work chapter has no gap.
+
+**I am calling the mid fly-through short of the bar.** It is not the dead black frame of Session 22 — it is populated and legible at every 5% sample — but "not broken" is not the standard here. It needs a key light on the passing planes and a brightness floor through the middle of the dolly. I ran out of session to fix it properly and would rather report it than claim it.
+
+### 8 · Deviations
+
+1. **The LCP element is `P.hx-kicker`, not the h1.** The brief asked for the h1. All hero text paints in the first frame; the kicker is simply the largest text block by area. LCP 1772 ms, well inside budget.
+2. **The mid fly-through is too dim** — see above. Open.
+3. **Hover labels on right-edge planes can clip.** Open.
+4. **The flat/mobile hero drops the fly-through entirely** rather than shortening it to a scale-through: on a phone the field sits at 0.5 opacity behind centred copy and the page simply scrolls. Reported as a simplification, not a completed sub-feature.
+5. The breathing rotation uses the CSS `rotate` property rather than a transform, so it composes with motion's transform writes instead of fighting them.
+
+### 9 · My own errors this session, found by probe
+
+1. **I authored the field in layout coordinates.** Perspective pulls far planes toward the origin, so six to eight of them rendered on top of the headline at every width. The plan is screen-space now.
+2. **I guessed the type divisor** (4.9) instead of measuring the line, and "is" orphaned onto its own line at 1920.
+3. **I measured the safe zone from element boxes** — the CTA row is a full-width block even with its buttons at the left, so the zone came out as 1341px of a 1440 frame and every overlap test was meaningless.
+4. **The first z distribution was clustered**, which emptied the frame at 45% of the pin — the same class of fault the owner rejected in Session 22, reproduced by me and caught by the 5% trace.
+5. **The slab shipped dark-on-dark** in the first build because I used PillHl's default on a dark ground.
+6. **The far planes had no edge** and read as lens dirt until they got a hairline.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -2209,6 +2322,10 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **THE HOME HERO IS MADE OF REAL WORK ONLY (23).** Every plane in the field is an existing case-study capture through the WebP pipeline or a live /services screen component. No generated sites, no stock, no placeholders, no invented figures — a plane prints a `headlineFigure` only where `caseStudies.ts` has one. The 21b generator and its presets are deleted.
+- **A 3D FIELD IS AUTHORED IN SCREEN SPACE (23).** `translateZ` moves a plane toward the perspective origin and shrinks it, so layout coordinates are not where the plane lands. `fieldPlan.ts` stores where each plane should APPEAR and `HeroField` divides by that plane's own `k = perspective / (perspective − z)`. Authoring in layout coordinates put six to eight planes on top of the headline.
+- **A DOLLY NEEDS AN EVEN DEPTH LADDER (23).** Clustered z values leave a stretch of the fly-through with nothing at a visible distance, and the frame empties out. The field's sixteen planes run +80 to −2000 at about 139px a rung, and the landing overlaps the field's exit by 18 points of the pin so there is never a gap.
 
 - **HOME IS FIVE CHAPTERS, AND EACH ONE PREVIEWS A PAGE (22).** Your business → The work (/work) → What we do (/services) → Who builds it (/about) → Start (/contact). A chapter previews the destination's IDEA and never copies its signature mechanic: home's monogram is drawn by the scroll, /about's draws on a timer. Each chapter carries `id` and `data-tone`, which is what the rail reads.
 - **NO UNVERIFIED FIGURES (22).** The three Averr Studio numbers (40+, 15×, 1.4s) are gone with `ProofLedger`. A case-study card prints a `headlineFigure` only where the data has one — two of the four do — and prints the sector and pillars where it does not. Nothing on the site invents a number.
@@ -2414,6 +2531,12 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **79 · A screen driven by one value has a RESTING value, and it is rarely zero.** *Cause:* home's Design panel mounted `ScreenBrandBoard` with `local` at 0. That screen draws itself across 0.08 → 0.40, so the panel opened on an empty sheet. *Fix:* each reused screen rests where its own "before" state is — the board drawn but un-tinted, the agent not yet run, the pin not yet climbed. **Read the transform ranges before you pick a starting value.**
 
+**80 · In a 3D scene, layout coordinates are not screen coordinates.** *Cause:* the hero field's planes were authored with `left`/`top` percentages, but each one also carries a `translateZ`, and perspective pulls a distant element toward the perspective origin while shrinking it. A plane written at x 4% rendered at 27%. Six to eight of sixteen sat on the headline at every width. *Fix:* store where the plane should LAND and divide by its own foreshortening, `k = perspective / (perspective − z)`, at render time. **If you can scroll past it in 3D, you cannot position it in 2D.**
+
+**81 · A dolly through clustered depths empties the frame.** *Cause:* the field's planes bunched between +80 and −940 with a thin tail. Once the near group had flown past, nothing was at a visible distance for a fifth of the pin and the screen went to near-black — the same fault the owner had just rejected. *Fix:* an even z ladder across the whole range, plus a landing frame that rises BEFORE the field leaves so the two overlap. **Trace a scroll sequence at every 5% and look at the frames; a counter that says "two elements visible" will not tell you the screen is empty.**
+
+**82 · A vignette that exists for text contrast must leave with the text.** *Cause:* the hero's radial darkening is there so the headline holds AA over the planes. It stayed at full strength through the fly-through, where there is no headline — the middle of the sequence sat at roughly half the brightness it should have. *Fix:* fade it on the same scroll range as the copy. **Ask what every layer is FOR, then ask when that reason stops applying.**
+
 ---
 
 ## 6. DATA FACTS
@@ -2516,6 +2639,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 21 rulings.**~~ **DONE** (`d6da1c7`, `8f02bb1`). Headline 147.9px at 1440 measured to the column; kicker, reel heading and meta description rewritten; navy agent screen kept by ruling; home mobile LCP re-measured honestly at 2000 ms.
 - ~~**Session 21b — the home flagship, reconceived.**~~ **DONE** (`021d6c8` … `ec38108`). The visitor types their business name into the slab and a premium site for it builds itself live in a large tilted window; seven industry presets, a generated monogram, self-scrolling; the scroll fills the screen and hands to the real reel; the name carries to /services and /contact. Home initial JS +1.97 kB gzip, generator 5.19 kB out of band, mobile LCP 2024 ms.
 - ~~**Session 22 — home as a five-chapter journey.**~~ **DONE** (`49501a1` … `73dce33`). Headline back to 104px, seven preset section shapes, a scroll-panned film strip of the work, three playable live service panels with all 16 chips deep-linking, a scroll-drawn founder chapter, a personalised slab closer, and a chapter rail. Home initial JS 106.80 → 94.31 kB gzip; mobile LCP 1788 ms.
+- ~~**Session 23 — the hero rebuilt from real work.**~~ **DONE** (`1f96a2e`). Sixteen real planes in a CSS 3D room, cursor-steered depth, hover-to-pull-forward with verified figures, and a fly-through that lands on CG Walls & Floors' own capture. Home initial JS 94.31 → 91.52 kB gzip; mobile LCP 1772 ms.
+- **STILL OPEN from 23:** the MIDDLE of the fly-through (roughly 40–60% of the pin) is legible but too dim — it needs a key light on the passing planes and a brightness floor. Hover labels on right-edge planes can clip. The mobile hero drops the fly-through rather than shortening it to a scale-through. Chapters 3–5 are next session.
 - **STILL OPEN from 22:** CareerClarity has no screenshot and no case study, so its card is text-only; CapitalCommand and CadenceStack have no `headlineFigure`; `public/about/` has no founder photograph. All three are owner-supplied assets, not code.
 - **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
