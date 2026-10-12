@@ -1,7 +1,6 @@
 import { useId, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useSearchParams } from "react-router-dom";
-import { useBusinessName } from "../../lib/businessName";
 import { duration, ease } from "../../lib/motion";
 import MagneticCTA from "../MagneticCTA";
 import ReplyPreview, { type Draft } from "./ReplyPreview";
@@ -48,13 +47,9 @@ export default function BriefSection() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  /* The start pass sends the business name as ?notes. When the visitor
-     arrived from the hero without one — an internal link, a back button —
-     the name they typed there is the fallback. Memory only; see
-     lib/businessName.tsx. */
-  const heroName = useBusinessName().name;
+  // the start pass sends the business name as ?notes
   const [business, setBusiness] = useState(function seed() {
-    return ((params.get("notes") || heroName) || "").slice(0, 60).trim();
+    return (params.get("notes") || "").slice(0, 60).trim();
   });
   const [pillars, setPillars] = useState<PillarId[]>([]);
   const [unsure, setUnsure] = useState(false);

@@ -5,7 +5,6 @@ import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import { PageToneProvider } from "./lib/pageTone";
 import { NavToneProvider } from "./lib/navTone";
-import { BusinessNameProvider } from "./lib/businessName";
 import AmbientEnvironment from "./components/AmbientEnvironment";
 import Home from "./pages/Home";
 
@@ -55,12 +54,11 @@ function App() {
   return (
     <PageToneProvider>
       <NavToneProvider>
-        <BusinessNameProvider>
-          <ScrollToTop />
-          <RouteWipe />
-          <AmbientEnvironment />
-          <Nav />
-          <main id="main" style={{ position: "relative", zIndex: 1 }}>
+        <ScrollToTop />
+        <RouteWipe />
+        <AmbientEnvironment />
+        <Nav />
+        <main id="main" style={{ position: "relative", zIndex: 1 }}>
             <Suspense fallback={<RouteFallback />}>
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -73,8 +71,7 @@ function App() {
               </Routes>
             </Suspense>
           </main>
-          <Footer />
-        </BusinessNameProvider>
+        <Footer />
       </NavToneProvider>
     </PageToneProvider>
   );

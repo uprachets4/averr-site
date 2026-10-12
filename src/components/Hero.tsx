@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useInView,
+  useMotionValue,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
@@ -10,70 +11,60 @@ import {
 import { duration, ease, easing, spring } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
 import LineReveal from "./LineReveal";
+import PillHl from "./PillHl";
 import TorontoClock from "./TorontoClock";
 import { useSetNavDarkOverride } from "../lib/navTone";
 import { useScrollStyle } from "../lib/useScrollStyle";
-import { useBusinessName } from "../lib/businessName";
-import NameField from "./home/NameField";
-import SketchWindow from "./home/SketchWindow";
+import HeroField from "./home/HeroField";
+import Screenshot from "./Screenshot";
+
+/**
+ * The home hero.
+ *
+ * A dark room with the studio's actual work hanging in it, a headline
+ * in the clear, and a scroll that flies the camera forward through the
+ * field until it lands square on the first real project. Everything in
+ * the room is real: twelve case-study captures through the WebP
+ * pipeline and four of the live /services screens.
+ */
 
 /* ── copy ──────────────────────────────────────────────────────────── */
 
 const EYEBROW = "A boutique studio · Toronto";
-const LEAD = "Let's make";
-const TAIL = "the one they choose.";
-/** What a screen reader hears for the heading. */
-const H1_SENTENCE = "Let's make your business the one they choose.";
+const LEAD = "Your next customer is";
+const SLAB = "already looking.";
+const H1_SENTENCE = "Your next customer is already looking.";
+const SUBLINE = "We make sure they find a business worth choosing.";
 const KICKER =
   "We design premium websites, build AI automations, and run the marketing engines that grow businesses like yours across the GTA.";
 
-/* ── load choreography, seconds from mount ─────────────────────────── */
+/** The plane the fly-through lands on — its real capture, full bleed. */
+const LANDING = "/work/cgwalls/hero.jpg";
 
-type Film = typeof T_DESKTOP;
-
-const T_DESKTOP = {
-  topRow: 0.25,
-  lead1: 0.35,
-  field: 0.6,
-  tail: 0.75,
-  kicker: 1.0,
-  ctaPrimary: 1.15,
-  ctaSecondary: 1.23,
-  scrollCue: 1.4,
-  scale: 1,
+const T = {
+  topRow: 0.2,
+  lead: 0.3,
+  slab: 0.52,
+  subline: 0.72,
+  kicker: 0.86,
+  ctaPrimary: 0.98,
+  ctaSecondary: 1.06,
+  cue: 1.3,
 };
 
-const T_MOBILE: Film = {
-  topRow: 0.12,
-  lead1: 0.18,
-  field: 0.32,
-  tail: 0.4,
-  kicker: 0.5,
-  ctaPrimary: 0.6,
-  ctaSecondary: 0.68,
-  scrollCue: 0.75,
-  scale: 0.5,
-};
-
-const MOBILE_QUERY = "(max-width: 767px)";
-const SHORT_QUERY = "(max-height: 699px)";
-/** Below this the hero stacks and the page scrolls — a pinned frame is
- *  100vh and clips, and a stacked composition does not fit inside one. */
 const FLAT_QUERY = "(max-width: 1023px)";
+const SHORT_QUERY = "(max-height: 639px)";
 
 function useHeroMode() {
   const reduce = useReducedMotion();
-  const [narrow, setNarrow] = useState(false);
   const [flat, setFlat] = useState(false);
   const [short, setShort] = useState(false);
-
   useEffect(function watch() {
-    const queries: Array<[string, (v: boolean) => void]> = [
-      [MOBILE_QUERY, setNarrow],
+    const pairs: Array<[string, (v: boolean) => void]> = [
       [FLAT_QUERY, setFlat],
       [SHORT_QUERY, setShort],
     ];
-    const offs = queries.map(function bind([q, set]) {
+    const offs = pairs.map(function bind([q, set]) {
       const mq = window.matchMedia(q);
       function on(e: MediaQueryList | MediaQueryListEvent) {
         set(e.matches);
@@ -88,15 +79,10 @@ function useHeroMode() {
       for (const off of offs) off();
     };
   }, []);
-
-  return {
-    pinned: !flat && !short && !reduce,
-    reduce: !!reduce,
-    film: narrow ? T_MOBILE : T_DESKTOP,
-  };
+  return { narrow: flat, short, reduce: !!reduce };
 }
 
-/** True once the reader has scrolled at all — the film then completes instantly. */
+/** True once the reader has scrolled — the film then completes instantly. */
 function useScrolledEarly() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(function watchScroll() {
@@ -111,7 +97,7 @@ function useScrolledEarly() {
       setScrolled(true);
     }
     window.addEventListener("scroll", onScroll, { passive: true });
-    const timer = window.setTimeout(function filmOver() {
+    const timer = window.setTimeout(function over() {
       done = true;
       window.removeEventListener("scroll", onScroll);
     }, 2100);
@@ -123,164 +109,192 @@ function useScrolledEarly() {
   return scrolled;
 }
 
-/**
- * What the sketch is currently building.
- *
- * The visitor's own name once they type one; before that, whichever
- * example the placeholder has just finished typing. The six examples are
- * chosen to land on six different presets, so the hero demonstrates
- * itself — a name arrives, a different site appears — without anyone
- * having touched the keyboard. The example is taken only when the word is
- * complete, never per keystroke.
- */
-function useSketchName() {
-  const { name } = useBusinessName();
-  const [demo, setDemo] = useState("");
-  const onExample = useCallback(function took(word: string) {
-    setDemo(word);
-  }, []);
-  return { name, demo, onExample };
-}
-
 /* ── the copy block ────────────────────────────────────────────────── */
 
-function HeroCopy({
-  skip,
-  film = T_DESKTOP,
-  onExample,
-}: {
-  skip: boolean;
-  film?: Film;
-  onExample?: (word: string) => void;
-}) {
+function HeroCopy({ skip }: { skip: boolean }) {
   const reduce = useReducedMotion();
   const instant = reduce || skip;
-  const T = film;
   const d = (v: number) => (instant ? 0 : v);
-  const dur = (v: number) => (instant ? 0 : v * film.scale);
-  const { name, setName } = useBusinessName();
-  const typed = name.trim();
-  const [touched, setTouched] = useState(false);
 
   return (
-    <div className="hero-copy">
+    <div className="hx-copy">
       <motion.div
+        className="hx-top"
         initial={{ opacity: 1, y: instant ? 0 : 8 }}
         animate={{ y: 0 }}
-        transition={{ duration: dur(duration.base), ease: ease.outQuart, delay: d(T.topRow) }}
-        className="hero-top"
+        transition={{ duration: instant ? 0 : duration.base, ease: ease.outQuart, delay: d(T.topRow) }}
       >
-        <div className="type-eyebrow" style={{ color: "var(--color-muted)", textTransform: "uppercase" }}>
-          {EYEBROW}
-        </div>
+        <div className="type-eyebrow hx-eyebrow">{EYEBROW}</div>
         <motion.div
+          className="hx-clock"
           initial={{ opacity: instant ? 1 : 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: dur(0.5), ease: ease.outQuart, delay: d(T.topRow) }}
+          transition={{ duration: instant ? 0 : 0.5, ease: ease.outQuart, delay: d(T.topRow) }}
         >
           <TorontoClock />
         </motion.div>
       </motion.div>
 
-      {/* One h1. Its accessible name is the whole sentence; the field
-          inside it keeps its own label and stays focusable, so the visible
-          words either side are hidden from assistive tech rather than the
-          block as a whole — aria-hidden over a focusable control is a
-          trap, not a tidy-up. */}
-      <h1 className="hero-h1" style={{ margin: 0 }}>
+      {/* The accessible name is the plain sentence; the visible halves
+          are hidden from assistive tech so it is not read twice. */}
+      <h1 className="hx-h1">
         <span className="sr-only">{H1_SENTENCE}</span>
-
-        <span className="type-hero hero-line" aria-hidden="true">
-          <LineReveal paint delay={d(T.lead1)}>{LEAD}</LineReveal>
-        </span>
-
-        <span className="type-hero hero-line hero-line--field">
-          <LineReveal paint block delay={d(T.field)}>
-            <NameField
-              value={name}
-              onChange={setName}
-              onTouched={function took() {
-                setTouched(true);
-              }}
-              onExample={onExample}
-              delay={d(T.field + 0.15)}
-              skip={instant}
-            />
-          </LineReveal>
-        </span>
-
-        <span className="type-hero hero-line" aria-hidden="true">
-          <LineReveal paint delay={d(T.tail)}>{TAIL}</LineReveal>
+        <span aria-hidden="true">
+          <span className="type-hero hx-line">
+            <LineReveal paint delay={d(T.lead)}>{LEAD}</LineReveal>
+          </span>
+          <span className="type-hero hx-line hx-line--slab">
+            <LineReveal paint delay={d(T.slab)}>
+              <PillHl entrance="slab" invert delay={d(T.slab + 0.1)} skip={instant}>
+                {SLAB}
+              </PillHl>
+            </LineReveal>
+          </span>
         </span>
       </h1>
 
-      <p className={touched || typed ? "nf-hint nf-hint--off" : "nf-hint"} aria-hidden="true">
-        Type your business name ↑
-      </p>
+      <motion.p
+        className="type-body-lg hx-sub"
+        initial={{ opacity: 1, y: instant ? 0 : 10 }}
+        animate={{ y: 0 }}
+        transition={{ duration: instant ? 0 : duration.base, ease: ease.outQuart, delay: d(T.subline) }}
+      >
+        {SUBLINE}
+      </motion.p>
 
-      <div className="hero-tail">
-        <motion.p
-          initial={{ opacity: 1, y: instant ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{ duration: dur(duration.base), ease: ease.outQuart, delay: d(T.kicker) }}
-          className="type-body-lg hero-kicker"
+      <motion.p
+        className="hx-kicker"
+        initial={{ opacity: 1, y: instant ? 0 : 10 }}
+        animate={{ y: 0 }}
+        transition={{ duration: instant ? 0 : duration.base, ease: ease.outQuart, delay: d(T.kicker) }}
+      >
+        {KICKER}
+      </motion.p>
+
+      <div className="hx-ctas">
+        <motion.div
+          initial={{ opacity: 1, y: instant ? 0 : 12, scale: instant ? 1 : 0.96 }}
+          animate={{ y: 0, scale: 1 }}
+          transition={instant ? { duration: 0 } : { delay: d(T.ctaPrimary), ...spring.snappy }}
+          style={{ display: "inline-flex" }}
         >
-          {KICKER}
-        </motion.p>
-
-        <div className="hero-ctas">
-          <motion.div
-            initial={{ opacity: 1, y: instant ? 0 : 12, scale: instant ? 1 : 0.96 }}
-            animate={{ y: 0, scale: 1 }}
-            transition={instant ? { duration: 0 } : { delay: d(T.ctaPrimary), ...spring.snappy }}
-            style={{ display: "inline-flex" }}
-          >
-            <MagneticCTA
-              to={typed ? `/contact?notes=${encodeURIComponent(typed)}` : "/contact"}
-              variant="primary"
-            >
-              Build the real one
-            </MagneticCTA>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 1, y: instant ? 0 : 12, scale: instant ? 1 : 0.96 }}
-            animate={{ y: 0, scale: 1 }}
-            transition={instant ? { duration: 0 } : { delay: d(T.ctaSecondary), ...spring.snappy }}
-            style={{ display: "inline-flex" }}
-          >
-            <MagneticCTA to="/work" variant="ghost">
-              See our work
-            </MagneticCTA>
-          </motion.div>
-        </div>
+          <MagneticCTA to="/contact" variant="primary" tone="dark">
+            Book a discovery call
+          </MagneticCTA>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 1, y: instant ? 0 : 12, scale: instant ? 1 : 0.96 }}
+          animate={{ y: 0, scale: 1 }}
+          transition={instant ? { duration: 0 } : { delay: d(T.ctaSecondary), ...spring.snappy }}
+          style={{ display: "inline-flex" }}
+        >
+          <MagneticCTA to="/work" variant="ghost" tone="dark">
+            See the work
+          </MagneticCTA>
+        </motion.div>
       </div>
     </div>
   );
 }
 
-/* ── scroll cue ────────────────────────────────────────────────────── */
+/* ── pinned: the fly-through ───────────────────────────────────────── */
 
-function ScrollCue({ skip, hidden, film = T_DESKTOP }: { skip: boolean; hidden: boolean; film?: Film }) {
+function PinnedHero({ skip }: { skip: boolean }) {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(frameRef, { margin: "20% 0px" });
+  const setNavDark = useSetNavDarkOverride();
+
+  const { scrollYProgress } = useScroll({
+    target: wrapRef,
+    offset: ["start start", "end end"],
+  });
+
+  /** The dolly: the camera's whole journey through the room, one value. */
+  const dolly = useTransform(scrollYProgress, [0.04, 0.72], [0, 1]);
+
+  /* The copy lifts and goes early. Opacity is written straight to the
+     node: motion accelerates scroll-linked opacity onto a ViewTimeline,
+     which is meaningless inside a pin (lib/useScrollStyle.ts). */
+  const copyFade = useTransform(scrollYProgress, [0.02, 0.2], [1, 0]);
+  const copyRef = useScrollStyle<HTMLDivElement>(copyFade);
+  const copyY = useTransform(scrollYProgress, [0.02, 0.24], [0, -70]);
+  /* The vignette exists to hold AA contrast behind the headline. Once
+     the headline has gone it is just darkness over the fly-through —
+     the middle of the pin was at about a third of its brightness. */
+  const vigFade = useTransform(scrollYProgress, [0.06, 0.26], [1, 0]);
+  const vigRef = useScrollStyle<HTMLDivElement>(vigFade);
+
+  /* The landing arrives BEFORE the field leaves, so the two overlap and
+     there is never an empty frame between them. */
+  const landFade = useTransform(scrollYProgress, [0.40, 0.66], [0, 1]);
+  const landRef = useScrollStyle<HTMLDivElement>(landFade);
+  const landScale = useTransform(scrollYProgress, [0.40, 1], [1.26, 1], { ease: easing.inOut });
+  const fieldFade = useTransform(scrollYProgress, [0.58, 0.80], [1, 0]);
+  const fieldRef = useScrollStyle<HTMLDivElement>(fieldFade);
+
+  const [cueGone, setCueGone] = useState(false);
+  useMotionValueEvent(scrollYProgress, "change", function p(v) {
+    setCueGone(v > 0.004);
+  });
+
+  useEffect(
+    function navTone() {
+      setNavDark(inView);
+      return function reset() {
+        setNavDark(false);
+      };
+    },
+    [inView, setNavDark]
+  );
+
+  return (
+    <div ref={wrapRef} className="hx-wrap">
+      <div ref={frameRef} className="hx-frame">
+        <div ref={fieldRef as React.Ref<HTMLDivElement>} className="hx-fieldlayer">
+          <HeroField dolly={dolly} inView={inView} />
+        </div>
+
+        <div ref={vigRef as React.Ref<HTMLDivElement>} className="hx-vignette" aria-hidden />
+
+        <motion.div ref={copyRef as React.Ref<HTMLDivElement>} className="hx-copylayer" style={{ y: copyY }}>
+          <HeroCopy skip={skip} />
+        </motion.div>
+
+        {/* the frame the camera lands on — a real capture, full bleed */}
+        <div ref={landRef as React.Ref<HTMLDivElement>} className="hx-landing" aria-hidden>
+          <motion.div className="hx-landing__img" style={{ scale: landScale }}>
+            <Screenshot src={LANDING} alt="" sizes="100vw" loading="lazy" fetchPriority="low" />
+          </motion.div>
+        </div>
+
+        <ScrollCue hidden={cueGone} skip={skip} />
+      </div>
+    </div>
+  );
+}
+
+function ScrollCue({ hidden, skip }: { hidden: boolean; skip: boolean }) {
   const reduce = useReducedMotion();
   const instant = reduce || skip;
   return (
     <motion.div
       aria-hidden
+      className="hx-cue"
       initial={{ opacity: instant ? 1 : 0 }}
       animate={{ opacity: hidden ? 0 : 1 }}
-      transition={{ duration: instant ? 0 : duration.base, delay: hidden || instant ? 0 : film.scrollCue }}
-      className="hero-cue"
+      transition={{ duration: instant ? 0 : duration.base, delay: hidden || instant ? 0 : T.cue }}
     >
-      <span className="type-eyebrow" style={{ color: "var(--color-muted)" }}>SCROLL</span>
-      <span style={{ display: "block", width: 1, height: 40, overflow: "hidden", background: "rgba(20,20,18,0.12)" }}>
+      <span className="type-eyebrow">SCROLL</span>
+      <span className="hx-cue__rail">
         <motion.span
-          style={{ display: "block", width: 1, height: "100%", background: "var(--color-ink)", transformOrigin: "top" }}
+          className="hx-cue__run"
           initial={{ scaleY: 0 }}
           animate={reduce ? { scaleY: 1 } : { scaleY: [0, 1, 1, 0] }}
           transition={
             reduce
               ? { duration: 0 }
-              : { duration: 2.4, times: [0, 0.4, 0.75, 1], repeat: Infinity, ease: ease.inOut, delay: skip ? 0 : film.scrollCue }
+              : { duration: 2.4, times: [0, 0.4, 0.75, 1], repeat: Infinity, ease: ease.inOut, delay: skip ? 0 : T.cue }
           }
         />
       </span>
@@ -288,204 +302,51 @@ function ScrollCue({ skip, hidden, film = T_DESKTOP }: { skip: boolean; hidden: 
   );
 }
 
-/* ── pinned: the sketch fills the screen and hands over to the reel ── */
+/* ── flat: phones, short windows, reduced motion ───────────────────── */
 
-function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const frameRef = useRef<HTMLDivElement | null>(null);
-  const copyRef = useRef<HTMLDivElement | null>(null);
-  const { name, demo, onExample } = useSketchName();
-
-  /* 3 stages in a 100vh pin → (3 + 1) × 100vh, per the n+1 rule: the
-     sketch filling, the beat it holds, and the reel's own pinned time. */
-  const { scrollYProgress } = useScroll({
-    target: wrapperRef,
-    offset: ["start start", "end end"],
-  });
-
-  const [engaged, setEngaged] = useState(false);
-  useMotionValueEvent(scrollYProgress, "change", function onP(p) {
-    setEngaged(p > 0.004);
-  });
-
-  /** One value drives the hand-over. */
-  const fill = useTransform(scrollYProgress, [0.05, 0.42], [0, 1], { ease: easing.inOut });
-  /** The copy clears out of the way before the window reaches it.
-   *  The OPACITY is written straight to the node: motion accelerates
-   *  scroll-linked opacity onto a ViewTimeline, which is meaningless for
-   *  anything pinned, and the copy faded back IN as you scrolled. The
-   *  transform is fine on the normal path. */
-  const copyFade = useTransform(scrollYProgress, [0.02, 0.18], [1, 0]);
-  const copyRef2 = useScrollStyle<HTMLDivElement>(copyFade);
-  const copyY = useTransform(scrollYProgress, [0.02, 0.18], [0, -40]);
-  /** A beat at full screen, then the sketch dissolves into the dark that
-   *  Chapter 2 opens on, so the two chapters share one edge. */
-  const veilIn = useTransform(scrollYProgress, [0.62, 0.88], [0, 1]);
-  const veilRef = useScrollStyle<HTMLDivElement>(veilIn);
-  const sketchFade = useTransform(scrollYProgress, [0.66, 0.9], [1, 0]);
-  const sketchRef = useScrollStyle<HTMLDivElement>(sketchFade);
-
-  /* the nav goes dark once the reel is what is behind it */
+function FlatHero({ skip }: { skip: boolean }) {
+  const ref = useRef<HTMLElement | null>(null);
+  const inView = useInView(ref, { margin: "20% 0px" });
   const setNavDark = useSetNavDarkOverride();
-  const [dark, setDark] = useState(false);
-  /* The reel covers the whole frame from the first frame of the page, at
-     opacity 0. Invisible is not absent: it ate every pointer event over
-     the hero — the name field could not be clicked — and its four card
-     links sat in the tab order the whole time. It is inert until it is
-     actually on screen. */
-  const frameInView = useInView(frameRef);
-  useMotionValueEvent(veilIn, "change", function onVeil(v) {
-    setDark(v > 0.5);
-  });
+  /** No dolly here: the flat hero does not fly anywhere. */
+  const still = useMotionValue(0);
+
   useEffect(
-    function publishNavTone() {
-      setNavDark(frameInView && dark);
+    function navTone() {
+      setNavDark(inView);
       return function reset() {
         setNavDark(false);
       };
     },
-    [frameInView, dark, setNavDark]
+    [inView, setNavDark]
   );
 
-  /* The window's top follows the headline's last line. A percentage
-     cleared it at 900 and ran into it at 720, and the headline is a
-     third taller after A1. */
-  useLayoutEffect(function placeWindow() {
-    function run() {
-      const frame = frameRef.current;
-      const h1 = frame?.querySelector(".hero-h1");
-      const layer = frame?.querySelector(".hero-sketch-layer");
-      const win = frame?.querySelector(".sw-win");
-      if (!frame || !h1 || !layer || !win) return;
-      const frameTop = frame.getBoundingClientRect().top;
-      const want = h1.getBoundingClientRect().bottom - frameTop + 26;
-      /* The window is rotated in 3D, so its rect reaches ABOVE the layer
-         that positions it — by 20px at 1920, enough to put the tilted
-         corner over the headline's last line. Push down by whatever the
-         overshoot actually measures rather than by a guessed angle. */
-      const overshoot = Math.max(
-        0,
-        layer.getBoundingClientRect().top - win.getBoundingClientRect().top
-      );
-      frame.style.setProperty("--sw-top", `${Math.round(want + overshoot)}px`);
-    }
-    run();
-    // a second pass once the first has settled: the overshoot can only be
-    // measured after the layer has been placed
-    const again = requestAnimationFrame(run);
-    const ro = new ResizeObserver(run);
-    if (frameRef.current) ro.observe(frameRef.current);
-    const h1 = frameRef.current?.querySelector(".hero-h1");
-    if (h1) ro.observe(h1);
-    document.fonts?.ready.then(run).catch(function ignore() {});
-    return function off() {
-      cancelAnimationFrame(again);
-      ro.disconnect();
-    };
-  }, []);
-
-  /* the cue stands down when the copy has grown into it */
-  const [cueFits, setCueFits] = useState(true);
-  useLayoutEffect(function watchCue() {
-    function check() {
-      const frame = frameRef.current;
-      const copy = copyRef.current;
-      if (!frame || !copy) return;
-      setCueFits(copy.getBoundingClientRect().bottom <= frame.getBoundingClientRect().bottom - 88);
-    }
-    check();
-    const ro = new ResizeObserver(check);
-    if (frameRef.current) ro.observe(frameRef.current);
-    if (copyRef.current) ro.observe(copyRef.current);
-    document.fonts?.ready.then(check).catch(function ignore() {});
-    return function off() {
-      ro.disconnect();
-    };
-  }, []);
-
   return (
-    <div ref={wrapperRef} style={{ position: "relative", height: "320vh" }}>
-      <div ref={frameRef} className="hero-frame">
-        <HeroGround />
-
-        <motion.div ref={mergeRefs(copyRef, copyRef2)} className="hero-copy-layer" style={{ y: copyY }}>
-          <HeroCopy skip={skip} film={film} onExample={onExample} />
-        </motion.div>
-
-        <motion.div ref={sketchRef as React.Ref<HTMLDivElement>} className="hero-sketch-layer">
-          <SketchWindow name={name || demo} fill={fill} />
-        </motion.div>
-
-        <ScrollCue skip={skip} hidden={engaged || !cueFits} film={film} />
-
-        {/* the hand-over: the hero closes on the dark Chapter 2 opens on */}
-        <div ref={veilRef as React.Ref<HTMLDivElement>} className="hero-veil" aria-hidden />
+    <section ref={ref} className="hx-frame hx-frame--flat">
+      <div className="hx-fieldlayer">
+        <HeroField dolly={still} inView={inView} />
       </div>
-    </div>
-  );
-}
-
-/* ── flat: phones, tablets, short windows, reduced motion ──────────── */
-
-function FlatHero({ skip, film }: { skip: boolean; film: Film }) {
-  const { name, demo, onExample } = useSketchName();
-  return (
-    <>
-      <section className="hero-flat">
-        <HeroGround />
-        <HeroCopy skip={skip} film={film} onExample={onExample} />
-        <div className="hero-sketch-flat">
-          <SketchWindow name={name || demo} compact />
-        </div>
-      </section>
-
-    </>
-  );
-}
-
-/** Two refs on one node. */
-function mergeRefs<T>(...refs: Array<React.Ref<T> | React.MutableRefObject<T | null> | null>) {
-  return function setRef(node: T | null) {
-    for (const r of refs) {
-      if (!r) continue;
-      if (typeof r === "function") r(node);
-      else (r as React.MutableRefObject<T | null>).current = node;
-    }
-  };
-}
-
-/* ── ambient ground ────────────────────────────────────────────────── */
-
-function HeroGround() {
-  return (
-    <>
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div className="grain-light" aria-hidden="true" />
-    </>
+      <div className="hx-vignette" aria-hidden />
+      <div className="hx-copylayer">
+        <HeroCopy skip={skip} />
+      </div>
+    </section>
   );
 }
 
 /* ── entry ─────────────────────────────────────────────────────────── */
 
 export default function Hero() {
-  const { pinned, film } = useHeroMode();
+  const { narrow, short, reduce } = useHeroMode();
   const skip = useScrolledEarly();
+  const pinned = !narrow && !short && !reduce;
 
   if (pinned) {
     return (
       <div data-hero-wrapper>
-        <PinnedHero skip={skip} film={film} />
+        <PinnedHero skip={skip} />
       </div>
     );
   }
-  return <FlatHero skip={skip} film={film} />;
+  return <FlatHero skip={skip} />;
 }

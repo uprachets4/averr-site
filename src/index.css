@@ -134,18 +134,14 @@
   --type-display-2xl-tracking: -0.055em;
   --type-display-2xl-leading: 0.88;
 
-  /* The home hero's own size (Session 21b).
-     Two things bind it, and the smaller wins:
-       WIDTH  — "the one they choose." is the longest fixed line and must
-                never wrap. It measures ~9.4 x the font size; 9.6 is that
-                with headroom. The field above it steps its own type down
-                separately, so a long business name cannot widen the h1.
-       HEIGHT — the copy block and the sketch window share one 100vh
-                pinned frame, and the window has to start below the h1's
-                last line. 11.2vh keeps three display lines, the kicker,
-                the hint and the CTAs inside the upper half.
-     Below 1024 the hero stacks and the page scrolls, so only width binds. */
-  --type-hero-size: clamp(30px, min(calc(var(--hero-copy-w) / 9.6), 12vh), 150px);
+  /* The home hero's size (Session 23). The two lines are "Your next
+     customer is" and the slab "already looking." — the longer measures
+     about 10.4 x the font size, and the headline lives in a safe zone
+     of 46% of the container, so that ratio and the height budget set
+     it. 7.4vh keeps the h1, subline, kicker and CTAs inside the fold
+     at 720. */
+  --hero-copy-w: calc(var(--container-wide) * 0.55);
+  --type-hero-size: clamp(34px, min(calc(var(--hero-copy-w) / 9.8), 7.4vh), 112px);
   --type-hero-weight: 500;
   --type-hero-tracking: -0.05em;
   --type-hero-leading: 0.92;
@@ -367,219 +363,9 @@ a { color: inherit; text-decoration: none; }
    past its share. The old `.hero-pill-line` 38% indent went with the old
    two-word headline: the staircase is now lead → "your business" → slab,
    and an indent on a line holding "look serious." would overflow. */
-/* ── The home hero (Session 21b) ───────────────────────────────────────
-   Copy upper-left, a large browser window across the lower right that
-   bleeds off the right edge and the bottom like a film frame. The window
-   must never cover a glyph, so the copy's two blocks are bounded: the h1
-   by the frame's height (its last line has to clear --sw-top) and the
-   kicker + CTAs by --hero-tail-w (they have to clear --sw-left). */
-:root {
-  /* The window starts 44% across the container and runs 86% of it wide,
-     so it always crops by about the same fraction instead of by whatever
-     the viewport happens to be: a vw width cropped 30% at 1440 and 57% at
-     1920, where the container stops growing but vw does not. */
-  --sw-inset: 0.438;
-  /* Overwritten in px by the hero once it has measured the h1 — the
-     window starts below the headline's last line whatever the viewport
-     does to it, rather than at a percentage that works at 900 and
-     collides at 720. */
-  --sw-top: 55%;
-  --sw-w: 0.9;
-  /* Everything in the copy is bounded to this, 44px clear of the window's
-     left edge. The h1's own box used to span the whole container: its
-     glyphs ran 45px under the window at 1440, and the field — a
-     full-width transparent input — swallowed the pointer across the
-     window as well. */
-  /* The h1's bound. 0.786 of the container puts the headline at ~104px
-     at 1440 (A1): "the one they choose." is 9.6 x the font size, so the
-     column and the type size are the same number twice. */
-  --hero-copy-w: calc(var(--container-wide) * 0.786 - 44px);
-  /* The hint, kicker and CTAs get their OWN, narrower bound: they sit
-     level with the window, where the h1 sits above it. */
-  --hero-tail-w: min(560px, 42%);
-}
 
-/* Below 1024 the hero stacks: the copy has the whole container and only
-   width binds the type. This block has to come AFTER the :root above —
-   same specificity, so source order decides, and declared first it lost.
-   The copy column was resolving to 152px on a phone and every line of
-   the h1 wrapped. */
-@media (max-width: 1023px) {
-  :root {
-    --hero-copy-w: var(--container-wide);
-    --type-hero-size: clamp(30px, calc(var(--container-wide) / 9.6), 112px);
-  }
-}
 
-.hero-frame {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-  background-color: var(--color-bg);
-}
-.hero-flat {
-  position: relative;
-  overflow: hidden;
-  background-color: var(--color-bg);
-  padding: 118px 0 0;
-}
 
-.hero-copy-layer {
-  position: absolute;
-  inset: 144px 0 auto 0;
-  z-index: 2;
-  pointer-events: none;
-}
-/* The field and the buttons are the only things in the copy you can
-   touch; the layer above them is inert so the window behind stays
-   hoverable where the copy is only air.
-   These are the hero's OWN classes, not `a` and `button`: MagneticCTA
-   sets pointer-events on its anchor itself, and an element selector here
-   lost to it — the primary CTA computed `pointer-events: none` and could
-   not be clicked at all. */
-.hero-copy-layer .nf,
-.hero-copy-layer .hero-ctas,
-.hero-copy-layer .hero-ctas * { pointer-events: auto; }
-
-.hero-copy {
-  width: 100%;
-  max-width: var(--container-wide);
-  margin: 0 auto;
-}
-.hero-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 22px;
-}
-.hero-h1 { max-width: var(--hero-copy-w); }
-.hero-h1 .hero-line { display: block; color: var(--color-ink); }
-.hero-h1 .hero-line:first-of-type { opacity: 0.72; }
-.hero-line--field { margin: 2px 0; }
-/* LineReveal's inner span is inline-block, which shrink-wraps — the
-   field's `width: 100%` then resolved against its own content and the
-   input came out 446px inside a 698px column, so a long name was clipped
-   instead of stepping down. The field's line, and only it, is a block. */
-.hero-line--field > span > span { display: block; }
-.hero-tail { max-width: var(--hero-tail-w); margin-top: 24px; }
-.hero-kicker { color: var(--color-muted); margin: 0; }
-.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
-.hero-cue {
-  position: absolute;
-  left: var(--gutter);
-  bottom: 28px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  pointer-events: none;
-  z-index: 3;
-}
-
-.hero-sketch-layer {
-  position: absolute;
-  left: calc(50% - var(--container-wide) / 2 + var(--container-wide) * var(--sw-inset));
-  top: var(--sw-top);
-  width: calc(var(--container-wide) * var(--sw-w));
-  height: calc(var(--container-wide) * var(--sw-w) * 0.78);
-  z-index: 1;
-}
-.hero-sketch-flat {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: var(--container-wide);
-  /* A DEFINITE height, phone-proportioned. Left to size itself the
-     window grew when the generator replaced the static frame, and the
-     whole page under it moved. */
-  height: min(132vw, 560px);
-  margin: 44px auto 0;
-}
-.hero-flat { padding-bottom: 72px; }
-
-/* ── the window ── */
-.sw { position: relative; width: 100%; height: 100%; perspective: 1800px; }
-.sw-win {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: var(--color-bg);
-  border: 1px solid rgba(20,20,18,0.16);
-  box-shadow: 0 60px 120px -50px rgba(20,20,18,0.5);
-  transform-origin: center center;
-  will-change: transform;
-}
-.sw-chrome {
-  display: flex; align-items: center; gap: 7px;
-  padding: 12px 18px;
-  background: var(--color-bg-alt);
-  border-bottom: 1px solid rgba(20,20,18,0.12);
-}
-.sw-chrome > span { width: 11px; height: 11px; border-radius: 50%; background: rgba(20,20,18,0.18); }
-.sw-url {
-  margin-left: 14px; font-style: normal;
-  font-family: var(--font-mono); font-size: 13px; color: var(--color-muted);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-/* A DEFINITE height for the viewport inside, so the generator swapping
-   in for the static frame cannot shift anything. */
-.sw-view { position: relative; height: calc(100% - 41px); overflow: hidden; }
-.sw-page { position: absolute; inset: 0 0 auto 0; will-change: transform; }
-.sw-ghost {
-  position: absolute; left: 0; top: 0; z-index: 4;
-  margin: -2px 0 0 -2px;
-  transition: filter 160ms ease;
-  pointer-events: none;
-}
-.sw-ghost--down { filter: drop-shadow(0 0 0 rgba(0,0,0,0)) brightness(0.9) scale(1); transform-origin: top left; }
-.sw-label {
-  position: absolute;
-  left: 2px; bottom: -34px;
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--color-muted);
-  white-space: nowrap;
-}
-
-/* the first frame: plain boxes at the same size as the real thing */
-.sw-static { width: 100%; min-height: 100%; }
-.sw-static__nav {
-  display: flex; align-items: center; gap: 12px;
-  padding: 18px 34px;
-  border-bottom: 1px solid rgba(20,20,18,0.08);
-}
-.sw-static__mark { width: 30px; height: 30px; border-radius: 8px; }
-.sw-static__name { width: 120px; height: 13px; border-radius: 3px; }
-.sw-static__pill { width: 126px; height: 34px; border-radius: 999px; margin-left: auto; }
-.sw-static__art { height: 220px; }
-.sw-static__body { display: flex; flex-direction: column; gap: 14px; padding: 34px; }
-.sw-static__line { height: 30px; border-radius: 4px; opacity: 0.85; }
-.sw-static__sub { height: 12px; border-radius: 3px; opacity: 0.45; }
-.sw-static__btn { width: 168px; height: 44px; border-radius: 999px; margin-top: 10px; }
-
-/* ── the reel, revealed under the dissolving sketch ── */
-.hero-reel-stage {
-  position: absolute; inset: 0; z-index: 4;
-  background-color: var(--color-dark);
-  display: flex; flex-direction: column; justify-content: center;
-  gap: 34px;
-}
-.hero-reel-head,
-.hero-reel-cta { padding: 0 var(--gutter); max-width: var(--container-wide); margin: 0 auto; width: 100%; }
-.hero-reel-row {
-  list-style: none; margin: 0; padding: 0 0 0 var(--gutter);
-  display: flex; gap: 24px; will-change: transform;
-}
-
-@media (max-width: 1023px) {
-  .hero-copy-layer { position: static; inset: auto; }
-  .hero-tail { max-width: none; }
-  .hero-sketch-layer { position: static; width: 100%; height: auto; }
-}
 
 
 /* Slab variant — same box as .pill-hl, but the surface is its own layer so
@@ -620,108 +406,6 @@ a { color: inherit; text-decoration: none; }
   -webkit-text-fill-color: transparent;
 }
 
-/* ── The home hero's slab FIELD (Session 21b) ──────────────────────────
-   PillHl's slab box with an <input> inside it. These rules live here
-   rather than in a <style> inside the component, because the component
-   renders inside the <h1> and a <style> element there lands in the
-   heading's own textContent. */
-.nf-wrap { display: block; }
-.nf {
-  position: relative;
-  isolation: isolate;
-  display: block;
-  width: 100%;
-  cursor: text;
-  /* the surface and the text cross together, once, when the film says so */
-  --nf-fg: var(--color-ink);
-}
-.nf--lit { --nf-fg: var(--color-parch); }
-/* The ruler is laid out, so it has a width — but it is out of flow and
-   invisible, so it cannot affect the box it measures for. It is pinned to
-   the UNSCALED size: measuring in the stepped-down size would chase its
-   own tail. */
-.nf-ruler {
-  position: absolute; left: 0; top: 0;
-  visibility: hidden; pointer-events: none; white-space: pre;
-  font-size: var(--type-hero-size);
-  font-weight: 500;
-  letter-spacing: -0.015em;
-}
-.nf-slab {
-  opacity: 0;
-  transition: opacity 360ms var(--ease-out-quart), transform 420ms var(--ease-out-expo);
-}
-.nf--lit .nf-slab { opacity: 1; }
-.nf-input {
-  position: relative; z-index: 1;
-  display: block;
-  width: 100%;
-  margin: 0; padding: 0;
-  border: 0; outline: 0; background: none; border-radius: 0;
-  font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: -0.015em;
-  /* A FIXED box. The font steps down for a long name and the placeholder
-     tries names of different lengths on — if the line box followed the
-     font size, every step moved the whole page under it. Height and line
-     height come from the UNSCALED size, so only the glyphs change. */
-  height: calc(var(--type-hero-size) * var(--type-hero-leading));
-  line-height: calc(var(--type-hero-size) * var(--type-hero-leading));
-  color: var(--nf-fg);
-  -webkit-text-fill-color: var(--nf-fg);
-  caret-color: var(--nf-fg);
-  transition: color 360ms var(--ease-out-quart), -webkit-text-fill-color 360ms var(--ease-out-quart);
-}
-.nf-input::placeholder {
-  color: var(--nf-fg);
-  -webkit-text-fill-color: var(--nf-fg);
-  opacity: 0.78;
-}
-.nf-input:focus-visible { outline: none; }
-/* The field's focus ring is the slab itself — an outline on a box this
-   size reads as a mistake, and the caret plus the surface already say
-   where you are. AA focus visibility comes from the 2px rule below. */
-.nf:focus-within .nf-slab {
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.06),
-    inset 0 -1px 0 rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,255,255,0.05),
-    0 2px 8px rgba(20,20,18,0.15),
-    0 0 0 3px var(--color-ink),
-    0 0 0 6px rgba(244,240,230,0.9);
-}
-/* A caret before the field is focused, so it reads as typeable. */
-.nf-caret {
-  position: absolute;
-  /* percentages of the fixed box, not em of a font that steps */
-  top: 14%; bottom: 14%;
-  width: 2px;
-  z-index: 2;
-  background: var(--nf-fg);
-  opacity: 0;
-  pointer-events: none;
-}
-.nf--lit .nf-caret { animation: nf-blink 1.1s step-end infinite; }
-@keyframes nf-blink { 0%, 100% { opacity: 0.85; } 50% { opacity: 0; } }
-
-.nf-hint {
-  margin: 18px 0 0;
-  max-width: var(--hero-tail-w);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-  animation: nf-pulse 2.8s ease-in-out infinite;
-}
-.nf-hint--off { animation: none; opacity: 0; transition: opacity 240ms ease; }
-@keyframes nf-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
-
-@media (prefers-reduced-motion: reduce) {
-  .nf-slab, .nf-input { transition: none; }
-  .nf--lit .nf-caret { animation: none; opacity: 0.85; }
-  .nf-hint { animation: none; opacity: 0.8; }
-}
 
 /* Scoped so it cannot reach the slab variant's own children — it is
    specificity (0,1,1) and would otherwise beat .pill-hl__slab (0,1,0) and
@@ -1246,13 +930,6 @@ a { color: inherit; text-decoration: none; }
 }
 @media (prefers-reduced-motion: reduce) { .st-path { transition: none; } }
 
-/* The hero's last frame is the dark Chapter 2 opens on, so the two share
-   one edge instead of meeting at a seam. */
-.hero-veil {
-  position: absolute; inset: 0; z-index: 4;
-  background: var(--color-dark);
-  opacity: 0; pointer-events: none;
-}
 
 /* ── the chapter rail ──────────────────────────────────────────────── */
 .rail {
@@ -1330,8 +1007,6 @@ a { color: inherit; text-decoration: none; }
    components the chapters reuse — their own MIN constant, the site's
    standing floor — and is left alone rather than changed from here. */
 @media (max-width: 1023px) {
-  .nf-hint,
-  .sw-label,
   .ws-flag,
   .ws-fig__c,
   .ws-fig__c--thin,
@@ -1340,4 +1015,183 @@ a { color: inherit; text-decoration: none; }
   .st-promise,
   .fc-credit dt,
   .sp-cue { font-size: 13px; }
+}
+
+/* ══ Session 23: the hero — a dark room of the real work ═══════════ */
+.hx-wrap { position: relative; height: 360vh; }
+.hx-frame {
+  position: sticky; top: 0; height: 100vh;
+  overflow: hidden;
+  background: var(--color-dark);
+  isolation: isolate;
+}
+.hx-frame--flat { position: relative; height: auto; min-height: 100vh; }
+
+/* the field */
+.hx-fieldlayer { position: absolute; inset: 0; z-index: 1; }
+.hf { position: absolute; inset: 0; perspective: 1400px; perspective-origin: 50% 46%; }
+.hf-scene {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.hf[data-breathing="on"] .hf-scene { animation: hf-breathe 40s ease-in-out infinite; }
+@keyframes hf-breathe {
+  0%, 100% { rotate: y -1.5deg; }
+  50%      { rotate: y 1.5deg; }
+}
+
+.hf-plane {
+  position: absolute;
+  transform: translate(-50%, -50%) translateZ(var(--hf-z)) rotateY(var(--hf-yaw));
+  transform-style: preserve-3d;
+  display: block; text-decoration: none; color: inherit;
+  border-radius: 10px;
+  background: #101113;
+  /* A HAIRLINE. Without it the far planes were grey smudges rather than
+     screens at depth — the edge is what makes a dark surface read. */
+  box-shadow:
+    0 0 0 1px rgba(244,240,230,0.14),
+    0 40px 100px -40px rgba(0,0,0,0.85);
+  transition: opacity 420ms var(--ease-out-quart), transform 520ms var(--ease-out-expo);
+  animation: hf-drift var(--hf-period) ease-in-out infinite alternate;
+}
+.hf--still .hf-plane { animation: none; }
+@keyframes hf-drift {
+  from { translate: 0 0; }
+  to   { translate: 0 calc(var(--hf-drift) * -1); }
+}
+.hf-plane--on {
+  transform: translate(-50%, -50%) translateZ(calc(var(--hf-z) + 120px)) rotateY(var(--hf-yaw)) scale(1.04);
+  z-index: 3;
+}
+.hf-plane:focus-visible { outline: 2px solid var(--color-parch); outline-offset: 5px; }
+
+.hf-chrome {
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 10px;
+  background: #22252a;
+  border-radius: 10px 10px 0 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.hf-chrome i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.18); }
+.hf-chrome em {
+  margin-left: 7px; font-style: normal;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+  color: rgba(244,240,230,0.72);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hf-shot { display: block; position: relative; overflow: hidden; border-radius: 0 0 10px 10px; }
+.hf-shot img { display: block; width: 100%; height: auto; }
+.hf-live { display: block; position: relative; width: 100%; aspect-ratio: 16 / 11; }
+.hf-hold { display: block; width: 100%; aspect-ratio: 16 / 10; background: #141619; }
+
+.hf-label {
+  position: absolute; left: 0; top: calc(100% + 9px);
+  display: flex; flex-direction: column; gap: 2px;
+  opacity: 0; transform: translateY(-4px);
+  transition: opacity 260ms ease, transform 260ms var(--ease-out-quart);
+  pointer-events: none;
+}
+.hf-label--on { opacity: 1; transform: translateY(0); }
+.hf-label__name {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--color-parch);
+}
+.hf-label__fig { font-size: 12px; color: rgba(244,240,230,0.68); max-width: 30ch; }
+.hf-label__fig b { color: var(--color-parch); font-weight: 500; }
+
+/* the headline's safe zone gets its own darkness, for AA on any plane */
+.hx-vignette {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  /* Softer and wider than the first pass, which left a visible
+     rectangular edge where it met the planes behind the headline. */
+  background:
+    radial-gradient(86% 104% at 16% 50%, rgba(8,8,9,0.94) 0%, rgba(8,8,9,0.74) 38%, rgba(8,8,9,0.26) 62%, transparent 80%),
+    linear-gradient(94deg, rgba(8,8,9,0.72) 0%, rgba(8,8,9,0.24) 42%, transparent 62%);
+}
+
+/* the copy */
+.hx-copylayer {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; align-items: center;
+  pointer-events: none;
+}
+.hx-copylayer :is(a, button) { pointer-events: auto; }
+.hx-copy {
+  width: 100%; max-width: var(--container-wide); margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+/* The whole copy column is bounded to the safe zone — not just the h1.
+   A full-width CTA row box reached 1341px at 1440 even with its buttons
+   at the left, which made every overlap test meaningless. */
+.hx-h1, .hx-sub, .hx-kicker, .hx-ctas { max-width: var(--hero-copy-w); }
+.hx-top {
+  position: absolute; top: 118px; left: 0; right: 0;
+  width: 100%; max-width: var(--container-wide); margin: 0 auto;
+  padding: 0 var(--gutter);
+  display: flex; align-items: baseline; justify-content: space-between; gap: 24px;
+}
+.hx-eyebrow { color: rgba(244,240,230,0.62); text-transform: uppercase; }
+.hx-h1 { margin: 0; max-width: var(--hero-copy-w); }
+.hx-line { display: block; color: var(--color-parch); }
+.hx-line--slab { margin-top: 4px; }
+.hx-sub {
+  margin: 22px 0 0; max-width: 30ch;
+  color: rgba(244,240,230,0.82);
+}
+.hx-kicker {
+  margin: 16px 0 0; max-width: 46ch; font-size: 15px; line-height: 1.6;
+  color: rgba(244,240,230,0.6);
+}
+.hx-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+
+/* the landing frame */
+.hx-landing { position: absolute; inset: 0; z-index: 4; opacity: 0; overflow: hidden; }
+.hx-landing__img { position: absolute; inset: 0; will-change: transform; }
+.hx-landing__img img { width: 100%; height: 100%; object-fit: cover; }
+
+.hx-cue {
+  position: absolute; left: var(--gutter); bottom: 28px; z-index: 5;
+  display: flex; align-items: center; gap: 12px; pointer-events: none;
+  color: rgba(244,240,230,0.6);
+}
+.hx-cue__rail { display: block; width: 1px; height: 40px; overflow: hidden; background: rgba(244,240,230,0.2); }
+.hx-cue__run { display: block; width: 1px; height: 100%; background: var(--color-parch); transform-origin: top; }
+
+@media (max-width: 1023px) {
+  .hx-frame--flat { padding: 128px 0 84px; }
+  .hx-copylayer { position: relative; inset: auto; }
+  .hx-top { position: relative; top: auto; margin-bottom: 34px; }
+  .hx-h1 { max-width: none; }
+  .hx-sub, .hx-kicker { max-width: 40ch; }
+  .hx-kicker { font-size: 14px; }
+  .hx-fieldlayer { opacity: 0.5; }
+  .hx-vignette {
+    background: radial-gradient(120% 70% at 50% 44%, rgba(10,10,10,0.94) 0%, rgba(10,10,10,0.8) 50%, rgba(10,10,10,0.55) 100%);
+  }
+  .hf-chrome em { font-size: 9px; }
+  .hf-label { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hf-plane { transition: none; animation: none; }
+  .hf[data-breathing] .hf-scene { animation: none; }
+  .hf-label { transition: none; }
+}
+
+/* The slab, inverted for the dark hero: parch surface, ink text. The
+   default is dark-on-dark and disappears on this ground. */
+.pill-hl--invert .pill-hl__slab {
+  background: linear-gradient(135deg, #F6F2E8 0%, #E6DFCE 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(20,20,18,0.08),
+    inset 0 -1px 0 rgba(20,20,18,0.12),
+    0 10px 40px -14px rgba(0,0,0,0.7);
+}
+.pill-hl--invert .pill-hl__word {
+  background: linear-gradient(180deg, #16171A 0%, #0E0F11 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }

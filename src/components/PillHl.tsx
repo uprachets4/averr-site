@@ -16,6 +16,9 @@ type Props = {
   /** False draws the word with no surface of its own — for the hero takeover,
    *  where a separate dark layer is the pill and a second one would double up. */
   surface?: boolean;
+  /** Inverted: a PARCH slab with ink text, for the dark hero ground. The
+   *  dark-on-dark default disappears there. */
+  invert?: boolean;
 };
 
 export default function PillHl({
@@ -25,6 +28,7 @@ export default function PillHl({
   skip = false,
   speed = 1,
   surface = true,
+  invert = false,
 }: Props) {
   const reduce = useReducedMotion();
 
@@ -41,7 +45,7 @@ export default function PillHl({
 
   return (
     <span
-      className={surface ? "pill-hl pill-hl--bare" : "pill-hl pill-hl--bare"}
+      className={invert ? "pill-hl pill-hl--bare pill-hl--invert" : "pill-hl pill-hl--bare"}
       style={{ position: "relative", isolation: "isolate" }}
     >
       {surface ? (

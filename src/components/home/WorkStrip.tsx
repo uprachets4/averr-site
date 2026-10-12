@@ -290,7 +290,7 @@ export default function WorkStrip() {
       style={pinned ? { y: headY } : undefined}
     >
       <div className="type-eyebrow ws-eyebrow">//_SELECTED WORK</div>
-      <h2 className="type-h2 measure-wide ws-h2">That was a sketch. Here's the real thing.</h2>
+      <h2 className="type-h2 measure-wide ws-h2">Here's the real thing.</h2>
     </motion.div>
   );
 

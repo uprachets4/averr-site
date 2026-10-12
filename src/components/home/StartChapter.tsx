@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
 import { duration, ease } from "../../lib/motion";
-import { useBusinessName } from "../../lib/businessName";
 import PillHl from "../PillHl";
 
 /**
@@ -17,8 +16,6 @@ import PillHl from "../PillHl";
  */
 export default function StartChapter() {
   const reduce = !!useReducedMotion();
-  const { name } = useBusinessName();
-  const shown = name.trim() || "your business";
 
   const paths = [
     {
@@ -41,11 +38,11 @@ export default function StartChapter() {
         <div className="type-eyebrow st-eyebrow">//_START</div>
 
         <h2 className="type-display-l st-h2">
-          Ready to make{" "}
+          Your next customer is{" "}
           <span className="st-slab">
-            <PillHl>{shown}</PillHl>
+            <PillHl>already looking.</PillHl>
           </span>{" "}
-          the one they choose?
+          Let's make sure they find you.
         </h2>
 
         <ul className="st-paths">
