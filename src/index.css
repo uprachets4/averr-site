@@ -134,22 +134,18 @@
   --type-display-2xl-tracking: -0.055em;
   --type-display-2xl-leading: 0.88;
 
-  /* The home hero's own size (Session 21, resized by the 21 rulings).
-     It is driven by the CONTAINER, not by vw, because the thing that has
-     to fit is the widest phrase inside the headline's own column — and
-     --container-wide caps at 1440px while vw keeps going, so any vw clamp
-     is either too small below the cap or too big above it.
-
-     "look serious." measures 6.256 × the font size including the slab's
-     own padding. That ratio is a constant: measured 6.2560 at 1440,
-     6.2563 at 1920 and 6.2568 at 375. 6.36 is the same number with ~1.7%
-     of headroom, so the slab always lands inside its column.
-
-     Single column: the headline has the whole container, less 8%.
-     Two columns (1240 up): it has its 74fr share of the container less
-     the 40px gap. The upper bound never binds — the formula peaks at
-     ~162px once the container caps — and is there only as a backstop. */
-  --type-hero-size: clamp(44px, calc(var(--container-wide) * 0.92 / 6.36), 200px);
+  /* The home hero's own size (Session 21b).
+     Two things bind it, and the smaller wins:
+       WIDTH  — "the one they choose." is the longest fixed line and must
+                never wrap. It measures ~9.4 x the font size; 9.6 is that
+                with headroom. The field above it steps its own type down
+                separately, so a long business name cannot widen the h1.
+       HEIGHT — the copy block and the sketch window share one 100vh
+                pinned frame, and the window has to start below the h1's
+                last line. 11.2vh keeps three display lines, the kicker,
+                the hint and the CTAs inside the upper half.
+     Below 1024 the hero stacks and the page scrolls, so only width binds. */
+  --type-hero-size: clamp(30px, min(calc(var(--hero-copy-w) / 9.6), 12vh), 150px);
   --type-hero-weight: 500;
   --type-hero-tracking: -0.05em;
   --type-hero-leading: 0.92;
@@ -371,32 +367,187 @@ a { color: inherit; text-decoration: none; }
    past its share. The old `.hero-pill-line` 38% indent went with the old
    two-word headline: the staircase is now lead → "your business" → slab,
    and an indent on a line holding "look serious." would overflow. */
-.hero-main {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 44px;
+/* ── The home hero (Session 21b) ───────────────────────────────────────
+   Copy upper-left, a large browser window across the lower right that
+   bleeds off the right edge and the bottom like a film frame. The window
+   must never cover a glyph, so the copy's two blocks are bounded: the h1
+   by the frame's height (its last line has to clear --sw-top) and the
+   kicker + CTAs by --hero-tail-w (they have to clear --sw-left). */
+@media (max-width: 1023px) {
+  :root { --hero-copy-w: var(--container-wide); --type-hero-size: clamp(30px, calc(var(--container-wide) / 9.6), 112px); }
+}
+
+:root {
+  /* The window starts 44% across the container and runs 86% of it wide,
+     so it always crops by about the same fraction instead of by whatever
+     the viewport happens to be: a vw width cropped 30% at 1440 and 57% at
+     1920, where the container stops growing but vw does not. */
+  --sw-inset: 0.56;
+  --sw-top: 30%;
+  --sw-w: 0.64;
+  /* Everything in the copy is bounded to this, 44px clear of the window's
+     left edge. The h1's own box used to span the whole container: its
+     glyphs ran 45px under the window at 1440, and the field — a
+     full-width transparent input — swallowed the pointer across the
+     window as well. */
+  --hero-copy-w: calc(var(--container-wide) * 0.56 - 44px);
+}
+
+.hero-frame {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--color-bg);
+}
+.hero-flat {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-bg);
+  padding: 118px 0 0;
+}
+
+.hero-copy-layer {
+  position: absolute;
+  inset: 144px 0 auto 0;
+  z-index: 2;
+  pointer-events: none;
+}
+/* The field and the buttons are the only things in the copy you can
+   touch; the layer above them is inert so the window behind stays
+   hoverable where the copy is only air. */
+.hero-copy-layer :is(input, a, button) { pointer-events: auto; }
+
+.hero-copy {
+  width: 100%;
+  max-width: var(--container-wide);
+  margin: 0 auto;
+}
+.hero-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.hero-h1 { max-width: var(--hero-copy-w); }
+.hero-h1 .hero-line { display: block; color: var(--color-ink); }
+.hero-h1 .hero-line:first-of-type { opacity: 0.72; }
+.hero-line--field { margin: 2px 0; }
+.hero-tail { max-width: var(--hero-copy-w); margin-top: 24px; }
+.hero-kicker { color: var(--color-muted); margin: 0; }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.hero-cue {
+  position: absolute;
+  left: var(--gutter);
+  bottom: 28px;
+  display: flex;
   align-items: center;
+  gap: 12px;
+  pointer-events: none;
+  z-index: 3;
 }
-/* The scene takes 26% of the container but never less than 280px — at
-   1024 a flat 26% is about 245px, which is not a window you can read a
-   screen in. The headline then gets whatever is left, which is why the
-   size below is a `min` of two branches: the 74% share above 1170, and
-   "the container minus the gap and the scene's floor" below it. They
-   meet exactly where the floor takes over, so the type scales smoothly
-   through the breakpoint instead of jumping. */
-@media (min-width: 1024px) {
-  :root {
-    --type-hero-size: clamp(
-      44px,
-      calc(min(var(--container-wide) * 0.74 - 40px, var(--container-wide) - 320px) / 6.36),
-      200px
-    );
-  }
-  .hero-main {
-    grid-template-columns: minmax(0, 1fr) max(280px, 26%);
-    gap: 40px;
-  }
+
+.hero-sketch-layer {
+  position: absolute;
+  left: calc(50% - var(--container-wide) / 2 + var(--container-wide) * var(--sw-inset));
+  top: var(--sw-top);
+  width: calc(var(--container-wide) * var(--sw-w));
+  height: calc(var(--container-wide) * var(--sw-w) * 0.86);
+  z-index: 1;
 }
+.hero-sketch-flat {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--container-wide);
+  margin: 44px auto 0;
+  padding-bottom: 64px;
+}
+
+/* ── the window ── */
+.sw { position: relative; width: 100%; height: 100%; perspective: 1800px; }
+.sw-win {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+  border: 1px solid rgba(20,20,18,0.16);
+  box-shadow: 0 60px 120px -50px rgba(20,20,18,0.5);
+  transform-origin: center center;
+  will-change: transform;
+}
+.sw-chrome {
+  display: flex; align-items: center; gap: 7px;
+  padding: 12px 18px;
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid rgba(20,20,18,0.12);
+}
+.sw-chrome > span { width: 11px; height: 11px; border-radius: 50%; background: rgba(20,20,18,0.18); }
+.sw-url {
+  margin-left: 14px; font-style: normal;
+  font-family: var(--font-mono); font-size: 13px; color: var(--color-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* A DEFINITE height for the viewport inside, so the generator swapping
+   in for the static frame cannot shift anything. */
+.sw-view { position: relative; height: calc(100% - 41px); overflow: hidden; }
+.sw-page { position: absolute; inset: 0 0 auto 0; will-change: transform; }
+.sw-ghost {
+  position: absolute; left: 0; top: 0; z-index: 4;
+  margin: -2px 0 0 -2px;
+  transition: filter 160ms ease;
+  pointer-events: none;
+}
+.sw-ghost--down { filter: drop-shadow(0 0 0 rgba(0,0,0,0)) brightness(0.9) scale(1); transform-origin: top left; }
+.sw-label {
+  position: absolute;
+  left: 2px; bottom: -34px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+/* the first frame: plain boxes at the same size as the real thing */
+.sw-static { width: 100%; min-height: 100%; }
+.sw-static__nav {
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 34px;
+  border-bottom: 1px solid rgba(20,20,18,0.08);
+}
+.sw-static__mark { width: 30px; height: 30px; border-radius: 8px; }
+.sw-static__name { width: 120px; height: 13px; border-radius: 3px; }
+.sw-static__pill { width: 126px; height: 34px; border-radius: 999px; margin-left: auto; }
+.sw-static__art { height: 220px; }
+.sw-static__body { display: flex; flex-direction: column; gap: 14px; padding: 34px; }
+.sw-static__line { height: 30px; border-radius: 4px; opacity: 0.85; }
+.sw-static__sub { height: 12px; border-radius: 3px; opacity: 0.45; }
+.sw-static__btn { width: 168px; height: 44px; border-radius: 999px; margin-top: 10px; }
+
+/* ── the reel, revealed under the dissolving sketch ── */
+.hero-reel-stage {
+  position: absolute; inset: 0; z-index: 4;
+  background-color: var(--color-dark);
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 34px;
+}
+.hero-reel-head,
+.hero-reel-cta { padding: 0 var(--gutter); max-width: var(--container-wide); margin: 0 auto; width: 100%; }
+.hero-reel-row {
+  list-style: none; margin: 0; padding: 0 0 0 var(--gutter);
+  display: flex; gap: 24px; will-change: transform;
+}
+
+@media (max-width: 1023px) {
+  .hero-copy-layer { position: static; inset: auto; }
+  .hero-tail { max-width: none; }
+  .hero-sketch-layer { position: static; width: 100%; height: auto; }
+}
+
 
 /* Slab variant — same box as .pill-hl, but the surface is its own layer so
    it can grow scaleX from the left, and the word sits above it. */
@@ -436,34 +587,101 @@ a { color: inherit; text-decoration: none; }
   -webkit-text-fill-color: transparent;
 }
 
-/* The home hero's cycling slab (Session 21) extends the slab variant above.
-   These rules live here rather than in a <style> inside the component,
-   because that component renders inside the <h1> and a <style> element there
-   lands in the heading's own textContent. */
-.ps { position: relative; isolation: isolate; cursor: pointer; }
-/* The ruler is laid out, so it has widths — but it is out of flow and
-   invisible, so it cannot affect the box it is measuring for. */
-.ps-ruler {
-  position: absolute; left: 0; top: 0;
-  visibility: hidden; pointer-events: none; white-space: nowrap;
+/* ── The home hero's slab FIELD (Session 21b) ──────────────────────────
+   PillHl's slab box with an <input> inside it. These rules live here
+   rather than in a <style> inside the component, because the component
+   renders inside the <h1> and a <style> element there lands in the
+   heading's own textContent. */
+.nf-wrap { display: block; }
+.nf {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: 100%;
+  cursor: text;
+  /* the surface and the text cross together, once, when the film says so */
+  --nf-fg: var(--color-ink);
 }
-.ps-ruler > span { display: inline-block; white-space: nowrap; }
-.ps-words { position: relative; z-index: 1; display: block; white-space: nowrap; }
-.ps-word { display: inline-block; white-space: nowrap; }
-/* The parch layer sits exactly over the ink one and is clipped to the
-   surface's right edge. The z-index is not decoration: .pill-hl__word
-   carries `z-index: 1`, so the ink copy inside this one would otherwise
-   paint on top of the parch copy and the words would stay ink over a dark
-   slab. */
-.ps-reveal { position: absolute; left: 0; top: 0; display: block; z-index: 2; }
-/* The ink copy is .pill-hl__word with the fill put back, so it is the SAME
-   type as the parch copy it sits under — carrying the class and overriding
-   only the paint. Without the class its tracking was the headline's -0.05em
-   against the word's -0.015em, and the two copies did not line up. */
-.ps-ink {
-  background: none;
-  color: var(--color-ink);
-  -webkit-text-fill-color: var(--color-ink);
+.nf--lit { --nf-fg: var(--color-parch); }
+/* The ruler is laid out, so it has a width — but it is out of flow and
+   invisible, so it cannot affect the box it measures for. It is pinned to
+   the UNSCALED size: measuring in the stepped-down size would chase its
+   own tail. */
+.nf-ruler {
+  position: absolute; left: 0; top: 0;
+  visibility: hidden; pointer-events: none; white-space: pre;
+  font-size: var(--type-hero-size);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+.nf-slab {
+  opacity: 0;
+  transition: opacity 360ms var(--ease-out-quart), transform 420ms var(--ease-out-expo);
+}
+.nf--lit .nf-slab { opacity: 1; }
+.nf-input {
+  position: relative; z-index: 1;
+  display: block;
+  width: 100%;
+  margin: 0; padding: 0;
+  border: 0; outline: 0; background: none; border-radius: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: var(--type-hero-leading);
+  color: var(--nf-fg);
+  -webkit-text-fill-color: var(--nf-fg);
+  caret-color: var(--nf-fg);
+  transition: color 360ms var(--ease-out-quart), -webkit-text-fill-color 360ms var(--ease-out-quart);
+}
+.nf-input::placeholder {
+  color: var(--nf-fg);
+  -webkit-text-fill-color: var(--nf-fg);
+  opacity: 0.78;
+}
+.nf-input:focus-visible { outline: none; }
+/* The field's focus ring is the slab itself — an outline on a box this
+   size reads as a mistake, and the caret plus the surface already say
+   where you are. AA focus visibility comes from the 2px rule below. */
+.nf:focus-within .nf-slab {
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    inset 0 -1px 0 rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 2px 8px rgba(20,20,18,0.15),
+    0 0 0 3px var(--color-ink),
+    0 0 0 6px rgba(244,240,230,0.9);
+}
+/* A caret before the field is focused, so it reads as typeable. */
+.nf-caret {
+  position: absolute;
+  top: 0.26em; bottom: 0.26em;
+  width: 2px;
+  z-index: 2;
+  background: var(--nf-fg);
+  opacity: 0;
+  pointer-events: none;
+}
+.nf--lit .nf-caret { animation: nf-blink 1.1s step-end infinite; }
+@keyframes nf-blink { 0%, 100% { opacity: 0.85; } 50% { opacity: 0; } }
+
+.nf-hint {
+  margin: 18px 0 0;
+  max-width: var(--hero-copy-w);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  animation: nf-pulse 2.8s ease-in-out infinite;
+}
+.nf-hint--off { animation: none; opacity: 0; transition: opacity 240ms ease; }
+@keyframes nf-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .nf-slab, .nf-input { transition: none; }
+  .nf--lit .nf-caret { animation: none; opacity: 0.85; }
+  .nf-hint { animation: none; opacity: 0.8; }
 }
 
 /* Scoped so it cannot reach the slab variant's own children — it is
