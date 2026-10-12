@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `ec38108` — *21b-6 CLS, the mobile cascade, and the compact type floor*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 21b. |
+| **HEAD** | `73dce33` — *22-C2 close the gap between chapters 4 and 5*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 22. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -1994,6 +1994,116 @@ Yes. The fold is a sentence the reader completes themselves, a slab that accepts
 
 ---
 
+**SESSION 22 — home as a five-chapter journey, plus the 21b rulings.** Six commits (`49501a1` … `73dce33`).
+
+### PART A — the 21b rulings
+
+**A1 · The headline is back up.** `--hero-copy-w` and `--type-hero-size` are the same number twice — "the one they choose." is 9.6 × the font size, so a copy column of 0.786 of the container sets both. Measured: **103.9px at 1440**, 113.3 at 1920, 109.3 at 1512, 92.2 at 1366, 86.4 at 1280, 72.5 at 1024. The hint, kicker and CTAs took their own narrower bound (`--hero-tail-w`) because they sit level with the window where the h1 sits above it.
+
+The window now starts **below the headline's last line, measured**, not at a percentage — 55% cleared the h1 at 900 and ran into it at 720. It is wider (0.9 of the container) and bleeds further off the right and the bottom to stay large as it moves down. It is also pushed down by the tilt's **measured overshoot**: a 3D-rotated element's rect reaches above the layer that positions it, by 20px at 1920, which was enough to put the tilted corner over the headline. **Clear of every glyph at ten widths.**
+
+*h1 and primary CTA above the fold:* 1920×1080 h1 184…530, CTA 746 · 1440×900 h1 184…502, CTA 717 · 1280×720 h1 184…449, CTA 655.
+
+**A2 · The placeholder-driven sketch stays.** Unchanged.
+
+**A3 · Seven industries, seven section SHAPES.** No two alike, and zero currency characters on any of them:
+
+| Preset | Shape | What it looks like |
+|---|---|---|
+| food | menu | Dish names with dotted leaders to a short note. **No prices.** |
+| health | bookable list | Rows on cards, each with a Book chip |
+| trades | numbered process | 01–04 on a vertical rule |
+| beauty | lookbook | A grid of drawn tiles with captions |
+| fitness | schedule | Day · time, the class, its length, a Join chip |
+| professional | practice areas | A ruled two-column list |
+| local | cards | The plain card row |
+
+Trades and professional needed new **content** as well as a new shape: a numbered process listing services reads as a mislabelled menu, and "practice areas" listing appointment lengths is not practice areas.
+
+### PART B — the five chapters
+
+| | Chapter | Sends you to | Mechanic |
+|---|---|---|---|
+| 1 | Your business | — | The 21b hero through its scroll-fill, now closing on the dark its successor opens on |
+| 2 | The work | /work | A film strip panned horizontally by one vertical scroll value |
+| 3 | What we do | /services | Three panels driven by scroll AND tabs, each with a playable live screen |
+| 4 | Who builds it | /about | The monogram drawn by the scroll |
+| 5 | Start | /contact | The hero's slab again, with the reader's own name |
+
+**Ch2.** Each card plays its own screenshots on hover or focus — a crossfade under a slow Ken-Burns drift, a ≤4° lean, siblings to 0.7 — and opens the study on click through the site's ink wipe. End card "Open the vault →".
+
+**Ch3.** Every one of the sixteen services is a chip that deep-links to `/services#{service-slug}`. The slug and the beat both come from the service's name, so a rename cannot leave a stale anchor. **16/16 chips land on their own beat**, verified one at a time. Beside each pillar is the REAL /services screen with one thing you can play:
+
+| Pillar | Screen | Control | Verified change |
+|---|---|---|---|
+| Design | `ScreenBrandBoard` | Pick the accent | Accent re-tints `rgb(200,118,60)` → `rgb(62,124,166)` |
+| Automate | `ScreenAgent` | Run agent | The lead ("Priya Raghunathan, Oshawa") appears and is scored |
+| Grow | `ScreenMap` | Publish update | The results list and the pin's position change |
+
+**Ch4.** `pathLength` is the chapter's own scroll progress, so the mark is drawn by the reader's hand. /about keeps its timed draw — home previews the idea rather than copying the mechanic. Once drawn it leans toward the cursor.
+
+**Ch5.** `PillHl` bookend with the typed name: default "Ready to make **your business** the one they choose?", typed "Ready to make **Harbour Dental** the one they choose?". Two path cards to `/contact#booking` and `/contact#brief`, and the existing "24 hours. Every message."
+
+**REMOVED**, zero importers verified first: `ThreeScenes` (the result grid), `ThreeDoors`, `Manifesto` (the Philosophy section), `ProofLedger` (the "Recent projects" feature **and** the three unverified Averr Studio figures — 40+, 15×, 1.4s), and `DoorPreviewLive`, which only ThreeDoors used.
+
+> **The three studio figures may return if the owner confirms them.** They were 40+ ("custom-built marketing sites and SaaS product surfaces across the GTA"), 15× ("AI agents and workflows removing manual work") and 1.4s. They are in git at `b8dd1bc^`.
+
+### PART C — the journey layer
+
+A fixed rail on the left edge from 1024 up: a progress fill, five dots, the active chapter's name on hover. It is hidden over the hero's first frame and arrives once the fill begins. **Tone flips from the chapter's own `data-tone`**, not from a scroll position, so a chapter that moves takes the rail's contrast with it — parch on `#141412` is 14.6:1.
+
+*Rail tracking, sampled down the page:* 0 hidden · 0.08 shown, "Your business" · 0.34 dark, "The work" · 0.66 light, "What we do" · 0.93 "Start".
+
+### Numbers
+
+| | 21b | 22 |
+|---|---|---|
+| Home initial JS | 106.80 kB gzip | **94.31 kB gzip** (−12.49) |
+| Chapter chunks | — | StartChapter 1.08 · FounderChapter 1.17 · WorkStrip 2.01 · ServicePanels 2.02 kB gzip, all below the fold |
+| Mobile LCP (alias, standard harness) | 2024 ms | **1788 ms** on `P.type-body-lg`, FCP 1788, TTFB 100, CLS 0.0006 |
+
+*Crash scroll, three speeds, both directions:*
+
+| | CLS load | CLS total | longest task | errors |
+|---|---|---|---|---|
+| 1440×900 | 0.0002 | 0.0003 | 66 ms | none |
+| 1920×1080 | 0.0001 | 0.0002 | 55 ms | none |
+| 375×812 | 0.0003 | 0.0012 | 82 ms | none |
+
+*Mobile 375:* zero horizontal overflow at every scroll position; every chapter stacks and stays usable; tabs, chips and path cards all ≥44px.
+
+*Reduced motion:* the hero does not pin, Ch2 and Ch3 both render stacked, the rail is present and jumps instantly.
+
+*PillHl inventory:* **home 2** (the hero's field + the closer), /work 0, /services 0, /about 0, /contact 0.
+
+### Does home read as one cinematic journey?
+
+Yes, and more than the sum of the chapters. You arrive at a sentence you finish yourself and a site for your own business building beside it; the scroll turns that into the whole screen, dissolves it to black, and pans the real work past you; the work hands to three panels you can press; the mark draws itself under your scroll; and the last thing on the page is your own business name on the same slab the page opened with. The rail makes the shape legible without narrating it.
+
+Two honest reservations: **chapter 3 is the least cinematic of the five** — it is a good interactive panel set, but the transition between its panels is a crossfade rather than a move, and next to the film strip either side of it that reads as a step down. And the hero's window shows **less of the generated site at rest** than it did in 21b, because A1 pushed it down and further off the edge; you only see the whole sketch once the scroll fills it.
+
+### Deviations and judgement calls — every one
+
+1. **ASSET: CareerClarity has no screenshot.** `public/work/` holds only the four live studies, and `careerclarity-ai` is a `draft()` record with every copy field empty. Its card is **text-only, flagged "In progress"**, and is not a link because there is no case study to open. It cannot have the screenshot the others have until the asset exists. *This is the STOP the asset rule asks for — reported rather than papered over.*
+2. **DATA: only two of four live studies have a `headlineFigure`** — CG Walls & Floors (85%) and SIFT (42%). CapitalCommand and CadenceStack have none, so their cards print the sector and the pillars. **Nothing invents a number.**
+3. **ASSET: `public/about/` is empty**, so there is no founder photograph to reveal as the mark completes. The chapter is built so that adding `public/about/founder.webp` is the only change needed.
+4. **Design's playable screen is the BRAND BOARD, not the Northgate site.** The brief asked for palette chips recolouring the site; `ScreenLocalSite` has no colour hook, while `ScreenBrandBoard` re-tints everything downstream of its accent. The real component that recolours is the one used.
+5. **Three new copy lines**: the pillar promises in Ch3. Nothing else is new copy.
+6. **Ch3's heading** is "Sixteen services. Three things they add up to." — new, and the count comes from the data.
+7. **Rail labels are an overlay, not in flow.** In flow the rail was 150px wide and sat on chapter 2's cards.
+8. **`ProofLedger` was deleted, not just its studio row.** It had zero importers once home stopped using it, so leaving it would have left dead code carrying the figures the owner wants gone.
+9. **11px type remains inside the reused /services screens** on mobile (their own `MIN`) and in the global footer. Home's own small type is 13px. Changing `MIN` would change /services, which is out of scope here.
+10. The hero's wrapper is 320vh, not 400: three stages, not four, now the reel has its own chapter.
+
+### My own errors this session, found by probe
+
+1. **The rail shipped 150px wide and sat on top of chapter 2's cards** — I had styled the labels in flow without checking what the rail overlapped.
+2. **The Design panel opened on an empty sheet.** `ScreenBrandBoard` draws itself across `local` 0.08–0.40 and I rested it at 0. Each screen now rests at its own "before" value.
+3. **The window's tilt overshoot** — I set its top from the h1's bottom and measured the collision anyway, because a rotated element's rect is bigger than the element.
+4. **Chapters 4 and 5 both padded a full chapter against the same edge**, leaving 290px of dead cream between the founder's CTA and the closer's eyebrow.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -2099,6 +2209,9 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **HOME IS FIVE CHAPTERS, AND EACH ONE PREVIEWS A PAGE (22).** Your business → The work (/work) → What we do (/services) → Who builds it (/about) → Start (/contact). A chapter previews the destination's IDEA and never copies its signature mechanic: home's monogram is drawn by the scroll, /about's draws on a timer. Each chapter carries `id` and `data-tone`, which is what the rail reads.
+- **NO UNVERIFIED FIGURES (22).** The three Averr Studio numbers (40+, 15×, 1.4s) are gone with `ProofLedger`. A case-study card prints a `headlineFigure` only where the data has one — two of the four do — and prints the sector and pillars where it does not. Nothing on the site invents a number.
 
 - **THE TYPED NAME IS MEMORY ONLY (21b).** `lib/businessName.tsx` is React state at the app root: no localStorage, no sessionStorage, no cookie, no analytics, no network. It dies with the tab. It travels only in a `?notes=` the visitor clicks, and the context is the fallback for a navigation that carries none.
 - **THE HERO SLAB IS A CONTROL NOW (21b).** It is PillHl's box with an `<input>` in it. Anything done to the slab has to keep: the ruler measuring at the UNSCALED size, the step-down fitting the CONTENT box, the line box fixed so the page cannot move under it, and the first frame painted in ink before the surface arrives.
@@ -2297,6 +2410,10 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **77 · A `pointer-events: none` layer needs YOUR classes to switch back on.** *Cause:* the hero's copy layer is inert so the window behind stays hoverable, with `:is(input, a, button)` re-enabled. MagneticCTA sets pointer-events on its own anchor, beat the element selector, and the primary CTA computed `none` — unclickable. *Fix:* re-enable by the hero's own class names. **Do not re-enable with a selector someone else's component can outrank.**
 
+**78 · A fixed rail is as wide as its labels, and its labels are over your content.** *Cause:* the chapter rail's five labels were in flow beside the dots, making it 150px wide — straight on top of chapter 2's cards and their figures. *Fix:* the labels are an absolutely positioned overlay revealed on hover, the rail is 57px at rest (inside the page's own gutter), and a `::before` keeps the 5px dots at a 44px hit target. **Measure what a fixed element covers, not just what it is.**
+
+**79 · A screen driven by one value has a RESTING value, and it is rarely zero.** *Cause:* home's Design panel mounted `ScreenBrandBoard` with `local` at 0. That screen draws itself across 0.08 → 0.40, so the panel opened on an empty sheet. *Fix:* each reused screen rests where its own "before" state is — the board drawn but un-tinted, the agent not yet run, the pin not yet climbed. **Read the transform ranges before you pick a starting value.**
+
 ---
 
 ## 6. DATA FACTS
@@ -2398,6 +2515,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 21 — the home hero.**~~ **DONE** (`edd31d8` … `60b2bab`). The headline speaks to the business, the slab cycles three measured outcomes, the reader can drive it three ways, and /services' real screens run beside it after LCP. Home initial JS +2.92 kB gzip; mobile LCP 600ms.
 - ~~**Session 21 rulings.**~~ **DONE** (`d6da1c7`, `8f02bb1`). Headline 147.9px at 1440 measured to the column; kicker, reel heading and meta description rewritten; navy agent screen kept by ruling; home mobile LCP re-measured honestly at 2000 ms.
 - ~~**Session 21b — the home flagship, reconceived.**~~ **DONE** (`021d6c8` … `ec38108`). The visitor types their business name into the slab and a premium site for it builds itself live in a large tilted window; seven industry presets, a generated monogram, self-scrolling; the scroll fills the screen and hands to the real reel; the name carries to /services and /contact. Home initial JS +1.97 kB gzip, generator 5.19 kB out of band, mobile LCP 2024 ms.
+- ~~**Session 22 — home as a five-chapter journey.**~~ **DONE** (`49501a1` … `73dce33`). Headline back to 104px, seven preset section shapes, a scroll-panned film strip of the work, three playable live service panels with all 16 chips deep-linking, a scroll-drawn founder chapter, a personalised slab closer, and a chapter rail. Home initial JS 106.80 → 94.31 kB gzip; mobile LCP 1788 ms.
+- **STILL OPEN from 22:** CareerClarity has no screenshot and no case study, so its card is text-only; CapitalCommand and CadenceStack have no `headlineFigure`; `public/about/` has no founder photograph. All three are owner-supplied assets, not code.
 - **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
 
@@ -2407,7 +2526,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 
 | Surface | Trajectory |
 |---|---|
-| Home | **2 → 4–5 → 6 → 4–5 (21 brief) → 4 (21 verdict) → awaiting (21b)** |
+| Home | **2 → 4–5 → 6 → 4–5 → 4 (21 verdict) → awaiting (21b, 22)** |
 | Case studies | **2 → 4–5** |
 | /services | **4** |
 | /about | **4** |
