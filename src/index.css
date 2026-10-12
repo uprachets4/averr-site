@@ -378,15 +378,25 @@ a { color: inherit; text-decoration: none; }
      so it always crops by about the same fraction instead of by whatever
      the viewport happens to be: a vw width cropped 30% at 1440 and 57% at
      1920, where the container stops growing but vw does not. */
-  --sw-inset: 0.56;
-  --sw-top: 30%;
-  --sw-w: 0.64;
+  --sw-inset: 0.438;
+  /* Overwritten in px by the hero once it has measured the h1 — the
+     window starts below the headline's last line whatever the viewport
+     does to it, rather than at a percentage that works at 900 and
+     collides at 720. */
+  --sw-top: 55%;
+  --sw-w: 0.9;
   /* Everything in the copy is bounded to this, 44px clear of the window's
      left edge. The h1's own box used to span the whole container: its
      glyphs ran 45px under the window at 1440, and the field — a
      full-width transparent input — swallowed the pointer across the
      window as well. */
-  --hero-copy-w: calc(var(--container-wide) * 0.56 - 44px);
+  /* The h1's bound. 0.786 of the container puts the headline at ~104px
+     at 1440 (A1): "the one they choose." is 9.6 x the font size, so the
+     column and the type size are the same number twice. */
+  --hero-copy-w: calc(var(--container-wide) * 0.786 - 44px);
+  /* The hint, kicker and CTAs get their OWN, narrower bound: they sit
+     level with the window, where the h1 sits above it. */
+  --hero-tail-w: min(560px, 42%);
 }
 
 /* Below 1024 the hero stacks: the copy has the whole container and only
@@ -454,7 +464,7 @@ a { color: inherit; text-decoration: none; }
    input came out 446px inside a 698px column, so a long name was clipped
    instead of stepping down. The field's line, and only it, is a block. */
 .hero-line--field > span > span { display: block; }
-.hero-tail { max-width: var(--hero-copy-w); margin-top: 24px; }
+.hero-tail { max-width: var(--hero-tail-w); margin-top: 24px; }
 .hero-kicker { color: var(--color-muted); margin: 0; }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 .hero-cue {
@@ -473,7 +483,7 @@ a { color: inherit; text-decoration: none; }
   left: calc(50% - var(--container-wide) / 2 + var(--container-wide) * var(--sw-inset));
   top: var(--sw-top);
   width: calc(var(--container-wide) * var(--sw-w));
-  height: calc(var(--container-wide) * var(--sw-w) * 0.86);
+  height: calc(var(--container-wide) * var(--sw-w) * 0.78);
   z-index: 1;
 }
 .hero-sketch-flat {
@@ -696,7 +706,7 @@ a { color: inherit; text-decoration: none; }
 
 .nf-hint {
   margin: 18px 0 0;
-  max-width: var(--hero-copy-w);
+  max-width: var(--hero-tail-w);
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.12em;

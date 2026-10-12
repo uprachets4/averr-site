@@ -351,6 +351,43 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
     [frameInView, dark, setNavDark]
   );
 
+  /* The window's top follows the headline's last line. A percentage
+     cleared it at 900 and ran into it at 720, and the headline is a
+     third taller after A1. */
+  useLayoutEffect(function placeWindow() {
+    function run() {
+      const frame = frameRef.current;
+      const h1 = frame?.querySelector(".hero-h1");
+      const layer = frame?.querySelector(".hero-sketch-layer");
+      const win = frame?.querySelector(".sw-win");
+      if (!frame || !h1 || !layer || !win) return;
+      const frameTop = frame.getBoundingClientRect().top;
+      const want = h1.getBoundingClientRect().bottom - frameTop + 26;
+      /* The window is rotated in 3D, so its rect reaches ABOVE the layer
+         that positions it — by 20px at 1920, enough to put the tilted
+         corner over the headline's last line. Push down by whatever the
+         overshoot actually measures rather than by a guessed angle. */
+      const overshoot = Math.max(
+        0,
+        layer.getBoundingClientRect().top - win.getBoundingClientRect().top
+      );
+      frame.style.setProperty("--sw-top", `${Math.round(want + overshoot)}px`);
+    }
+    run();
+    // a second pass once the first has settled: the overshoot can only be
+    // measured after the layer has been placed
+    const again = requestAnimationFrame(run);
+    const ro = new ResizeObserver(run);
+    if (frameRef.current) ro.observe(frameRef.current);
+    const h1 = frameRef.current?.querySelector(".hero-h1");
+    if (h1) ro.observe(h1);
+    document.fonts?.ready.then(run).catch(function ignore() {});
+    return function off() {
+      cancelAnimationFrame(again);
+      ro.disconnect();
+    };
+  }, []);
+
   /* the cue stands down when the copy has grown into it */
   const [cueFits, setCueFits] = useState(true);
   useLayoutEffect(function watchCue() {
