@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
@@ -39,21 +39,6 @@ import { PLANES, clientFor, figureFor, type Plane } from "./fieldPlan";
  * its verified figure.
  */
 
-const Site = lazy(async function a() {
-  return { default: (await import("../services/build/BuildScreens")).ScreenLocalSite };
-});
-const Brand = lazy(async function b() {
-  return { default: (await import("../services/build/BuildScreens")).ScreenBrandBoard };
-});
-const Agent = lazy(async function c() {
-  return { default: (await import("../services/build/AutomateScreens")).ScreenAgent };
-});
-const Map = lazy(async function d() {
-  return { default: (await import("../services/build/GrowScreens")).ScreenMap };
-});
-
-const SCREENS = { site: Site, brand: Brand, agent: Agent, map: Map } as const;
-
 /** Created once at module scope: motion.create returns a new component
  *  each call and would remount every plane on every render. */
 const MotionLink = motion.create(RouterLink);
@@ -82,10 +67,8 @@ function PlaneBox({
   p,
   active,
   dimmed,
-  live,
   onEnter,
   onLeave,
-  localValue,
   dolly,
   flying,
   push,
@@ -93,17 +76,14 @@ function PlaneBox({
   p: Plane;
   active: boolean;
   dimmed: boolean;
-  live: boolean;
   onEnter: (rect: DOMRect | null, info: Tip) => void;
   onLeave: () => void;
-  localValue: MotionValue<number>;
   dolly: MotionValue<number>;
   flying: boolean;
   push: number;
 }) {
   const figure = figureFor(p.slug);
   const client = clientFor(p.slug);
-  const Screen = p.screen ? SCREENS[p.screen] : null;
   const boxRef = useRef<HTMLAnchorElement | null>(null);
 
   /* depth decides how much of the dark it keeps */
@@ -142,23 +122,13 @@ function PlaneBox({
         <em>{p.label}</em>
       </motion.span>
       <span className="hf-shot">
-        {p.kind === "shot" && p.src ? (
-          <Screenshot
-            src={p.src}
-            alt={`${p.label} — product screen`}
-            sizes="(min-width: 1024px) 38vw, 70vw"
-            loading={EAGER.has(p.id) ? "eager" : "lazy"}
-            fetchPriority="low"
-          />
-        ) : Screen && live ? (
-          <Suspense fallback={null}>
-            <span className="hf-live">
-              <Screen local={localValue} compact />
-            </span>
-          </Suspense>
-        ) : (
-          <span className="hf-hold" aria-hidden />
-        )}
+        <Screenshot
+          src={p.src}
+          alt={`${p.label} — product screen`}
+          sizes="(min-width: 1024px) 38vw, 70vw"
+          loading={EAGER.has(p.id) ? "eager" : "lazy"}
+          fetchPriority="low"
+        />
       </span>
       <motion.span className="hf-sheen" aria-hidden style={{ opacity: rim }} />
     </>
@@ -237,13 +207,18 @@ export default function HeroField({
   const reduce = !!useReducedMotion();
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [hover, setHover] = useState<string | null>(null);
+  /* Which plane owns the label right now. A ref, because the leaving
+     plane's blur fires around the arriving plane's focus and the two
+     must not race: clearing from inside a setState updater let one
+     plane's exit wipe the next plane's label, and only the first plane
+     in the field ever showed one. */
+  const ownerRef = useRef<string | null>(null);
   /* ONE label, rendered outside the 3D scene and clamped to the frame.
      Per-plane labels could not be kept on screen: `right: 0` inside a
      plane whose own right edge is past the viewport is still past the
      viewport, and a px nudge inside a 3D-transformed parent is itself
      transformed. Six of sixteen clipped at 1280 and two at 1920. */
   const [tip, setTip] = useState<{ x: number; y: number; info: Tip } | null>(null);
-  const [live, setLive] = useState(false);
   const [narrow, setNarrow] = useState(false);
 
   useEffect(function watch() {
@@ -257,46 +232,6 @@ export default function HeroField({
       mq.removeEventListener("change", on);
     };
   }, []);
-
-  /* the live screens mount after the hero has painted */
-  useEffect(function afterPaint() {
-    let done = false;
-    function go() {
-      if (done) return;
-      done = true;
-      setLive(true);
-    }
-    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: object) => number })
-      .requestIdleCallback;
-    const id = ric ? ric(go, { timeout: 2600 }) : window.setTimeout(go, 1900);
-    window.addEventListener("pointermove", go, { once: true, passive: true });
-    window.addEventListener("scroll", go, { once: true, passive: true });
-    return function off() {
-      done = true;
-      window.removeEventListener("pointermove", go);
-      window.removeEventListener("scroll", go);
-      if (!ric) window.clearTimeout(id as number);
-    };
-  }, []);
-
-  /* one value drives every live screen's own micro-motion */
-  const localValue = useMotionValue(reduce ? 1 : 0);
-  useEffect(
-    function loop() {
-      if (!live || reduce || !inView) return;
-      let raf = 0;
-      const t0 = performance.now();
-      function frame(now: number) {
-        localValue.set(((now - t0) % 11000) / 11000);
-        raf = requestAnimationFrame(frame);
-      }
-      raf = requestAnimationFrame(frame);
-      return function stop() {
-        cancelAnimationFrame(raf);
-      };
-    },
-    [live, reduce, inView, localValue]
-  );
 
   /* ── the cursor camera ── */
   const mx = useMotionValue(0);
@@ -360,14 +295,13 @@ export default function HeroField({
             <PlaneBox
               key={p.id}
               p={p}
-              live={live}
               dolly={dolly}
               flying={flying}
               push={narrow ? PUSH_NARROW : PUSH}
               active={hover === p.id}
               dimmed={hover !== null && hover !== p.id}
-              localValue={localValue}
               onEnter={function enter(rect, info) {
+                ownerRef.current = p.id;
                 setHover(p.id);
                 const host = hostRef.current?.getBoundingClientRect();
                 if (!rect || !host) return;
@@ -380,13 +314,10 @@ export default function HeroField({
                 });
               }}
               onLeave={function leave() {
-                setHover(function clear(cur: string | null) {
-                  if (cur === p.id) {
-                    setTip(null);
-                    return null;
-                  }
-                  return cur;
-                });
+                if (ownerRef.current !== p.id) return;
+                ownerRef.current = null;
+                setHover(null);
+                setTip(null);
               }}
             />
           );

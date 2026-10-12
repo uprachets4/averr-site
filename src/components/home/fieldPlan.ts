@@ -3,10 +3,15 @@ import { caseStudies } from "../../data/caseStudies";
 /**
  * The composition of the hero's 3D field.
  *
- * EVERY plane is real. Twelve are case-study screenshots that already
- * exist under public/work/ with WebP derivatives; four are the live
- * /services screen components the build stage pins. Nothing here is
- * generated, stocked or placeheld.
+ * EVERY plane is a real case-study capture that already exists under
+ * public/work/ with WebP derivatives. Nothing is generated, stocked or
+ * placeheld, and nothing is repeated.
+ *
+ * The four live /services screens that used to hang here were replaced
+ * by owner ruling in 24b: home must not import another page's
+ * components, and taking them out lifts BuildScreens, GrowScreens and
+ * AutomateScreens off home's module graph entirely. The replacements
+ * are the next unused capture from each project.
  *
  * The layout is deliberate rather than scattered:
  *
@@ -26,14 +31,12 @@ import { caseStudies } from "../../data/caseStudies";
 
 export type Plane = {
   id: string;
-  /** A real capture, or a live /services screen. */
-  kind: "shot" | "screen";
-  /** For kind "shot": the JPEG path the WebP pipeline knows. */
-  src?: string;
-  /** For kind "screen": which component. */
-  screen?: "site" | "map" | "agent" | "brand";
-  /** Which case study the plane belongs to, if any — drives the link. */
-  slug?: string;
+  /** Always a real capture now — see the note above. */
+  kind: "shot";
+  /** The JPEG path the WebP pipeline knows. */
+  src: string;
+  /** Which case study the plane belongs to — drives the link. */
+  slug: string;
   label: string;
   x: number;
   y: number;
@@ -101,10 +104,11 @@ export const PLANES: Plane[] = [
     drift: [3, 21], yaw: 8, mobile: true,
   },
   {
-    id: "screen-site",
-    kind: "screen",
-    screen: "site",
-    label: "Marketing websites",
+    id: "cg-testimonials",
+    kind: "shot",
+    src: "/work/cgwalls/testimonials.jpg",
+    slug: "cg-walls-and-floors",
+    label: "CG Walls & Floors",
     x: 64, y: 7, w: 15, z: -337,
     drift: [3, 25], yaw: -5, mobile: true,
   },
@@ -118,10 +122,11 @@ export const PLANES: Plane[] = [
     drift: [3, 29], yaw: 10,
   },
   {
-    id: "screen-agent",
-    kind: "screen",
-    screen: "agent",
-    label: "AI agents",
+    id: "cc-ipo",
+    kind: "shot",
+    src: "/work/capitalcommand/04-ipo-intelligence.jpg",
+    slug: "capitalcommand",
+    label: "CapitalCommand",
     x: 89, y: 78, w: 16, z: -615,
     drift: [3, 18], yaw: -8, mobile: true,
   },
@@ -146,10 +151,11 @@ export const PLANES: Plane[] = [
     drift: [2, 30], yaw: -6,
   },
   {
-    id: "screen-map",
-    kind: "screen",
-    screen: "map",
-    label: "Local search",
+    id: "sift-tailor",
+    kind: "shot",
+    src: "/work/sift/02-tailor-resume.jpg",
+    slug: "sift",
+    label: "SIFT",
     x: 70, y: 95, w: 11, z: -1310,
     drift: [2, 26], yaw: 9,
   },
@@ -172,10 +178,11 @@ export const PLANES: Plane[] = [
     drift: [2, 28], yaw: 7,
   },
   {
-    id: "screen-brand",
-    kind: "screen",
-    screen: "brand",
-    label: "Brand & design direction",
+    id: "cad-pillars",
+    kind: "shot",
+    src: "/work/cadencestack/02-content-pillars.jpg",
+    slug: "cadencestack",
+    label: "CadenceStack",
     x: 4, y: 86, w: 12, z: -1588,
     drift: [2, 20], yaw: 11,
   },
