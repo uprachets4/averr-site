@@ -1147,7 +1147,11 @@ a { color: inherit; text-decoration: none; }
 .hx-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
 
 /* the landing frame */
-.hx-landing { position: absolute; inset: 0; z-index: 4; opacity: 0; overflow: hidden; }
+/* Opaque, so the capture never blends with the room behind it. */
+.hx-landing {
+  position: absolute; inset: 0; z-index: 4; opacity: 0; overflow: hidden;
+  background: #0B0D10;
+}
 .hx-landing__img { position: absolute; inset: 0; will-change: transform; }
 .hx-landing__img img { width: 100%; height: 100%; object-fit: cover; }
 

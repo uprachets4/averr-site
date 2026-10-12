@@ -14,7 +14,7 @@ import LineReveal from "./LineReveal";
 import PillHl from "./PillHl";
 import TorontoClock from "./TorontoClock";
 import { useSetNavDarkOverride } from "../lib/navTone";
-import { useScrollStyle } from "../lib/useScrollStyle";
+import { useScrollProp, useScrollStyle } from "../lib/useScrollStyle";
 import HeroField from "./home/HeroField";
 import Screenshot from "./Screenshot";
 
@@ -38,8 +38,11 @@ const SUBLINE = "We make sure they find a business worth choosing.";
 const KICKER =
   "We design premium websites, build AI automations, and run the marketing engines that grow businesses like yours across the GTA.";
 
-/** The plane the fly-through lands on — its real capture, full bleed. */
-const LANDING = "/work/cgwalls/hero.jpg";
+/** The plane the fly-through lands on — its real capture, full bleed.
+ *  The dark finance dashboard, not the renovation site: it is the
+ *  strongest frame in the set and it keeps the hero on its own ground
+ *  instead of handing a cream page to a cream chapter. */
+const LANDING = "/work/capitalcommand/01-overview.jpg";
 
 const T = {
   topRow: 0.2,
@@ -232,9 +235,23 @@ function PinnedHero({ skip, narrow }: { skip: boolean; narrow: boolean }) {
      edge, CG Walls 6666px off the left — so the room cannot carry that
      window and the mean luminance fell to 23.5 against 51.8 at rest.
      The destination comes up to meet the camera instead. */
-  const landFade = useTransform(scrollYProgress, narrow ? [0.14, 0.42] : [0.28, 0.52], [0, 1]);
-  const landRef = useScrollStyle<HTMLDivElement>(landFade);
-  const landScale = useTransform(scrollYProgress, narrow ? [0.14, 1] : [0.28, 1], [1.34, 1], { ease: easing.inOut });
+  const openFrom = narrow ? 0.12 : 0.22;
+  const openTo = narrow ? 0.40 : 0.46;
+  /* inset(top right bottom left): a small box at the upper right — where
+     the CapitalCommand plane sits — opening to the whole frame. */
+  const landClip = useTransform(
+    scrollYProgress,
+    [openFrom, openTo],
+    ["inset(8% 2% 78% 74%)", "inset(0% 0% 0% 0%)"],
+    { ease: easing.inOut }
+  );
+  /* Both are written straight to the node. clip-path is accelerated the
+     same way opacity is, and inside a pin that means it never advances:
+     the wipe read `inset(8% 2% 78% 74%)` at the END of the pin. */
+  const landOn = useTransform(scrollYProgress, [openFrom - 0.01, openFrom], [0, 1]);
+  const landFadeRef = useScrollStyle<HTMLDivElement>(landOn);
+  const landClipRef = useScrollProp<HTMLDivElement>(landClip, "clipPath");
+  const landScale = useTransform(scrollYProgress, [openFrom, 1], [1.22, 1], { ease: easing.inOut });
   const fieldFade = useTransform(scrollYProgress, [0.46, 0.70], [1, 0]);
   const fieldRef = useScrollStyle<HTMLDivElement>(fieldFade);
 
@@ -267,11 +284,15 @@ function PinnedHero({ skip, narrow }: { skip: boolean; narrow: boolean }) {
         </motion.div>
 
         {/* the frame the camera lands on — a real capture, full bleed */}
-        <div ref={landRef as React.Ref<HTMLDivElement>} className="hx-landing" aria-hidden>
+        <motion.div
+          ref={mergeRefs(landFadeRef, landClipRef) as React.Ref<HTMLDivElement>}
+          className="hx-landing"
+          aria-hidden
+        >
           <motion.div className="hx-landing__img" style={{ scale: landScale }}>
             <Screenshot src={LANDING} alt="" sizes="100vw" loading="lazy" fetchPriority="low" />
           </motion.div>
-        </div>
+        </motion.div>
 
         <ScrollCue hidden={cueGone} skip={skip} />
       </div>
@@ -305,6 +326,17 @@ function ScrollCue({ hidden, skip }: { hidden: boolean; skip: boolean }) {
       </span>
     </motion.div>
   );
+}
+
+/** Two refs on one node. */
+function mergeRefs<T>(...refs: Array<React.Ref<T> | null>) {
+  return function setRef(node: T | null) {
+    for (const r of refs) {
+      if (!r) continue;
+      if (typeof r === "function") r(node);
+      else (r as React.MutableRefObject<T | null>).current = node;
+    }
+  };
 }
 
 /* ── flat: phones, short windows, reduced motion ───────────────────── */

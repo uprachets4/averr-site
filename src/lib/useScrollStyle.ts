@@ -60,3 +60,45 @@ export function useScrollStyle<T extends HTMLElement = HTMLElement>(
 }
 
 export default useScrollStyle;
+
+/**
+ * The same escape hatch for any other property.
+ *
+ * `clip-path` goes down the accelerated path too: the hero's landing wipe
+ * was handed to motion as a scroll-linked `clipPath` and never opened —
+ * it still read `inset(8% 2% 78% 74%)` at the end of the pin, because the
+ * WAAPI animation motion compiled it into was running on the sticky
+ * element's own ViewTimeline, which never advances.
+ */
+export function useScrollProp<T extends HTMLElement = HTMLElement>(
+  value: MotionValue<string>,
+  prop: "clipPath" | "filter" | "backgroundPosition"
+) {
+  const ref = useRef<T | null>(null);
+
+  const write = useCallback(
+    function writeProp(v: string) {
+      if (ref.current) ref.current.style[prop] = v;
+    },
+    [prop]
+  );
+
+  useMotionValueEvent(value, "change", write);
+
+  const setRef = useCallback(
+    function attach(node: T | null) {
+      ref.current = node;
+      if (node) node.style[prop] = value.get();
+    },
+    [value, prop]
+  );
+
+  useLayoutEffect(
+    function syncOnMount() {
+      if (ref.current) ref.current.style[prop] = value.get();
+    },
+    [value, prop]
+  );
+
+  return setRef;
+}
