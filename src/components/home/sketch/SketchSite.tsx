@@ -319,7 +319,7 @@ export default function SketchSite({
           .sk-reviews { padding: 10px 34px 46px; }
           .sk-reviews__head { display: flex; align-items: baseline; gap: 12px; }
           .sk-sample {
-            font-family: ${MONO_FAMILY}; font-size: 11px; letter-spacing: 0.12em;
+            font-family: ${MONO_FAMILY}; font-size: 12px; letter-spacing: 0.12em;
             text-transform: uppercase; color: var(--sk-muted);
             border: 1px solid color-mix(in srgb, var(--sk-ink) 18%, transparent);
             border-radius: 4px; padding: 2px 6px;
@@ -361,7 +361,7 @@ export default function SketchSite({
           .sk--compact .sk-hero--centered .sk-h1,
           .sk--compact .sk-hero--editorial .sk-h1 { font-size: 26px; }
           .sk--compact .sk-sub { font-size: 13px; margin-bottom: 18px; }
-          .sk--compact .sk-eyebrow { font-size: 11px; margin-bottom: 10px; }
+          .sk--compact .sk-eyebrow { font-size: 13px; margin-bottom: 10px; }
           .sk--compact .sk-btn { padding: 10px 14px; font-size: 13px; }
           .sk--compact .sk-hero { display: block; }
           .sk--compact .sk-hero__art { height: 130px; }
@@ -375,6 +375,7 @@ export default function SketchSite({
           .sk--compact .sk-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
           .sk--compact .sk-card { padding: 14px 12px; }
           .sk--compact .sk-card__name { font-size: 14px; }
+          .sk--compact .sk-sample { font-size: 13px; }
           .sk--compact .sk-card__note,
           .sk--compact .sk-quote__who,
           .sk--compact .sk-foot { font-size: 13px; }

@@ -373,10 +373,6 @@ a { color: inherit; text-decoration: none; }
    must never cover a glyph, so the copy's two blocks are bounded: the h1
    by the frame's height (its last line has to clear --sw-top) and the
    kicker + CTAs by --hero-tail-w (they have to clear --sw-left). */
-@media (max-width: 1023px) {
-  :root { --hero-copy-w: var(--container-wide); --type-hero-size: clamp(30px, calc(var(--container-wide) / 9.6), 112px); }
-}
-
 :root {
   /* The window starts 44% across the container and runs 86% of it wide,
      so it always crops by about the same fraction instead of by whatever
@@ -391,6 +387,18 @@ a { color: inherit; text-decoration: none; }
      full-width transparent input — swallowed the pointer across the
      window as well. */
   --hero-copy-w: calc(var(--container-wide) * 0.56 - 44px);
+}
+
+/* Below 1024 the hero stacks: the copy has the whole container and only
+   width binds the type. This block has to come AFTER the :root above —
+   same specificity, so source order decides, and declared first it lost.
+   The copy column was resolving to 152px on a phone and every line of
+   the h1 wrapped. */
+@media (max-width: 1023px) {
+  :root {
+    --hero-copy-w: var(--container-wide);
+    --type-hero-size: clamp(30px, calc(var(--container-wide) / 9.6), 112px);
+  }
 }
 
 .hero-frame {
@@ -473,9 +481,13 @@ a { color: inherit; text-decoration: none; }
   z-index: 1;
   width: 100%;
   max-width: var(--container-wide);
+  /* A DEFINITE height, phone-proportioned. Left to size itself the
+     window grew when the generator replaced the static frame, and the
+     whole page under it moved. */
+  height: min(132vw, 560px);
   margin: 44px auto 0;
-  padding-bottom: 64px;
 }
+.hero-flat { padding-bottom: 72px; }
 
 /* ── the window ── */
 .sw { position: relative; width: 100%; height: 100%; perspective: 1800px; }
@@ -639,7 +651,12 @@ a { color: inherit; text-decoration: none; }
   font-family: var(--font-display);
   font-weight: 500;
   letter-spacing: -0.015em;
-  line-height: var(--type-hero-leading);
+  /* A FIXED box. The font steps down for a long name and the placeholder
+     tries names of different lengths on — if the line box followed the
+     font size, every step moved the whole page under it. Height and line
+     height come from the UNSCALED size, so only the glyphs change. */
+  height: calc(var(--type-hero-size) * var(--type-hero-leading));
+  line-height: calc(var(--type-hero-size) * var(--type-hero-leading));
   color: var(--nf-fg);
   -webkit-text-fill-color: var(--nf-fg);
   caret-color: var(--nf-fg);
@@ -666,7 +683,8 @@ a { color: inherit; text-decoration: none; }
 /* A caret before the field is focused, so it reads as typeable. */
 .nf-caret {
   position: absolute;
-  top: 0.26em; bottom: 0.26em;
+  /* percentages of the fixed box, not em of a font that steps */
+  top: 14%; bottom: 14%;
   width: 2px;
   z-index: 2;
   background: var(--nf-fg);
