@@ -1,14 +1,15 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   motion,
   useMotionValue,
+  useMotionValueEvent,
   useReducedMotion,
   useSpring,
   useTransform,
   type MotionValue,
 } from "motion/react";
 import { easing, spring } from "../../lib/motion";
+import { Link as RouterLink } from "react-router-dom";
 import Screenshot from "../Screenshot";
 import { PLANES, clientFor, figureFor, type Plane } from "./fieldPlan";
 
@@ -53,6 +54,10 @@ const Map = lazy(async function d() {
 
 const SCREENS = { site: Site, brand: Brand, agent: Agent, map: Map } as const;
 
+/** Created once at module scope: motion.create returns a new component
+ *  each call and would remount every plane on every render. */
+const MotionLink = motion.create(RouterLink);
+
 /** Must match `perspective` and `perspective-origin` in the stylesheet. */
 const PERSPECTIVE = 1400;
 const ORIGIN_X = 50;
@@ -60,6 +65,13 @@ const ORIGIN_Y = 46;
 
 /** The four planes that carry the first paint. */
 const EAGER = new Set(["cg-hero", "sift-overview", "cc-overview", "cad-center"]);
+
+/** How far the dolly pushes the whole scene. Must match `push` below. */
+const PUSH = 2400;
+/** Where a plane is at its brightest: just short of the eye, while it is
+ *  large on screen and before it clips past. */
+const LIT_Z = 900;
+const LIT_FALLOFF = 1150;
 
 function PlaneBox({
   p,
@@ -69,6 +81,8 @@ function PlaneBox({
   onEnter,
   onLeave,
   localValue,
+  dolly,
+  flying,
 }: {
   p: Plane;
   active: boolean;
@@ -77,6 +91,8 @@ function PlaneBox({
   onEnter: () => void;
   onLeave: () => void;
   localValue: MotionValue<number>;
+  dolly: MotionValue<number>;
+  flying: boolean;
 }) {
   const figure = figureFor(p.slug);
   const client = clientFor(p.slug);
@@ -88,12 +104,35 @@ function PlaneBox({
      depth comes from SIZE and the hairline, not from fading to nothing. */
   const base = p.z < -1300 ? 0.62 : p.z < -800 ? 0.78 : p.z < -250 ? 0.92 : 1;
 
+  /* THE KEY LIGHT. A plane brightens as it comes toward the camera, so
+     the fly-through is lit by what is passing rather than by nothing.
+     Measured against the at-rest frame, the pin had a crater at 40% —
+     mean luminance 23.5 against 51.8 — in the gap between the near
+     planes leaving and the landing arriving. This fills it. */
+  const near = useTransform(dolly, function light(t: number) {
+    const zNow = p.z + PUSH * easing.inOut(t);
+    return Math.max(0, 1 - Math.abs(zNow - LIT_Z) / LIT_FALLOFF);
+  });
+  /* A plane that reaches the eye magnifies one pixel across the whole
+     frame. Fade it out as it arrives rather than letting it smear. */
+  const exit = useTransform(dolly, function cull(t: number) {
+    const zNow = p.z + PUSH * easing.inOut(t);
+    return 1 - Math.min(1, Math.max(0, (zNow - 980) / 320));
+  });
+  const lit = useTransform([near, exit] as const, function paint([n, e]: number[]) {
+    if (dimmed) return base * 0.55 * e;
+    /* no plane in the frustum sits under 0.62 while the camera moves */
+    const floor = flying ? Math.max(base, 0.62) : base;
+    return Math.min(1, floor + 0.38 * n) * e;
+  });
+  const rim = useTransform(near, [0.25, 1], [0, 1]);
+
   const inner = (
     <>
-      <span className="hf-chrome" aria-hidden>
+      <motion.span className="hf-chrome" aria-hidden style={{ "--hf-rim": rim } as never}>
         <i /><i /><i />
         <em>{p.label}</em>
-      </span>
+      </motion.span>
       <span className="hf-shot">
         {p.kind === "shot" && p.src ? (
           <Screenshot
@@ -113,6 +152,7 @@ function PlaneBox({
           <span className="hf-hold" aria-hidden />
         )}
       </span>
+      <motion.span className="hf-sheen" aria-hidden style={{ opacity: rim }} />
       <span className={active ? "hf-label hf-label--on" : "hf-label"}>
         <span className="hf-label__name">{client ?? p.label}</span>
         {figure ? (
@@ -136,7 +176,6 @@ function PlaneBox({
     left: `${ORIGIN_X + (p.x - ORIGIN_X) / k}%`,
     top: `${ORIGIN_Y + (p.y - ORIGIN_Y) / k}%`,
     width: `${p.w / k}%`,
-    opacity: dimmed ? base * 0.55 : base,
     "--hf-z": `${p.z}px`,
     "--hf-yaw": `${p.yaw}deg`,
     "--hf-drift": `${p.drift[0]}px`,
@@ -144,13 +183,14 @@ function PlaneBox({
   } as React.CSSProperties;
 
   const cls = `hf-plane${active ? " hf-plane--on" : ""}`;
+  const motionStyle = { ...style, opacity: lit };
 
   if (p.slug) {
     return (
-      <Link
+      <MotionLink
         to={`/work/${p.slug}`}
         className={cls}
-        style={style}
+        style={motionStyle}
         onMouseEnter={onEnter}
         onMouseLeave={onLeave}
         onFocus={onEnter}
@@ -158,14 +198,14 @@ function PlaneBox({
         aria-label={`${client ?? p.label} — open the case study`}
       >
         {inner}
-      </Link>
+      </MotionLink>
     );
   }
   return (
-    <Link
+    <MotionLink
       to="/services"
       className={cls}
-      style={style}
+      style={motionStyle}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
       onFocus={onEnter}
@@ -173,7 +213,7 @@ function PlaneBox({
       aria-label={`${p.label} — see the services`}
     >
       {inner}
-    </Link>
+    </MotionLink>
   );
 }
 
@@ -279,6 +319,13 @@ export default function HeroField({
 
   const shown = narrow ? PLANES.filter(function six(p) { return p.mobile; }) : PLANES;
 
+  /* True while the camera is moving: the brightness floor only applies
+     during the pin, so the at-rest composition keeps its depth falloff. */
+  const [flying, setFlying] = useState(false);
+  useMotionValueEvent(dolly, "change", function moving(t) {
+    setFlying(t > 0.015);
+  });
+
   return (
     <div
       ref={hostRef}
@@ -299,6 +346,8 @@ export default function HeroField({
               key={p.id}
               p={p}
               live={live}
+              dolly={dolly}
+              flying={flying}
               active={hover === p.id}
               dimmed={hover !== null && hover !== p.id}
               localValue={localValue}

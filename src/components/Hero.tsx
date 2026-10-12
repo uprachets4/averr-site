@@ -222,15 +222,20 @@ function PinnedHero({ skip }: { skip: boolean }) {
   /* The vignette exists to hold AA contrast behind the headline. Once
      the headline has gone it is just darkness over the fly-through —
      the middle of the pin was at about a third of its brightness. */
-  const vigFade = useTransform(scrollYProgress, [0.06, 0.26], [1, 0]);
+  const vigFade = useTransform(scrollYProgress, [0.005, 0.20], [1, 0]);
   const vigRef = useScrollStyle<HTMLDivElement>(vigFade);
 
   /* The landing arrives BEFORE the field leaves, so the two overlap and
      there is never an empty frame between them. */
-  const landFade = useTransform(scrollYProgress, [0.40, 0.66], [0, 1]);
+  /* The landing rises EARLY. Past about 35% of the pin the planes have
+     scaled up and swept outside the frame — SIFT 6828px off the right
+     edge, CG Walls 6666px off the left — so the room cannot carry that
+     window and the mean luminance fell to 23.5 against 51.8 at rest.
+     The destination comes up to meet the camera instead. */
+  const landFade = useTransform(scrollYProgress, [0.28, 0.52], [0, 1]);
   const landRef = useScrollStyle<HTMLDivElement>(landFade);
-  const landScale = useTransform(scrollYProgress, [0.40, 1], [1.26, 1], { ease: easing.inOut });
-  const fieldFade = useTransform(scrollYProgress, [0.58, 0.80], [1, 0]);
+  const landScale = useTransform(scrollYProgress, [0.28, 1], [1.34, 1], { ease: easing.inOut });
+  const fieldFade = useTransform(scrollYProgress, [0.46, 0.70], [1, 0]);
   const fieldRef = useScrollStyle<HTMLDivElement>(fieldFade);
 
   const [cueGone, setCueGone] = useState(false);
