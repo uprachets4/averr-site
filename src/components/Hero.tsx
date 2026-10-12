@@ -255,6 +255,14 @@ function PinnedHero({ skip, narrow }: { skip: boolean; narrow: boolean }) {
   const fieldFade = useTransform(scrollYProgress, [0.46, 0.70], [1, 0]);
   const fieldRef = useScrollStyle<HTMLDivElement>(fieldFade);
 
+  /* THE HAND-OVER. The landed frame pulls back and recedes into the dark
+     through the pin's tail, so the cream chapter's slab rises over a
+     frame that is already leaving rather than cutting from a static
+     one. One value, same as everything else here. */
+  const recede = useTransform(scrollYProgress, [0.9, 1], [1, 0.72], { ease: easing.inOut });
+  const recedeDark = useTransform(scrollYProgress, [0.9, 1], [0, 0.38]);
+  const recedeDarkRef = useScrollStyle<HTMLDivElement>(recedeDark);
+
   const [cueGone, setCueGone] = useState(false);
   useMotionValueEvent(scrollYProgress, "change", function p(v) {
     setCueGone(v > 0.004);
@@ -289,9 +297,12 @@ function PinnedHero({ skip, narrow }: { skip: boolean; narrow: boolean }) {
           className="hx-landing"
           aria-hidden
         >
-          <motion.div className="hx-landing__img" style={{ scale: landScale }}>
-            <Screenshot src={LANDING} alt="" sizes="100vw" loading="lazy" fetchPriority="low" />
+          <motion.div className="hx-landing__pull" style={{ scale: recede }}>
+            <motion.div className="hx-landing__img" style={{ scale: landScale }}>
+              <Screenshot src={LANDING} alt="" sizes="100vw" loading="lazy" fetchPriority="low" />
+            </motion.div>
           </motion.div>
+          <div ref={recedeDarkRef as React.Ref<HTMLDivElement>} className="hx-landing__veil" aria-hidden />
         </motion.div>
 
         <ScrollCue hidden={cueGone} skip={skip} />

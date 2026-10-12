@@ -1406,3 +1406,11 @@ a { color: inherit; text-decoration: none; }
   .tw-beat__body { font-size: 15px; }
   .tw-beats { min-height: 190px; }
 }
+
+/* The hand-over: the landed frame pulls back and the dark closes over it
+   while the cream chapter's slab rises. */
+.hx-landing__pull { position: absolute; inset: 0; will-change: transform; }
+.hx-landing__veil {
+  position: absolute; inset: 0; z-index: 2;
+  background: var(--color-dark); opacity: 0; pointer-events: none;
+}

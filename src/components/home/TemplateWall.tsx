@@ -32,6 +32,38 @@ const REAL = {
   client: "CG Walls & Floors",
 };
 
+/**
+ * One card in the wall, with its own scroll-linked entrance.
+ *
+ * The wall ASSEMBLES card by card as the cream slab passes over the
+ * hero's receding frame, rather than being there the moment the chapter
+ * arrives. Each card owns a slice of the same one scroll value, offset
+ * by its index, so the stagger is the reader's scroll and not a timer.
+ */
+function WallCard({
+  index,
+  chosen,
+  progress,
+}: {
+  index: number;
+  chosen: boolean;
+  progress: ReturnType<typeof useScroll>["scrollYProgress"];
+}) {
+  const from = 0.004 * index;
+  const fade = useTransform(progress, [from, from + 0.05], [0, 1]);
+  const ref = useScrollStyle<HTMLDivElement>(fade);
+  const y = useTransform(progress, [from, from + 0.06], [22, 0]);
+  return (
+    <motion.div
+      ref={ref as React.Ref<HTMLDivElement>}
+      className={chosen ? "tw-card tw-card--chosen" : "tw-card"}
+      style={{ y }}
+    >
+      <Skeleton />
+    </motion.div>
+  );
+}
+
 /** A generic template site, drawn in grey. Legible as a website, and
  *  deliberately like every other card on the wall. */
 function Skeleton() {
@@ -221,9 +253,7 @@ export default function TemplateWall() {
           >
             {cards.map(function card(i) {
               return (
-                <div key={i} className={i === heroAt ? "tw-card tw-card--chosen" : "tw-card"}>
-                  <Skeleton />
-                </div>
+                <WallCard key={i} index={i} chosen={i === heroAt} progress={scrollYProgress} />
               );
             })}
           </motion.div>
@@ -241,13 +271,16 @@ export default function TemplateWall() {
                 ref={revealRef as React.Ref<HTMLDivElement>}
                 className="tw-chosen__real"
               >
-                {/* Screenshot sets `height: auto` inline, which beat the
-                    stylesheet and letterboxed the capture inside its card
-                    — the skeleton's grey showed below it. */}
+                {/* Two things this component gets wrong for a card that
+                    SCALES: its inline `height: auto` letterboxes the
+                    capture, and a `sizes` matching the card's layout
+                    width makes the browser pick a 640w rung that is then
+                    blown up 2.35x. `sizes` is pinned near the viewport so
+                    the largest rung (1400w) is chosen from the start. */}
                 <Screenshot
                   src={REAL.src}
                   alt={REAL.alt}
-                  sizes="(min-width: 1024px) 56vw, 90vw"
+                  sizes="96vw"
                   loading="lazy"
                   style={{ height: "100%", objectFit: "cover" }}
                 />
