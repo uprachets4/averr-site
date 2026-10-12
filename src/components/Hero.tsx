@@ -199,7 +199,7 @@ function HeroCopy({ skip }: { skip: boolean }) {
 
 /* ── pinned: the fly-through ───────────────────────────────────────── */
 
-function PinnedHero({ skip }: { skip: boolean }) {
+function PinnedHero({ skip, narrow }: { skip: boolean; narrow: boolean }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLDivElement | null>(null);
   const inView = useInView(frameRef, { margin: "20% 0px" });
@@ -232,9 +232,9 @@ function PinnedHero({ skip }: { skip: boolean }) {
      edge, CG Walls 6666px off the left — so the room cannot carry that
      window and the mean luminance fell to 23.5 against 51.8 at rest.
      The destination comes up to meet the camera instead. */
-  const landFade = useTransform(scrollYProgress, [0.28, 0.52], [0, 1]);
+  const landFade = useTransform(scrollYProgress, narrow ? [0.14, 0.42] : [0.28, 0.52], [0, 1]);
   const landRef = useScrollStyle<HTMLDivElement>(landFade);
-  const landScale = useTransform(scrollYProgress, [0.28, 1], [1.34, 1], { ease: easing.inOut });
+  const landScale = useTransform(scrollYProgress, narrow ? [0.14, 1] : [0.28, 1], [1.34, 1], { ease: easing.inOut });
   const fieldFade = useTransform(scrollYProgress, [0.46, 0.70], [1, 0]);
   const fieldRef = useScrollStyle<HTMLDivElement>(fieldFade);
 
@@ -254,7 +254,7 @@ function PinnedHero({ skip }: { skip: boolean }) {
   );
 
   return (
-    <div ref={wrapRef} className="hx-wrap">
+    <div ref={wrapRef} className={narrow ? "hx-wrap hx-wrap--narrow" : "hx-wrap"}>
       <div ref={frameRef} className="hx-frame">
         <div ref={fieldRef as React.Ref<HTMLDivElement>} className="hx-fieldlayer">
           <HeroField dolly={dolly} inView={inView} />
@@ -344,12 +344,16 @@ function FlatHero({ skip }: { skip: boolean }) {
 export default function Hero() {
   const { narrow, short, reduce } = useHeroMode();
   const skip = useScrolledEarly();
-  const pinned = !narrow && !short && !reduce;
+  /* The phone pins too — a shorter SCALE-THROUGH rather than the full
+     fly — so the hero still hands over to the work instead of simply
+     scrolling away. Only a short window or reduced motion falls back to
+     the flat hero. */
+  const pinned = !short && !reduce;
 
   if (pinned) {
     return (
       <div data-hero-wrapper>
-        <PinnedHero skip={skip} />
+        <PinnedHero skip={skip} narrow={narrow} />
       </div>
     );
   }

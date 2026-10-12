@@ -69,8 +69,10 @@ const ORIGIN_Y = 46;
 /** The four planes that carry the first paint. */
 const EAGER = new Set(["cg-hero", "sift-overview", "cc-overview", "cad-center"]);
 
-/** How far the dolly pushes the whole scene. Must match `push` below. */
+/** How far the dolly pushes the whole scene. The phone's scale-through
+ *  is shorter: fewer planes, less room to travel. */
 const PUSH = 2400;
+const PUSH_NARROW = 1250;
 /** Where a plane is at its brightest: just short of the eye, while it is
  *  large on screen and before it clips past. */
 const LIT_Z = 900;
@@ -86,6 +88,7 @@ function PlaneBox({
   localValue,
   dolly,
   flying,
+  push,
 }: {
   p: Plane;
   active: boolean;
@@ -96,6 +99,7 @@ function PlaneBox({
   localValue: MotionValue<number>;
   dolly: MotionValue<number>;
   flying: boolean;
+  push: number;
 }) {
   const figure = figureFor(p.slug);
   const client = clientFor(p.slug);
@@ -114,13 +118,13 @@ function PlaneBox({
      mean luminance 23.5 against 51.8 — in the gap between the near
      planes leaving and the landing arriving. This fills it. */
   const near = useTransform(dolly, function light(t: number) {
-    const zNow = p.z + PUSH * easing.inOut(t);
+    const zNow = p.z + push * easing.inOut(t);
     return Math.max(0, 1 - Math.abs(zNow - LIT_Z) / LIT_FALLOFF);
   });
   /* A plane that reaches the eye magnifies one pixel across the whole
      frame. Fade it out as it arrives rather than letting it smear. */
   const exit = useTransform(dolly, function cull(t: number) {
-    const zNow = p.z + PUSH * easing.inOut(t);
+    const zNow = p.z + push * easing.inOut(t);
     return 1 - Math.min(1, Math.max(0, (zNow - 980) / 320));
   });
   const lit = useTransform([near, exit] as const, function paint([n, e]: number[]) {
@@ -318,7 +322,7 @@ export default function HeroField({
   );
 
   /* ── the fly-through ── */
-  const push = useTransform(dolly, [0, 1], [0, 2400], { ease: easing.inOut });
+  const push = useTransform(dolly, [0, 1], [0, narrow ? PUSH_NARROW : PUSH], { ease: easing.inOut });
   /* the camera straightens as it accelerates, so the landing is square */
   const settle = useTransform(dolly, [0, 0.55], [1, 0]);
   const rotY = useTransform([camY, settle] as const, function y([c, s]: number[]) {
@@ -359,6 +363,7 @@ export default function HeroField({
               live={live}
               dolly={dolly}
               flying={flying}
+              push={narrow ? PUSH_NARROW : PUSH}
               active={hover === p.id}
               dimmed={hover !== null && hover !== p.id}
               localValue={localValue}
