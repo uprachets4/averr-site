@@ -1551,3 +1551,9 @@ a { color: inherit; text-decoration: none; }
 .st-path:focus-visible { outline-color: var(--color-parch); }
 .st-path__kicker, .st-path__note, .st-promise { color: var(--color-muted-l); }
 .st-path__label { color: var(--color-parch); }
+
+/* Home's chapter controls all meet the 44px target: .sa-link, .st-path,
+   .ws-end and the rail's dots. The links that do NOT are the global nav
+   and MagneticCTA's text variant (22-27px), which are shared with every
+   other page — a site-wide decision, not a home one, and recorded in the
+   handoff rather than changed from here. */
