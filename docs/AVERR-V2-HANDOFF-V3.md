@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `f918e18` — *24b-3 mobile tap targets: home's are fine, the shared ones are not*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 24b. |
+| **HEAD** | `b0af4ee` — *24b-4 the hero field is all real client work*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of the 24b ruling. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -2490,6 +2490,62 @@ Six chapters, all reached. *Rail tracking, sampled every 5% down the whole page:
 
 ---
 
+**SESSION 24b RULING — the hero field is all real client work.** One commit (`b0af4ee`).
+
+Owner ruling on 24b: replace the four live /services screen planes with real case-study captures; home must no longer import any /services screen component.
+
+### The swap
+
+| Was | Is now |
+|---|---|
+| `ScreenLocalSite` | `cgwalls/testimonials.jpg` |
+| `ScreenAgent` | `capitalcommand/04-ipo-intelligence.jpg` |
+| `ScreenMap` | `sift/02-tailor-resume.jpg` |
+| `ScreenBrandBoard` | `cadencestack/02-content-pillars.jpg` |
+
+One more from each project, none of them already in the field, all through the existing WebP pipeline. `Plane` no longer has a `screen` branch at all, and `HeroField`'s lazy imports, `Suspense`, live-mount gate and micro-motion loop went with it.
+
+### The chunks
+
+**No home module imports from `services/build`** — verified by grep and by watching the network: loading home and moving the pointer requests **no screen chunk at all**.
+
+With only /services left as a consumer, Vite folds the three into the already-lazy `ServicesBuild` chunk:
+
+| | before | after |
+|---|---|---|
+| BuildScreens | 9.87 kB gzip | — |
+| GrowScreens | 18.19 | — |
+| AutomateScreens | 9.06 | — |
+| ServicesBuild | 5.90 | **40.83** |
+| **Home entry** | 92.15 | **91.39 kB gzip** |
+
+The **37.12 kB gzip** is off home's graph. /services carries exactly what it did, inside a chunk it already loaded lazily.
+
+### Re-verified
+
+- **Safe zone CLEAR** at 1280×720, 1440×900, 1680×1050, 1920×1080 — 16 planes, none over the copy.
+- **Hover labels: 16/16 shown at 1280 and 1920, none clipped**, and only the two verified figures appear (CG Walls 85%, SIFT 42%).
+- **Fly-through, every 5%:** unchanged in shape — monotonic into the CapitalCommand landing (53.1 → 38.6 → 36.3 → ~36), then 28.8 → 24.1 across the deliberate recede into Ch2. No empty frame, no crater.
+- **Crash scroll:** CLS 0.0002 / 0.0001 / 0.008 at 1440 / 1920 / 375, **zero overflow**, no errors.
+- **Mobile LCP (standard harness): 1824 ms** `[1824, 1984, 1760]`, CLS 0.0069.
+
+### A latent bug the swap exposed
+
+Taking the `live` state out of `HeroField` changed its render cadence and broke the hover label: **only the first plane in the field showed one.** The cause was older than this session — `setTip(null)` was called from **inside a `setHover` updater**, so the leaving plane's blur raced the arriving plane's focus and wiped the label that had just been set. The owning plane is a ref now and the clear happens outside the updater.
+
+### Quality gate — the at-rest frame
+
+Substantively better. Where the live screens sat — a quote form, an agent console, a brand board — there are now actual client captures, so the room reads as a **portfolio** rather than a demo rig, and nothing on home is borrowed from another page. The parch slab remains the strongest typographic moment on the site.
+
+The cost is chromatic. Those three screens carried the only green, navy and copper accents in the field; with all-real captures, most of which are dark dashboards, the room is more uniformly grey and the CG Walls plane carries nearly all the warmth. The top-left quadrant and the lower-left are darker than before. **That is the right trade — integrity over variety for a portfolio — but it is a real loss and worth knowing before the next pass.**
+
+### Deviations
+
+1. The field is **more monotone** than with the live screens — see above.
+2. 11–12px text inside the /services screens is **gone from home**, since the screens are gone. Home's own small type is ≥13px.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -2595,6 +2651,8 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **HOME IMPORTS NOTHING FROM ANOTHER PAGE'S COMPONENTS (24b ruling).** Every plane in the hero field is a real case-study capture, and no home module imports from `services/build`. The screen chunks (37.12 kB gzip) are off home's graph and live inside /services' own lazy `ServicesBuild`.
 
 - **HOME IS SIX CHAPTERS AND EVERY ONE REACHES A PAGE (24).** Your customer (the hero) · Seen it before (the argument) · The work (/work) · How we do it (/services) · Who you'll work with (/about) · Your move (/contact). A chapter previews a destination's IDEA and never mounts its components or copies its mechanic — `ServicePanels` was deleted for doing exactly that.
 
@@ -2831,6 +2889,8 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **89 · `sizes` describes the LAYOUT width, so an element that scales picks the wrong rung.** *Cause:* chapter 2's card is 24% of the frame and scales 2.35x. Its `sizes` matched the layout width, the browser chose a 640w rung, and the capture was soft through the whole move. *Fix:* pin `sizes` near the viewport so the largest rung is chosen from the start; it then renders at 0.58x of natural and is downscaled throughout. **For anything that scales up, size the image for where it ends, not where it starts.**
 
+**90 · Never call a setter from inside another setter's updater.** *Cause:* the hero field cleared its hover label with `setTip(null)` written inside a `setHover` updater function. A leaving plane's `blur` fires around the arriving plane's `focus`, so one plane's exit wiped the label the next plane had just set — and after an unrelated change to the component's render cadence, **only the first plane in the field ever showed a label**. It had passed 16/16 the session before. *Fix:* keep the owning id in a ref and clear outside the updater. **An updater runs in the render phase and may run twice; a side effect in one is a race waiting for a re-render that changes.**
+
 ---
 
 ## 6. DATA FACTS
@@ -2910,6 +2970,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 
 ## 8. ROADMAP REMAINING
 
+**ACCESSIBILITY, for the Ship pass.** Two site-wide controls are under the 44px touch target on a phone and were deliberately NOT changed from a home session, because both are shared by every route: the **global nav** ("Averr" 27px, "Work" 22px) and **MagneticCTA's `variant="text"`** (27px). Home's own chapter controls all meet 44px. Fixing these is a site-wide change and belongs with the Ship pass's accessibility work.
+
 - ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
 - ~~**Session 17 — /services.**~~ **COMPLETE** (17 → 17c-5). The page is the build scene; see §3.
 - ~~**Session 18e — /about's second half.**~~ **DONE** (`822eeca` … `915d9ec`). The "one site, idea to live" process scene, the founder credits and the signature closer. **Settled by the 18e rulings:** one statement line is restored verbatim under the name ("Started Averr Studios…"); the other bio sentences stay retired with their facts in the credit lines, and the SALES line is now "B2B SaaS for Google" by owner ruling. `FounderStatement.tsx` stays as the provenance record.
@@ -2937,7 +2999,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 23b — the hero's open items.**~~ **DONE** (`fb0eb76` … `2fd9aec`). The fly-through is lit (no frame below the at-rest mean at 1440 or 1920, against a 28-point crater), hover labels never clip (16/16 at 1280 and 1920), and the phone runs the specced scale-through. The 54ms long task was initial render at 191ms, not the fly-through.
 - ~~**Session 24a — chapters 1–3.**~~ **DONE** (`592dab6` … `547cfca`). The fly-through lands on CapitalCommand and occludes; "You've seen this website before." stages the restored argument as a wall of templates with one breaking out into real work; the strip's end card teases the vault; the rail reads six chapters.
 - ~~**Session 24b — chapters 4–6 and the journey layer.**~~ **DONE** (`0c50d81` … `f918e18`). The Ch1→Ch2 hand-over composed, Ch2 sharp, three image-in-type acts replacing `ServicePanels`, Ch5 and Ch6 lines, the six-chapter rail, no dead frames anywhere. Home initial JS 92.15 kB gzip; mobile LCP 1732 ms.
-- **STILL OPEN from 24b:** the /services screen chunks (37.1 kB gzip) remain on home via Ch1's field — removing them is a design call on the hero; sub-44px tap targets in the GLOBAL nav and MagneticCTA's text variant (site-wide, not home); image-in-type fills are desaturated by the legibility wash; Ch5 is still the quietest chapter.
+- ~~**24b ruling — the hero field is all real work.**~~ **DONE** (`b0af4ee`). Four live /services screens replaced by unused case-study captures; the 37.12 kB gzip of screen chunks off home's graph; home entry 91.39 kB gzip; mobile LCP 1824 ms.
+- **STILL OPEN from 24b:** the hero field is more monotone without the screens' colour accents; image-in-type fills are desaturated by the legibility wash; Ch5 is still the quietest chapter.
 - **STILL OPEN from 23b:** 11–12px text inside the reused /services screens on mobile; the LCP element is the kicker rather than the h1.
 - **STILL OPEN from 22:** CareerClarity has no screenshot and no case study, so its card is text-only; CapitalCommand and CadenceStack have no `headlineFigure`; `public/about/` has no founder photograph. All three are owner-supplied assets, not code.
 - **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
