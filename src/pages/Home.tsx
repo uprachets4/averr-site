@@ -19,12 +19,14 @@ import ChapterRail, { CHAPTERS } from "../components/home/ChapterRail";
  * chapter that changes tone takes the rail with it.
  */
 
+const TemplateWall = lazy(() => import("../components/home/TemplateWall"));
 const WorkStrip = lazy(() => import("../components/home/WorkStrip"));
 const ServicePanels = lazy(() => import("../components/home/ServicePanels"));
 const FounderChapter = lazy(() => import("../components/home/FounderChapter"));
 const StartChapter = lazy(() => import("../components/home/StartChapter"));
 
 export default function Home() {
+  const loadWall = useCallback(() => import("../components/home/TemplateWall"), []);
   const loadWork = useCallback(() => import("../components/home/WorkStrip"), []);
   const loadServices = useCallback(() => import("../components/home/ServicePanels"), []);
   const loadFounder = useCallback(() => import("../components/home/FounderChapter"), []);
@@ -38,8 +40,19 @@ export default function Home() {
         <Hero />
       </section>
 
-      {/* 2 · the work — the hero's sketch dissolves straight into this */}
-      <section id={CHAPTERS[1].id} data-tone="dark">
+      {/* 2 · you've seen this website before */}
+      <Chapter tone="cream" from="dark">
+        <section id={CHAPTERS[1].id} data-tone="cream">
+          <LazyBelowFold load={loadWall} minHeight="420vh" background="var(--color-bg)">
+            <Suspense fallback={<div aria-hidden style={{ minHeight: "420vh", background: "var(--color-bg)" }} />}>
+              <TemplateWall />
+            </Suspense>
+          </LazyBelowFold>
+        </section>
+      </Chapter>
+
+      {/* 3 · the work */}
+      <section id={CHAPTERS[2].id} data-tone="dark">
         <LazyBelowFold load={loadWork} minHeight="420vh" background="var(--color-dark)">
           <Suspense fallback={<div aria-hidden style={{ minHeight: "420vh", background: "var(--color-dark)" }} />}>
             <WorkStrip />
@@ -47,9 +60,9 @@ export default function Home() {
         </LazyBelowFold>
       </section>
 
-      {/* 3 · what we do */}
+      {/* 4 · what we do */}
       <Chapter tone="cream-alt" from="dark">
-        <section id={CHAPTERS[2].id} data-tone="cream">
+        <section id={CHAPTERS[3].id} data-tone="cream">
           <LazyBelowFold load={loadServices} minHeight="340vh" background="var(--color-bg-alt)">
             <Suspense fallback={<div aria-hidden style={{ minHeight: "340vh", background: "var(--color-bg-alt)" }} />}>
               <ServicePanels />
@@ -58,8 +71,8 @@ export default function Home() {
         </section>
       </Chapter>
 
-      {/* 4 · who builds it */}
-      <section id={CHAPTERS[3].id} data-tone="cream">
+      {/* 5 · who builds it */}
+      <section id={CHAPTERS[4].id} data-tone="cream">
         <LazyBelowFold load={loadFounder} minHeight="92vh" background="var(--color-bg)">
           <Suspense fallback={<div aria-hidden style={{ minHeight: "92vh", background: "var(--color-bg)" }} />}>
             <FounderChapter />
@@ -67,8 +80,8 @@ export default function Home() {
         </LazyBelowFold>
       </section>
 
-      {/* 5 · start */}
-      <section id={CHAPTERS[4].id} data-tone="cream">
+      {/* 6 · start */}
+      <section id={CHAPTERS[5].id} data-tone="cream">
         <LazyBelowFold load={loadStart} minHeight="82vh" background="var(--color-bg)">
           <Suspense fallback={<div aria-hidden style={{ minHeight: "82vh", background: "var(--color-bg)" }} />}>
             <StartChapter />

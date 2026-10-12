@@ -20,11 +20,12 @@ import { motion, useReducedMotion } from "motion/react";
 export type RailChapter = { id: string; label: string };
 
 export const CHAPTERS: RailChapter[] = [
-  { id: "ch-business", label: "Your business" },
+  { id: "ch-customer", label: "Your customer" },
+  { id: "ch-seen", label: "Seen it before" },
   { id: "ch-work", label: "The work" },
-  { id: "ch-services", label: "What we do" },
-  { id: "ch-founder", label: "Who builds it" },
-  { id: "ch-start", label: "Start" },
+  { id: "ch-services", label: "How we do it" },
+  { id: "ch-founder", label: "Who you'll work with" },
+  { id: "ch-start", label: "Your move" },
 ];
 
 export default function ChapterRail() {

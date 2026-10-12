@@ -1246,3 +1246,136 @@ a { color: inherit; text-decoration: none; }
   .hx-frame .hx-top { position: absolute; top: 104px; }
   .hx-frame .hx-fieldlayer { opacity: 0.62; }
 }
+
+/* ══ Chapter 2: "You've seen this website before." ════════════════ */
+.tw-wrap { position: relative; height: 420vh; background: var(--color-bg); }
+.tw {
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  background: var(--color-bg);
+  /* The head and the copy OVERLAY the wall rather than taking rows from
+     it: in a three-row grid the wall was squeezed to half the frame, its
+     second row cut off, and the body copy clipped. */
+  position: sticky;
+}
+.tw--still { position: static; height: auto; display: block; padding: 88px 0 96px; }
+.tw-head, .tw-beats, .tw-stillcopy {
+  width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter);
+}
+.tw-head { position: absolute; top: 104px; left: 0; right: 0; z-index: 3; }
+.tw-beats {
+  position: absolute; left: 0; right: 0; bottom: 44px; z-index: 3;
+}
+.tw-beats::before {
+  content: ""; position: absolute; inset: -64px -100vw -64px -100vw;
+  background: linear-gradient(0deg, var(--color-bg) 42%, rgba(244,240,230,0.86) 72%, transparent 100%);
+  pointer-events: none;
+}
+.tw-beat { position: absolute; }
+.tw-eyebrow { color: var(--color-muted); margin: 0 0 12px; }
+.tw-h2 { margin: 0; color: var(--color-ink); max-width: 20ch; }
+
+.tw-stage { position: absolute; inset: 0; }
+
+/* the wall */
+.tw-grid {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 16px;
+  padding: 182px var(--gutter) 210px;
+  transform-origin: center 42%;
+  will-change: transform, opacity;
+}
+.tw-grid--narrow { grid-template-columns: repeat(3, 1fr); }
+.tw-card {
+  position: relative; overflow: hidden;
+  border-radius: 7px;
+  background: #E7E4DC;
+  box-shadow: inset 0 0 0 1px rgba(20,20,18,0.08);
+}
+.tw-card--chosen { visibility: hidden; }
+
+/* one generic site, drawn */
+.tw-skel { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.tw-skel i { display: block; background: #CFCBC1; border-radius: 2px; }
+.tw-skel__nav {
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 8px; background: #DEDAD1;
+}
+.tw-skel__logo { width: 16px; height: 6px; background: #B9B4A9 !important; }
+.tw-skel__link { width: 11px; height: 3px; }
+.tw-skel__link:nth-of-type(2) { margin-left: auto; }
+.tw-skel__cta { width: 18px; height: 7px; border-radius: 99px; background: #B9B4A9 !important; }
+.tw-skel__hero { flex: 1; padding: 11px 9px; display: flex; flex-direction: column; gap: 4px; }
+.tw-skel__h1 { height: 7px; width: 78%; background: #BDB8AD !important; }
+.tw-skel__h1--short { width: 52%; margin-bottom: 3px; }
+.tw-skel__body { height: 3px; width: 88%; }
+.tw-skel__body--short { width: 64%; }
+.tw-skel__btn { margin-top: 6px; width: 34px; height: 9px; border-radius: 99px; background: #B9B4A9 !important; }
+.tw-skel__band { display: flex; gap: 7px; padding: 0 9px 9px; align-items: stretch; }
+.tw-skel__tile { width: 42%; min-height: 34px; background: #D5D1C7 !important; border-radius: 3px; }
+.tw-skel__col { flex: 1; display: flex; flex-direction: column; gap: 4px; justify-content: center; }
+.tw-skel__row { display: flex; gap: 5px; padding: 0 9px 10px; margin-top: auto; }
+.tw-skel__row i { flex: 1; height: 20px; }
+
+/* the one that breaks out */
+.tw-chosen {
+  position: absolute; left: 50%; top: 44%;
+  width: 24%; aspect-ratio: 16 / 10;
+  transform-origin: center center;
+  translate: -50% -50%;
+  opacity: 0;
+  will-change: transform, opacity;
+  z-index: 2;
+}
+.tw-chosen__inner {
+  position: relative; width: 100%; height: 100%;
+  border-radius: 7px; overflow: hidden;
+  background: #E7E4DC;
+  box-shadow: 0 40px 90px -38px rgba(20,20,18,0.5), inset 0 0 0 1px rgba(20,20,18,0.1);
+}
+.tw-chosen__real { position: absolute; inset: 0; }
+.tw-chosen__real img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tw-caption {
+  position: absolute; left: 0; top: calc(100% + 8px);
+  background: var(--color-bg);
+  padding: 6px 10px 7px; border-radius: 6px;
+  display: flex; flex-direction: column; gap: 2px;
+  opacity: 0;
+  /* the caption rides a scaled parent, so it is counter-scaled by hand */
+  transform: scale(0.43); transform-origin: top left;
+}
+.tw-caption__name {
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--color-ink);
+}
+.tw-caption__note { font-size: 14px; color: var(--color-muted); max-width: 44ch; }
+
+/* the restored argument */
+
+.tw-beat {
+  position: absolute; left: var(--gutter); right: var(--gutter); bottom: 0;
+  max-width: 54ch;
+  opacity: 0;
+}
+.tw-beat--still { position: static; opacity: 1; margin-bottom: 40px; }
+.tw-beat__eyebrow { color: var(--color-muted); margin: 0 0 10px; }
+.tw-beat__line {
+  margin: 0 0 10px;
+  font-family: var(--font-display); font-size: clamp(22px, 2.3vw, 32px);
+  letter-spacing: -0.02em; line-height: 1.2; color: var(--color-ink);
+}
+.tw-beat__body { margin: 0; font-size: 16px; line-height: 1.6; color: var(--color-muted); }
+
+.tw-stillgrid { max-width: var(--container-wide); margin: 32px auto; padding: 0 var(--gutter); }
+.tw-card--real { aspect-ratio: 16 / 10; border-radius: 10px; }
+.tw-card--real img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+@media (max-width: 1023px) {
+  .tw { padding-top: 88px; }
+  .tw-chosen { width: 46%; }
+  .tw-caption { transform: scale(0.6); }
+  .tw-beat__body { font-size: 15px; }
+  .tw-beats { min-height: 190px; }
+}
