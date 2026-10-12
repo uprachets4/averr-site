@@ -36,13 +36,14 @@ export default function StartChapter() {
     <section className="st">
       <div className="st-inner">
         <div className="type-eyebrow st-eyebrow">//_START</div>
+        <p className="st-line">Your move.</p>
 
         <h2 className="type-display-l st-h2">
-          Your next customer is{" "}
+          <span className="st-h2__a">Your next customer is</span>{" "}
           <span className="st-slab">
             <PillHl>already looking.</PillHl>
-          </span>{" "}
-          Let's make sure they find you.
+          </span>
+          <span className="st-h2__b">Let's make sure they find you.</span>
         </h2>
 
         <ul className="st-paths">

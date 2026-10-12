@@ -103,6 +103,7 @@ export default function FounderChapter() {
 
         <div className="fc-copy">
           <div className="type-eyebrow fc-eyebrow">//_WHO BUILDS IT</div>
+          <p className="fc-line">Here's who you'll work with.</p>
           <h2 className="type-h2 fc-h2">
             You work directly with{" "}
             <span className="type-accent">the person who builds it.</span>

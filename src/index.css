@@ -1414,3 +1414,140 @@ a { color: inherit; text-decoration: none; }
   position: absolute; inset: 0; z-index: 2;
   background: var(--color-dark); opacity: 0; pointer-events: none;
 }
+
+/* ══ Chapter 4: "Here's how we do it." — three image-in-type acts ══ */
+.sa-wrap { position: relative; height: 420vh; background: var(--color-dark); }
+.sa {
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  background: var(--color-dark);
+  display: grid; grid-template-rows: auto 1fr auto;
+  padding: 104px 0 40px;
+}
+.sa--stacked { position: static; height: auto; display: block; padding: 88px 0 96px; }
+.sa-head, .sa-foot { width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter); }
+.sa-eyebrow { color: var(--color-muted-l); margin: 0 0 12px; }
+.sa-h2 { margin: 0; color: var(--color-parch); }
+.sa-stage { position: relative; min-height: 0; }
+
+.sa-act {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: center; gap: clamp(20px, 3vh, 40px);
+  width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter);
+  left: 0; right: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.sa-act--static { position: static; opacity: 1; margin-bottom: 72px; }
+
+/* the giant word, with the work showing through it */
+.sa-word { margin: 0; line-height: 0.86; }
+.sa-word__fill {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  text-transform: uppercase;
+  /* measured to the container: the longest word is AUTOMATE at 8
+     characters, about 0.62em each */
+  font-size: min(calc(var(--container-wide) / 5.1), 23vh);
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-size: cover, cover, cover;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  /* an edge, so the letterform still reads where the capture behind it
+     happens to be dark */
+  -webkit-text-stroke: 1px rgba(244,240,230,0.26);
+}
+
+/* the services, as a list you walk into /services with */
+.sa-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.sa-line { border-top: 1px solid rgba(244,240,230,0.14); }
+.sa-line:last-child { border-bottom: 1px solid rgba(244,240,230,0.14); }
+.sa-link {
+  position: relative;
+  display: flex; align-items: center; gap: 16px;
+  padding: clamp(9px, 1.3vh, 15px) 0;
+  min-height: 44px;
+  text-decoration: none; color: var(--color-parch);
+  overflow: hidden;
+}
+.sa-link__text {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(17px, 1.5vw, 23px);
+  letter-spacing: -0.02em;
+  transition: transform 320ms var(--ease-out-quart);
+}
+.sa-link--on .sa-link__text { transform: translateX(14px); }
+.sa-arrow {
+  width: 28px; height: 10px; color: var(--color-parch);
+  opacity: 0; transform: translateX(-8px);
+  transition: opacity 280ms ease, transform 320ms var(--ease-out-quart);
+}
+.sa-arrow path { stroke-dasharray: 36; stroke-dashoffset: 36; transition: stroke-dashoffset 420ms var(--ease-out-quart); }
+.sa-link--on .sa-arrow { opacity: 1; transform: translateX(0); }
+.sa-link--on .sa-arrow path { stroke-dashoffset: 0; }
+.sa-link:focus-visible { outline: 2px solid var(--color-parch); outline-offset: 3px; }
+
+.sa-proof {
+  position: absolute; right: 0; top: 50%;
+  display: flex; align-items: center; gap: 10px;
+  transform: translate(10px, -50%);
+  opacity: 0; pointer-events: none;
+  transition: opacity 280ms ease, transform 320ms var(--ease-out-quart);
+}
+.sa-link--on .sa-proof { opacity: 1; transform: translate(0, -50%); }
+.sa-proof img {
+  display: block; width: 92px; height: auto; border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(244,240,230,0.2);
+}
+.sa-proof em {
+  font-style: normal; font-family: var(--font-mono);
+  font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--color-muted-l);
+}
+
+@media (max-width: 1023px) {
+  .sa-word__fill { font-size: min(calc(var(--container-wide) / 4.6), 16vw); }
+  .sa-proof { display: none; }
+  .sa-link__text { font-size: 16px; }
+  .sa-act { gap: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sa-link__text, .sa-arrow, .sa-arrow path, .sa-proof { transition: none; }
+}
+
+/* Ch5 + Ch6 chapter lines, and a tighter founder scene. */
+.fc-line, .st-line {
+  margin: 0 0 18px;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.1vw, 28px);
+  letter-spacing: -0.025em;
+  color: var(--color-muted);
+}
+.st-line { color: rgba(244,240,230,0.66); }
+/* The founder chapter read as a stack of blocks; the rhythm tightens so
+   the mark, the claim and the credits sit as one scene. */
+.fc { padding-top: clamp(76px, 10vh, 112px); padding-bottom: clamp(76px, 10vh, 112px); }
+.fc-h2 { margin-bottom: 14px; }
+.fc-statement { margin-bottom: 20px; }
+.fc-credits { gap: 8px; margin-bottom: 24px; }
+.fc-credit { padding-top: 9px; }
+.st-h2__a, .st-h2__b { display: block; }
+.st-h2__b { margin-top: 4px; }
+
+/* Ch6 is dark now: it closes the film on the hero's own ground. */
+.st { background: var(--color-dark); }
+.st-eyebrow { color: var(--color-muted-l); }
+.st-h2 { color: var(--color-parch); }
+.st-path {
+  border-color: rgba(244,240,230,0.2);
+  background: rgba(244,240,230,0.04);
+}
+.st-path:hover { background: rgba(244,240,230,0.08); border-color: var(--color-parch); }
+.st-path:focus-visible { outline-color: var(--color-parch); }
+.st-path__kicker, .st-path__note, .st-promise { color: var(--color-muted-l); }
+.st-path__label { color: var(--color-parch); }
