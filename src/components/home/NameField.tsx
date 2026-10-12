@@ -117,11 +117,14 @@ export default function NameField({
         const box = host.getBoundingClientRect().width;
         if (!box) return;
         const text = ruler.getBoundingClientRect().width;
-        const full = text + pad;
-        // step the type down only when the line would leave the column
-        const f = full > box ? box / full : 1;
+        /* The scaled TEXT has to fit the content box, which is the host
+           less its padding. Dividing by the padded width instead left the
+           longest name 18px over the edge: the padding was being counted
+           as space the text could use. */
+        const avail = box - pad;
+        const f = text > avail && text > 0 ? avail / text : 1;
         setFit(f);
-        setRatio(Math.min(1, (full * f) / box));
+        setRatio(Math.min(1, (text * f + pad) / box));
         setCaretX(pad / 2 + text * f);
       }
       run();

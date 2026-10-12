@@ -199,7 +199,7 @@ function HeroCopy({
         </span>
 
         <span className="type-hero hero-line hero-line--field">
-          <LineReveal paint delay={d(T.field)}>
+          <LineReveal paint block delay={d(T.field)}>
             <NameField
               value={name}
               onChange={setName}
@@ -314,12 +314,18 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
 
   /** One value drives the hand-over. */
   const fill = useTransform(scrollYProgress, [0.05, 0.42], [0, 1], { ease: easing.inOut });
-  /** The copy clears out of the way before the window reaches it. */
-  const copyOpacity = useTransform(scrollYProgress, [0.02, 0.18], [1, 0]);
+  /** The copy clears out of the way before the window reaches it.
+   *  The OPACITY is written straight to the node: motion accelerates
+   *  scroll-linked opacity onto a ViewTimeline, which is meaningless for
+   *  anything pinned, and the copy faded back IN as you scrolled. The
+   *  transform is fine on the normal path. */
+  const copyFade = useTransform(scrollYProgress, [0.02, 0.18], [1, 0]);
+  const copyRef2 = useScrollStyle<HTMLDivElement>(copyFade);
   const copyY = useTransform(scrollYProgress, [0.02, 0.18], [0, -40]);
   /** A beat at full screen, then the dissolve. */
   const reelIn = useTransform(scrollYProgress, [0.56, 0.7], [0, 1]);
-  const sketchOut = useTransform(scrollYProgress, [0.56, 0.68], [1, 0]);
+  const sketchFade = useTransform(scrollYProgress, [0.56, 0.68], [1, 0]);
+  const sketchRef = useScrollStyle<HTMLDivElement>(sketchFade);
 
   /* the nav goes dark once the reel is what is behind it */
   const setNavDark = useSetNavDarkOverride();
@@ -369,11 +375,11 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
       <div ref={frameRef} className="hero-frame">
         <HeroGround />
 
-        <motion.div ref={copyRef} className="hero-copy-layer" style={{ opacity: copyOpacity, y: copyY }}>
+        <motion.div ref={mergeRefs(copyRef, copyRef2)} className="hero-copy-layer" style={{ y: copyY }}>
           <HeroCopy skip={skip} film={film} onExample={onExample} />
         </motion.div>
 
-        <motion.div className="hero-sketch-layer" style={{ opacity: sketchOut }}>
+        <motion.div ref={sketchRef as React.Ref<HTMLDivElement>} className="hero-sketch-layer">
           <SketchWindow name={name || demo} fill={fill} />
         </motion.div>
 
@@ -445,12 +451,14 @@ function ReelStage({
   const x = useTransform(progress, [0.72, 0.98], [0, -overflow]);
   const headingY = useTransform(progress, [0.6, 0.74], [26, 0]);
   const headRef = useScrollOpacity(progress, 0.6, 0.72);
+  const stageRef = useScrollStyle<HTMLDivElement>(reelIn);
   const ctaRef = useScrollOpacity(progress, 0.78, 0.88);
 
   return (
     <motion.div
+      ref={stageRef as React.Ref<HTMLDivElement>}
       className="hero-reel-stage"
-      style={{ opacity: reelIn, pointerEvents: live ? "auto" : "none" }}
+      style={{ pointerEvents: live ? "auto" : "none" }}
       aria-hidden={!live}
       inert={!live}
     >
@@ -482,6 +490,17 @@ function ReelStage({
       </div>
     </motion.div>
   );
+}
+
+/** Two refs on one node. */
+function mergeRefs<T>(...refs: Array<React.Ref<T> | React.MutableRefObject<T | null> | null>) {
+  return function setRef(node: T | null) {
+    for (const r of refs) {
+      if (!r) continue;
+      if (typeof r === "function") r(node);
+      else (r as React.MutableRefObject<T | null>).current = node;
+    }
+  };
 }
 
 /* ── ambient ground ────────────────────────────────────────────────── */

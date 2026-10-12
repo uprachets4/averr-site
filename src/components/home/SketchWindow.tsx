@@ -123,14 +123,20 @@ export default function SketchWindow({
       const host = hostRef.current;
       const win = winRef.current;
       if (!host || !win) return;
-      const w = win.getBoundingClientRect();
-      if (!w.width) return;
+      /* The LAYOUT size, not getBoundingClientRect: the window is rotated
+         in 3D, and a rect is the axis-aligned box around a rotated
+         element — bigger than the element. Scaling against that box left
+         the window 62px short of the right edge at full fill. */
+      const cw = win.offsetWidth;
+      const ch = win.offsetHeight;
+      const hostBox = host.getBoundingClientRect();
+      if (!cw || !ch) return;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       setTarget({
-        scale: Math.max(vw / w.width, vh / w.height),
-        x: vw / 2 - (w.left + w.width / 2),
-        y: vh / 2 - (w.top + w.height / 2),
+        scale: Math.max(vw / cw, vh / ch) * 1.02,
+        x: vw / 2 - (hostBox.left + cw / 2),
+        y: vh / 2 - (hostBox.top + ch / 2),
       });
     }
     run();

@@ -20,11 +20,15 @@ export default function LineReveal({
   delay,
   duration = 0.8,
   paint,
+  block,
   children,
 }: {
   delay: number;
   duration?: number;
   paint?: boolean;
+  /** The inner span shrink-wraps by default. A line whose child must fill
+   *  the column — the hero's name field — asks for a block instead. */
+  block?: boolean;
   children: React.ReactNode;
 }) {
   const reduce = useReducedMotion();
@@ -33,7 +37,7 @@ export default function LineReveal({
       style={{ display: "block", overflow: paint ? "visible" : "hidden" }}
     >
       <motion.span
-        style={{ display: "inline-block" }}
+        style={{ display: block ? "block" : "inline-block" }}
         initial={{
           y: reduce ? 0 : paint ? 12 : "100%",
           opacity: reduce || paint ? 1 : 0,

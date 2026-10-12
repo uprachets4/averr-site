@@ -415,8 +415,14 @@ a { color: inherit; text-decoration: none; }
 }
 /* The field and the buttons are the only things in the copy you can
    touch; the layer above them is inert so the window behind stays
-   hoverable where the copy is only air. */
-.hero-copy-layer :is(input, a, button) { pointer-events: auto; }
+   hoverable where the copy is only air.
+   These are the hero's OWN classes, not `a` and `button`: MagneticCTA
+   sets pointer-events on its anchor itself, and an element selector here
+   lost to it — the primary CTA computed `pointer-events: none` and could
+   not be clicked at all. */
+.hero-copy-layer .nf,
+.hero-copy-layer .hero-ctas,
+.hero-copy-layer .hero-ctas * { pointer-events: auto; }
 
 .hero-copy {
   width: 100%;
@@ -435,6 +441,11 @@ a { color: inherit; text-decoration: none; }
 .hero-h1 .hero-line { display: block; color: var(--color-ink); }
 .hero-h1 .hero-line:first-of-type { opacity: 0.72; }
 .hero-line--field { margin: 2px 0; }
+/* LineReveal's inner span is inline-block, which shrink-wraps — the
+   field's `width: 100%` then resolved against its own content and the
+   input came out 446px inside a 698px column, so a long name was clipped
+   instead of stepping down. The field's line, and only it, is a block. */
+.hero-line--field > span > span { display: block; }
 .hero-tail { max-width: var(--hero-copy-w); margin-top: 24px; }
 .hero-kicker { color: var(--color-muted); margin: 0; }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
