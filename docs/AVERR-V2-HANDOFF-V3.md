@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `547cfca` — *24a-4 the rail reads six chapters, and keeps the last one*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 24a. |
+| **HEAD** | `f918e18` — *24b-3 mobile tap targets: home's are fine, the shared ones are not*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 24b. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -2396,6 +2396,100 @@ The 53–55ms task is the initial render at ~191ms, identified in 23b — not an
 
 ---
 
+**SESSION 24b — chapters 4–6, the journey layer, and 24a's carry-overs.** Four commits (`0c50d81` … `f918e18`).
+
+### The carry-overs
+
+**(a) The Ch1→Ch2 hand-over is composed.** The landed CapitalCommand frame pulls back through the pin's tail — **1445×800 full bleed → 1037×574 inset**, dark closing to 0.38 over it — so the cream slab rises over a frame that is already leaving rather than cutting from a static one. The wall then **assembles card by card**: each of the fourteen owns a slice of the chapter's own scroll value offset by its index, so the stagger is the reader's scroll and not a timer.
+
+*Traced every 5% across the seam at 1440 and 1920:* luma 35.7 → 21.1 (the recede) → 43.6 → 228 (cream); cards 0 → 5 → 14. **No blank frame.**
+
+**(b) Ch2's breakout card is sharp.** A `sizes` matching the card's **layout** width made the browser pick a 640w rung and then blow it up 2.35×. Pinned near the viewport it picks **`hero-1400.webp`** and renders at **0.58× of natural** at both the 50% and 80% frames — downscaled throughout the scale, never up.
+
+### Ch4 · "Here's how we do it."
+
+**`ServicePanels` is deleted.** It mounted the build stage's own screens on the home page, which is the one thing the page rules forbid. Its chunk (2.02 kB gzip) is replaced by **`ServiceActs` at 1.79 kB**.
+
+Three acts, each a giant word with the studio's real captures showing **through** the letterforms, panned by the same scroll value that slides the acts. Under each, that pillar's services as a ruled list; hover or focus shifts the line, draws an arrow and shows a real proof thumbnail where the data has proof.
+
+*Fills, per the brief:*
+
+| Act | Captures in the type |
+|---|---|
+| DESIGN | `cgwalls/hero-1400.webp` + `sift/01-command-overview-1680.webp` |
+| AUTOMATE | `capitalcommand/01-overview-1680.webp` + `cadencestack/01-command-center-1680.webp` |
+| GROW | `cgwalls/gallery2-1400.webp` + `cadencestack/04-performance-analytics-1680.webp` |
+
+*All sixteen lines, verified:*
+
+| Act | Services | Beat links | Proof thumbs |
+|---|---|---|---|
+| Design | 5 | 5/5 correct | 4 |
+| Automate | 5 | 5/5 correct | 2 |
+| Grow | 6 | 6/6 correct | 3 |
+
+**16/16 land on their own `/services#{service-slug}` beat**, and a proof thumbnail appears on exactly the **9** services whose `proof` array is non-empty — never invented.
+
+**The first build FAILED the gate.** Three of the six captures are dark dashboards, and a dark image inside dark letterforms on a dark ground is a smudge — you could not tell there was a picture in AUTOMATE at all. A parch wash at 0.56 lifts every fill into legibility with the image's own texture still reading, and a 1px parch stroke keeps the letterform's edge where the capture behind it goes dark.
+
+**Chunk savings, honestly:** `ServicePanels` is gone, but `BuildScreens` (9.87), `GrowScreens` (18.19) and `AutomateScreens` (9.06 kB gzip) are **still built** — because **Ch1's field mounts four of them as live planes**, which is the hero the owner accepted at 5–6/10 in 23b. So "home no longer imports the /services screen components" is **half true**: chapter 4 no longer does, chapter 1 still does. Taking them out of the hero as well would remove **37.1 kB gzip** of lazy chunks from home's path, and is a design call rather than a cleanup.
+
+### Ch5 · "Here's who you'll work with."
+
+The chapter line added and the rhythm tightened — padding, the gap under the h2, the credit spacing — so the mark, the claim and the credits read as one scene rather than three stacked blocks.
+
+### Ch6 · "Your move."
+
+The chapter line added, the slab headline split into its two halves, and the closer moved onto **the hero's own dark ground** rather than cream, so the film ends where it began. PillHl inventory on home is still **2**.
+
+### The journey layer
+
+Six chapters, all reached. *Rail tracking, sampled every 5% down the whole page:* Your customer (0–15%) · Seen it before (20–40%) · The work (45–60%) · How we do it (65–85%) · Who you'll work with (90%) · Your move (95–100%).
+
+**Frames with almost nothing painted, across the entire page at every 5%: NONE.**
+
+`Chapter` clip transitions now sit at every cream↔dark boundary: dark→cream into Ch2, dark→cream into Ch5, cream→dark into Ch6.
+
+### Numbers
+
+| | 24a | 24b |
+|---|---|---|
+| Home initial JS | 92.16 kB gzip | **92.15 kB gzip** (−0.01) |
+| Mobile LCP (alias) | 1948 ms | **1732 ms** `[1732, 1764, 1716]` |
+| CLS (load) | 0.0069 | 0.0069 |
+
+*Crash scroll, three speeds, both directions:*
+
+| | CLS load/total | overflow | longest task | errors |
+|---|---|---|---|---|
+| 1440×900 | 0.0001 / 0.0002 | **0** | none > 50ms | none |
+| 1920×1080 | 0 / 0.0001 | **0** | 55, 93 ms | none |
+| 375×812 | 0.0078 / 0.008 | **0** | 57 ms | none |
+
+*Reduced motion:* the hero does not pin, the wall renders its still state, the acts render stacked with static fills.
+
+### Does home read as one cinematic film that reaches every page?
+
+**Yes.** You arrive in a dark room of the studio's actual work, fly through it and land on a client's dashboard; the cream rises and a wall of identical templates assembles, one breaks out and becomes real work while the studio's oldest argument plays across it; the strip pans the vault past you and its end card teases /work's doors; three giant words carry the work inside their letterforms and every one of the sixteen services is a door into /services; the founder's mark draws under your own scroll into /about; and it closes on the hero's ground with two ways into /contact. Every destination is reached, and no chapter borrows another page's mechanic.
+
+**Where it is still short.** The image-in-type fills are desaturated — the parch wash buys legibility on a dark ground and costs the captures' colour. Ch5 remains the quietest chapter; tightening the spacing helped but it is still the one moment that is a layout rather than a scene. And the Ch2→Ch3 and Ch3→Ch4 boundaries are hard cuts between two dark chapters, which is correct but unremarkable next to the Ch1→Ch2 move.
+
+### Deviations
+
+1. **The /services screen chunks remain on home** via Ch1's field — see above. Ch4 imports none.
+2. **Sub-44px tap targets remain on mobile**, and they are the **global nav** ("Averr" 27px, "Work" 22px) and **MagneticCTA's text variant** (27px) — shared with every page, so a site-wide decision rather than a home one. Home's own chapter controls all meet 44px.
+3. **11–12px text remains inside the reused /services screens** in the hero field on mobile.
+4. Ch6 moved from cream to dark, which the spec implies ("dark") and the 24a build had not done.
+5. The LCP element is still `P.hx-kicker` rather than the h1.
+
+### My own errors this session
+
+1. **I shipped the image-in-type acts without checking the fill was visible.** Three of six captures are dark dashboards; AUTOMATE read as an empty grey word until I looked at the frame.
+2. **I wrote a CSS rule for the mobile tap targets that matched nothing** and only found out by re-measuring — the links were `MagneticCTA`'s, not home's own.
+3. **The first Ch1→Ch2 recede finished before the cream arrived**, so the composed move the brief asked for was two separate moves; the dark band above the slab was empty in the frame I captured.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -2501,6 +2595,8 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **HOME IS SIX CHAPTERS AND EVERY ONE REACHES A PAGE (24).** Your customer (the hero) · Seen it before (the argument) · The work (/work) · How we do it (/services) · Who you'll work with (/about) · Your move (/contact). A chapter previews a destination's IDEA and never mounts its components or copies its mechanic — `ServicePanels` was deleted for doing exactly that.
 
 - **THE LUMINANCE RULE IS RELATIVE TO THE SUBJECT (24a).** 23b's "no frame below the at-rest mean" was written for a bright landing. CapitalCommand's capture has a mean luminance of 38.6 where CG Walls' was 224.4, against a room at 52.9 — a dark destination can never clear it. The tests that hold: the landed frame matches the CAPTURE's own luminance (full brightness, nothing dimming it), no frame is empty, and the sweep into the landing is monotonic.
 - **HOME'S ARGUMENT COPY IS RESTORED, NOT REWRITTEN (24a).** The three beats in chapter 2 are verbatim from `src/data/homeScenes.ts`, which outlived the component that used them (`ThreeScenes.tsx`, deleted in `b8dd1bc`). Anything that re-stages this argument takes the copy from there.
@@ -2731,6 +2827,10 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **87 · `Screenshot` sets `height: auto` inline, and inline beats your stylesheet.** *Cause:* chapter 2's chosen card gave its image `height: 100%; object-fit: cover` in CSS and the capture still letterboxed, showing the grey skeleton below it. The component's own inline style won. *Fix:* pass the override through its `style` prop, which it spreads last. **A shared component's inline defaults are not suggestions.**
 
+**88 · `background-clip: text` needs the fill to out-contrast the ground.** *Cause:* home's three acts put real captures inside giant letterforms on the dark chapter. Three of the six are dark dashboards, so AUTOMATE read as an empty grey word — the picture was there and invisible. *Fix:* a parch wash in the background stack above the images lifts every fill into legibility while their texture still reads, plus a 1px stroke so the letterform keeps its edge where the capture goes dark. **Image-in-type is a contrast problem before it is a typography one.**
+
+**89 · `sizes` describes the LAYOUT width, so an element that scales picks the wrong rung.** *Cause:* chapter 2's card is 24% of the frame and scales 2.35x. Its `sizes` matched the layout width, the browser chose a 640w rung, and the capture was soft through the whole move. *Fix:* pin `sizes` near the viewport so the largest rung is chosen from the start; it then renders at 0.58x of natural and is downscaled throughout. **For anything that scales up, size the image for where it ends, not where it starts.**
+
 ---
 
 ## 6. DATA FACTS
@@ -2836,7 +2936,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 23 — the hero rebuilt from real work.**~~ **DONE** (`1f96a2e`). Sixteen real planes in a CSS 3D room, cursor-steered depth, hover-to-pull-forward with verified figures, and a fly-through that lands on CG Walls & Floors' own capture. Home initial JS 94.31 → 91.52 kB gzip; mobile LCP 1772 ms.
 - ~~**Session 23b — the hero's open items.**~~ **DONE** (`fb0eb76` … `2fd9aec`). The fly-through is lit (no frame below the at-rest mean at 1440 or 1920, against a 28-point crater), hover labels never clip (16/16 at 1280 and 1920), and the phone runs the specced scale-through. The 54ms long task was initial render at 191ms, not the fly-through.
 - ~~**Session 24a — chapters 1–3.**~~ **DONE** (`592dab6` … `547cfca`). The fly-through lands on CapitalCommand and occludes; "You've seen this website before." stages the restored argument as a wall of templates with one breaking out into real work; the strip's end card teases the vault; the rail reads six chapters.
-- **SESSION 24b — chapters 4–6.** The three image-in-type acts replacing `ServicePanels` (which still copies the /services screens — the owner's second complaint, unaddressed), the founder scene tightened, the "Your move." closer, and the Chapter transitions at every cream↔dark boundary.
+- ~~**Session 24b — chapters 4–6 and the journey layer.**~~ **DONE** (`0c50d81` … `f918e18`). The Ch1→Ch2 hand-over composed, Ch2 sharp, three image-in-type acts replacing `ServicePanels`, Ch5 and Ch6 lines, the six-chapter rail, no dead frames anywhere. Home initial JS 92.15 kB gzip; mobile LCP 1732 ms.
+- **STILL OPEN from 24b:** the /services screen chunks (37.1 kB gzip) remain on home via Ch1's field — removing them is a design call on the hero; sub-44px tap targets in the GLOBAL nav and MagneticCTA's text variant (site-wide, not home); image-in-type fills are desaturated by the legibility wash; Ch5 is still the quietest chapter.
 - **STILL OPEN from 23b:** 11–12px text inside the reused /services screens on mobile; the LCP element is the kicker rather than the h1.
 - **STILL OPEN from 22:** CareerClarity has no screenshot and no case study, so its card is text-only; CapitalCommand and CadenceStack have no `headlineFigure`; `public/about/` has no founder photograph. All three are owner-supplied assets, not code.
 - **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
