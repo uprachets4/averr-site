@@ -56,7 +56,18 @@ export type TypeStyle = {
   navWeight: number;
 };
 
+/** How a preset lays its offer out. No two share a shape. */
+export type SectionKind =
+  | "menu"       /* food — dish names and notes, no prices */
+  | "booklist"   /* health — rows with a Book chip */
+  | "process"    /* trades — numbered steps */
+  | "lookbook"   /* beauty — a grid of drawn tiles */
+  | "schedule"   /* fitness — day, time, class */
+  | "areas"      /* professional — ruled practice areas */
+  | "cards";     /* local — the plain card row */
+
 export type Preset = {
+  section: { kind: SectionKind; title: string };
   id: PresetId;
   /** What the corner of the sketch calls this kind of business. */
   kind: string;
@@ -67,7 +78,7 @@ export type Preset = {
   headline: string;
   sub: string;
   nav: string[];
-  services: { name: string; note: string }[];
+  services: { name: string; note: string; meta?: string }[];
   /** The booking bar's verb. */
   cta: string;
   /** Three fictional first names for the review strip. */
@@ -83,6 +94,7 @@ const MONO = '"Geist Mono", ui-monospace, monospace';
 export const PRESETS: Record<PresetId, Preset> = {
   /* ── food: warm, appetising, lowercase, art-directed ─────────────── */
   food: {
+    section: { kind: "menu", title: "On the counter today" },
     id: "food",
     kind: "café + kitchen",
     palette: {
@@ -124,6 +136,7 @@ export const PRESETS: Record<PresetId, Preset> = {
 
   /* ── health: calm, clinical, generous whitespace ──────────────────── */
   health: {
+    section: { kind: "booklist", title: "Appointments" },
     id: "health",
     kind: "clinic",
     palette: {
@@ -163,6 +176,7 @@ export const PRESETS: Record<PresetId, Preset> = {
 
   /* ── trades: sturdy, angular, confident ───────────────────────────── */
   trades: {
+    section: { kind: "process", title: "How the job runs" },
     id: "trades",
     kind: "contractor",
     palette: {
@@ -186,11 +200,13 @@ export const PRESETS: Record<PresetId, Preset> = {
     headline: "{name}. Built right, on schedule.",
     sub: "Licensed and insured. Fixed quotes, a written schedule, and the same crew from start to finish.",
     nav: ["Work", "Process", "Quote"],
+    /* A numbered PROCESS, so the steps are steps — a list of services
+       under 01/02/03 reads as a mislabelled menu. */
     services: [
-      { name: "Kitchens + baths", note: "4 – 8 weeks" },
-      { name: "Basement finishing", note: "6 – 10 weeks" },
-      { name: "Additions", note: "by consultation" },
-      { name: "Decks + exteriors", note: "seasonal" },
+      { name: "Site visit + measure", note: "within the week" },
+      { name: "Fixed quote, in writing", note: "2 – 3 days" },
+      { name: "Build, same crew throughout", note: "4 – 10 weeks" },
+      { name: "Walkthrough + deficiency list", note: "before final payment" },
     ],
     cta: "Get a fixed quote",
     reviewers: ["Grant", "Melanie", "Owen"],
@@ -203,6 +219,7 @@ export const PRESETS: Record<PresetId, Preset> = {
 
   /* ── beauty: soft, centred, quietly luxurious ─────────────────────── */
   beauty: {
+    section: { kind: "lookbook", title: "The lookbook" },
     id: "beauty",
     kind: "salon + spa",
     palette: {
@@ -242,6 +259,7 @@ export const PRESETS: Record<PresetId, Preset> = {
 
   /* ── fitness: the dark one, loud and tight ────────────────────────── */
   fitness: {
+    section: { kind: "schedule", title: "This week" },
     id: "fitness",
     kind: "studio",
     palette: {
@@ -266,10 +284,10 @@ export const PRESETS: Record<PresetId, Preset> = {
     sub: "Small classes, named coaches, and a plan that moves with you. First session is free.",
     nav: ["Classes", "Coaches", "Rates"],
     services: [
-      { name: "Strength", note: "45 min" },
-      { name: "Conditioning", note: "30 min" },
-      { name: "Mobility", note: "40 min" },
-      { name: "1:1 coaching", note: "by block" },
+      { name: "Strength", note: "45 min", meta: "Mon · 6:30" },
+      { name: "Conditioning", note: "30 min", meta: "Tue · 7:00" },
+      { name: "Mobility", note: "40 min", meta: "Thu · 6:00" },
+      { name: "1:1 coaching", note: "by block", meta: "Sat · 9:00" },
     ],
     cta: "Claim a free session",
     reviewers: ["Kofi", "Sam", "Elena"],
@@ -282,6 +300,7 @@ export const PRESETS: Record<PresetId, Preset> = {
 
   /* ── professional: conservative, ruled, serif authority ───────────── */
   professional: {
+    section: { kind: "areas", title: "Practice areas" },
     id: "professional",
     kind: "practice",
     palette: {
@@ -305,10 +324,12 @@ export const PRESETS: Record<PresetId, Preset> = {
     headline: "{name}. Advice you can act on.",
     sub: "Plain answers, fixed engagements, and a named advisor who picks up the phone.",
     nav: ["Practice", "People", "Insights", "Contact"],
+    /* Practice AREAS, not appointment types. */
     services: [
-      { name: "Initial consultation", note: "45 min" },
-      { name: "Ongoing advisory", note: "monthly" },
-      { name: "Filings + review", note: "by season" },
+      { name: "Business & corporate", note: "formation, contracts, disputes" },
+      { name: "Real estate", note: "purchase, sale, refinance" },
+      { name: "Wills & estates", note: "planning and administration" },
+      { name: "Employment", note: "agreements and terminations" },
     ],
     cta: "Request a consultation",
     reviewers: ["Harold", "Simone", "Devi"],
@@ -321,6 +342,7 @@ export const PRESETS: Record<PresetId, Preset> = {
 
   /* ── local: the honest default ────────────────────────────────────── */
   local: {
+    section: { kind: "cards", title: "What we do" },
     id: "local",
     kind: "local service",
     palette: {

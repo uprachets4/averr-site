@@ -2,7 +2,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { duration, ease } from "../../../lib/motion";
 import HeroArt from "./HeroArt";
 import Monogram from "./Monogram";
-import { MONO_FAMILY, PRESETS, type PresetId } from "./presets";
+import { MONO_FAMILY, PRESETS, type Preset, type PresetId } from "./presets";
 
 /**
  * The site the sketch builds.
@@ -41,6 +41,128 @@ function Stars({ colour }: { colour: string }) {
       ★★★★★
     </span>
   );
+}
+
+/**
+ * The offer, laid out the way its industry lays it out.
+ *
+ * Seven shapes, no two alike: a menu, a bookable list, a numbered
+ * process, a lookbook grid, a week's schedule, ruled practice areas, and
+ * a plain card row. The café's menu carries dish names and notes and NO
+ * prices — the site has no currency on it anywhere.
+ */
+function OfferSection({ preset }: { preset: Preset }) {
+  const items = preset.services;
+  switch (preset.section.kind) {
+    case "menu":
+      return (
+        <ul className="sk-menu">
+          {items.map(function row(s) {
+            return (
+              <li key={s.name} className="sk-menu__row">
+                <span className="sk-menu__name">{s.name}</span>
+                <span className="sk-menu__dots" aria-hidden />
+                <span className="sk-menu__note">{s.note}</span>
+              </li>
+            );
+          })}
+        </ul>
+      );
+
+    case "booklist":
+      return (
+        <ul className="sk-book-list">
+          {items.map(function row(s) {
+            return (
+              <li key={s.name} className="sk-book-row">
+                <span className="sk-book-row__text">
+                  <span className="sk-book-row__name">{s.name}</span>
+                  <span className="sk-book-row__note">{s.note}</span>
+                </span>
+                <span className="sk-chip">Book</span>
+              </li>
+            );
+          })}
+        </ul>
+      );
+
+    case "process":
+      return (
+        <ol className="sk-process">
+          {items.map(function step(s, i) {
+            return (
+              <li key={s.name} className="sk-step">
+                <span className="sk-step__n">{String(i + 1).padStart(2, "0")}</span>
+                <span className="sk-step__body">
+                  <span className="sk-step__name">{s.name}</span>
+                  <span className="sk-step__note">{s.note}</span>
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      );
+
+    case "lookbook":
+      return (
+        <ul className="sk-look">
+          {items.map(function tile(s, i) {
+            return (
+              <li key={s.name} className="sk-look__tile">
+                <span className={`sk-look__art sk-look__art--${i % 4}`} aria-hidden />
+                <span className="sk-look__cap">{s.name}</span>
+                <span className="sk-look__note">{s.note}</span>
+              </li>
+            );
+          })}
+        </ul>
+      );
+
+    case "schedule":
+      return (
+        <ul className="sk-sched">
+          {items.map(function row(s) {
+            return (
+              <li key={s.name} className="sk-sched__row">
+                <span className="sk-sched__when">{s.meta ?? s.note}</span>
+                <span className="sk-sched__what">{s.name}</span>
+                <span className="sk-sched__len">{s.note}</span>
+                <span className="sk-chip sk-chip--solid">Join</span>
+              </li>
+            );
+          })}
+        </ul>
+      );
+
+    case "areas":
+      return (
+        <ul className="sk-areas">
+          {items.map(function row(s) {
+            return (
+              <li key={s.name} className="sk-area">
+                <span className="sk-area__name">{s.name}</span>
+                <span className="sk-area__note">{s.note}</span>
+              </li>
+            );
+          })}
+        </ul>
+      );
+
+    default:
+      return (
+        <ul className="sk-cards">
+          {items.map(function card(s) {
+            return (
+              <li key={s.name} className="sk-card">
+                <span className="sk-card__rule" />
+                <span className="sk-card__name">{s.name}</span>
+                <span className="sk-card__note">{s.note}</span>
+              </li>
+            );
+          })}
+        </ul>
+      );
+  }
 }
 
 export default function SketchSite({
@@ -143,20 +265,10 @@ export default function SketchSite({
 
         <motion.div {...rise(1)}>{Hero}</motion.div>
 
-        {/* services */}
+        {/* the offer — a different SHAPE per industry, never a recolour */}
         <motion.section className="sk-services" {...rise(2)}>
-          <h2 className="sk-h2">What we do</h2>
-          <ul className="sk-cards">
-            {preset.services.map(function card(s) {
-              return (
-                <li key={s.name} className="sk-card">
-                  <span className="sk-card__rule" />
-                  <span className="sk-card__name">{s.name}</span>
-                  <span className="sk-card__note">{s.note}</span>
-                </li>
-              );
-            })}
-          </ul>
+          <h2 className="sk-h2">{preset.section.title}</h2>
+          <OfferSection preset={preset} />
         </motion.section>
 
         {/* reviews — labelled as samples, with invented first names */}
@@ -315,6 +427,114 @@ export default function SketchSite({
           .sk-card__name { font-size: 16px; font-weight: 500; }
           .sk-card__note { font-size: 13px; color: var(--sk-muted); }
 
+          /* ── the offer, seven shapes ── */
+          .sk-chip {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 500;
+            border: 1px solid color-mix(in srgb, var(--sk-ink) 22%, transparent);
+            color: var(--sk-ink); white-space: nowrap;
+          }
+          .sk-chip--solid { background: var(--sk-accent); color: var(--sk-on-accent); border-color: transparent; }
+
+          /* food — a menu, dish and note, no prices anywhere */
+          .sk-menu { list-style: none; margin: 0; padding: 0; max-width: 620px; }
+          .sk-menu__row {
+            display: flex; align-items: baseline; gap: 10px;
+            padding: 11px 0;
+            border-bottom: 1px dashed color-mix(in srgb, var(--sk-ink) 16%, transparent);
+          }
+          .sk-menu__name {
+            font-family: var(--sk-display); font-style: var(--sk-display-style);
+            font-weight: var(--sk-display-weight); font-size: 21px; white-space: nowrap;
+          }
+          .sk-menu__dots { flex: 1; border-bottom: 1px dotted color-mix(in srgb, var(--sk-ink) 28%, transparent); }
+          .sk-menu__note { font-size: 14px; color: var(--sk-muted); white-space: nowrap; }
+
+          /* health — a bookable list */
+          .sk-book-list { list-style: none; margin: 0; padding: 0; }
+          .sk-book-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 18px;
+            padding: 15px 18px; margin-bottom: 10px;
+            background: var(--sk-surface); border-radius: 12px;
+            border: 1px solid color-mix(in srgb, var(--sk-ink) 8%, transparent);
+          }
+          .sk-book-row__text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+          .sk-book-row__name { font-size: 16px; font-weight: 500; }
+          .sk-book-row__note { font-size: 13px; color: var(--sk-muted); }
+
+          /* trades — a numbered process on a rule */
+          .sk-process {
+            list-style: none; margin: 0; padding: 0 0 0 22px;
+            border-left: 2px solid color-mix(in srgb, var(--sk-accent) 45%, transparent);
+            display: flex; flex-direction: column; gap: 20px;
+          }
+          .sk-step { display: flex; gap: 16px; align-items: baseline; }
+          .sk-step__n {
+            font-family: ${MONO_FAMILY}; font-size: 13px; letter-spacing: 0.1em;
+            color: var(--sk-accent); min-width: 26px;
+          }
+          .sk-step__body { display: flex; flex-direction: column; gap: 3px; }
+          .sk-step__name { font-size: 17px; font-weight: 500; }
+          .sk-step__note { font-size: 13px; color: var(--sk-muted); }
+
+          /* beauty — a lookbook grid of drawn tiles */
+          .sk-look {
+            list-style: none; margin: 0; padding: 0;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;
+          }
+          .sk-look__tile { display: flex; flex-direction: column; gap: 8px; }
+          .sk-look__art {
+            display: block; height: 150px; border-radius: 10px;
+            background: color-mix(in srgb, var(--sk-accent) 16%, var(--sk-surface));
+            position: relative; overflow: hidden;
+          }
+          .sk-look__art::after {
+            content: ""; position: absolute; inset: 0;
+            background:
+              radial-gradient(60% 50% at 30% 28%, color-mix(in srgb, var(--sk-accent) 42%, transparent), transparent 70%),
+              linear-gradient(130deg, transparent 46%, color-mix(in srgb, var(--sk-accent) 30%, transparent) 50%, transparent 54%);
+          }
+          .sk-look__art--1::after { transform: scaleX(-1); }
+          .sk-look__art--2::after { transform: rotate(180deg); }
+          .sk-look__art--3::after { transform: scaleY(-1); }
+          .sk-look__cap {
+            font-family: var(--sk-display); font-size: 17px;
+            letter-spacing: var(--sk-display-tracking);
+          }
+          .sk-look__note { font-size: 13px; color: var(--sk-muted); }
+
+          /* fitness — a week's schedule */
+          .sk-sched { list-style: none; margin: 0; padding: 0; }
+          .sk-sched__row {
+            display: grid; grid-template-columns: 110px 1fr auto auto; gap: 16px; align-items: center;
+            padding: 13px 0;
+            border-top: 1px solid color-mix(in srgb, var(--sk-ink) 14%, transparent);
+          }
+          .sk-sched__row:last-child { border-bottom: 1px solid color-mix(in srgb, var(--sk-ink) 14%, transparent); }
+          .sk-sched__when {
+            font-family: ${MONO_FAMILY}; font-size: 13px; letter-spacing: 0.06em;
+            color: var(--sk-accent); text-transform: uppercase;
+          }
+          .sk-sched__what { font-size: 17px; font-weight: 500; text-transform: uppercase; letter-spacing: -0.01em; }
+          .sk-sched__len { font-size: 13px; color: var(--sk-muted); }
+
+          /* professional — ruled practice areas */
+          .sk-areas {
+            list-style: none; margin: 0; padding: 0;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            border-top: 2px solid color-mix(in srgb, var(--sk-accent) 70%, transparent);
+          }
+          .sk-area {
+            padding: 18px 20px 20px 0;
+            border-bottom: 1px solid color-mix(in srgb, var(--sk-ink) 14%, transparent);
+            display: flex; flex-direction: column; gap: 6px;
+          }
+          .sk-area__name {
+            font-family: var(--sk-display); font-size: 19px;
+            letter-spacing: var(--sk-display-tracking);
+          }
+          .sk-area__note { font-size: 13px; color: var(--sk-muted); }
+
           /* ── reviews ── */
           .sk-reviews { padding: 10px 34px 46px; }
           .sk-reviews__head { display: flex; align-items: baseline; gap: 12px; }
@@ -373,6 +593,25 @@ export default function SketchSite({
           .sk--compact .sk-reviews { padding: 22px 16px; }
           .sk--compact .sk-h2 { font-size: 19px; margin-bottom: 14px; }
           .sk--compact .sk-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+          .sk--compact .sk-menu__name { font-size: 16px; }
+          .sk--compact .sk-menu__note,
+          .sk--compact .sk-book-row__note,
+          .sk--compact .sk-step__note,
+          .sk--compact .sk-look__note,
+          .sk--compact .sk-sched__len,
+          .sk--compact .sk-area__note { font-size: 13px; }
+          .sk--compact .sk-book-row { padding: 11px 12px; }
+          .sk--compact .sk-book-row__name,
+          .sk--compact .sk-step__name,
+          .sk--compact .sk-sched__what { font-size: 14px; }
+          .sk--compact .sk-look { grid-template-columns: 1fr 1fr; gap: 10px; }
+          .sk--compact .sk-look__art { height: 92px; }
+          .sk--compact .sk-look__cap, .sk--compact .sk-area__name { font-size: 15px; }
+          .sk--compact .sk-areas { grid-template-columns: 1fr; }
+          .sk--compact .sk-sched__row { grid-template-columns: 84px 1fr auto; gap: 10px; }
+          .sk--compact .sk-sched__len { display: none; }
+          .sk--compact .sk-chip { padding: 6px 11px; font-size: 13px; }
+          .sk--compact .sk-process { padding-left: 14px; gap: 14px; }
           .sk--compact .sk-card { padding: 14px 12px; }
           .sk--compact .sk-card__name { font-size: 14px; }
           .sk--compact .sk-sample { font-size: 13px; }
