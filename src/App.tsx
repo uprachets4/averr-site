@@ -5,6 +5,7 @@ import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import { PageToneProvider } from "./lib/pageTone";
 import { NavToneProvider } from "./lib/navTone";
+import { BusinessNameProvider } from "./lib/businessName";
 import AmbientEnvironment from "./components/AmbientEnvironment";
 import Home from "./pages/Home";
 
@@ -54,24 +55,26 @@ function App() {
   return (
     <PageToneProvider>
       <NavToneProvider>
-        <ScrollToTop />
-        <RouteWipe />
-        <AmbientEnvironment />
-        <Nav />
-        <main id="main" style={{ position: "relative", zIndex: 1 }}>
-          <Suspense fallback={<RouteFallback />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/work" element={<Work />} />
-              <Route path="/work/:slug" element={<CaseStudy />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </main>
-        <Footer />
+        <BusinessNameProvider>
+          <ScrollToTop />
+          <RouteWipe />
+          <AmbientEnvironment />
+          <Nav />
+          <main id="main" style={{ position: "relative", zIndex: 1 }}>
+            <Suspense fallback={<RouteFallback />}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/work" element={<Work />} />
+                <Route path="/work/:slug" element={<CaseStudy />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </main>
+          <Footer />
+        </BusinessNameProvider>
       </NavToneProvider>
     </PageToneProvider>
   );

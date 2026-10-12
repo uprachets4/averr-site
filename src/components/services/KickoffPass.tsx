@@ -29,6 +29,7 @@ import {
   weekdayShort,
   type CivilDate,
 } from "../../lib/businessDays";
+import { useBusinessName } from "../../lib/businessName";
 import {
   bookedLabel,
   bookedSpoken,
@@ -69,7 +70,10 @@ export default function KickoffPass() {
   const reduce = useReducedMotion();
   const today = useMemo(() => todayInToronto(), []);
   const [offset, setOffset] = useState(0);
-  const [name, setName] = useState("");
+  /* Prefilled with whatever the visitor typed into the home hero this
+     session — memory only, see lib/businessName.tsx. They can clear it. */
+  const heroName = useBusinessName().name;
+  const [name, setName] = useState(heroName);
   const [booked, setBooked] = useState<string | null>(null);
 
   const sectionRef = useRef<HTMLElement | null>(null);
