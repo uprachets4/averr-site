@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `1f96a2e` — *23 the hero rebuilt from real work: a dark room you fly through*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 23. |
+| **HEAD** | `2fd9aec` — *23b-3 the phone gets the scale-through it was specced*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 23b. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -2217,6 +2217,93 @@ One scroll value pushes the scene +2400px. The copy lifts and goes by 20%; the v
 
 ---
 
+**SESSION 23b — the hero's open items closed.** Three commits (`fb0eb76`, `d31936c`, `2fd9aec`).
+
+### 1 · The fly-through is lit
+
+**Measured, not judged.** A 160×100 downsample of every 5% of the pin, mean luminance by the Rec.709 coefficients. That immediately contradicted the Session 23 report of a "murky 40–60% stretch": it was a **single crater at 40%**, luma **23.5** against **51.8** at rest, with the neighbours fine.
+
+And the cause was not darkness. At 40% the planes have scaled toward the eye and swept **outside the frame** — SIFT 6,828px past the right edge, CG Walls 6,666px past the left, CapitalCommand 4,108px above. Nothing was in shot. A brightness fix alone would have done nothing, and the first attempt at one changed the number by zero.
+
+Three changes:
+
+- **A key light per plane.** Each brightens as it comes toward the camera — a parch rim on its chrome, a sheen across the glass, opacity toward 1 — computed from its own z plus the dolly's push, so the room is lit by whatever is passing. The 0.62 floor applies **only while the camera is moving**, so the at-rest composition keeps its depth falloff.
+- **A cull at the eye.** A plane that reaches the camera magnifies one pixel across the whole frame. Each now fades over its last 320px instead of smearing.
+- **The landing rises early** (28% rather than 40%) and the field leaves later (46% rather than 58%), so the destination comes up to meet the camera through exactly the window the room cannot carry. The vignette is fully released by 20%.
+
+| % of pin | 1440 before | 1440 after | 1920 after |
+|---|---|---|---|
+| at rest | 51.8 | 51.8 | 52.3 |
+| 25 | 54.8 | 55.9 | 59.1 |
+| 35 | 47.3 | 90.3 | 90.1 |
+| **40** | **23.5** | **111.3** | **110.0** |
+| 45 | 58.5 | 148.7 | 147.0 |
+| 50 | 92.6 | 186.2 | 184.2 |
+| 55 | 125.5 | 201.0 | 201.2 |
+| 60 | 158.6 | 199.1 | 203.6 |
+
+**Darkest frame at 1440 is now 0% — the at-rest frame itself. At 1920, likewise 0%. No frame at either width falls below the at-rest mean.**
+
+**Honest critique of the five frames.** *40%* is the one that was broken and is now the best argument for the whole idea: the CG Walls site arrives readable — headline, body, both buttons, the trust row — with CadenceStack passing over it and CapitalCommand entering from the right. It reads as a camera landing on a project. *45% and 50%* are the strongest: the destination is nearly resolved while a plane still crosses the top, which is the Awwwards-grade beat the sequence needed. *55% and 60%* are clean but quiet — the room has gone and it is simply the capture settling, which is correct but is the least interesting part of the pin. The one weakness across 40–50% is that crossfading two full-frame layers leaves the CG site's blacks grey rather than black; it resolves by 55%. Against Linear and Vercel this now holds: lit, legible, and never a dead frame.
+
+### 2 · One hover label, clamped
+
+Flipping the label's side by measurement was not enough: `right: 0` inside a plane whose own right edge is past the viewport is still past the viewport, and a pixel nudge inside a 3D-transformed parent is itself transformed. **Six of sixteen still clipped at 1280 and two at 1920.**
+
+The field renders **one** label instead, outside the 3D scene, positioned from the hovered plane's measured rect and clamped to the frame.
+
+**Verified on every plane:** 1280×720 — 16 planes, 16 labels shown, **none clipped**. 1920×1080 — same.
+
+*(A probe error of mine along the way: I measured the label in the same `evaluate` as the `focus()` that triggered it, so I was reading the rect before React had re-rendered and six labels looked broken that were not.)*
+
+### 3 · The phone gets its scale-through
+
+The mobile hero pinned nothing and scrolled away. It now runs the shorter sequence as specced: six planes, a **1250px** push rather than 2400, no cursor camera, landing on the same CG Walls capture and handing into the work strip. A 240vh wrapper rather than 360.
+
+*Sampled every 10% at 375×812:*
+
+| % | 0 | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| planes in frame | 6 | 6 | 6 | 6 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| landing | 0 | 0 | 0 | .08 | .50 | .92 | 1 | 1 | 1 | 1 | 1 |
+| luma | 34.0 | 33.1 | 35.5 | 44.5 | 53.6 | 48.7 | 53.6 | 58.2 | 59.4 | 61.0 | 60.9 |
+
+**No blank frame.** The darkest is 10% at 33.1 against 34.0 at rest — 0.9 below, the copy leaving. The 20% crater the first mobile build had is gone now the landing starts at 14%.
+
+**Zero horizontal overflow at 375.** The plane chrome labels were **9px** on a phone; they are decorative and cannot carry 13px on a plane that size, so they are hidden rather than shipped under the floor. What remains at 11–12px is inside the live /services screen components the planes render — their own `MIN`, shared with /services — exactly as recorded in Session 22.
+
+### 4 · The 54ms long task
+
+**Identified, and it is not the fly-through.** It is a single 55ms task at **startTime 191ms** — the app's initial render. My Session 23 probe used a `buffered: true` observer and attributed a load-time task to the scroll sequence it happened to be watching. **A fly-through at 1920, sampled at every 5%, produces no long task at all.**
+
+It is ours, but reducing it means splitting the hero out of the entry chunk, which would cost the thing it is paying for — the hero is the LCP surface. Left alone, and recorded.
+
+### 5 · Numbers
+
+| | S23 | S23b |
+|---|---|---|
+| Home initial JS | 91.52 kB gzip | **91.89 kB gzip** (+0.37) |
+| Mobile LCP (alias, standard harness) | 1772 ms | **1724 ms** `[1736, 1724, 1724]` |
+| FCP | 1704 | 1724 ms |
+| CLS (load) | 0.0026 | 0.0069 |
+| Long tasks during a fly-through | 54 ms (misattributed) | **none** |
+
+### 6 · Deviations
+
+1. **The 40–50% frames are slightly washed** — two full-frame layers crossfading means the CG site's blacks are grey until ~55%. Inherent to the crossfade; not worth a compositing rewrite.
+2. **CLS rose from 0.0026 to 0.0069** when the phone started pinning. Still a twentieth of the budget.
+3. **11–12px text remains inside the reused /services screens** on mobile. Home's own text is ≥13px.
+4. The LCP element is still `P.hx-kicker` rather than the h1 — carried over from Session 23, all hero text paints in frame one.
+
+### 7 · My own errors this session
+
+1. **I reported "the 40–60% stretch is murky" in Session 23 from looking at it.** It was one frame at 40%, and the three either side were fine. A luminance sample at every 5% found that in one run.
+2. **I built the key light before diagnosing**, and it moved the number by exactly zero, because the frame was empty rather than dark.
+3. **I misattributed the 54ms long task** to the fly-through in Session 23; a buffered PerformanceObserver reports tasks from before you started watching.
+4. **I measured hover labels in the same `evaluate` as the focus that triggered them**, before React had re-rendered.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -2322,6 +2409,8 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **A SCROLL SEQUENCE IS JUDGED BY PIXELS (23b).** Sample mean luminance of a downsample at every 5% of the pin and compare each frame to the at-rest frame. No frame may be darker than the composition the reader arrived on. "It looks murky" found a 20-point stretch that did not exist; the measurement found one crater 28 points deep at a single 5% mark.
 
 - **THE HOME HERO IS MADE OF REAL WORK ONLY (23).** Every plane in the field is an existing case-study capture through the WebP pipeline or a live /services screen component. No generated sites, no stock, no placeholders, no invented figures — a plane prints a `headlineFigure` only where `caseStudies.ts` has one. The 21b generator and its presets are deleted.
 - **A 3D FIELD IS AUTHORED IN SCREEN SPACE (23).** `translateZ` moves a plane toward the perspective origin and shrinks it, so layout coordinates are not where the plane lands. `fieldPlan.ts` stores where each plane should APPEAR and `HeroField` divides by that plane's own `k = perspective / (perspective − z)`. Authoring in layout coordinates put six to eight planes on top of the headline.
@@ -2537,6 +2626,12 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **82 · A vignette that exists for text contrast must leave with the text.** *Cause:* the hero's radial darkening is there so the headline holds AA over the planes. It stayed at full strength through the fly-through, where there is no headline — the middle of the sequence sat at roughly half the brightness it should have. *Fix:* fade it on the same scroll range as the copy. **Ask what every layer is FOR, then ask when that reason stops applying.**
 
+**83 · A dark frame in a 3D fly-through is usually an EMPTY one.** *Cause:* the hero's pin had a luminance crater at 40%. The instinct was lighting, and a per-plane key light moved the number by exactly zero. The planes were not dark — they had scaled toward the eye and swept outside the frame: SIFT 6,828px past the right edge, CG Walls 6,666px past the left. *Fix:* bring the landing forward so the destination carries the window the room cannot, and cull planes as they reach the eye so none magnifies one pixel across the screen. **Before you light a frame, list what is actually in it.**
+
+**84 · A buffered PerformanceObserver reports what happened before you were watching.** *Cause:* a 54ms long task was attributed to the fly-through and chased for a session. `buffered: true` had replayed it from startTime 191ms — the app's initial render, long before any scrolling. *Fix:* read `startTime`, not just `duration`. **A long task has a clock as well as a length.**
+
+**85 · You cannot clamp a child of a 3D-transformed element to the viewport.** *Cause:* the field's hover labels clipped on edge planes. Flipping their side by measurement left six of sixteen still off screen at 1280, because `right: 0` inside a plane whose own right edge is past the viewport is still past it, and a pixel offset inside a transformed parent is itself transformed. *Fix:* one label for the whole scene, rendered OUTSIDE the transform and positioned from the hovered element's measured rect. **If the parent is transformed, position the tooltip somewhere else.**
+
 ---
 
 ## 6. DATA FACTS
@@ -2640,7 +2735,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 21b — the home flagship, reconceived.**~~ **DONE** (`021d6c8` … `ec38108`). The visitor types their business name into the slab and a premium site for it builds itself live in a large tilted window; seven industry presets, a generated monogram, self-scrolling; the scroll fills the screen and hands to the real reel; the name carries to /services and /contact. Home initial JS +1.97 kB gzip, generator 5.19 kB out of band, mobile LCP 2024 ms.
 - ~~**Session 22 — home as a five-chapter journey.**~~ **DONE** (`49501a1` … `73dce33`). Headline back to 104px, seven preset section shapes, a scroll-panned film strip of the work, three playable live service panels with all 16 chips deep-linking, a scroll-drawn founder chapter, a personalised slab closer, and a chapter rail. Home initial JS 106.80 → 94.31 kB gzip; mobile LCP 1788 ms.
 - ~~**Session 23 — the hero rebuilt from real work.**~~ **DONE** (`1f96a2e`). Sixteen real planes in a CSS 3D room, cursor-steered depth, hover-to-pull-forward with verified figures, and a fly-through that lands on CG Walls & Floors' own capture. Home initial JS 94.31 → 91.52 kB gzip; mobile LCP 1772 ms.
-- **STILL OPEN from 23:** the MIDDLE of the fly-through (roughly 40–60% of the pin) is legible but too dim — it needs a key light on the passing planes and a brightness floor. Hover labels on right-edge planes can clip. The mobile hero drops the fly-through rather than shortening it to a scale-through. Chapters 3–5 are next session.
+- ~~**Session 23b — the hero's open items.**~~ **DONE** (`fb0eb76` … `2fd9aec`). The fly-through is lit (no frame below the at-rest mean at 1440 or 1920, against a 28-point crater), hover labels never clip (16/16 at 1280 and 1920), and the phone runs the specced scale-through. The 54ms long task was initial render at 191ms, not the fly-through.
+- **STILL OPEN from 23b:** the 40–50% frames are slightly washed where two full-frame layers crossfade; 11–12px text remains inside the reused /services screens on mobile; the LCP element is the kicker rather than the h1. Chapters 3–5 are next session.
 - **STILL OPEN from 22:** CareerClarity has no screenshot and no case study, so its card is text-only; CapitalCommand and CadenceStack have no `headlineFigure`; `public/about/` has no founder photograph. All three are owner-supplied assets, not code.
 - **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
