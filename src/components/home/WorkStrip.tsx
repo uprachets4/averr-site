@@ -276,6 +276,14 @@ export default function WorkStrip() {
       })}
       <li className="ws-item ws-item--end">
         <Link to="/work" className="ws-end">
+          {/* A teaser of /work's doors, not the mechanic itself: two
+              cream panels part a little on hover. The full thing lives
+              on /work and home does not copy another page's signature. */}
+          <span className="ws-doors" aria-hidden>
+            <span className="ws-door ws-door--l" />
+            <span className="ws-door ws-door--r" />
+            <span className="ws-doors__gap" />
+          </span>
           <span className="ws-end__label">Open the vault</span>
           <span className="ws-end__arrow" aria-hidden>→</span>
         </Link>
