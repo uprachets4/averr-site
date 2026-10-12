@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `2fd9aec` — *23b-3 the phone gets the scale-through it was specced*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of Session 23b. |
+| **HEAD** | `547cfca` — *24a-4 the rail reads six chapters, and keeps the last one*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 24a. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -2304,6 +2304,98 @@ It is ours, but reducing it means splitting the hero out of the entry chunk, whi
 
 ---
 
+**SESSION 24a — chapters 1–3 of the complete film.** Four commits (`592dab6` … `547cfca`).
+
+Owner verdict on 23b: hero **5–6/10**, right direction. **Split reported and taken:** the brief's three new builds (the template wall, three image-in-type acts, the closer rework) are well past 2000 lines together, so this session is **24a = Ch1–3** and **24b = Ch4–6 + the rail's remaining work**.
+
+### Ch1 · The fly-through lands on CapitalCommand
+
+`LANDING` is now `/work/capitalcommand/01-overview.jpg`. It **occludes** rather than crossfades: a `clip-path` wipe opens from the CapitalCommand plane's own corner of the frame over a layer that is opaque throughout. Two full-frame layers blending was what left the blacks grey.
+
+**The wipe did not work at first, and the failure was invisible.** Handed to motion as a scroll-linked `clipPath` it read `inset(8% 2% 78% 74%)` at the **end** of the pin — clip-path is accelerated onto a ViewTimeline exactly as opacity is, and inside a sticky frame that timeline never advances. `lib/useScrollStyle.ts` has a sibling now, **`useScrollProp`**, and the wipe is written straight to the node.
+
+**On the luminance rule.** Session 23b's "no frame below the at-rest mean" **cannot hold against a dark landing** and should not be applied literally here:
+
+| | mean luminance |
+|---|---|
+| The room at rest | 52.9 |
+| CG Walls' capture (the old landing) | 224.4 |
+| **CapitalCommand's capture (the new one)** | **38.6** |
+| The landed frame as rendered | **35.3** |
+
+The landed frame matches the capture's own luminance, so it is at full brightness and nothing is dimming it. The test that means something is that, plus no empty frame. Traced at every 5%, the sweep into the landing is **monotonic** — 53.3 → 38.4 → 36.3 → 37.4 — with no dip below the destination's own level. The 40% crater that 23b fixed has not returned.
+
+### Ch2 · "You've seen this website before."
+
+A wall of **fourteen identical template sites** fills the frame. One scroll value pulls a single card out of the grid, pushes the rest back to a ghost at 0.12, and **wipes a real CG Walls & Floors capture over the skeleton it was**.
+
+**THE COPY IS RESTORED, NOT REWRITTEN.** The three beats are verbatim from **`src/data/homeScenes.ts`**, which survived the Session 22 removal of `ThreeScenes.tsx` (deleted in **`b8dd1bc`**) — the component went, the copy did not, so no git archaeology was needed:
+
+| Beat | Line | Accent |
+|---|---|---|
+| The Studio | "We started because most agency work **looks the same.**" | Cormorant |
+| The Approach | "So we built one that starts from the **client's world.**" | Cormorant |
+| The Result | "Sites that earn their portfolio slot. **Yours and ours.**" | Cormorant |
+
+All three bodies intact. Only the chapter's own h2 is new.
+
+*Traced at every 5%:* grid 1 → 0.72 → 0.12, chosen card 0 → 0.58 → 1, wipe `inset(0 100% 0 0)` → `inset(0 22% 0 0)` → `inset(0)`, beats 1/0/0 → 0/1/0 → 0/0/1 — **never two at once**.
+
+**Three faults the frames caught.** In a three-row grid the wall was squeezed to half the frame with its second row cut off and the body copy clipped — the head and the copy overlay the wall now, with a scrim. The skeletons were hollow through the middle, which reads as an unfinished wireframe rather than a generic site — they have a content band now. And `Screenshot` sets `height: auto` **inline**, which beat the stylesheet and letterboxed the capture inside its card; verified filling at 1440 (812×508) and 1920 (1083×677).
+
+### Ch3 · The vault teaser
+
+The strip's end card gained two cream panels that part on hover or focus with a hairline of parch opening between them — **a hint of /work's doors, not the mechanic**, which stays on /work. Measured −19.4px / +19.4px with the gap scaling 0 → 1. Links to `/work`.
+
+### The rail
+
+Six chapters: Your customer · Seen it before · The work · How we do it · Who you'll work with · Your move. It fell back to the **first** chapter at the bottom of the page — past the last section's midpoint nothing contains it and the default was index 0, so it jumped to "Your customer" at 97%. It falls back to the last chapter passed. *Verified:* 10% Your customer · 30% Seen it before · 50% The work · 70% How we do it · 88% Who you'll work with · 97% Your move.
+
+### Numbers
+
+| | 23b | 24a |
+|---|---|---|
+| Home initial JS | 91.89 kB gzip | **92.16 kB gzip** (+0.27) |
+| Mobile LCP (alias) | 1724 ms | **1948 ms** `[1760, 2044, 1948]` |
+| CLS (load) | 0.0069 | 0.0069 |
+
+*Crash scroll, three speeds, both directions:*
+
+| | CLS load/total | overflow | longest task | errors |
+|---|---|---|---|---|
+| 1440×900 | 0.0001 / 0.0002 | **0** | 55 ms | none |
+| 1920×1080 | 0 / 0.0001 | **0** | 55 ms | none |
+| 375×812 | 0.0078 / 0.008 | **0** | 53 ms | none |
+
+The 53–55ms task is the initial render at ~191ms, identified in 23b — not any scroll sequence.
+
+*Reduced motion:* the hero does not pin and the wall renders its still state — the real capture plus all three beats stated plainly.
+
+### Quality gate — honest critique
+
+**Ch1's landing** is the right call. CapitalCommand is the strongest capture in the set and it keeps the hero on its own dark ground instead of handing a cream page to a cream chapter. The wipe opening from the plane's own corner reads as the camera arriving rather than as a dissolve. It is darker than what came before, and that is the subject, not a fault.
+
+**Ch2 is the best new thing on the site.** The opening frame — fourteen identical templates under "You've seen this website before.", with "most agency work *looks the same*" in Cormorant below — makes the argument before a word of body copy is read. The payoff frame, where the real CG Walls site stands large and sharp with the ghost wall still legible behind it, is the clearest statement of the studio's position home has ever made. Against Linear and Awwwards SOTD this holds: it is an idea staged, not a layout filled.
+
+**Ch3** is unchanged from 23 apart from the teaser, and the teaser is restrained in the right way — two panels and a hairline, not a door mechanic competing with /work's.
+
+**Where it is still short.** The transition *between* Ch1's dark landing and Ch2's cream wall is a `Chapter` clip wipe doing ordinary work; it is clean but it is the least composed moment in the three. And Ch2's chosen card is upscaled during its growth, so there is a stretch where the real capture is soft before it settles sharp.
+
+### Deviations
+
+1. **Split into 24a/24b**, as the brief allows and instructs. Ch4 (the three image-in-type acts), Ch5 and Ch6 are not in this session; `ServicePanels` is still mounted and still copies the /services screens — **the owner's second complaint is not yet addressed** and is the first thing 24b does.
+2. **The luminance rule is reinterpreted** for a dark landing — see Ch1.
+3. The chapter line over the landed frame is **none**, as instructed.
+4. 11–12px text remains inside the reused /services screens in the hero field on mobile; home's own text is ≥13px.
+
+### My own errors this session
+
+1. **I shipped the landing wipe without checking it had opened.** It read its start value at the end of the pin for a whole build, and the only reason I caught it was measuring the computed `clipPath` rather than trusting the screenshot's darkness.
+2. **I applied 23b's luminance rule mechanically** to a landing that is deliberately dark, and flagged twelve frames as faults before working out the rule's own premise had changed.
+3. **I built Ch2 as a three-row grid**, which left the wall at half height with its second row cut off and the copy clipped — visible in the first frame I captured.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -2409,6 +2501,9 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **THE LUMINANCE RULE IS RELATIVE TO THE SUBJECT (24a).** 23b's "no frame below the at-rest mean" was written for a bright landing. CapitalCommand's capture has a mean luminance of 38.6 where CG Walls' was 224.4, against a room at 52.9 — a dark destination can never clear it. The tests that hold: the landed frame matches the CAPTURE's own luminance (full brightness, nothing dimming it), no frame is empty, and the sweep into the landing is monotonic.
+- **HOME'S ARGUMENT COPY IS RESTORED, NOT REWRITTEN (24a).** The three beats in chapter 2 are verbatim from `src/data/homeScenes.ts`, which outlived the component that used them (`ThreeScenes.tsx`, deleted in `b8dd1bc`). Anything that re-stages this argument takes the copy from there.
 
 - **A SCROLL SEQUENCE IS JUDGED BY PIXELS (23b).** Sample mean luminance of a downsample at every 5% of the pin and compare each frame to the at-rest frame. No frame may be darker than the composition the reader arrived on. "It looks murky" found a 20-point stretch that did not exist; the measurement found one crater 28 points deep at a single 5% mark.
 
@@ -2632,6 +2727,10 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **85 · You cannot clamp a child of a 3D-transformed element to the viewport.** *Cause:* the field's hover labels clipped on edge planes. Flipping their side by measurement left six of sixteen still off screen at 1280, because `right: 0` inside a plane whose own right edge is past the viewport is still past it, and a pixel offset inside a transformed parent is itself transformed. *Fix:* one label for the whole scene, rendered OUTSIDE the transform and positioned from the hovered element's measured rect. **If the parent is transformed, position the tooltip somewhere else.**
 
+**86 · clip-path is accelerated the same way opacity is.** *Cause:* the hero's landing wipe was handed to motion as a scroll-linked `clipPath` inside a sticky frame. It read `inset(8% 2% 78% 74%)` — its START value — at the END of the pin, because the WAAPI animation motion compiled it into was running on the pinned element's own ViewTimeline, which never advances. The frame just looked dark, so the cause was invisible. *Fix:* `useScrollProp`, the sibling of `useScrollStyle`, writing the property straight to the node. **Anything scroll-linked inside a pin: assume it is accelerated until you have read its computed value at the end of the pin.**
+
+**87 · `Screenshot` sets `height: auto` inline, and inline beats your stylesheet.** *Cause:* chapter 2's chosen card gave its image `height: 100%; object-fit: cover` in CSS and the capture still letterboxed, showing the grey skeleton below it. The component's own inline style won. *Fix:* pass the override through its `style` prop, which it spreads last. **A shared component's inline defaults are not suggestions.**
+
 ---
 
 ## 6. DATA FACTS
@@ -2736,7 +2835,9 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 22 — home as a five-chapter journey.**~~ **DONE** (`49501a1` … `73dce33`). Headline back to 104px, seven preset section shapes, a scroll-panned film strip of the work, three playable live service panels with all 16 chips deep-linking, a scroll-drawn founder chapter, a personalised slab closer, and a chapter rail. Home initial JS 106.80 → 94.31 kB gzip; mobile LCP 1788 ms.
 - ~~**Session 23 — the hero rebuilt from real work.**~~ **DONE** (`1f96a2e`). Sixteen real planes in a CSS 3D room, cursor-steered depth, hover-to-pull-forward with verified figures, and a fly-through that lands on CG Walls & Floors' own capture. Home initial JS 94.31 → 91.52 kB gzip; mobile LCP 1772 ms.
 - ~~**Session 23b — the hero's open items.**~~ **DONE** (`fb0eb76` … `2fd9aec`). The fly-through is lit (no frame below the at-rest mean at 1440 or 1920, against a 28-point crater), hover labels never clip (16/16 at 1280 and 1920), and the phone runs the specced scale-through. The 54ms long task was initial render at 191ms, not the fly-through.
-- **STILL OPEN from 23b:** the 40–50% frames are slightly washed where two full-frame layers crossfade; 11–12px text remains inside the reused /services screens on mobile; the LCP element is the kicker rather than the h1. Chapters 3–5 are next session.
+- ~~**Session 24a — chapters 1–3.**~~ **DONE** (`592dab6` … `547cfca`). The fly-through lands on CapitalCommand and occludes; "You've seen this website before." stages the restored argument as a wall of templates with one breaking out into real work; the strip's end card teases the vault; the rail reads six chapters.
+- **SESSION 24b — chapters 4–6.** The three image-in-type acts replacing `ServicePanels` (which still copies the /services screens — the owner's second complaint, unaddressed), the founder scene tightened, the "Your move." closer, and the Chapter transitions at every cream↔dark boundary.
+- **STILL OPEN from 23b:** 11–12px text inside the reused /services screens on mobile; the LCP element is the kicker rather than the h1.
 - **STILL OPEN from 22:** CareerClarity has no screenshot and no case study, so its card is text-only; CapitalCommand and CadenceStack have no `headlineFigure`; `public/about/` has no founder photograph. All three are owner-supplied assets, not code.
 - **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
