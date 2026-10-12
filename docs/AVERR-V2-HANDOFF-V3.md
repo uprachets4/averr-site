@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `8f02bb1` — *21-6 the headline takes the column: 148px at 1440, measured*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of the Session 21 rulings. |
+| **HEAD** | `ec38108` — *21b-6 CLS, the mobile cascade, and the compact type floor*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 21b. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -1868,6 +1868,132 @@ Auto-cycle at 3.2/6.4/9.6s with the scene in step · stops on interaction (4 sam
 
 ---
 
+**SESSION 21b — the home flagship, reconceived.** Six commits (`021d6c8` … `ec38108`).
+
+Owner verdict on Session 21: **4/10, "nothing changed"** — still text and a small dashboard. This replaced the concept: the visitor types their business name into the slab and a premium website for it builds itself live.
+
+### 1 · Copy
+
+| Where | Now |
+|---|---|
+| h1 | "Let's make" / **[the slab field]** / "the one they choose." |
+| h1 accessible name | "Let's make your business the one they choose." |
+| Field label | "Your business name" (`.sr-only`) |
+| Hint | "Type your business name ↑", Geist Mono, pulsing until first focus |
+| Primary CTA | **Build the real one →** · `/contact?notes={name}` when a name is typed, `/contact` otherwise |
+| Secondary CTA | See our work → (unchanged) |
+| Reel heading | "That was a sketch. Here's the real thing." |
+| Kicker, eyebrow, Toronto clock | unchanged |
+
+### 2 · The slab is a text field
+
+`NameField` keeps PillHl's `.pill-hl--bare` box and puts an `<input>` in it: `maxlength=32`, `autocomplete="organization"`, spellcheck off, a blinking caret before focus, the native one after.
+
+- **Measured, never reflowing.** A hidden ruler pinned to the UNSCALED size lays out whatever is shown; the surface behind scales to it on `transform`; the input stays the full width of the column.
+- **Steps down, never wraps.** "Northgate Renovations & Custom Millwork" caps at 32 characters and the type steps **72.7px → 40.7px**: `scrollWidth 657 = clientWidth 657`, one line, nothing clipped.
+- **Painted at the first frame.** The placeholder "your business" is in the markup at first render in **ink** (`rgb(20,20,18)`) on cream — legible before anything animates — and crosses to parch as the surface fades in under it. An input's glyphs cannot be clipped, so Session 21's reveal becomes a colour crossfade.
+- **The placeholder tries six names on**, typed in and backspaced, 2.6s each, with "your business" between: Harbour Dental · Maple & Pine Café · Northgate Renovations · Bloor St. Barbers · Lakeview Physio · Summit Law. Focus stops it and clears to the caret; empty + blur resumes it.
+
+### 3 · The live sketch
+
+`SketchWindow` holds a browser window across the lower right of the hero, bleeding off the right edge and the bottom, leaning ±5° toward the cursor on `spring.soft` from a rest of `rotateX 6 / rotateY -10`. Its page scrolls itself on a 26s out-and-back loop, paused on hover, and a ghost cursor reaches the booking button once per lap. Corner label: "A 10-SECOND SKETCH · THE REAL ONE TAKES TWO WEEKS".
+
+`SketchSite` generates the page. **Seven presets, each a whole design rather than a recolour** — verified by typing one name per preset at 1440:
+
+| Name typed | Preset | Palette ground / accent | Display | Nav | Hero layout | Mark |
+|---|---|---|---|---|---|---|
+| Maple & Pine Café | food | `#FBF5EC` / `#C2552C` | Cormorant **italic** | lowercase | stacked | filled disc |
+| Harbour Dental | health | `#F3F8F8` / `#17746F` | Inter 600 | normal | split | rounded square |
+| Northgate Renovations | trades | `#F1F2F3` / `#D0711A` | Geist 600 | UPPER 0.1em | split-reverse | shield |
+| Bloor St. Barbers | beauty | `#FAF4F5` / `#8B4663` | Cormorant 500 | UPPER 0.22em | centered | thin ring |
+| Summit Yoga | fitness | `#101214` / `#C4F04A` | Geist 600 | UPPER 0.14em | editorial | cut block |
+| Summit Law | professional | `#F7F6F1` / `#1E3A72` | Cormorant 600 | UPPER 0.16em | split | ruled square |
+| Rowan & Field | local | `#F6F5F1` / `#3C6A48` | Geist 600 | normal | stacked | pin |
+
+Each carries its own hero art (SVG: a cup and warm arcs; soft overlaps and a pulse line; roof pitches; a blush blob and arcs; diagonals and a ring; ruled columns; a street grid and a pin), its own 3–4 service cards, its own headline template, and a review strip of invented first names behind a **"sample"** label. The URL in the chrome is derived from the name with accents folded — "Maple & Pine Café" → `maplepinecafe.ca`, not `maplepinecaf.ca`.
+
+**Honest look at the seven:** they read as seven different studios' work, not one template. The café is warm and italic with a terracotta cup; the fitness studio is near-black with acid lime, uppercase and tight; the law practice is ivory, navy and ruled. The clearest tell that they share a skeleton is the service-card row, which is the same shape in all seven.
+
+**ASSET RULE honoured:** no photographs, no real brands. Every mark and every image is SVG drawn from the typed name.
+
+**PALETTE:** these are screen interiors and carry their own identity, per the 21 ruling. Nothing reaches the page around the window, which stays on the site's cream/ink tokens.
+
+### 4 · Scroll
+
+One value. The copy clears (p 0.02→0.18), the window un-tilts and scales until it fills the viewport (p 0.05→0.42), it holds, then dissolves (p 0.56→0.68) into the reel (p 0.56→0.70). The pin is **4 × 100vh** for three stages, per the n+1 rule. Measured at 1440×900:
+
+| p | window rect | copy | sketch | reel |
+|---|---|---|---|---|
+| 0 | 822..1700 / 249..1040 | 1.00 | 1.00 | 0 (inert) |
+| 0.2 | 608..1630 / 133..1053 | 0.00 | 1.00 | 0 (inert) |
+| 0.35 | 17..1462 / −166..1081 | 0.00 | 1.00 | 0 (inert) |
+| 0.5 | −14..1454 / −181..1082 | 0.00 | 1.00 | 0 (inert) |
+| 0.62 | −14..1454 / −181..1082 | 0.00 | 0.50 | 0.43 |
+| 0.75 | −14..1454 / −181..1082 | 0.00 | 0.00 | 1.00 |
+
+### 5 · The through-line
+
+`lib/businessName.tsx` — React state at the app root, **no storage, no analytics, no network**, dead with the tab. Verified end to end: typing "Harbour Dental" in the hero then clicking through in-app prefills **/services' start pass** ("Harbour Dental", found at y=12000) and **/contact's business field**. The CTA carries `?notes=Harbour%20Dental`; `?notes` still wins over the context where both exist.
+
+### 6 · Numbers
+
+| | Session 21 | 21b |
+|---|---|---|
+| Home initial JS | 104.83 kB gzip | **106.80 kB gzip** (+1.97, target ≤ +4) |
+| CSS | 9.15 | 10.44 kB gzip |
+| Generator chunk | — | **SketchSite 21.75 kB / 5.19 kB gzip**, outside the initial payload |
+
+*Alias, 390×844, 4× CPU, 1.6 Mbps / 150 ms, cache disabled, fresh context per run, edge warmed, median of 3:* **LCP 2024 ms** `[2024, 2064, 2000]` on `P.type-body-lg`, FCP 2024 ms, TTFB 102 ms, CLS 0.0006. Throttle proof: 108,589 B in 1290 ms ≈ 673 kbit/s.
+
+*First frame:* every hero text element at opacity 1 at 1440 and 390, placeholder "your business" in ink, window and static frame present.
+
+*CLS and crash scroll (3 speeds, both directions):*
+
+| | load CLS | total CLS | overflow | longest task | errors |
+|---|---|---|---|---|---|
+| 1440×900 | 0.0002 | 0.0563 | **0** | 95 ms | none |
+| 390×844 | 0.0005 | 0.0029 | **0** | 118 ms | none |
+| 375×812 | 0.0004 | 0.0029 | **0** | 79 ms | none |
+
+*Reduced motion:* no placeholder typing (static "your business"), not pinned, `sw-page` transform `none` (no self-scroll), no ghost cursor, hint and caret animations `none`.
+
+*Mobile (<1024):* the h1 is three lines with the field full-width, then hint, kicker, CTAs, then the sketch in a phone-proportioned window of definite height. Minimum font inside the sketch **13px**. Zero overflow at 375 and 390.
+
+### 7 · Does it read as a flagship?
+
+Yes. The fold is a sentence the reader completes themselves, a slab that accepts typing, and a premium website for *their* business assembling beside it — and the scroll turns that sketch into the whole screen before handing over to real work. The two reservations are below.
+
+### 8 · Deviations and judgement calls — every one
+
+1. **The headline is ~73px at 1440, not the ≥140px the 21 ruling set.** That ruling was written when the headline *was* the hero. Here the sketch is, and the two cannot both be large in one 100vh frame: the copy is bounded to 56% of the container so the window can have the rest. **If the size ruling still stands, the window has to shrink — that is a ruling, not something I should decide.**
+2. **The sketch follows the placeholder before anyone types.** Not in the brief. The six examples map to six different presets, which reads as deliberate, and without it the hero cannot demonstrate itself to someone who never touches the keyboard. The example is taken only once a word has finished typing, never per keystroke.
+3. **The window occupies the lower ~72%, not ~55%**, and is positioned from `--container-wide` rather than `vw`: a `vw` width cropped 30% at 1440 and 57% at 1920, where the container stops growing and the viewport does not.
+4. **An `<input>` lives inside the `<h1>`.** Valid HTML, and the reading order matches the visual order. The alternative — `aria-hidden` over the visible block as in Session 21 — would have hidden a focusable control, which is a trap. The h1's accessible name is the full sentence in an `.sr-only` span and only the decorative words either side are hidden.
+5. **Desktop total CLS is 0.0563** across a full crash scroll (load CLS is 0.0002). Under budget, not zero; the shift happens during the scroll sequence, not at load.
+6. **The hero stops pinning below 1024** (`FLAT_QUERY`), carried over from the 21 rulings.
+7. The compact sketch's smallest type is 13px per this brief, above the site's usual 11px floor.
+
+### 9 · Copy that now reads wrong next to the new hero — candidates only, not changed
+
+1. **`ThreeScenes` / `ThreeDoors` headings** on home immediately after the reel — worth re-reading now that the hero promises a sketch in ten seconds and the reel answers it; the next section starts a third argument.
+2. **`FinalCTA`** still invites a conversation in the abstract; the hero now ends on "Build the real one", so the closer could pick that thread up.
+3. **The `og:description` / `twitter:description`** ("A boutique studio building websites, AI systems, and marketing engines for businesses that expect craft") no longer echo any on-page line.
+
+### 10 · My own errors this session, all found by probe
+
+1. **The reel stage covered the whole hero at opacity 0 from the first frame** — it ate every pointer event (the name field could not be clicked at all) and its four card links sat in the tab order the whole time. Inert until on screen now.
+2. **Scroll-linked opacity went to motion inside the pinned frame**, which is exactly what `lib/useScrollStyle.ts` exists to prevent: the copy faded back IN as you scrolled past it (0.02 at p=0.2, **0.39** at p=0.5, **0.70** at p=0.75). I had read that file's warning in a previous session and still reached for `style={{ opacity }}`.
+3. **The fill target was measured with `getBoundingClientRect` on a window rotated in 3D** — a rect is the axis-aligned box *around* a rotated element, so the scale came out short and the window stopped 62px from the right edge.
+4. **The field's line used `LineReveal`, whose inner span is `inline-block`**, so `width: 100%` resolved against its own content: a 446px input in a 698px column, and a long name clipped instead of stepping down.
+5. **The step-down divided by the padded width**, counting the slab's padding as space the text could use — still 18px over.
+6. **The primary CTA could not be clicked**: the copy layer is `pointer-events: none` with the interactive parts switched back on, but an `a` element selector lost to MagneticCTA's own rule and the anchor computed `none`.
+7. **The field's line box followed its own font size**, so every step-down and every placeholder of a different length moved the page: load CLS 0.0364 at 390.
+8. **The stacked sketch had no definite height**, so the window grew when the generator replaced the static frame.
+9. **The mobile `:root` override was declared before the base `:root`** — same specificity, so source order decided and it lost. `--hero-copy-w` resolved to 152px on a phone and the headline wrapped to six lines.
+10. The editorial preset gave its copy the 0.6fr column and the headline overflowed; the café's URL dropped the accent and read `maplepinecaf.ca`.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -1973,6 +2099,9 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **THE TYPED NAME IS MEMORY ONLY (21b).** `lib/businessName.tsx` is React state at the app root: no localStorage, no sessionStorage, no cookie, no analytics, no network. It dies with the tab. It travels only in a `?notes=` the visitor clicks, and the context is the fallback for a navigation that carries none.
+- **THE HERO SLAB IS A CONTROL NOW (21b).** It is PillHl's box with an `<input>` in it. Anything done to the slab has to keep: the ruler measuring at the UNSCALED size, the step-down fitting the CONTENT box, the line box fixed so the page cannot move under it, and the first frame painted in ink before the surface arrives.
 
 - **A SCREEN'S INTERIOR IS NOT THE PAGE'S PALETTE (21 ruling).** /services' screens carry their own colours wherever they are reused — the navy agent console in the home hero is correct and stays. The 18d rule governs the PAGE: cream/ink chapter rhythm and tokens, with blue/violet confined to `.studio-screen`. A reused screen inside its own window frame is not an extrapolation.
 - **A PINNED HERO MUST FIT 100vh, SO IT ONLY PINS WHERE IT FITS (21 ruling).** A sticky 100vh frame clips. When the hero's composition stacks, it stops pinning — `FLAT_QUERY` is `max-width: 1023px`, the same breakpoint at which the hero stops being two columns. At 1024×768 before this, the headline's first line sat 53px above the viewport.
@@ -2158,6 +2287,16 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **72 · Growing the type is a layout change, not a type change.** *Cause:* raising the hero from 112px to 162px broke two things nowhere near the font declaration — the composition stopped fitting the pinned 100vh frame between 1024 and 1239 (h1 top −53px), and the absolutely positioned SCROLL cue ended up under the primary CTA at 1280×720. *Fix:* both, above. **After a size change, re-measure the things that are positioned against the frame rather than against the text.**
 
+**73 · An invisible full-bleed layer is still a layer.** *Cause:* the hero's reel stage is `inset: 0` at opacity 0 from the first frame of the page. It swallowed every pointer event over the hero — the name field could not be clicked at all — and its four card links sat in the tab order behind an invisible surface. *Fix:* `pointer-events: none` plus `inert` and `aria-hidden` until the scroll actually brings it on screen. **This is the third time this class of bug has shipped here. Opacity 0 is not display none.**
+
+**74 · `getBoundingClientRect` on a 3D-rotated element measures the box AROUND it.** *Cause:* the sketch window is tilted, and the fill scale was computed as `viewport / rect.width`. A rect is the axis-aligned bounding box of the rotated element, which is wider than the element — so the scale came out short and the window stopped 62px from the right edge at full fill. *Fix:* `offsetWidth`/`offsetHeight`, which are layout, not geometry. **Measure the layout box when you are going to scale the layout box.**
+
+**75 · A font that steps down moves everything under it.** *Cause:* the hero field scales its type to fit a long name, and the line box followed the font size — so each step, and each placeholder of a different length, reflowed the page: load CLS 0.0364 at 390. *Fix:* height and line-height from the UNSCALED size, so only the glyphs change. 0.0005 after. **An element that resizes its own text needs a box that does not.**
+
+**76 · Two `:root` blocks, and source order decides.** *Cause:* the mobile `--hero-copy-w` override was written above the base `:root` that set it. Same specificity, later wins, so the phone got the desktop value — a 152px copy column — and the headline wrapped to six lines. *Fix:* the override goes after. **A media query does not outrank anything; it only narrows when a rule applies.**
+
+**77 · A `pointer-events: none` layer needs YOUR classes to switch back on.** *Cause:* the hero's copy layer is inert so the window behind stays hoverable, with `:is(input, a, button)` re-enabled. MagneticCTA sets pointer-events on its own anchor, beat the element selector, and the primary CTA computed `none` — unclickable. *Fix:* re-enable by the hero's own class names. **Do not re-enable with a selector someone else's component can outrank.**
+
 ---
 
 ## 6. DATA FACTS
@@ -2258,6 +2397,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 20 — site-wide.**~~ **DONE** (`342ce75` … `54c6285`). Page transitions, the new footer, home's live door previews and reel hover, the new 404, PillHl home-only.
 - ~~**Session 21 — the home hero.**~~ **DONE** (`edd31d8` … `60b2bab`). The headline speaks to the business, the slab cycles three measured outcomes, the reader can drive it three ways, and /services' real screens run beside it after LCP. Home initial JS +2.92 kB gzip; mobile LCP 600ms.
 - ~~**Session 21 rulings.**~~ **DONE** (`d6da1c7`, `8f02bb1`). Headline 147.9px at 1440 measured to the column; kicker, reel heading and meta description rewritten; navy agent screen kept by ruling; home mobile LCP re-measured honestly at 2000 ms.
+- ~~**Session 21b — the home flagship, reconceived.**~~ **DONE** (`021d6c8` … `ec38108`). The visitor types their business name into the slab and a premium site for it builds itself live in a large tilted window; seven industry presets, a generated monogram, self-scrolling; the scroll fills the screen and hands to the real reel; the name carries to /services and /contact. Home initial JS +1.97 kB gzip, generator 5.19 kB out of band, mobile LCP 2024 ms.
 - **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
 - **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
 
@@ -2267,7 +2407,7 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 
 | Surface | Trajectory |
 |---|---|
-| Home | **2 → 4–5 → 6 → 4–5 (hero, 21 brief) → awaiting** |
+| Home | **2 → 4–5 → 6 → 4–5 (21 brief) → 4 (21 verdict) → awaiting (21b)** |
 | Case studies | **2 → 4–5** |
 | /services | **4** |
 | /about | **4** |
