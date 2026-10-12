@@ -53,7 +53,10 @@ const PROMISE: Record<PillarId, string> = {
 
 /** What the one playable control says, and what it does to `local`. */
 const PLAY: Record<PillarId, { label: string; to: number; from?: number; ms: number }> = {
-  design: { label: "Pick the accent", to: 0.78, from: 0.3, ms: 900 },
+  /* The brand board draws itself across local 0.08 → 0.40, so its RESTING
+     value is 0.45 — at 0 the panel showed an empty sheet. 0.78 crosses
+     the 0.545 the board re-tints at. */
+  design: { label: "Pick the accent", to: 0.78, from: 0.45, ms: 900 },
   automate: { label: "Run agent", to: 1, from: 0, ms: 2400 },
   grow: { label: "Publish update", to: 1, from: 0, ms: 2400 },
 };
@@ -68,9 +71,11 @@ function Panel({
   compact: boolean;
 }) {
   const reduce = !!useReducedMotion();
-  const local = useMotionValue(reduce ? 1 : 0);
-  const [played, setPlayed] = useState(false);
+  /* Each screen rests where its own 'before' state is: the board drawn
+     but un-tinted, the agent not yet run, the pin not yet climbed. */
   const play = PLAY[pillar];
+  const local = useMotionValue(play.from ?? 0);
+  const [played, setPlayed] = useState(false);
 
   function run() {
     setPlayed(true);

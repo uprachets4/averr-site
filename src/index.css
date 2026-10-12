@@ -1269,14 +1269,34 @@ a { color: inherit; text-decoration: none; }
   background: var(--color-ink); transform-origin: top;
   transition: transform 120ms linear;
 }
-.rail-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.rail-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
 .rail-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 4px 6px 4px 0; background: none; border: 0;
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--color-muted);
+  position: relative;
+  display: flex; align-items: center;
+  width: 18px; height: 18px; padding: 0; background: none; border: 0;
+  color: var(--color-muted);
   transition: color 220ms ease, opacity 220ms ease;
   opacity: 0.72;
+}
+/* The labels are an OVERLAY, not part of the rail's width: with them in
+   flow the rail was 150px wide and sat on top of chapter 2's cards. At
+   rest the rail is 34px — inside the page's own gutter — and the names
+   appear when the reader goes looking for them. */
+.rail-label {
+  position: absolute; left: 16px; top: 50%; transform: translate(-4px, -50%);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; white-space: nowrap;
+  padding: 4px 9px; border-radius: 4px;
+  background: var(--color-bg); color: var(--color-ink);
+  box-shadow: 0 2px 14px rgba(20,20,18,0.14);
+  opacity: 0; pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms var(--ease-out-quart);
+}
+.rail:hover .rail-label,
+.rail-item:focus-visible .rail-label { opacity: 1; transform: translate(0, -50%); }
+.rail--dark .rail-label {
+  background: #22231f; color: var(--color-parch);
+  box-shadow: 0 2px 14px rgba(0,0,0,0.5);
 }
 .rail-item:hover { color: var(--color-ink); opacity: 1; }
 .rail-item:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; border-radius: 3px; }
@@ -1295,9 +1315,28 @@ a { color: inherit; text-decoration: none; }
 .rail--dark .rail-item { color: var(--color-muted-l); }
 .rail--dark .rail-item:hover,
 .rail--dark .rail-item--on { color: var(--color-parch); }
+/* the hit target stays 44px even though the dot is 5px */
+.rail-item::before { content: ""; position: absolute; inset: -13px -13px -13px -6px; }
 .rail--dark .rail-item:focus-visible { outline-color: var(--color-parch); }
 
 @media (max-width: 1023px) { .rail { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   .rail-fill, .rail-item, .rail-dot { transition: none; }
+}
+
+/* Session 22 raises home's small-type floor to 13px on a phone. The
+   11px that remains below this is inside the /services screen
+   components the chapters reuse — their own MIN constant, the site's
+   standing floor — and is left alone rather than changed from here. */
+@media (max-width: 1023px) {
+  .nf-hint,
+  .sw-label,
+  .ws-flag,
+  .ws-fig__c,
+  .ws-fig__c--thin,
+  .ws-noshot__text,
+  .st-path__kicker,
+  .st-promise,
+  .fc-credit dt,
+  .sp-cue { font-size: 13px; }
 }
