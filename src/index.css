@@ -986,3 +986,318 @@ a { color: inherit; text-decoration: none; }
   }
 
 }
+
+/* ── Chapter 2: the work, a film strip panned by vertical scroll ───── */
+.ws-wrap { position: relative; height: 420vh; }
+.ws {
+  position: sticky; top: 0; height: 100vh;
+  overflow: hidden;
+  background: var(--color-dark);
+  display: flex; flex-direction: column; justify-content: center; gap: 36px;
+}
+.ws--stacked { position: static; height: auto; padding: 96px 0 104px; }
+.ws-head,
+.ws-cta { padding: 0 var(--gutter); max-width: var(--container-wide); margin: 0 auto; width: 100%; }
+.ws-eyebrow { color: var(--color-muted-l); margin-bottom: 16px; }
+.ws-h2 { color: var(--color-parch); margin: 0; }
+.ws-track { will-change: transform; }
+.ws-row {
+  list-style: none; margin: 0; padding: 0 var(--gutter);
+  display: flex; gap: 28px; align-items: flex-start;
+}
+.ws-row--snap {
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  padding-bottom: 8px;
+}
+.ws-row--snap::-webkit-scrollbar { display: none; }
+.ws-item { flex: 0 0 auto; width: 42vw; scroll-snap-align: start; }
+.ws-row--snap .ws-item { width: 82vw; }
+.ws-item--end { width: 300px; align-self: center; }
+.ws-row--snap .ws-item--end { width: 70vw; }
+.ws-link { display: block; text-decoration: none; color: inherit; border-radius: 16px; }
+.ws-link:focus-visible { outline: 3px solid var(--color-parch); outline-offset: 6px; }
+
+.ws-card { display: block; will-change: transform; }
+.ws-shot {
+  position: relative; border-radius: 14px; overflow: hidden;
+  background: #16181a; aspect-ratio: 16 / 10;
+  box-shadow: 0 40px 90px -46px rgba(0,0,0,0.8);
+}
+.ws-layer { position: absolute; inset: 0; opacity: 0; transition: opacity 760ms var(--ease-out-quart); }
+.ws-layer img { width: 100%; height: 100%; object-fit: cover; }
+.ws-layer--on { opacity: 1; }
+.ws-layer--drift { animation: ws-kb 7s ease-in-out infinite alternate; }
+@keyframes ws-kb {
+  from { transform: scale(1.02) translate3d(0, 0, 0); }
+  to   { transform: scale(1.09) translate3d(-1.5%, -1.5%, 0); }
+}
+.ws-noshot {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  border: 1px dashed rgba(244,240,230,0.22);
+  border-radius: 14px;
+}
+.ws-noshot__mark {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid rgba(244,240,230,0.3);
+}
+.ws-noshot__text { font-family: var(--font-mono); font-size: 13px; color: var(--color-muted-l); }
+.ws-flag {
+  position: absolute; top: 14px; left: 14px;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--color-dark); background: var(--color-parch);
+  padding: 4px 9px; border-radius: 4px;
+}
+.ws-meta { display: flex; flex-direction: column; gap: 8px; padding: 18px 2px 0; }
+.ws-name { font-family: var(--font-display); font-size: 24px; letter-spacing: -0.02em; color: var(--color-parch); }
+.ws-fig { display: flex; flex-direction: column; gap: 3px; }
+.ws-fig__v {
+  font-family: var(--font-display); font-size: 38px; line-height: 1;
+  letter-spacing: -0.03em; color: var(--color-parch);
+}
+.ws-fig__c { font-size: 14px; color: var(--color-muted-l); max-width: 36ch; }
+.ws-fig__c--thin { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.ws-end {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  padding: 30px 26px; border-radius: 14px;
+  border: 1px solid rgba(244,240,230,0.26);
+  color: var(--color-parch); text-decoration: none;
+  transition: background-color 240ms ease, border-color 240ms ease;
+}
+.ws-end:hover { background: rgba(244,240,230,0.07); border-color: rgba(244,240,230,0.5); }
+.ws-end:focus-visible { outline: 3px solid var(--color-parch); outline-offset: 4px; }
+.ws-end__label { font-family: var(--font-display); font-size: 21px; letter-spacing: -0.02em; }
+.ws-end__arrow { font-size: 21px; }
+
+@media (max-width: 1023px) {
+  .ws-name { font-size: 20px; }
+  .ws-fig__v { font-size: 30px; }
+  .ws-row { gap: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ws-layer { transition: none; }
+  .ws-layer--drift { animation: none; }
+}
+
+/* ── Chapter 3: what we do — three playable panels ─────────────────── */
+.sp-wrap { position: relative; height: 340vh; }
+.sp {
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  background: var(--color-bg-alt);
+  display: flex; flex-direction: column; justify-content: center; gap: 22px;
+  padding: 104px 0 36px;
+}
+.sp--stacked { position: static; height: auto; padding: 88px 0 96px; gap: 56px; }
+.sp-head, .sp-tabs, .sp-foot {
+  width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter);
+}
+.sp-eyebrow { color: var(--color-muted); margin-bottom: 12px; }
+.sp-h2 { margin: 0; color: var(--color-ink); }
+.sp-tabs { display: flex; gap: 10px; }
+.sp-tab {
+  padding: 10px 20px; border-radius: 999px;
+  border: 1px solid rgba(20,20,18,0.18);
+  background: transparent; color: var(--color-muted);
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+  min-height: 44px;
+  transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease;
+}
+.sp-tab:hover { color: var(--color-ink); border-color: rgba(20,20,18,0.36); }
+.sp-tab--on { background: var(--color-dark); color: var(--color-parch); border-color: var(--color-dark); }
+.sp-tab:focus-visible { outline: 3px solid var(--color-ink); outline-offset: 3px; }
+
+.sp-stack { position: relative; flex: 1; min-height: 0; }
+.sp-slot { position: absolute; inset: 0; }
+.sp-panel {
+  height: 100%;
+  width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter);
+  display: grid; grid-template-columns: minmax(0, 43fr) minmax(0, 57fr); gap: 40px; align-items: center;
+}
+.sp-name { margin: 0 0 14px; color: var(--color-ink); }
+.sp-promise { margin: 0 0 22px; font-size: 18px; line-height: 1.5; color: var(--color-muted); max-width: 34ch; }
+.sp-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.sp-chip {
+  display: inline-flex; align-items: center; min-height: 44px;
+  padding: 9px 15px; border-radius: 999px;
+  border: 1px solid rgba(20,20,18,0.16);
+  color: var(--color-ink); text-decoration: none; font-size: 14px;
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+.sp-chip:hover { background: var(--color-bg); border-color: rgba(20,20,18,0.4); }
+.sp-chip:focus-visible { outline: 3px solid var(--color-ink); outline-offset: 3px; }
+
+.sp-stage { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.sp-screen {
+  position: relative;
+  width: 100%;
+  /* a DEFINITE height so a lazy screen cannot shift the panel */
+  height: min(54vh, 460px);
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(20,20,18,0.16);
+  background: var(--color-bg);
+  box-shadow: 0 40px 90px -48px rgba(20,20,18,0.45);
+}
+.sp-play { display: flex; align-items: center; gap: 14px; }
+.sp-btn {
+  min-height: 44px; padding: 12px 22px; border-radius: 999px;
+  background: var(--color-dark); color: var(--color-parch);
+  font-size: 15px; font-weight: 500;
+  transition: transform 180ms var(--ease-out-quart);
+}
+.sp-btn:hover { transform: translateY(-1px); }
+.sp-btn:focus-visible { outline: 3px solid var(--color-ink); outline-offset: 3px; }
+.sp-cue {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--color-muted);
+  animation: nf-pulse 2.8s ease-in-out infinite;
+}
+.sp-cue--off { opacity: 0; animation: none; }
+.sp-foot { margin-top: 4px; }
+
+@media (max-width: 1023px) {
+  .sp-panel { grid-template-columns: 1fr; gap: 20px; height: auto; }
+  .sp-screen { height: 320px; }
+  .sp-promise { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sp-cue { animation: none; }
+  .sp-btn { transition: none; }
+}
+
+/* ── Chapter 4: who builds it ──────────────────────────────────────── */
+.fc-wrap { position: relative; background: var(--color-bg); }
+.fc {
+  width: 100%; max-width: var(--container-wide); margin: 0 auto;
+  padding: clamp(96px, 14vh, 150px) var(--gutter);
+  display: grid; grid-template-columns: minmax(0, 38fr) minmax(0, 62fr);
+  gap: clamp(32px, 5vw, 72px); align-items: center;
+}
+.fc-markbox { display: grid; place-items: center; }
+.fc-mark { position: relative; width: 100%; display: grid; place-items: center; will-change: transform; }
+.fc-svg { display: block; width: clamp(150px, 26vh, 320px); height: auto; overflow: visible; }
+.fc-glow {
+  position: absolute; inset: -12%;
+  pointer-events: none; opacity: 0;
+  background: radial-gradient(closest-side, rgba(177,133,68,0.16), transparent 72%);
+}
+.fc-eyebrow { color: var(--color-muted); margin-bottom: 14px; }
+.fc-h2 { margin: 0 0 20px; color: var(--color-ink); max-width: 20ch; }
+.fc-statement {
+  margin: 0 0 26px; font-size: 18px; line-height: 1.55;
+  color: var(--color-muted); max-width: 48ch;
+}
+.fc-credits { margin: 0 0 30px; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.fc-credit {
+  display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px;
+  padding-top: 11px; border-top: 1px solid rgba(20,20,18,0.14);
+}
+.fc-credit dt {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--color-muted);
+}
+.fc-credit dd { margin: 0; font-size: 16px; color: var(--color-ink); }
+
+@media (max-width: 1023px) {
+  .fc { grid-template-columns: 1fr; gap: 32px; padding-top: 80px; padding-bottom: 80px; }
+  .fc-svg { width: clamp(120px, 34vw, 190px); }
+  .fc-statement { font-size: 16px; }
+  .fc-credit { grid-template-columns: 1fr; gap: 3px; }
+}
+
+/* ── Chapter 5: start ──────────────────────────────────────────────── */
+.st { background: var(--color-bg); }
+.st-inner {
+  width: 100%; max-width: var(--container-wide); margin: 0 auto;
+  padding: clamp(92px, 13vh, 140px) var(--gutter) clamp(104px, 15vh, 160px);
+}
+.st-eyebrow { color: var(--color-muted); margin-bottom: 18px; }
+.st-h2 { margin: 0 0 clamp(40px, 6vh, 64px); color: var(--color-ink); max-width: 18ch; }
+.st-slab { display: inline-block; max-width: 100%; }
+.st-paths {
+  list-style: none; margin: 0 0 32px; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px;
+}
+.st-path {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 30px 28px 32px; border-radius: 16px;
+  border: 1px solid rgba(20,20,18,0.16);
+  background: var(--color-bg-alt);
+  text-decoration: none; color: inherit; min-height: 44px;
+  transition: background-color 240ms ease, border-color 240ms ease, transform 240ms var(--ease-out-quart);
+}
+.st-path:hover { background: var(--color-bg); border-color: var(--color-ink); transform: translateY(-2px); }
+.st-path:focus-visible { outline: 3px solid var(--color-ink); outline-offset: 4px; }
+.st-path__kicker {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--color-muted);
+}
+.st-path__label {
+  display: flex; align-items: baseline; gap: 10px;
+  font-family: var(--font-display); font-size: clamp(22px, 2.4vw, 30px);
+  letter-spacing: -0.025em; color: var(--color-ink);
+}
+.st-path__note { font-size: 15px; line-height: 1.5; color: var(--color-muted); max-width: 34ch; }
+.st-promise {
+  margin: 0; font-family: var(--font-mono); font-size: 13px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted);
+}
+@media (prefers-reduced-motion: reduce) { .st-path { transition: none; } }
+
+/* The hero's last frame is the dark Chapter 2 opens on, so the two share
+   one edge instead of meeting at a seam. */
+.hero-veil {
+  position: absolute; inset: 0; z-index: 4;
+  background: var(--color-dark);
+  opacity: 0; pointer-events: none;
+}
+
+/* ── the chapter rail ──────────────────────────────────────────────── */
+.rail {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+  z-index: 40;
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 0 0 clamp(14px, 1.6vw, 26px);
+}
+.rail-track {
+  position: relative; width: 2px; height: clamp(170px, 24vh, 240px);
+  background: rgba(20,20,18,0.14); border-radius: 2px; overflow: hidden;
+}
+.rail-fill {
+  position: absolute; inset: 0;
+  background: var(--color-ink); transform-origin: top;
+  transition: transform 120ms linear;
+}
+.rail-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.rail-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 4px 6px 4px 0; background: none; border: 0;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--color-muted);
+  transition: color 220ms ease, opacity 220ms ease;
+  opacity: 0.72;
+}
+.rail-item:hover { color: var(--color-ink); opacity: 1; }
+.rail-item:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; border-radius: 3px; }
+.rail-item--on { color: var(--color-ink); opacity: 1; }
+.rail-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: currentColor; opacity: 0.4;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.rail-item--on .rail-dot { opacity: 1; transform: scale(1.5); }
+
+/* On a dark chapter the rail inverts. Parch on #141412 is 14.6:1 and the
+   dimmed state is still above 4.5:1. */
+.rail--dark .rail-track { background: rgba(244,240,230,0.22); }
+.rail--dark .rail-fill { background: var(--color-parch); }
+.rail--dark .rail-item { color: var(--color-muted-l); }
+.rail--dark .rail-item:hover,
+.rail--dark .rail-item--on { color: var(--color-parch); }
+.rail--dark .rail-item:focus-visible { outline-color: var(--color-parch); }
+
+@media (max-width: 1023px) { .rail { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .rail-fill, .rail-item, .rail-dot { transition: none; }
+}

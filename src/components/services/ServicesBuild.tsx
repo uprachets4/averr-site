@@ -19,8 +19,7 @@ import {
   PILLAR_TIMELINE,
   ILLUSTRATIVE_LABEL,
   type PillarId,
-  type Service,
-} from "../../data/servicePillars";
+  type Service, SERVICE_BEATS } from "../../data/servicePillars";
 import WindowChrome from "./build/WindowChrome";
 import GhostCursor from "./build/GhostCursor";
 import { useFocus } from "./build/camera";
@@ -215,11 +214,16 @@ export default function ServicesBuild() {
   useEffect(
     function jumpToHash() {
       const id = hash.replace("#", "");
+      /* Pillar anchors land on that chapter's first beat; a SERVICE
+         anchor lands on its own beat. Home's "what we do" chapter links
+         every one of the sixteen chips to /services#{service-slug}, and
+         the slug and the beat come from the same name. */
       const first: Record<string, number> = {
         design: 0,
         automate: DESIGN_COUNT,
         grow: DESIGN_COUNT + AUTOMATE_COUNT,
       };
+      for (const [slug, beat] of Object.entries(SERVICE_BEATS)) first[slug] = beat.index;
       if (!(id in first) || !pinned) return;
 
       let cancelled = false;

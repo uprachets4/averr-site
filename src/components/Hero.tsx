@@ -6,17 +6,13 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
-  type MotionValue,
 } from "motion/react";
 import { duration, ease, easing, spring } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
 import LineReveal from "./LineReveal";
 import TorontoClock from "./TorontoClock";
-import Chapter from "./Chapter";
 import { useSetNavDarkOverride } from "../lib/navTone";
 import { useScrollStyle } from "../lib/useScrollStyle";
-import HeroReelStatic, { ReelCardTile, ReelCTA, ReelHeading } from "./HeroReel";
-import { reelCards } from "../data/heroReel";
 import { useBusinessName } from "../lib/businessName";
 import NameField from "./home/NameField";
 import SketchWindow from "./home/SketchWindow";
@@ -322,9 +318,11 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
   const copyFade = useTransform(scrollYProgress, [0.02, 0.18], [1, 0]);
   const copyRef2 = useScrollStyle<HTMLDivElement>(copyFade);
   const copyY = useTransform(scrollYProgress, [0.02, 0.18], [0, -40]);
-  /** A beat at full screen, then the dissolve. */
-  const reelIn = useTransform(scrollYProgress, [0.56, 0.7], [0, 1]);
-  const sketchFade = useTransform(scrollYProgress, [0.56, 0.68], [1, 0]);
+  /** A beat at full screen, then the sketch dissolves into the dark that
+   *  Chapter 2 opens on, so the two chapters share one edge. */
+  const veilIn = useTransform(scrollYProgress, [0.62, 0.88], [0, 1]);
+  const veilRef = useScrollStyle<HTMLDivElement>(veilIn);
+  const sketchFade = useTransform(scrollYProgress, [0.66, 0.9], [1, 0]);
   const sketchRef = useScrollStyle<HTMLDivElement>(sketchFade);
 
   /* the nav goes dark once the reel is what is behind it */
@@ -335,11 +333,9 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
      the hero — the name field could not be clicked — and its four card
      links sat in the tab order the whole time. It is inert until it is
      actually on screen. */
-  const [reelLive, setReelLive] = useState(false);
   const frameInView = useInView(frameRef);
-  useMotionValueEvent(reelIn, "change", function onReel(v) {
+  useMotionValueEvent(veilIn, "change", function onVeil(v) {
     setDark(v > 0.5);
-    setReelLive(v > 0.02);
   });
   useEffect(
     function publishNavTone() {
@@ -408,7 +404,7 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
   }, []);
 
   return (
-    <div ref={wrapperRef} style={{ position: "relative", height: "400vh" }}>
+    <div ref={wrapperRef} style={{ position: "relative", height: "320vh" }}>
       <div ref={frameRef} className="hero-frame">
         <HeroGround />
 
@@ -422,8 +418,8 @@ function PinnedHero({ skip, film }: { skip: boolean; film: Film }) {
 
         <ScrollCue skip={skip} hidden={engaged || !cueFits} film={film} />
 
-        {/* the real work, revealed under the dissolving sketch */}
-        <ReelStage progress={scrollYProgress} reelIn={reelIn} live={reelLive} />
+        {/* the hand-over: the hero closes on the dark Chapter 2 opens on */}
+        <div ref={veilRef as React.Ref<HTMLDivElement>} className="hero-veil" aria-hidden />
       </div>
     </div>
   );
@@ -443,89 +439,7 @@ function FlatHero({ skip, film }: { skip: boolean; film: Film }) {
         </div>
       </section>
 
-      <Chapter tone="dark" from="cream">
-        <HeroReelStatic />
-      </Chapter>
     </>
-  );
-}
-
-/* ── the reel inside the pinned frame ──────────────────────────────── */
-
-function useScrollOpacity(progress: MotionValue<number>, from: number, to: number, fadeOut = false) {
-  const opacity = useTransform(progress, [from, to], fadeOut ? [1, 0] : [0, 1]);
-  return useScrollStyle<HTMLElement>(opacity);
-}
-
-function ReelStage({
-  progress,
-  reelIn,
-  live,
-}: {
-  progress: MotionValue<number>;
-  reelIn: MotionValue<number>;
-  live: boolean;
-}) {
-  const rowRef = useRef<HTMLUListElement | null>(null);
-  const [overflow, setOverflow] = useState(0);
-
-  useLayoutEffect(function measureRow() {
-    function run() {
-      const row = rowRef.current;
-      if (!row) return;
-      setOverflow(Math.max(0, row.scrollWidth - row.clientWidth));
-    }
-    run();
-    const ro = new ResizeObserver(run);
-    if (rowRef.current) ro.observe(rowRef.current);
-    window.addEventListener("resize", run);
-    return function off() {
-      ro.disconnect();
-      window.removeEventListener("resize", run);
-    };
-  }, []);
-
-  const x = useTransform(progress, [0.72, 0.98], [0, -overflow]);
-  const headingY = useTransform(progress, [0.6, 0.74], [26, 0]);
-  const headRef = useScrollOpacity(progress, 0.6, 0.72);
-  const stageRef = useScrollStyle<HTMLDivElement>(reelIn);
-  const ctaRef = useScrollOpacity(progress, 0.78, 0.88);
-
-  return (
-    <motion.div
-      ref={stageRef as React.Ref<HTMLDivElement>}
-      className="hero-reel-stage"
-      style={{ pointerEvents: live ? "auto" : "none" }}
-      aria-hidden={!live}
-      inert={!live}
-    >
-      <motion.div ref={headRef as React.Ref<HTMLDivElement>} className="hero-reel-head" style={{ y: headingY }}>
-        <ReelHeading />
-      </motion.div>
-
-      <motion.ul ref={rowRef} className="hero-reel-row reel-row" style={{ x }}>
-        {reelCards.map(function card(c) {
-          return (
-            <li key={c.slug}>
-              <ReelCardTile card={c} width="38vw" />
-            </li>
-          );
-        })}
-        <li aria-hidden style={{ flex: "0 0 var(--gutter)" }} />
-        <style>{`
-          .reel-row :global(.reel-card) { transition: opacity ${duration.base}s ease; }
-          .reel-row:has(.reel-card:hover) .reel-card:not(:hover),
-          .reel-row:has(.reel-card:focus-visible) .reel-card:not(:focus-visible) { opacity: 0.7; }
-          @media (prefers-reduced-motion: reduce) {
-            .reel-row :global(.reel-card) { transition: none; }
-          }
-        `}</style>
-      </motion.ul>
-
-      <div ref={ctaRef as React.Ref<HTMLDivElement>} className="hero-reel-cta">
-        <ReelCTA />
-      </div>
-    </motion.div>
   );
 }
 

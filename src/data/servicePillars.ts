@@ -218,3 +218,35 @@ export const GROW_METRICS: GrowMetric[] = [
 
 /** The label every illustrative figure carries. */
 export const ILLUSTRATIVE_LABEL = "Illustrative";
+
+/* ── deep links ───────────────────────────────────────────────────── */
+
+/**
+ * A URL-safe id for a service, derived from its name.
+ *
+ * Home's "what we do" chapter links each service chip to
+ * `/services#{slug}`, and the build stage resolves the slug to that
+ * service's beat. Derived rather than hand-written so a renamed service
+ * cannot leave a stale anchor behind — the link and the beat come from
+ * the same string.
+ */
+export function serviceSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/** slug → { pillar, index within the full 16-beat order }. */
+export const SERVICE_BEATS: Record<string, { pillar: PillarId; index: number }> = (function build() {
+  const out: Record<string, { pillar: PillarId; index: number }> = {};
+  let i = 0;
+  (["design", "automate", "grow"] as PillarId[]).forEach(function pillar(p) {
+    PILLAR_SERVICES[p].forEach(function service(s) {
+      out[serviceSlug(s.name)] = { pillar: p, index: i };
+      i += 1;
+    });
+  });
+  return out;
+})();
