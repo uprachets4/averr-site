@@ -1217,3 +1217,18 @@ a { color: inherit; text-decoration: none; }
   );
 }
 @media (prefers-reduced-motion: reduce) { .hf-plane .hf-sheen { display: none; } }
+
+/* The label opens away from whichever edge it would otherwise cross. */
+.hf-label { max-width: 260px; }
+.hf-label--left { left: auto; right: 0; align-items: flex-end; text-align: right; }
+.hf-label--above { top: auto; bottom: calc(100% + 9px); }
+
+/* One label for the whole field, outside the 3D scene so it can be
+   clamped to the frame. Per-plane labels could not be: `right: 0`
+   inside a plane that is itself past the viewport is still past it. */
+.hf-tip {
+  position: absolute; z-index: 6;
+  width: 260px;
+  display: flex; flex-direction: column; gap: 3px;
+  pointer-events: none;
+}

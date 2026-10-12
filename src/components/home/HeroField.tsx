@@ -58,6 +58,9 @@ const SCREENS = { site: Site, brand: Brand, agent: Agent, map: Map } as const;
  *  each call and would remount every plane on every render. */
 const MotionLink = motion.create(RouterLink);
 
+/** What the one shared label shows. */
+type Tip = { name: string; figure?: { value: string; caption: string } };
+
 /** Must match `perspective` and `perspective-origin` in the stylesheet. */
 const PERSPECTIVE = 1400;
 const ORIGIN_X = 50;
@@ -88,7 +91,7 @@ function PlaneBox({
   active: boolean;
   dimmed: boolean;
   live: boolean;
-  onEnter: () => void;
+  onEnter: (rect: DOMRect | null, info: Tip) => void;
   onLeave: () => void;
   localValue: MotionValue<number>;
   dolly: MotionValue<number>;
@@ -97,6 +100,7 @@ function PlaneBox({
   const figure = figureFor(p.slug);
   const client = clientFor(p.slug);
   const Screen = p.screen ? SCREENS[p.screen] : null;
+  const boxRef = useRef<HTMLAnchorElement | null>(null);
 
   /* depth decides how much of the dark it keeps */
   /* The falloff had the middle of the room at 0.62, which read as murk
@@ -153,14 +157,6 @@ function PlaneBox({
         )}
       </span>
       <motion.span className="hf-sheen" aria-hidden style={{ opacity: rim }} />
-      <span className={active ? "hf-label hf-label--on" : "hf-label"}>
-        <span className="hf-label__name">{client ?? p.label}</span>
-        {figure ? (
-          <span className="hf-label__fig">
-            <b>{figure.value}</b> {figure.caption}
-          </span>
-        ) : null}
-      </span>
     </>
   );
 
@@ -185,15 +181,23 @@ function PlaneBox({
   const cls = `hf-plane${active ? " hf-plane--on" : ""}`;
   const motionStyle = { ...style, opacity: lit };
 
+  function enter() {
+    onEnter(boxRef.current?.getBoundingClientRect() ?? null, {
+      name: client ?? p.label,
+      figure,
+    });
+  }
+
   if (p.slug) {
     return (
       <MotionLink
+        ref={boxRef}
         to={`/work/${p.slug}`}
         className={cls}
         style={motionStyle}
-        onMouseEnter={onEnter}
+        onMouseEnter={enter}
         onMouseLeave={onLeave}
-        onFocus={onEnter}
+        onFocus={enter}
         onBlur={onLeave}
         aria-label={`${client ?? p.label} — open the case study`}
       >
@@ -203,12 +207,13 @@ function PlaneBox({
   }
   return (
     <MotionLink
+      ref={boxRef}
       to="/services"
       className={cls}
       style={motionStyle}
-      onMouseEnter={onEnter}
+      onMouseEnter={enter}
       onMouseLeave={onLeave}
-      onFocus={onEnter}
+      onFocus={enter}
       onBlur={onLeave}
       aria-label={`${p.label} — see the services`}
     >
@@ -228,6 +233,12 @@ export default function HeroField({
   const reduce = !!useReducedMotion();
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [hover, setHover] = useState<string | null>(null);
+  /* ONE label, rendered outside the 3D scene and clamped to the frame.
+     Per-plane labels could not be kept on screen: `right: 0` inside a
+     plane whose own right edge is past the viewport is still past the
+     viewport, and a px nudge inside a 3D-transformed parent is itself
+     transformed. Six of sixteen clipped at 1280 and two at 1920. */
+  const [tip, setTip] = useState<{ x: number; y: number; info: Tip } | null>(null);
   const [live, setLive] = useState(false);
   const [narrow, setNarrow] = useState(false);
 
@@ -351,18 +362,42 @@ export default function HeroField({
               active={hover === p.id}
               dimmed={hover !== null && hover !== p.id}
               localValue={localValue}
-              onEnter={function enter() {
+              onEnter={function enter(rect, info) {
                 setHover(p.id);
+                const host = hostRef.current?.getBoundingClientRect();
+                if (!rect || !host) return;
+                const W = 260;
+                const H = 64;
+                setTip({
+                  x: Math.min(Math.max(rect.left - host.left, 12), host.width - W - 12),
+                  y: Math.min(Math.max(rect.bottom - host.top + 10, 12), host.height - H - 12),
+                  info,
+                });
               }}
               onLeave={function leave() {
                 setHover(function clear(cur: string | null) {
-                  return cur === p.id ? null : cur;
+                  if (cur === p.id) {
+                    setTip(null);
+                    return null;
+                  }
+                  return cur;
                 });
               }}
             />
           );
         })}
       </motion.div>
+
+      {tip ? (
+        <span className="hf-tip" style={{ left: tip.x, top: tip.y }}>
+          <span className="hf-label__name">{tip.info.name}</span>
+          {tip.info.figure ? (
+            <span className="hf-label__fig">
+              <b>{tip.info.figure.value}</b> {tip.info.figure.caption}
+            </span>
+          ) : null}
+        </span>
+      ) : null}
     </div>
   );
 }
