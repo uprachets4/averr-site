@@ -1929,30 +1929,45 @@ a { color: inherit; text-decoration: none; }
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(12px, 1.6vw, 22px);
 }
-.pt { min-width: 0; }
-.pt-link {
-  display: flex; flex-direction: column; gap: 10px;
-  height: 100%; padding: 18px 20px 16px;
+.pt { min-width: 0; display: flex; flex-direction: column;
   border: 1px solid rgba(var(--chapter-rgb, 237,233,226), 0.22);
-  border-radius: 12px;
+  border-radius: 12px; overflow: hidden;
   /* the tiles sit IN the chapter's light rather than on a grey card */
   background: linear-gradient(
     180deg,
     rgba(var(--chapter-rgb, 237,233,226), 0.10),
     rgba(var(--chapter-rgb, 237,233,226), 0.03)
   );
-  text-decoration: none;
   transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
 }
-.pt-link:hover,
-.pt-link:focus-visible {
-  border-color: rgba(var(--chapter-rgb, 237,233,226), 0.5);
-  background: linear-gradient(
-    180deg,
-    rgba(var(--chapter-rgb, 237,233,226), 0.18),
-    rgba(var(--chapter-rgb, 237,233,226), 0.06)
-  );
-  transform: translateY(-2px);
+.pt:hover, .pt:focus-within { transform: translateY(-2px); }
+/* the tile body: brings this product to the front of the stack */
+.pt-swap {
+  flex: 1 1 auto;
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 18px 20px 14px;
+  background: none; border: 0; border-radius: 12px 12px 0 0;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
+.pt-swap:focus-visible { outline: 2px solid var(--color-parch); outline-offset: -3px; }
+.pt-cap {
+  margin-top: auto;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(237,233,226,0.6);
+}
+/* its own control, so the tap that swaps is never the tap that leaves */
+.pt-open {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 10px 20px;
+  border-top: 1px solid rgba(var(--chapter-rgb, 237,233,226), 0.18);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(237,233,226,0.72);
+  text-decoration: none;
+  transition: color 0.3s ease, background 0.3s ease;
+}
+.pt-open:hover, .pt-open:focus-visible {
+  color: var(--color-parch);
+  background: rgba(var(--chapter-rgb, 237,233,226), 0.12);
 }
 .pt-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .pt-name {
@@ -1975,13 +1990,20 @@ a { color: inherit; text-decoration: none; }
   color: rgba(237,233,226,0.56);
 }
 .pt-line { font-size: 14px; line-height: 1.5; color: rgba(237,233,226,0.78); }
-.pt-go {
-  margin-top: auto; display: flex; align-items: baseline; gap: 8px;
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
-  text-transform: uppercase; color: rgba(237,233,226,0.6);
-}
 .pt-arrow { margin-left: auto; color: var(--color-parch); }
 @media (max-width: 860px) {
   .pt-row { grid-template-columns: 1fr; }
   .ob-pstack__card { width: 94%; margin: -30% 0 0 -47%; }
+}
+
+/* The tile whose product is at the front of the stack. The ring is the
+   same chapter light the tiles already sit in, turned up — not a new
+   colour — so the active state reads as "this one is lit". */
+.pt--on {
+  border-color: rgba(var(--chapter-rgb, 237,233,226), 0.62);
+  background: linear-gradient(
+    180deg,
+    rgba(var(--chapter-rgb, 237,233,226), 0.2),
+    rgba(var(--chapter-rgb, 237,233,226), 0.07)
+  );
 }

@@ -1,4 +1,6 @@
-import { motion, useTransform, type MotionValue } from "motion/react";
+import { useEffect } from "react";
+import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from "motion/react";
+import { spring } from "../../lib/motion";
 import Screenshot from "../Screenshot";
 
 /**
@@ -155,24 +157,32 @@ function Pin({ pin, i, assemble }: { pin: { x: number; y: number; h: number }; i
 
 /* ── Ch3 · three real products, stacked in depth ───────────────────── */
 
-/** The three product captures, nearest first. Each is a real screen
- *  through the WebP pipeline — the masked-band "exploded" treatment it
- *  replaces was one capture cut into five strips, which read as muddy
- *  overlapping panels rather than as three products we built. */
-const PRODUCTS: Array<{ src: string; name: string }> = [
-  { src: "/work/capitalcommand/01-overview.jpg", name: "CapitalCommand" },
-  { src: "/work/sift/01-command-overview.jpg", name: "SIFT" },
-  { src: "/work/cadencestack/01-command-center.jpg", name: "CadenceStack" },
+/** The three product captures. Each is a real screen through the WebP
+ *  pipeline — the masked-band "exploded" treatment it replaces was one
+ *  capture cut into five strips, which read as muddy overlapping panels
+ *  rather than as three products we built. */
+export const PRODUCTS: Array<{ slug: string; src: string; name: string }> = [
+  { slug: "capitalcommand", src: "/work/capitalcommand/01-overview.jpg", name: "CapitalCommand" },
+  { slug: "sift", src: "/work/sift/01-command-overview.jpg", name: "SIFT" },
+  { slug: "cadencestack", src: "/work/cadencestack/01-command-center.jpg", name: "CadenceStack" },
 ];
 
-export function ProductStack({ assemble, tiltX, tiltY }: P) {
+export function ProductStack({
+  assemble,
+  tiltX,
+  tiltY,
+  front,
+  reduce,
+}: P & { front: number; reduce: boolean }) {
   return (
     <motion.div
       className="ob ob-pstack"
       style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 1500 }}
     >
       {PRODUCTS.map(function card(p, i) {
-        return <ProductCard key={p.name} p={p} i={i} assemble={assemble} />;
+        return (
+          <ProductCard key={p.name} p={p} i={i} assemble={assemble} front={front} reduce={reduce} />
+        );
       })}
     </motion.div>
   );
@@ -182,27 +192,49 @@ function ProductCard({
   p,
   i,
   assemble,
+  front,
+  reduce,
 }: {
   p: { src: string; name: string };
   i: number;
   assemble: MotionValue<number>;
+  front: number;
+  reduce: boolean;
 }) {
-  /* They arrive STACKED and slide apart as the chapter is read. The
-     spread goes backward in z and leftward in x for the same reason the
-     bands did: a plane pushed toward the camera is scaled up by the
-     perspective and spills into the text column. Going away it shrinks,
-     stays in its own column, and the stack reads as depth. */
-  /* The offsets are what make it read as THREE products rather than
-     one: at (-46, +58) the front plate simply covered the other two and
-     the object looked like a single screenshot. Each card has to clear
-     the one in front of it by more than its own chrome bar. */
-  /* The cascade goes UP and left. Downward, each card behind put its
-     own chrome bar underneath the plate in front of it, so only the
-     front product was ever named — the thing the chrome is there to do
-     did not happen. Rising, every title bar clears the one in front. */
-  const z = useTransform(assemble, [0.05, 0.7], [i * -20, i * -210]);
-  const x = useTransform(assemble, [0.05, 0.7], [i * -7, i * -78]);
-  const y = useTransform(assemble, [0.05, 0.7], [i * -8, i * -84]);
+  /* A card's place in the stack is its RANK FROM THE FRONT, not its
+     index, so the three can take turns without the composition moving:
+     rank 0 is the readable one, rank 2 is furthest back. Springing the
+     RANK ITSELF — rather than animating each offset — is what makes a
+     swap read as one plate sliding back while another rises, and it
+     stays transforms only: no layout, no repaint. */
+  const rank = (i - front + PRODUCTS.length) % PRODUCTS.length;
+  const raw = useMotionValue(rank);
+  useEffect(
+    function follow() {
+      raw.set(rank);
+    },
+    [rank, raw]
+  );
+  const sprung = useSpring(raw, spring.soft);
+  /* Reduced motion swaps instantly: the spring is bypassed, not sped up. */
+  const r = reduce ? raw : sprung;
+
+  /* The spread is the chapter's own scroll: they arrive stacked and
+     open as it is read. The cascade goes UP and left so every title bar
+     clears the one in front of it, and BACKWARD in z because a plane
+     pushed toward the camera is scaled up by the perspective and spills
+     into the text column. */
+  const spread = useTransform(assemble, [0.05, 0.7], [0.1, 1]);
+  const pair = [r, spread] as MotionValue<number>[];
+  const z = useTransform(pair, function zz([rv, sv]: number[]) {
+    return rv * -210 * sv;
+  });
+  const x = useTransform(pair, function xx([rv, sv]: number[]) {
+    return rv * -78 * sv;
+  });
+  const y = useTransform(pair, function yy([rv, sv]: number[]) {
+    return rv * -84 * sv;
+  });
   const nameOpacity = useTransform(assemble, [0.18, 0.4], [0, 1]);
 
   return (
