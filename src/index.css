@@ -103,6 +103,46 @@
   /* On-dark secondary text. AA against --color-dark (#141412) at 5.45:1. */
   --color-muted-l:    #918B80;
 
+  /* ══ Session 27 — THE NOLANA SYSTEM ════════════════════════════════
+     Owner direction, superseding the dark-ground + chapter-light
+     palette for home. Light dominates; navy and black are reserved for
+     cinematic moments. The other pages migrate later, so the older
+     tokens above stay until they do.
+
+     MEASURED, NOT ASSUMED: --ink-2 as given (#898997) is 3.15:1 on the
+     light ground, which fails AA for normal text. It is kept at the
+     measured value for LARGE display continuations only, where the
+     threshold is 3:1, and --ink-2 itself is darkened minimally to
+     #6E6E80 (4.56:1) so anything body-sized is safe by default. */
+  --bg:            #F5F4F9;
+  --bg-alt:        #EFEEF5;
+  --hair:          #D4D4DA;   /* hairline rules — decorative, not text */
+  --hair-strong:   #DADAE0;
+  --n-ink:         #0F1117;   /* 17.24:1 on --bg */
+  --ink-2:         #6E6E80;   /* 4.56:1 on --bg — the safe grey */
+  --ink-2-display: #898997;   /* 3.15:1 — the measured grey, >= 24px only */
+
+  /* the cinematic darks */
+  --navy-1:        #121C27;
+  --navy-2:        #182633;
+  --navy-3:        #232837;
+  --black:         #080A0A;
+  --foot-1:        #10141D;
+  --foot-2:        #252C39;
+
+  /* glass panels */
+  --glass-1:       #13181F;
+  --glass-2:       #151C25;
+  --glass-fill:    rgba(57, 64, 83, 0.38);
+  --glass-edge:    rgba(255, 255, 255, 0.08);
+
+  /* the one gradient, applied PER ELEMENT */
+  --grad: linear-gradient(90deg, #F9AF97 0%, #D5818C 22%, #9874E8 52%, #708DF8 78%, #569AFA 100%);
+  --glow-lav:      #A6B3EB;
+  --glow-lav-2:    #AF9EE0;
+  --glow-peach:    #F9AF97;
+  --mesh-teal:     #55848E;
+
   /* ── Session 26: ONE foreground accent set ──────────────────────────
      Everything in the FOREGROUND is parch or this single warm accent at
      a controlled strength. The chapter hues stay where they belong —
