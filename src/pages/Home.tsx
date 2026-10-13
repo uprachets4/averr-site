@@ -77,8 +77,8 @@ export default function Home() {
       </section>
 
       <section id="ch-products" data-tone="dark">
-        <LazyBelowFold load={loadProducts} minHeight="320vh" minHeightSm="93vh" background="transparent">
-          <Suspense fallback={<Reserve h="320vh" sm="93vh" />}>
+        <LazyBelowFold load={loadProducts} minHeight="320vh" minHeightSm="159vh" background="transparent">
+          <Suspense fallback={<Reserve h="320vh" sm="159vh" />}>
             <ProductsChapter />
           </Suspense>
         </LazyBelowFold>
