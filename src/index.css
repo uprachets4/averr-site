@@ -2384,3 +2384,96 @@ a { color: inherit; text-decoration: none; }
   .pc--pin:hover .pc-pin__ring, .pc--cursor:hover .pc-cursor__arrow,
   .pc--cursor:hover .pc-cursor__ring { animation: none; }
 }
+
+/* ── Session 26: the hero's room, made of pieces ──────────────────── */
+.pf {
+  position: absolute; inset: 0;
+  perspective: 1400px; perspective-origin: 50% 46%;
+  pointer-events: none;
+}
+.pf-scene {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.pf[data-breathing="on"] .pf-scene { animation: pf-breathe 40s ease-in-out infinite; }
+@keyframes pf-breathe {
+  0%, 100% { rotate: y 0deg; }
+  50%      { rotate: y 1.5deg; }
+}
+.pf-slot {
+  position: absolute;
+  transform: translate(-50%, -50%) translateZ(var(--pf-z)) rotateY(var(--pf-yaw));
+  transform-style: preserve-3d;
+  pointer-events: auto;
+  /* `translate` is its own property, so the drift does not fight the
+     transform above */
+  animation: pf-drift var(--pf-period, 22s) ease-in-out infinite;
+}
+.pf-gather { transform-style: preserve-3d; will-change: transform, opacity; }
+@keyframes pf-drift {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 calc(var(--pf-drift, 4px) * -1); }
+}
+/* the hover pull-forward the owner called the standard */
+.pf-slot .pc { transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease; }
+.pf-slot:hover { z-index: 3; }
+.pf--still .pf-gather { animation: none; }
+.pf-slot:hover .pc,
+.pf-slot .pc:focus-visible {
+  transform: translateZ(70px) scale(1.06);
+}
+.pf--still .pf-scene { animation: none; }
+.pf--still .pf-slot { animation: none; }
+@media (max-width: 1023px) {
+  .pf-slot { animation-duration: calc(var(--pf-period, 22s) * 1.4); }
+}
+
+/* ── Session 26: the hero types itself ────────────────────────────── */
+/* The LINE IS PRESENT AND LAID OUT AT FRAME ONE at 0.12, so the LCP
+   element paints immediately and the entrance cannot move it. Each
+   character then inks with a 2px rise on its own delay. */
+.hx-typed { position: relative; display: inline-block; white-space: pre; }
+.hx-ch {
+  display: inline-block;
+  opacity: 0.12;
+  translate: 0 2px;
+  animation: hx-ink 220ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--start, 0s) + var(--i) * 32ms + var(--j, 0ms));
+}
+@keyframes hx-ink { to { opacity: 1; translate: 0 0; } }
+.hx-caret {
+  position: absolute; top: 0.1em; left: 0;
+  width: 2px; height: 0.78em;
+  background: var(--color-parch);
+  opacity: 0;
+  animation:
+    hx-caret-run calc(var(--n) * 32ms) steps(var(--n)) var(--start, 0s) forwards,
+    hx-caret-on 1ms linear var(--start, 0s) forwards,
+    hx-caret-off 1ms linear calc(var(--start, 0s) + var(--n) * 32ms + 90ms) forwards;
+}
+@keyframes hx-caret-run { to { left: 100%; } }
+@keyframes hx-caret-on { to { opacity: 1; } }
+@keyframes hx-caret-off { to { opacity: 0; } }
+.hx-typed--instant { display: inline-block; }
+
+/* the slab SLAMS in once the two lines have typed */
+.hx-slam .pill-hl {
+  animation: hx-slam 420ms cubic-bezier(0.34, 1.56, 0.64, 1) 0.95s both;
+}
+@keyframes hx-slam {
+  0%   { transform: scale(1.12); opacity: 0; }
+  55%  { opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.hx-slam .pill-hl__slab { animation: hx-slab-pulse 520ms ease-out 1.05s both; }
+@keyframes hx-slab-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(237,233,226,0.5); }
+  100% { box-shadow: 0 18px 44px -26px rgba(0,0,0,0.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-ch { opacity: 1; translate: none; animation: none; }
+  .hx-caret { display: none; }
+  .hx-slam .pill-hl, .hx-slam .pill-hl__slab { animation: none; }
+}

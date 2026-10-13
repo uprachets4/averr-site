@@ -8,15 +8,13 @@ import {
   useScroll,
   useTransform,
 } from "motion/react";
-import { duration, ease, easing, spring } from "../lib/motion";
+import { duration, ease, spring } from "../lib/motion";
 import MagneticCTA from "./MagneticCTA";
-import LineReveal from "./LineReveal";
 import PillHl from "./PillHl";
 import TorontoClock from "./TorontoClock";
 import { useSetNavDarkOverride } from "../lib/navTone";
-import { useScrollProp, useScrollStyle } from "../lib/useScrollStyle";
-import HeroField from "./home/HeroField";
-import Screenshot from "./Screenshot";
+import { useScrollStyle } from "../lib/useScrollStyle";
+import PieceField from "./home/PieceField";
 
 /**
  * The home hero.
@@ -44,12 +42,6 @@ const SUBLINE =
   "Websites, web apps and SaaS products, AI automation and marketing for businesses across the GTA. One studio, start to finish.";
 const KICKER =
   "We design premium websites, build AI automations, and run the marketing engines that grow businesses like yours across the GTA.";
-
-/** The plane the fly-through lands on — its real capture, full bleed.
- *  The dark finance dashboard, not the renovation site: it is the
- *  strongest frame in the set and it keeps the hero on its own ground
- *  instead of handing a cream page to a cream chapter. */
-const LANDING = "/work/capitalcommand/01-overview.jpg";
 
 const T = {
   topRow: 0.2,
@@ -121,6 +113,56 @@ function useScrolledEarly() {
 
 /* ── the copy block ────────────────────────────────────────────────── */
 
+/** Deterministic ±8ms jitter, so the typing is not metronomic and the
+ *  same character always lands at the same time between renders. */
+function jitter(i: number) {
+  return (((i * 2654435761) % 17) - 8) | 0;
+}
+
+/**
+ * A headline line that types itself.
+ *
+ * THE WHOLE LINE PAINTS AT FRAME ONE at 0.12 — the LCP element is the
+ * text, present and laid out from the first paint, so the entrance
+ * cannot move LCP. Each character then inks 0.12 → 1 with a 2px rise on
+ * its own delay, and a parch caret steps along the line.
+ *
+ * It is all CSS: one class per character and an `--i`, rather than
+ * twenty-six motion values per line.
+ */
+function TypedLine({
+  text,
+  start,
+  instant,
+}: {
+  text: string;
+  /** Seconds before this line starts typing. */
+  start: number;
+  instant: boolean;
+}) {
+  const chars = Array.from(text);
+  if (instant) return <span className="hx-typed hx-typed--instant">{text}</span>;
+  return (
+    <span
+      className="hx-typed"
+      style={{ "--n": chars.length, "--start": `${start}s` } as React.CSSProperties}
+    >
+      {chars.map(function ch(c, i) {
+        return (
+          <span
+            key={i}
+            className="hx-ch"
+            style={{ "--i": i, "--j": `${jitter(i)}ms` } as React.CSSProperties}
+          >
+            {c === " " ? "\u00A0" : c}
+          </span>
+        );
+      })}
+      <span className="hx-caret" aria-hidden />
+    </span>
+  );
+}
+
 function HeroCopy({ skip }: { skip: boolean }) {
   const reduce = useReducedMotion();
   const instant = reduce || skip;
@@ -155,17 +197,15 @@ function HeroCopy({ skip }: { skip: boolean }) {
         <span className="sr-only">{H1_SENTENCE}</span>
         <span aria-hidden="true">
           <span className="type-hero hx-line hx-line--a">
-            <LineReveal paint delay={d(T.lead)}>{LEAD_A}</LineReveal>
+            <TypedLine text={LEAD_A} start={d(T.lead)} instant={instant} />
           </span>
           <span className="type-hero hx-line">
-            <LineReveal paint delay={d(T.lead + 0.08)}>{LEAD_B}</LineReveal>
+            <TypedLine text={LEAD_B} start={d(T.lead) + (instant ? 0 : LEAD_A.length * 0.032)} instant={instant} />
           </span>
-          <span className="type-hero hx-line hx-line--slab">
-            <LineReveal paint delay={d(T.slab)}>
-              <PillHl entrance="slab" invert delay={d(T.slab + 0.1)} skip={instant}>
-                {SLAB}
-              </PillHl>
-            </LineReveal>
+          <span className={instant ? "type-hero hx-line hx-line--slab" : "type-hero hx-line hx-line--slab hx-slam"}>
+            <PillHl entrance="slab" invert delay={0} skip>
+              {SLAB}
+            </PillHl>
           </span>
         </span>
       </h1>
@@ -242,42 +282,14 @@ function PinnedHero({ skip, narrow }: { skip: boolean; narrow: boolean }) {
   const vigFade = useTransform(scrollYProgress, [0.005, 0.20], [1, 0]);
   const vigRef = useScrollStyle<HTMLDivElement>(vigFade);
 
-  /* The landing arrives BEFORE the field leaves, so the two overlap and
-     there is never an empty frame between them. */
-  /* The landing rises EARLY. Past about 35% of the pin the planes have
-     scaled up and swept outside the frame — SIFT 6828px off the right
-     edge, CG Walls 6666px off the left — so the room cannot carry that
-     window and the mean luminance fell to 23.5 against 51.8 at rest.
-     The destination comes up to meet the camera instead. */
-  const openFrom = narrow ? 0.12 : 0.22;
-  const openTo = narrow ? 0.40 : 0.46;
-  /* inset(top right bottom left): a small box at the upper right — where
-     the CapitalCommand plane sits — opening to the whole frame. */
-  const landClip = useTransform(
-    scrollYProgress,
-    [openFrom, openTo],
-    ["inset(8% 2% 78% 74%)", "inset(0% 0% 0% 0%)"],
-    { ease: easing.inOut }
-  );
-  /* Both are written straight to the node. clip-path is accelerated the
-     same way opacity is, and inside a pin that means it never advances:
-     the wipe read `inset(8% 2% 78% 74%)` at the END of the pin. */
-  const landOn = useTransform(scrollYProgress, [openFrom - 0.01, openFrom], [0, 1]);
-  const landFadeRef = useScrollStyle<HTMLDivElement>(landOn);
-  const landClipRef = useScrollProp<HTMLDivElement>(landClip, "clipPath");
-  const landScale = useTransform(scrollYProgress, [openFrom, 1], [1.22, 1], { ease: easing.inOut });
-  const fieldFade = useTransform(scrollYProgress, [0.46, 0.70], [1, 0]);
+  /* THE GATHER REPLACES THE LANDING. The camera used to fly to a real
+     capture and park on it; the hero now ends on the pieces themselves
+     swirling into a formation that chapter two picks up, so there is no
+     cut and — the point of this session — no screenshot anywhere on
+     home outside the work section. The field no longer fades out: it IS
+     the hand-over. */
+  const fieldFade = useTransform(scrollYProgress, [0.9, 1], [1, 0.9]);
   const fieldRef = useScrollStyle<HTMLDivElement>(fieldFade);
-
-  /* THE HAND-OVER. The landed frame pulls back and recedes into the dark
-     through the pin's tail, so the cream chapter's slab rises over a
-     frame that is already leaving rather than cutting from a static
-     one. One value, same as everything else here. */
-  /* The camera does not park on the capture any more: it passes THROUGH
-     it into chapter 2, so the copper light blooms as the hero ends. */
-  const recede = useTransform(scrollYProgress, [0.72, 1], [1, 1.9], { ease: easing.inOut });
-  const recedeDark = useTransform(scrollYProgress, [0.78, 1], [0, 1]);
-  const recedeDarkRef = useScrollStyle<HTMLDivElement>(recedeDark);
 
   const [cueGone, setCueGone] = useState(false);
   useMotionValueEvent(scrollYProgress, "change", function p(v) {
@@ -298,27 +310,13 @@ function PinnedHero({ skip, narrow }: { skip: boolean; narrow: boolean }) {
     <div ref={wrapRef} className={narrow ? "hx-wrap hx-wrap--narrow" : "hx-wrap"}>
       <div ref={frameRef} className="hx-frame">
         <div ref={fieldRef as React.Ref<HTMLDivElement>} className="hx-fieldlayer">
-          <HeroField dolly={dolly} inView={inView} />
+          <PieceField dolly={dolly} inView={inView} />
         </div>
 
         <div ref={vigRef as React.Ref<HTMLDivElement>} className="hx-vignette" aria-hidden />
 
         <motion.div ref={copyRef as React.Ref<HTMLDivElement>} className="hx-copylayer" style={{ y: copyY }}>
           <HeroCopy skip={skip} />
-        </motion.div>
-
-        {/* the frame the camera lands on — a real capture, full bleed */}
-        <motion.div
-          ref={mergeRefs(landFadeRef, landClipRef) as React.Ref<HTMLDivElement>}
-          className="hx-landing"
-          aria-hidden
-        >
-          <motion.div className="hx-landing__pull" style={{ scale: recede }}>
-            <motion.div className="hx-landing__img" style={{ scale: landScale }}>
-              <Screenshot src={LANDING} alt="" sizes="100vw" loading="lazy" fetchPriority="low" />
-            </motion.div>
-          </motion.div>
-          <div ref={recedeDarkRef as React.Ref<HTMLDivElement>} className="hx-landing__veil" aria-hidden />
         </motion.div>
 
         <ScrollCue hidden={cueGone} skip={skip} />
@@ -356,15 +354,6 @@ function ScrollCue({ hidden, skip }: { hidden: boolean; skip: boolean }) {
 }
 
 /** Two refs on one node. */
-function mergeRefs<T>(...refs: Array<React.Ref<T> | null>) {
-  return function setRef(node: T | null) {
-    for (const r of refs) {
-      if (!r) continue;
-      if (typeof r === "function") r(node);
-      else (r as React.MutableRefObject<T | null>).current = node;
-    }
-  };
-}
 
 /* ── flat: phones, short windows, reduced motion ───────────────────── */
 
@@ -388,7 +377,7 @@ function FlatHero({ skip }: { skip: boolean }) {
   return (
     <section ref={ref} className="hx-frame hx-frame--flat">
       <div className="hx-fieldlayer">
-        <HeroField dolly={still} inView={inView} />
+        <PieceField dolly={still} inView={inView} />
       </div>
       <div className="hx-vignette" aria-hidden />
       <div className="hx-copylayer">
