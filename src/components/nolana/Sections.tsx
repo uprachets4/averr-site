@@ -119,7 +119,7 @@ function WhatWeBuild() {
             <TwoTone
               className="nw-h2"
               lead="We build the four things your business runs on"
-              rest="— from the first search to the booked job."
+              rest="— from first search to booked job."
             />
           </div>
           <Link to="/contact" className="nw-cta">
@@ -227,7 +227,7 @@ function Numbers() {
         <TwoTone
           className="nn-h2"
           lead="The numbers, honestly."
-          rest="Measured on real projects, or promised in writing."
+          rest="Measured, or promised in writing."
         />
         <div className="nn-grid">
           {FIGURES.map(function f(x) {
