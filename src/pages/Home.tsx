@@ -1,8 +1,9 @@
 import { Suspense, lazy, useCallback, type CSSProperties } from "react";
-import Hero from "../components/Hero";
+import NolanaHero from "../components/nolana/NolanaHero";
 import LazyBelowFold from "../components/LazyBelowFold";
 import ChapterRail from "../components/home/ChapterRail";
 import ChapterLightLayer from "../components/home/ChapterLight";
+import { GradientDefs } from "../components/nolana/Bits";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 
 /**
@@ -64,9 +65,8 @@ export default function Home() {
       <ChapterLightLayer />
       <ChapterRail />
 
-      <section id="ch-build" data-tone="dark">
-        <Hero />
-      </section>
+      <GradientDefs />
+      <NolanaHero />
 
       <section id="ch-websites" data-tone="dark">
         <LazyBelowFold load={loadWebsites} minHeight="320vh" minHeightSm="107vh" background="transparent">
