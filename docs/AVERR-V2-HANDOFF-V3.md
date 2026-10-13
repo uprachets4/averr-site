@@ -2829,6 +2829,8 @@ The lower third carries **a proof tile per product**: the name, that study's own
 
 *Verified:* all three products reach the front under auto-rotation; hover swaps each one and stops the rotation (7s idle, no further change); keyboard focus on a tile's button swaps and Tab reaches its link; on touch, tapping the tile body swaps **without navigating** and tapping the link opens the study. Worst text in the tiles **5.44:1**.
 
+*Verified on the alias:* auto-rotation reaches **3/3 products** at 1440 and 1920; hovering each tile brings its product to the front with the tile lit and the front card **100% unobstructed**; the rotation **stops** on interaction; on touch, tapping the tile body swaps **without navigating** and tapping the link opens the study. Crash scroll on the alias: 1440 CLS 0.0001/0.0002 · 1920 0.0000/0.0001 · 375 0.0090/0.0167, **zero horizontal overflow, no errors**. Ch3's mobile reserve follows the tile's new link row (159vh → **170vh**).
+
 **Honestly, where this leaves Ch3.** The rotation is the right call — it shows all three products without asking for anything, and it gets out of the way the moment the reader takes over. The two rear captures are still **named more than seen**, but that matters far less now that any of them can be brought forward. The chapter went from the weakest on the page to one that rewards pointing at it.
 
 ### Numbers
