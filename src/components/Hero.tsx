@@ -136,7 +136,11 @@ function HeroCopy({ skip }: { skip: boolean }) {
           animate={{ opacity: 1 }}
           transition={{ duration: instant ? 0 : 0.5, ease: ease.outQuart, delay: d(T.topRow) }}
         >
-          <TorontoClock />
+          {/* TorontoClock paints --color-muted INLINE, which is a token
+              for cream grounds: on the dark hero it measured 3.23:1 at
+              13px and failed AA. Only its own style prop can beat an
+              inline colour; --color-muted-l is the dark sibling, 5.54:1. */}
+          <TorontoClock style={{ color: "var(--color-muted-l)" }} />
         </motion.div>
       </motion.div>
 

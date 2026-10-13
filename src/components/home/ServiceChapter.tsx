@@ -153,6 +153,7 @@ export default function ServiceChapter({
           className="sc-word__fill"
           style={
             {
+              "--sc-chars": spec.word.length,
               backgroundImage: `linear-gradient(0deg, ${LIFT}, ${LIFT}), url(${spec.fill[0]}), url(${spec.fill[1]})`,
               /* the edge carries the LIVE chapter colour, so the word
                  belongs to the light it is standing in */
@@ -190,8 +191,8 @@ export default function ServiceChapter({
 
       <p className="sc-proof-link">
         <Link to={`/work/${spec.proof}`}>
-          See it on {caseStudies[spec.proof]?.client}{" "}
-          <span aria-hidden>→</span>
+          See it on {caseStudies[spec.proof]?.client}
+          <span className="sc-arrow-tail" aria-hidden>→</span>
         </Link>
       </p>
     </>
