@@ -2977,14 +2977,12 @@ a { color: inherit; text-decoration: none; }
   .np-stmt { max-width: none; }
 }
 
-/* ── Session 27: the sections 27b/27c will replace, carried over on the
-   new tokens so nothing between them looks broken. The work wall keeps
-   its dark ground (it is a cinematic moment and the captures need it);
-   the founder and the closer move onto the light ground. */
+/* ── Session 27: the sections 27c will replace, carried over on the new
+   tokens so nothing between them looks broken. 27b replaced the work
+   wall with the light work-card section, so its black-ground override
+   is gone with it — it outranked `.wc` and was painting the new
+   section dark. */
 .home-nolana { background: var(--bg); }
-.home-nolana #ch-work { background: var(--black); }
-.home-nolana .ww-head h2,
-.home-nolana .ww-head .ws-h2 { color: #fff; }
 
 .home-nolana #ch-founder,
 .home-nolana #ch-start { background: var(--bg); }
@@ -3215,4 +3213,87 @@ a { color: inherit; text-decoration: none; }
   .ds-device { transition: none; }
   .dp, .dp * { animation: none !important; transition: none !important; }
   .dp--on .dp-typed { width: auto; }
+}
+
+/* ══ 27b · the work ════════════════════════════════════════════════ */
+.wc { background: var(--bg); padding: clamp(80px, 12vh, 150px) 0; }
+.wc-inner { width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter); }
+.wc-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; margin-bottom: clamp(30px, 5vh, 54px); }
+.wc-h2 { margin-top: 16px; font-size: clamp(26px, 3.1vw, 44px); }
+.wc-all {
+  flex: 0 0 auto; display: inline-flex; align-items: center;
+  min-height: 46px; padding: 12px 24px; border-radius: 999px;
+  background: var(--n-ink); color: #fff; text-decoration: none; font-size: 15px; font-weight: 500;
+  transition: transform 0.3s ease;
+}
+.wc-all:hover { transform: translateY(-1px); }
+.wc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 2vw, 28px); }
+.wc-card {
+  display: flex; flex-direction: column;
+  border-radius: 20px; overflow: hidden; text-decoration: none;
+  background: var(--navy-1);
+  border: 1px solid rgba(255,255,255,0.09);
+  box-shadow: 0 40px 70px -46px rgba(8,10,14,0.85);
+  --ox: 50%; --oy: 40%;
+}
+.wc-card__stage { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; }
+.wc-card .ds-atmos { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* the orb follows the cursor across the card */
+.wc-orb {
+  position: absolute; left: var(--ox); top: var(--oy);
+  width: 128px; height: 128px; margin: -64px 0 0 -64px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255,255,255,0.42), rgba(166,179,235,0.18) 58%, transparent 72%);
+  box-shadow: 0 0 60px 12px rgba(166,179,235,0.3);
+  transition: left 420ms cubic-bezier(0.22,1,0.36,1), top 420ms cubic-bezier(0.22,1,0.36,1);
+  pointer-events: none;
+}
+.wc-orb::after {
+  content: ""; position: absolute; inset: 30%;
+  border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.7);
+  box-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+/* the capture, held in a glass device frame */
+.wc-frame {
+  position: absolute; left: 11%; right: -9%; bottom: -8%;
+  border-radius: 12px 12px 0 0; overflow: hidden;
+  background: rgba(12,16,22,0.82);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 30px 60px -28px rgba(0,0,0,0.9);
+  transition: transform 700ms cubic-bezier(0.22,1,0.36,1);
+}
+.wc-frame__bar { display: flex; gap: 5px; padding: 8px 11px; background: rgba(255,255,255,0.06); }
+.wc-frame__bar i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.24); }
+.wc-frame img { display: block; width: 100%; height: auto; }
+.wc-card:hover .wc-frame { transform: scale(1.045) translateY(-6px); }
+.wc-card:focus-visible { outline: 2px solid var(--n-ink); outline-offset: 3px; }
+.wc-card__foot { display: block; padding: 20px 22px 24px; }
+.wc-card__row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+.wc-card__t { font-family: var(--font-display); font-size: clamp(18px, 1.7vw, 24px); letter-spacing: -0.02em; color: #fff; }
+.wc-card__fig {
+  font-family: var(--font-display); font-weight: 600; font-size: clamp(20px, 1.9vw, 28px);
+  letter-spacing: -0.03em;
+  background: var(--grad); -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+}
+.wc-card__l { display: block; margin-top: 7px; font-size: 14px; line-height: 1.55; color: rgba(255,255,255,0.62); }
+.wc-also {
+  margin: clamp(26px, 4vh, 44px) 0 0;
+  font-size: 14px; color: var(--ink-2);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+}
+.wc-also a { color: var(--n-ink); text-decoration: none; border-bottom: 1px solid var(--hair-strong); }
+.wc-also a:hover { border-bottom-color: var(--n-ink); }
+.wc-also em { font-style: normal; color: var(--ink-2); }
+.wc-vault {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+@media (max-width: 860px) {
+  .wc-grid { grid-template-columns: 1fr; }
+  .wc-head { flex-direction: column; align-items: flex-start; }
+  .wc-vault { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wc-orb, .wc-frame { transition: none; }
 }

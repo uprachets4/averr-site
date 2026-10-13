@@ -4,6 +4,7 @@ import LazyBelowFold from "../components/LazyBelowFold";
 import { GradientDefs } from "../components/nolana/Bits";
 import { Problem, WhatWeBuild, Numbers } from "../components/nolana/Sections";
 import DeviceStory from "../components/nolana/DeviceStory";
+import WorkCards from "../components/nolana/WorkCards";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useSetNavDarkOverride } from "../lib/navTone";
 
@@ -23,7 +24,6 @@ import { useSetNavDarkOverride } from "../lib/navTone";
  * surface and carries nothing it does not need.
  */
 
-const WorkWall = lazy(() => import("../components/home/WorkWall"));
 const FounderChapter = lazy(() => import("../components/home/FounderChapter"));
 const StartChapter = lazy(() => import("../components/home/StartChapter"));
 
@@ -69,7 +69,6 @@ export default function Home() {
     [setNavDark]
   );
 
-  const loadWork = useCallback(() => import("../components/home/WorkWall"), []);
   const loadFounder = useCallback(() => import("../components/home/FounderChapter"), []);
   const loadStart = useCallback(() => import("../components/home/StartChapter"), []);
 
@@ -87,13 +86,7 @@ export default function Home() {
 
 
 
-      <section id="ch-work" data-tone="dark">
-        <LazyBelowFold load={loadWork} minHeight="320vh" minHeightSm="254vh" background="transparent">
-          <Suspense fallback={<Reserve h="320vh" sm="254vh" />}>
-            <WorkWall />
-          </Suspense>
-        </LazyBelowFold>
-      </section>
+      <WorkCards />
 
       <section id="ch-founder" data-tone="dark">
         <LazyBelowFold load={loadFounder} minHeight="72vh" minHeightSm="118vh" background="transparent">
