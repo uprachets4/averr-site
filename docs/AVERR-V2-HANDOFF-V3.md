@@ -2964,6 +2964,102 @@ An **app skeleton in isometric 3D** — nav rail, KPI cards, a chart, a table of
 
 ---
 
+---
+
+**SESSION 27a — home rebuilt on the Nolana system (part 1 of 3).** Five commits (`fed8880`, `9a386ef`, `2579342`, `27a-3`, `27a-4`) + this log.
+
+**A BLOCKER TO STATE FIRST: I do not have the Nolana recording or any Nolana frames.** The quality gate asks for each section side by side with the matching Nolana frame at 1440. That comparison was not possible. Everything below was built from the measured tokens and the structural DNA the brief describes, and critiqued against that plus the usual premium bar — **not** against the reference. If the owner wants the literal comparison, the frames need to be in the repo or attached.
+
+### The palette, measured
+
+| token | value | measured |
+|---|---|---|
+| `--n-ink` | `#0F1117` | 17.24:1 on `--bg` |
+| `--ink-2` | **`#6E6E80`** | **4.56:1** — darkened from the given value |
+| `--ink-2-display` | `#898997` | 3.15:1 — the measured grey, **≥ 24px only** |
+| `--bg` on `--black` | | 18.14:1 |
+| white on navy `#121C27` | | 17.20:1 |
+| `--hair` `#D4D4DA` | | 1.35:1 — a hairline rule, not text |
+
+**`--ink-2` as given is 3.15:1 and fails AA for normal text.** The minimum darkening that clears 4.5:1 is `#6E6E80`, so that is the token; the measured grey survives as `--ink-2-display` for the large two-tone continuations, where the threshold is 3:1.
+
+### The hero
+
+Navy, full viewport. Everything above the mesh is plain DOM text that paints at frame one; the mesh is lazy and mounts on an idle callback after it. **The LCP element is now `SPAN.nh-line` — the headline itself.**
+
+**The pill** cycles "a website / software / automation / customers" every 2.8s, and its width springs to each token's **measured** width — the words are rendered once into a hidden ruler carrying the pill's own typography, because a width animated to a guessed target is what makes a swap like this look cheap. The first interaction stops the carousel for good and hands over manual stepping. The accessible name is the whole sentence with every token, read once.
+
+**The mesh is raw WebGL2, not three.js.** The brief allows three + `@react-three/fiber` inside 180 kB gzip; three's core alone is ~170 kB gzip before the renderer, and this is **one draw call of `gl.POINTS`**. The shipped lazy chunk is **2.4 kB**. A grid of points displaced in a vertex shader: a travelling swell, a ripple following the cursor, amplitude lifting with scroll, colour teal → lavender → peach on the crests, far rows fading into the navy. It stops when the hero leaves the viewport or the tab is hidden. **60 fps at 1440**, on the alias, with hardware-backed GL.
+
+**The client row is its own solid band**, not an overlay on the mesh: over the live mesh its dimmest name measured **2.26:1** against a wave crest showing through the scrim. Contrast cannot depend on where a wave happens to be. On its own band the dimmest name is **5.49:1**, with the focal item at full white and 1.22× scale.
+
+### The light sections
+
+**PROBLEM** fills word by word with scroll — measured 0/24 → 14/24 → 24/24 across its pass; filled outright under reduced motion.
+
+**WHAT WE BUILD** — four hairline cards with gradient icon tiles, corner indices and real copy, each into its `/services` anchor: `marketing-websites`, `product-and-saas-interfaces`, `ai-agents`, `local-search`.
+
+**NUMBERS — every figure traced:**
+
+| figure | source |
+|---|---|
+| 85% | `caseStudies.ts` → `cg-walls-and-floors.headlineFigure`, caption verbatim |
+| 42% | `caseStudies.ts` → `sift.headlineFigure`, caption verbatim |
+| 16 | `servicePillars.ts` — counted, not claimed |
+| 14 days | the studio's standing kickoff promise |
+| 30 min | the standing first-call length |
+| 24 hrs | the standing reply promise |
+
+The heading says which are which — "Measured on real projects, or promised in writing." Nothing else appears. Count-up verified 0 → 82%/41%/15 → final on entry.
+
+### What was removed, and what was kept
+
+Deleted with zero importers outside their own dead cluster: the 26a pieces hero (`Hero.tsx`, `PieceField`, `piecePlan`, `pieces/`), the typed entrance inside it, the four chapter rooms (`ServiceChapter`, `chapterObjects`, `piecePattern`, `scenes/`), the colour-flow light layer (`ChapterLight`, `lightPlan`) and the rail. **One session's worth of 26a is gone; the pieces library it cost is gone with it.**
+
+Kept until 27b/27c, restyled to the new tokens: the work wall (black ground — it is a cinematic moment and the captures need it), the founder and the closer (light ground). Home declares a light end tone now, so the footer follows it back.
+
+### Numbers
+
+| | 26a | 27a |
+|---|---|---|
+| Home initial JS | 146.80 kB | **146.54 kB** (−0.26, budget +3) |
+| The 3D chunk | — | **2.4 kB** (budget 180 kB) |
+| Mobile LCP (alias, standard harness) | 1820 ms | **1768 ms** `[1752, 1768, 1772]` |
+| LCP element | `P.hx-sub` | **`SPAN.nh-line`** — the headline |
+| Mesh fps at 1440 (alias) | — | **60** |
+
+*Crash scroll, three speeds:* 1440 CLS 0.0161, 1920 0.0072, 375 0.0066; zero horizontal overflow; no task over 50ms after 2.5s; no errors.
+*Contrast:* all 70 text elements pass AA (large-text threshold applied at ≥24px).
+*Mobile 375:* no text under 13px, no control under 44px, zero overflow.
+*Reduced motion:* the mesh is a static still, the words are filled, the pill does not cycle but still responds.
+
+### Quality gate — honest critique
+
+**Against the DNA the brief describes, the hero is right and the light sections are right.** The gradient pill in a 64px headline is the strongest single element on the site, the particle wave reads as a real surface with a real cursor ripple rather than a decorative canvas, and the card grid, chips, two-tone headings and corner indices are a coherent system rather than four separate treatments.
+
+**Where it is short, plainly:**
+- **The two-tone heading continuations run long** — "We build the four things your business runs on — from the first search to the booked job." takes three lines at 1440 and the grey half dominates. It wants a shorter continuation or a wider measure.
+- **The hero's right half is empty** above the mesh. The headline column stops at ~1150px and nothing occupies the rest; Nolana-type heroes usually carry something there.
+- **The mesh is a flat field seen edge-on.** It reads well, but it is one surface — no depth layering, no second element.
+- **The page now ends on three carried-over sections in a different design language.** That is the plan (27b/27c), but today home is two-thirds new and one-third old, and the seam at the work wall is visible.
+
+### Deviations
+
+1. **No Nolana reference frames** — the literal side-by-side gate could not be run. Stated above.
+2. **Raw WebGL2 instead of three.js/R3F** — 2.4 kB against a 180 kB allowance for what is one `gl.POINTS` draw. Swappable if the owner prefers the named stack.
+3. **`--ink-2` darkened** from `#898997` to `#6E6E80` to clear AA, with the measured value kept for display sizes.
+4. **The client row is a solid band**, not an overlay on the mesh — a contrast decision, measured.
+5. The hero's `h1` measure is 1150px, not a `ch` value: at 64px the line needs ~1060px and a `ch` measure broke it into one word per line.
+
+### My own errors this session
+
+1. **I set the h1 measure in `ch` without measuring it** — 20ch is 760px where the line needs 1060px, so the headline broke to one word per line and pushed the mesh out of the hero entirely.
+2. **I put the client row over the live mesh** and only found the 2.26:1 by sampling the ground behind it.
+3. **My contrast probe fell through gradient backgrounds twice in two sessions** — the navy hero and the white CTA both came back as false failures because it only walks up for a solid `backgroundColor`.
+4. **I shipped the figures as block-level elements**, so a short number sampled only the first third of the gradient and every figure came out peach.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -3120,6 +3216,14 @@ Measured, not asserted: it is **never the brightest thing in frame**, it is **oc
 - **THE HERO TYPE SIZE IS A MEASUREMENT, NOT A STYLE (25c).** The divisor in `--type-hero-size` is the longest line's length in this face, and the vh term is the other half of the `min()`. When the copy changes, both change: the 25c headline is 13 characters where the old one was 38, and the vh term — not the column — was what held the type at 67px when the ruling asked for >= 120px. The field's safe zone is downstream of this: the headline's ink box moved from x 0-46% to x 8-58%, and planes that cleared the old zone did not clear the new one.
 
 - **A LAZY RESERVE IS ONLY CORRECT UNTIL ITS CHAPTER CHANGES (25c).** Ch3's proof tiles took it from 93vh to 159vh on a phone. Any session that changes a chapter's height re-measures and updates BOTH of its reserves.
+
+- **THE SITE PALETTE IS THE NOLANA SYSTEM (27, OWNER DIRECTION).** This **SUPERSEDES** the Session 25 dark-ground + chapter-light rule. Light dominates: `--bg #F5F4F9`, `--bg-alt #EFEEF5`, hairlines `--hair #D4D4DA`, ink `--n-ink #0F1117`. Navy (`#121C27`/`#182633`/`#232837`) and black (`#080A0A`) are **cinematic moments only**. ONE gradient, `--grad`, applied PER ELEMENT — `background-clip: text` for words and numbers, `fill` for pills and glyphs — never as a wash. Home is migrated; the other pages follow in later sessions. The shared parts live in `src/components/nolana/Bits.tsx`: the mono chip, the two-tone heading, the corner index, the hairline guides, the gradient icon tile. The dark glass nav bar sits on EVERY section of home.
+
+- **`--ink-2` IS TWO TOKENS (27a).** The measured grey `#898997` is 3.15:1 on `--bg` and fails AA for normal text. `--ink-2` is `#6E6E80` (4.56:1) and is the default; `--ink-2-display` is the measured grey and may only be used at **≥ 24px**, where the threshold is 3:1.
+
+- **A GRADIENT TEXT FILL SAMPLES THE ELEMENT'S BOX, NOT ITS GLYPHS (27a).** A block-level number takes the full cell width, so a short figure like "16" showed only the first third of the ramp and every number came out peach. Anything with `background-clip: text` is `display: inline-block`.
+
+- **A CONTRAST PROBE MUST KNOW THE GRADIENT GROUNDS (27a).** Walking up for a solid `backgroundColor` falls through every gradient surface — the navy hero, the paper pieces, a white button inside a dark section — and silently compares text against the wrong ground in both directions. Name the known grounds in the probe before trusting a sweep.
 
 - **CAPTURES APPEAR ONCE ON HOME: THE WORK SECTION (26, OWNER DIRECTION).** The project dashboards repeated in the hero, the service chapters, the work wall and the case studies. On home they now appear in Ch6 only. Everything else is built from the PIECES (`src/components/home/pieces/`) — including the giant words, whose fill is a tiling SVG pattern of the chapter's own pieces, and the service links, which name their project instead of showing a thumbnail. Audit it with a per-chapter `img` count.
 
