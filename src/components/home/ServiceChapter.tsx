@@ -154,7 +154,9 @@ export default function ServiceChapter({
           style={
             {
               backgroundImage: `linear-gradient(0deg, ${LIFT}, ${LIFT}), url(${spec.fill[0]}), url(${spec.fill[1]})`,
-              WebkitTextStroke: `1px ${spec.tint}`,
+              /* the edge carries the LIVE chapter colour, so the word
+                 belongs to the light it is standing in */
+              WebkitTextStroke: `1px rgba(var(--chapter-rgb, 237,233,226), 0.55)`,
             } as React.CSSProperties
           }
         >

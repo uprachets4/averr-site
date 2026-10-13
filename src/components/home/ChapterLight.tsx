@@ -57,6 +57,10 @@ export default function ChapterLightLayer() {
           ? blend(LIGHTS[i], LIGHTS[i], 0)
           : blend(LIGHTS[i], LIGHTS[Math.min(LIGHTS.length - 1, i + 1)], t);
         el.style.background = out.css;
+        /* published so the rail and the giant words can carry the
+           chapter's colour without each re-deriving it */
+        const root = document.documentElement;
+        root.style.setProperty("--chapter-rgb", out.rgb.join(","));
       }
 
       function onScroll() {

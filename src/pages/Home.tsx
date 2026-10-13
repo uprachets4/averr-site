@@ -23,7 +23,8 @@ import ChapterLightLayer from "../components/home/ChapterLight";
 const WebsitesChapter = lazy(() => import("../components/home/WebsitesChapter"));
 const ProductsChapter = lazy(() => import("../components/home/ProductsChapter"));
 const AutomationChapter = lazy(() => import("../components/home/AutomationChapter"));
-const WorkStrip = lazy(() => import("../components/home/WorkStrip"));
+const MarketingChapter = lazy(() => import("../components/home/MarketingChapter"));
+const WorkWall = lazy(() => import("../components/home/WorkWall"));
 const FounderChapter = lazy(() => import("../components/home/FounderChapter"));
 const StartChapter = lazy(() => import("../components/home/StartChapter"));
 
@@ -31,7 +32,8 @@ export default function Home() {
   const loadWebsites = useCallback(() => import("../components/home/WebsitesChapter"), []);
   const loadProducts = useCallback(() => import("../components/home/ProductsChapter"), []);
   const loadAI = useCallback(() => import("../components/home/AutomationChapter"), []);
-  const loadWork = useCallback(() => import("../components/home/WorkStrip"), []);
+  const loadMarketing = useCallback(() => import("../components/home/MarketingChapter"), []);
+  const loadWork = useCallback(() => import("../components/home/WorkWall"), []);
   const loadFounder = useCallback(() => import("../components/home/FounderChapter"), []);
   const loadStart = useCallback(() => import("../components/home/StartChapter"), []);
 
@@ -68,12 +70,18 @@ export default function Home() {
         </LazyBelowFold>
       </section>
 
-      {/* ch-marketing lands in 25b; the light plan already carries it. */}
+      <section id="ch-marketing" data-tone="dark">
+        <LazyBelowFold load={loadMarketing} minHeight="320vh" background="transparent">
+          <Suspense fallback={<div aria-hidden style={{ minHeight: "320vh" }} />}>
+            <MarketingChapter />
+          </Suspense>
+        </LazyBelowFold>
+      </section>
 
       <section id="ch-work" data-tone="dark">
-        <LazyBelowFold load={loadWork} minHeight="420vh" background="transparent">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "420vh" }} />}>
-            <WorkStrip />
+        <LazyBelowFold load={loadWork} minHeight="320vh" background="transparent">
+          <Suspense fallback={<div aria-hidden style={{ minHeight: "320vh" }} />}>
+            <WorkWall />
           </Suspense>
         </LazyBelowFold>
       </section>

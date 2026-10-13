@@ -38,12 +38,13 @@ export default function StartChapter() {
         <div className="type-eyebrow st-eyebrow">//_START</div>
         <p className="st-line">Your move.</p>
 
+        {/* The bookend: the hero opened on "…your business runs on." and
+            the page closes on the same slab. */}
         <h2 className="type-display-l st-h2">
-          <span className="st-h2__a">Your next customer is</span>{" "}
+          <span className="st-h2__a">Let's build what your business</span>{" "}
           <span className="st-slab">
-            <PillHl>already looking.</PillHl>
+            <PillHl invert>runs on.</PillHl>
           </span>
-          <span className="st-h2__b">Let's make sure they find you.</span>
         </h2>
 
         <ul className="st-paths">

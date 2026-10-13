@@ -99,9 +99,18 @@ function Band({
   assemble: MotionValue<number>;
 }) {
   const mid = (BANDS.length - 1) / 2;
-  const z = useTransform(assemble, [0, 1], [0, (i - mid) * 150]);
-  const x = useTransform(assemble, [0, 1], [0, (i - mid) * 34]);
-  const y = useTransform(assemble, [0, 1], [0, (i - mid) * 26]);
+  /* The bands spread mostly in DEPTH. A wide lateral spread put the
+     capture under the text column and took parch there to 3.9:1 — the
+     only chapter that failed the contrast sweep. */
+  /* The explosion goes BACKWARD. A band pushed toward the viewer is
+     scaled up by the perspective — at +330 a 536px band renders ~700px
+     and spilled into the text column, taking parch there to 3.9:1. Going
+     away from the camera it shrinks, stays in its column, and still
+     reads as an exploded view. */
+  void mid;
+  const z = useTransform(assemble, [0, 1], [0, i * -170]);
+  const x = useTransform(assemble, [0, 1], [0, i * 16]);
+  const y = useTransform(assemble, [0, 1], [0, i * -22]);
   return (
     <motion.div className="ob-explode__band" style={{ z, x, y, clipPath: band.clip }}>
       <Screenshot
@@ -153,5 +162,50 @@ export function Orb({ assemble, tiltX, tiltY }: P) {
         })}
       </motion.div>
     </motion.div>
+  );
+}
+
+/* ── Ch5 · concentric rings on a tilted plane, with pins ───────────── */
+
+const RINGS = [0, 1, 2, 3];
+const PINS = [
+  { x: -118, y: -46, h: 74 },
+  { x: -28, y: 22, h: 108 },
+  { x: 62, y: -14, h: 88 },
+  { x: 128, y: 54, h: 62 },
+  { x: -82, y: 72, h: 52 },
+];
+
+export function Rings({ assemble, tiltX, tiltY }: P) {
+  return (
+    <motion.div className="ob ob-rings" style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 1300 }}>
+      <div className="ob-rings__plane">
+        {RINGS.map(function ring(i) {
+          return <Ring key={i} i={i} assemble={assemble} />;
+        })}
+        {PINS.map(function pin(p, i) {
+          return <Pin key={i} pin={p} i={i} assemble={assemble} />;
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
+function Ring({ i, assemble }: { i: number; assemble: MotionValue<number> }) {
+  /* the rings push outward as the chapter is read */
+  const scale = useTransform(assemble, [0, 1], [0.5 + i * 0.22, 0.78 + i * 0.4]);
+  const op = useTransform(assemble, [0, 1], [0.5 - i * 0.08, 0.26 - i * 0.05]);
+  return <motion.span className="ob-rings__ring" style={{ scale, opacity: op }} />;
+}
+
+function Pin({ pin, i, assemble }: { pin: { x: number; y: number; h: number }; i: number; assemble: MotionValue<number> }) {
+  const h = useTransform(assemble, [0.1 + i * 0.06, 0.6 + i * 0.06], [0, pin.h]);
+  return (
+    <motion.span
+      className="ob-rings__pin"
+      style={{ x: pin.x, y: pin.y, height: h }}
+    >
+      <span className="ob-rings__head" />
+    </motion.span>
   );
 }

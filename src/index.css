@@ -1693,13 +1693,14 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Home is one ground now: the rail is always on dark. */
-.rail { --rail-tint: var(--color-parch); }
+.rail { --rail-tint: rgb(var(--chapter-rgb, 237,233,226)); }
 .rail .rail-track { background: rgba(237,233,226,0.2); }
 .rail .rail-fill { background: var(--rail-tint); }
 .rail .rail-item { color: rgba(237,233,226,0.6); }
 .rail .rail-item:hover, .rail .rail-item--on { color: var(--rail-tint); }
 .rail .rail-item:focus-visible { outline-color: var(--color-parch); }
 .rail .rail-label { background: #22231f; color: var(--color-parch); box-shadow: 0 2px 14px rgba(0,0,0,0.5); }
+.rail .rail-item--on .rail-label { color: rgb(var(--chapter-rgb, 237,233,226)); }
 
 /* the hero's second CTA scrolls rather than navigates */
 .hx-jump {
@@ -1731,3 +1732,105 @@ a { color: inherit; text-decoration: none; }
 .home-dark .fc-credit { border-top-color: rgba(237,233,226,0.16); }
 .home-dark .fc-svg path { stroke: var(--color-parch); }
 .home-dark .fc-glow { background: radial-gradient(closest-side, rgba(237,233,226,0.18), transparent 72%); }
+
+/* ── Ch5's object: rings on a tilted plane, pins rising out of it ── */
+.ob-rings { display: grid; place-items: center; }
+.ob-rings__plane {
+  position: relative; width: 1px; height: 1px;
+  transform: rotateX(62deg);
+  transform-style: preserve-3d;
+}
+.ob-rings__ring {
+  position: absolute; left: 50%; top: 50%;
+  width: 360px; height: 360px; margin: -180px 0 0 -180px;
+  border-radius: 50%;
+  border: 1px solid rgba(212,168,75,0.7);
+  box-shadow: 0 0 26px rgba(212,168,75,0.22);
+}
+.ob-rings__pin {
+  position: absolute; left: 50%; top: 50%;
+  width: 2px; margin-left: -1px;
+  background: linear-gradient(0deg, rgba(212,168,75,0.15), rgba(212,168,75,0.95));
+  transform-origin: bottom center;
+  transform-style: preserve-3d;
+  bottom: 0;
+}
+.ob-rings__head {
+  position: absolute; left: 50%; top: 0;
+  width: 9px; height: 9px; margin: -4px 0 0 -4.5px;
+  border-radius: 50%; background: #E8C070;
+  box-shadow: 0 0 14px rgba(212,168,75,0.85);
+}
+
+/* ══ Chapter 6: the work wall ═════════════════════════════════════ */
+.ww-wrap { position: relative; height: 320vh; }
+.ww { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.ww--still { position: static; height: auto; padding: 80px 0; }
+.ww-stage { position: absolute; inset: 0; perspective: 1800px; display: grid; place-items: center; }
+.ww-wall {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 14px;
+  width: 128%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.ww--still .ww-wall { position: static; width: 100%; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); padding: 0 var(--gutter); }
+.ww-tile {
+  position: relative; display: block;
+  aspect-ratio: 16 / 10; border-radius: 7px; overflow: hidden;
+  background: #16181a;
+  box-shadow: 0 0 0 1px rgba(237,233,226,0.12), 0 24px 56px -30px rgba(0,0,0,0.8);
+  transition: transform 420ms var(--ease-out-expo), opacity 320ms ease, box-shadow 320ms ease;
+  opacity: 0.74;
+}
+.ww-wall:has(.ww-tile--on) .ww-tile { opacity: 0.4; }
+.ww-tile--on {
+  opacity: 1 !important;
+  transform: translateZ(90px) scale(1.06);
+  z-index: 3;
+  box-shadow: 0 0 0 1px rgba(237,233,226,0.4), 0 40px 80px -28px rgba(0,0,0,0.9);
+}
+.ww-tile:focus-visible { outline: 2px solid var(--color-parch); outline-offset: 4px; }
+.ww-meta {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 26px 12px 10px;
+  background: linear-gradient(0deg, rgba(10,10,10,0.92), transparent);
+  opacity: 0; transition: opacity 280ms ease;
+}
+.ww-tile--on .ww-meta { opacity: 1; }
+.ww-meta__name { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-parch); }
+.ww-meta__fig { font-size: 13px; color: rgba(237,233,226,0.74); }
+.ww-meta__fig b { color: var(--color-parch); font-weight: 500; }
+
+.ww-head {
+  position: absolute; left: 0; right: 0; bottom: 48px; z-index: 4;
+  width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter);
+  pointer-events: none;
+}
+.ww--still .ww-head { position: static; margin-bottom: 36px; pointer-events: auto; }
+.ww-head > * { pointer-events: auto; }
+.ww-eyebrow { color: rgba(237,233,226,0.6); margin: 0 0 10px; }
+.ww-h2 { margin: 0 0 6px; color: var(--color-parch); }
+.ww-sub { margin: 0 0 18px; font-size: 16px; color: rgba(237,233,226,0.72); }
+.ww-vault {
+  position: relative; overflow: hidden;
+  display: inline-flex; align-items: center; gap: 16px;
+  padding: 18px 26px; border-radius: 12px; min-height: 44px;
+  border: 1px solid rgba(237,233,226,0.26);
+  color: var(--color-parch); text-decoration: none;
+  transition: background-color 240ms ease, border-color 240ms ease;
+}
+.ww-vault:hover { background: rgba(237,233,226,0.07); border-color: rgba(237,233,226,0.5); }
+.ww-vault:focus-visible { outline: 2px solid var(--color-parch); outline-offset: 3px; }
+
+@media (max-width: 1023px) {
+  .ww-wrap { height: auto; }
+  .ww { position: static; height: auto; padding: 72px 0; }
+  .ww-stage { position: static; }
+  .ww-wall { width: 100%; grid-template-columns: repeat(2, 1fr); padding: 0 var(--gutter); }
+  .ww-head { position: static; margin-top: 30px; }
+  .ww-meta { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .ww-tile, .ww-meta { transition: none; } }
