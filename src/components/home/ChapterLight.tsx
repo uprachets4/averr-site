@@ -56,9 +56,15 @@ export default function ChapterLightLayer() {
         const out = reduce
           ? blend(LIGHTS[i], LIGHTS[i], 0)
           : blend(LIGHTS[i], LIGHTS[Math.min(LIGHTS.length - 1, i + 1)], t);
-        el.style.background = out.css;
-        /* published so the rail and the giant words can carry the
-           chapter's colour without each re-deriving it */
+        el.style.background = out.horizonCss;
+        el.style.setProperty("--cl-rgb", out.rgb.join(","));
+        el.style.setProperty("--cl-beam", out.alpha.toFixed(3));
+        el.style.setProperty("--cl-x", out.x.toFixed(1) + "%");
+        el.style.setProperty("--cl-y", out.y.toFixed(1) + "%");
+        /* published so anything else can read where the room's light is.
+           Session 26: FOREGROUND accents no longer consume this — they
+           use the one accent set — but the chapter hue still drives the
+           light itself. */
         const root = document.documentElement;
         root.style.setProperty("--chapter-rgb", out.rgb.join(","));
       }
@@ -79,5 +85,10 @@ export default function ChapterLightLayer() {
     [reduce]
   );
 
-  return <div ref={ref} className="clight" aria-hidden />;
+  return (
+    <div ref={ref} className="clight" aria-hidden>
+      <span className="clight__beam clight__beam--a" />
+      <span className="clight__beam clight__beam--b" />
+    </div>
+  );
 }

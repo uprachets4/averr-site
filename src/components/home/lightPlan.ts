@@ -7,16 +7,21 @@
  * leaves after it. No cream grounds, no clip-path slab switching between
  * two grounds.
  *
- * TWO layers per chapter, raised by the 25b ruling so the colour reads
- * as colour:
+ * SESSION 26 — the light is LIGHT IN A ROOM, not a coloured blob. The
+ * tight radial "glow" is retired: a soft-edged circle reads as a
+ * gradient smear behind the content, which is exactly the look the
+ * owner called out. What replaces it:
  *
- *   the GLOW   a tight radial behind that chapter's 3D object, up to
- *              0.5. It sits on the object's side of the frame, not
- *              under the text, which is what lets it be this strong
- *              without taking the body copy under 7:1.
- *   the HORIZON a wide, low wash along the bottom of the frame, up to
- *              0.3, so the colour belongs to the room rather than to one
- *              hotspot.
+ *   the HORIZON  a wide, low wash along the bottom of the frame, up to
+ *                0.3 — the room's floor bounce.
+ *   two BEAMS    soft diagonal volumetric shafts crossing the frame,
+ *                blurred and masked at both ends so they read as light
+ *                through air rather than as shapes. `alpha` is now the
+ *                beams' peak strength.
+ *
+ * `x`/`y` steer where the beams cross, so the light still belongs to the
+ * side of the frame the chapter's scene occupies and the text column
+ * stays off the brightest part.
  *
  * Contrast is measured off the brightest actually-lit pixel behind text,
  * not assumed from the token — see the handoff's table.
@@ -26,19 +31,19 @@ export type ChapterLight = {
   id: string;
   /** The glow's colour. */
   rgb: [number, number, number];
-  /** Peak alpha of the object glow, 0–0.5. */
+  /** Peak alpha of the volumetric beams, 0–0.5. */
   alpha: number;
   /** Peak alpha of the low horizon wash, 0–0.3. */
   horizon: number;
-  /** Where the glow sits, in % of the viewport. */
+  /** Where the beams cross, in % of the viewport. */
   x: number;
   y: number;
 };
 
 export const LIGHTS: ChapterLight[] = [
-  { id: "ch-build", rgb: [255, 255, 255], alpha: 0.14, horizon: 0.1, x: 62, y: 46 },
-  /* every service chapter's object sits in the LEFT column, so the glow
-     does too and the right-hand text stays off the hotspot */
+  { id: "ch-build", rgb: [255, 255, 255], alpha: 0.13, horizon: 0.1, x: 62, y: 46 },
+  /* every service chapter's scene sits in the LEFT column, so the beams
+     cross there and the right-hand text stays off the brightest part */
   { id: "ch-websites", rgb: [200, 118, 60], alpha: 0.5, horizon: 0.3, x: 24, y: 48 },
   { id: "ch-products", rgb: [61, 107, 255], alpha: 0.46, horizon: 0.26, x: 24, y: 48 },
   { id: "ch-ai", rgb: [123, 92, 255], alpha: 0.48, horizon: 0.28, x: 24, y: 48 },
@@ -63,18 +68,17 @@ export function blend(a: ChapterLight, b: ChapterLight, t: number) {
   const x = lerp(a.x, b.x, k);
   const y = lerp(a.y, b.y, k);
   return {
-    css:
-      /* the glow, tight and on the object's side */
-      `radial-gradient(34% 40% at ${x.toFixed(1)}% ${y.toFixed(1)}%, ` +
-      `rgba(${r},${g},${bl},${al.toFixed(3)}) 0%, ` +
-      `rgba(${r},${g},${bl},${(al * 0.4).toFixed(3)}) 42%, ` +
-      `rgba(${r},${g},${bl},0) 78%), ` +
-      /* the horizon, wide and low */
-      `radial-gradient(118% 46% at 50% 108%, ` +
+    /* The horizon is painted by the layer itself; the beams are its two
+       children, so they can be rotated and blurred. Everything travels
+       as custom properties — one style write per frame either way. */
+    horizonCss:
+      `radial-gradient(130% 44% at 50% 108%, ` +
       `rgba(${r},${g},${bl},${hz.toFixed(3)}) 0%, ` +
-      `rgba(${r},${g},${bl},${(hz * 0.45).toFixed(3)}) 40%, ` +
-      `rgba(${r},${g},${bl},0) 82%)`,
+      `rgba(${r},${g},${bl},${(hz * 0.45).toFixed(3)}) 42%, ` +
+      `rgba(${r},${g},${bl},0) 84%)`,
     rgb: [r, g, bl] as [number, number, number],
     alpha: al,
+    x,
+    y,
   };
 }

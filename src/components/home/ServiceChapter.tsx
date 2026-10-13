@@ -170,9 +170,10 @@ export default function ServiceChapter({
                 const l = `rgba(238,233,221,${spec.lift ?? LIFT_DEFAULT})`;
                 return `linear-gradient(0deg, ${l}, ${l}), url(${spec.fill[0]}), url(${spec.fill[1]})`;
               })(),
-              /* the edge carries the LIVE chapter colour, so the word
-                 belongs to the light it is standing in */
-              WebkitTextStroke: `1px rgba(var(--chapter-rgb, 237,233,226), 0.55)`,
+              /* Session 26: the edge carries the ONE accent, not the
+                 live chapter hue — foreground accents are a single set
+                 and the chapter's colour lives in the room's light. */
+              WebkitTextStroke: `1px rgba(var(--accent-rgb), 0.5)`,
             } as React.CSSProperties
           }
         >
