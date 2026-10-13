@@ -2963,3 +2963,41 @@ a { color: inherit; text-decoration: none; }
   .nw-grid, .nn-grid { grid-template-columns: 1fr; }
   .np-stmt { max-width: none; }
 }
+
+/* ── Session 27: the sections 27b/27c will replace, carried over on the
+   new tokens so nothing between them looks broken. The work wall keeps
+   its dark ground (it is a cinematic moment and the captures need it);
+   the founder and the closer move onto the light ground. */
+.home-nolana { background: var(--bg); }
+.home-nolana #ch-work { background: var(--black); }
+.home-nolana .ww-head h2,
+.home-nolana .ww-head .ws-h2 { color: #fff; }
+
+.home-nolana #ch-founder,
+.home-nolana #ch-start { background: var(--bg); }
+.home-nolana #ch-founder .fc-wrap,
+.home-nolana #ch-founder .fc,
+.home-nolana #ch-start .st { background: transparent; color: var(--n-ink); }
+.home-nolana #ch-founder .fc-h2,
+.home-nolana #ch-founder .fc-credit dd,
+.home-nolana #ch-start .st-h2,
+.home-nolana #ch-start .st-path__label { color: var(--n-ink); }
+.home-nolana #ch-founder .fc-eyebrow,
+.home-nolana #ch-founder .fc-credit dt,
+.home-nolana #ch-founder .fc-line,
+.home-nolana #ch-founder .fc-statement,
+.home-nolana #ch-start .st-eyebrow,
+.home-nolana #ch-start .st-line,
+.home-nolana #ch-start .st-path__kicker,
+.home-nolana #ch-start .st-path__note,
+.home-nolana #ch-start .st-promise { color: var(--ink-2); }
+.home-nolana #ch-founder .fc-credit { border-top-color: var(--hair); }
+.home-nolana #ch-founder .fc-svg path { stroke: var(--n-ink); }
+.home-nolana #ch-founder .fc-glow {
+  background: radial-gradient(closest-side, rgba(166,179,235,0.3), transparent 72%);
+}
+.home-nolana #ch-start .st-path {
+  border-color: var(--hair); background: #fff;
+}
+.home-nolana #ch-start .st-path:hover { background: var(--bg-alt); border-color: var(--hair-strong); }
+.home-nolana #ch-start .st-path__arrow { color: var(--n-ink); }

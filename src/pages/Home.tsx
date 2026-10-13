@@ -1,15 +1,13 @@
 import { Suspense, lazy, useCallback, useEffect, type CSSProperties } from "react";
 import NolanaHero from "../components/nolana/NolanaHero";
 import LazyBelowFold from "../components/LazyBelowFold";
-import ChapterRail from "../components/home/ChapterRail";
-import ChapterLightLayer from "../components/home/ChapterLight";
 import { GradientDefs } from "../components/nolana/Bits";
 import { Problem, WhatWeBuild, Numbers } from "../components/nolana/Sections";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useSetNavDarkOverride } from "../lib/navTone";
 
 /**
- * Home, as one storytelling film on ONE colour flow.
+ * Home, on the Nolana system.
  *
  * There is a single dark ground from the first pixel to the last. The
  * story is told with LIGHT — a fixed layer whose colour interpolates
@@ -24,10 +22,6 @@ import { useSetNavDarkOverride } from "../lib/navTone";
  * surface and carries nothing it does not need.
  */
 
-const WebsitesChapter = lazy(() => import("../components/home/WebsitesChapter"));
-const ProductsChapter = lazy(() => import("../components/home/ProductsChapter"));
-const AutomationChapter = lazy(() => import("../components/home/AutomationChapter"));
-const MarketingChapter = lazy(() => import("../components/home/MarketingChapter"));
 const WorkWall = lazy(() => import("../components/home/WorkWall"));
 const FounderChapter = lazy(() => import("../components/home/FounderChapter"));
 const StartChapter = lazy(() => import("../components/home/StartChapter"));
@@ -52,7 +46,8 @@ export default function Home() {
      of ending the colour flow with a cream slab. Declared here rather than
      in StartChapter because that chapter is lazy and the footer would
      otherwise paint cream until it mounted. */
-  useDeclarePageEndTone("dark");
+  /* home now ENDS on the light ground, so the footer follows it back */
+  useDeclarePageEndTone("cream");
 
   /* Session 27: the dark glass bar sits on EVERY section of home, light
      ones included — it is part of the system, not a reaction to what is
@@ -68,18 +63,12 @@ export default function Home() {
     [setNavDark]
   );
 
-  const loadWebsites = useCallback(() => import("../components/home/WebsitesChapter"), []);
-  const loadProducts = useCallback(() => import("../components/home/ProductsChapter"), []);
-  const loadAI = useCallback(() => import("../components/home/AutomationChapter"), []);
-  const loadMarketing = useCallback(() => import("../components/home/MarketingChapter"), []);
   const loadWork = useCallback(() => import("../components/home/WorkWall"), []);
   const loadFounder = useCallback(() => import("../components/home/FounderChapter"), []);
   const loadStart = useCallback(() => import("../components/home/StartChapter"), []);
 
   return (
-    <div className="home-dark">
-      <ChapterLightLayer />
-      <ChapterRail />
+    <div className="home-nolana">
 
       <GradientDefs />
       <NolanaHero />
@@ -87,37 +76,9 @@ export default function Home() {
       <WhatWeBuild />
       <Numbers />
 
-      <section id="ch-websites" data-tone="dark">
-        <LazyBelowFold load={loadWebsites} minHeight="320vh" minHeightSm="107vh" background="transparent">
-          <Suspense fallback={<Reserve h="320vh" sm="107vh" />}>
-            <WebsitesChapter />
-          </Suspense>
-        </LazyBelowFold>
-      </section>
 
-      <section id="ch-products" data-tone="dark">
-        <LazyBelowFold load={loadProducts} minHeight="320vh" minHeightSm="93vh" background="transparent">
-          <Suspense fallback={<Reserve h="320vh" sm="93vh" />}>
-            <ProductsChapter />
-          </Suspense>
-        </LazyBelowFold>
-      </section>
 
-      <section id="ch-ai" data-tone="dark">
-        <LazyBelowFold load={loadAI} minHeight="320vh" minHeightSm="113vh" background="transparent">
-          <Suspense fallback={<Reserve h="320vh" sm="113vh" />}>
-            <AutomationChapter />
-          </Suspense>
-        </LazyBelowFold>
-      </section>
 
-      <section id="ch-marketing" data-tone="dark">
-        <LazyBelowFold load={loadMarketing} minHeight="320vh" minHeightSm="106vh" background="transparent">
-          <Suspense fallback={<Reserve h="320vh" sm="106vh" />}>
-            <MarketingChapter />
-          </Suspense>
-        </LazyBelowFold>
-      </section>
 
       <section id="ch-work" data-tone="dark">
         <LazyBelowFold load={loadWork} minHeight="320vh" minHeightSm="254vh" background="transparent">

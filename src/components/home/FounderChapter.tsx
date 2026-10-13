@@ -125,7 +125,7 @@ export default function FounderChapter() {
             animate={{ opacity: reduce || drawn ? 1 : 0.45 }}
             transition={{ duration: reduce ? 0 : 0.4, ease: ease.outQuart }}
           >
-            <MagneticCTA to="/about" variant="ghost" tone="dark">
+            <MagneticCTA to="/about" variant="ghost">
               Meet the person who builds it
             </MagneticCTA>
           </motion.div>
