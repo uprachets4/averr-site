@@ -66,67 +66,10 @@ function StackCard({
   );
 }
 
-/* ── Ch3 · one real product capture, exploded into z-layers ────────── */
-
-const EXPLODE = "/work/capitalcommand/01-overview.jpg";
-/** Bands of the SAME capture, masked — a genuine exploded view of one
- *  screen rather than five invented panels. */
-const BANDS = [
-  { clip: "inset(0% 78% 0% 0%)", label: "sidebar" },
-  { clip: "inset(0% 0% 86% 22%)", label: "header" },
-  { clip: "inset(14% 0% 56% 22%)", label: "cards" },
-  { clip: "inset(44% 0% 24% 22%)", label: "chart" },
-  { clip: "inset(76% 0% 0% 22%)", label: "table" },
-];
-
-export function Exploded({ assemble, tiltX, tiltY }: P) {
-  return (
-    <motion.div className="ob ob-explode" style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 1500 }}>
-      {BANDS.map(function band(b, i) {
-        return <Band key={b.label} band={b} i={i} assemble={assemble} />;
-      })}
-    </motion.div>
-  );
-}
-
-function Band({
-  band,
-  i,
-  assemble,
-}: {
-  band: { clip: string; label: string };
-  i: number;
-  assemble: MotionValue<number>;
-}) {
-  const mid = (BANDS.length - 1) / 2;
-  /* The bands spread mostly in DEPTH. A wide lateral spread put the
-     capture under the text column and took parch there to 3.9:1 — the
-     only chapter that failed the contrast sweep. */
-  /* The explosion goes BACKWARD. A band pushed toward the viewer is
-     scaled up by the perspective — at +330 a 536px band renders ~700px
-     and spilled into the text column, taking parch there to 3.9:1. Going
-     away from the camera it shrinks, stays in its column, and still
-     reads as an exploded view. */
-  void mid;
-  const z = useTransform(assemble, [0, 1], [0, i * -170]);
-  const x = useTransform(assemble, [0, 1], [0, i * 16]);
-  const y = useTransform(assemble, [0, 1], [0, i * -22]);
-  return (
-    <motion.div className="ob-explode__band" style={{ z, x, y, clipPath: band.clip }}>
-      <Screenshot
-        src={EXPLODE}
-        alt=""
-        sizes="(min-width: 1024px) 32vw, 72vw"
-        loading="lazy"
-        style={{ height: "100%", objectFit: "cover" }}
-      />
-    </motion.div>
-  );
-}
-
-/* ── Ch4 · an orb of nodes ─────────────────────────────────────────── */
+/* ── Ch4 · a sphere of nodes ───────────────────────────────────────── */
 
 const N = 40;
+
 /** A Fibonacci sphere, so the nodes are evenly spread rather than
  *  clustered at the poles. */
 const NODES = Array.from({ length: N }, function node(_, i) {
@@ -207,5 +150,76 @@ function Pin({ pin, i, assemble }: { pin: { x: number; y: number; h: number }; i
     >
       <span className="ob-rings__head" />
     </motion.span>
+  );
+}
+
+/* ── Ch3 · three real products, stacked in depth ───────────────────── */
+
+/** The three product captures, nearest first. Each is a real screen
+ *  through the WebP pipeline — the masked-band "exploded" treatment it
+ *  replaces was one capture cut into five strips, which read as muddy
+ *  overlapping panels rather than as three products we built. */
+const PRODUCTS: Array<{ src: string; name: string }> = [
+  { src: "/work/capitalcommand/01-overview.jpg", name: "CapitalCommand" },
+  { src: "/work/sift/01-command-overview.jpg", name: "SIFT" },
+  { src: "/work/cadencestack/01-command-center.jpg", name: "CadenceStack" },
+];
+
+export function ProductStack({ assemble, tiltX, tiltY }: P) {
+  return (
+    <motion.div
+      className="ob ob-pstack"
+      style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 1500 }}
+    >
+      {PRODUCTS.map(function card(p, i) {
+        return <ProductCard key={p.name} p={p} i={i} assemble={assemble} />;
+      })}
+    </motion.div>
+  );
+}
+
+function ProductCard({
+  p,
+  i,
+  assemble,
+}: {
+  p: { src: string; name: string };
+  i: number;
+  assemble: MotionValue<number>;
+}) {
+  /* They arrive STACKED and slide apart as the chapter is read. The
+     spread goes backward in z and leftward in x for the same reason the
+     bands did: a plane pushed toward the camera is scaled up by the
+     perspective and spills into the text column. Going away it shrinks,
+     stays in its own column, and the stack reads as depth. */
+  /* The offsets are what make it read as THREE products rather than
+     one: at (-46, +58) the front plate simply covered the other two and
+     the object looked like a single screenshot. Each card has to clear
+     the one in front of it by more than its own chrome bar. */
+  /* The cascade goes UP and left. Downward, each card behind put its
+     own chrome bar underneath the plate in front of it, so only the
+     front product was ever named — the thing the chrome is there to do
+     did not happen. Rising, every title bar clears the one in front. */
+  const z = useTransform(assemble, [0.05, 0.7], [i * -20, i * -210]);
+  const x = useTransform(assemble, [0.05, 0.7], [i * -7, i * -78]);
+  const y = useTransform(assemble, [0.05, 0.7], [i * -8, i * -84]);
+  const nameOpacity = useTransform(assemble, [0.18, 0.4], [0, 1]);
+
+  return (
+    <motion.div className="ob-pstack__card" style={{ z, x, y }}>
+      <span className="ob-pstack__chrome" aria-hidden>
+        <i /><i /><i />
+        <motion.em style={{ opacity: nameOpacity }}>{p.name}</motion.em>
+      </span>
+      <span className="ob-pstack__shot">
+        <Screenshot
+          src={p.src}
+          alt=""
+          sizes="(min-width: 1024px) 34vw, 76vw"
+          loading="lazy"
+          style={{ height: "100%", objectFit: "cover", objectPosition: "top left" }}
+        />
+      </span>
+    </motion.div>
   );
 }

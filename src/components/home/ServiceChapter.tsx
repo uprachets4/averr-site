@@ -112,8 +112,13 @@ function ServiceLine({
 export default function ServiceChapter({
   spec,
   object,
+  below,
 }: {
   spec: ChapterSpec;
+  /** An optional full-width row under the object and the copy. Ch3 uses
+   *  it for its three proof tiles; the other chapters leave it empty and
+   *  render exactly as before. */
+  below?: ReactNode;
   /** The 3D object, given the chapter's own 0–1 assembly value. */
   object: (p: {
     assemble: ReturnType<typeof useScroll>["scrollYProgress"];
@@ -211,9 +216,10 @@ export default function ServiceChapter({
   if (reduce) {
     return (
       <section className="sc sc--still">
-        <div className="sc-inner">
+        <div className={below ? "sc-inner sc-inner--below" : "sc-inner"}>
           <div className="sc-object sc-object--still">{object({ assemble: scrollYProgress, tiltX, tiltY })}</div>
           <div className="sc-text">{body}</div>
+          {below ? <div className="sc-below">{below}</div> : null}
         </div>
       </section>
     );
@@ -222,9 +228,15 @@ export default function ServiceChapter({
   return (
     <div ref={wrapRef} className="sc-wrap">
       <section className="sc">
-        <div className="sc-inner" ref={stageRef} onMouseMove={onMove} onMouseLeave={function out() { rx.set(0); ry.set(0); }}>
+        <div
+          className={below ? "sc-inner sc-inner--below" : "sc-inner"}
+          ref={stageRef}
+          onMouseMove={onMove}
+          onMouseLeave={function out() { rx.set(0); ry.set(0); }}
+        >
           <div className="sc-object">{object({ assemble: scrollYProgress, tiltX, tiltY })}</div>
           <div className="sc-text">{body}</div>
+          {below ? <div className="sc-below">{below}</div> : null}
         </div>
       </section>
     </div>

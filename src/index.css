@@ -1890,3 +1890,98 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 860px) {
   .lbf-reserve { min-height: var(--lbf-h-sm, var(--lbf-h)); }
 }
+
+/* ── Ch3's object: three real products, stacked in depth ──────────── */
+.ob-pstack { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
+.ob-pstack__card {
+  position: absolute; left: 50%; top: 50%;
+  /* 86% left no room for the cascade to be seen inside the column */
+  width: 74%; margin: -23% 0 0 -37%;
+  border-radius: 8px; overflow: hidden;
+  background: #0B0D10;
+  box-shadow: 0 30px 70px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(61,107,255,0.26);
+}
+/* the thin window chrome, so each plate reads as a product and not a photo */
+.ob-pstack__chrome {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 10px;
+  background: rgba(237,233,226,0.06);
+  border-bottom: 1px solid rgba(237,233,226,0.10);
+}
+.ob-pstack__chrome i {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(237,233,226,0.26);
+}
+.ob-pstack__chrome em {
+  margin-left: 6px;
+  font-family: var(--font-mono); font-style: normal;
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(237,233,226,0.82);
+}
+.ob-pstack__shot { display: block; aspect-ratio: 16 / 10; }
+.ob-pstack__shot img { width: 100%; height: 100%; display: block; }
+
+/* ── Ch3's lower third: one proof tile per product ────────────────── */
+.sc-inner--below { grid-template-rows: auto auto; row-gap: clamp(26px, 4vh, 48px); }
+.sc-inner--below .sc-below { grid-column: 1 / -1; }
+.pt-row {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.6vw, 22px);
+}
+.pt { min-width: 0; }
+.pt-link {
+  display: flex; flex-direction: column; gap: 10px;
+  height: 100%; padding: 18px 20px 16px;
+  border: 1px solid rgba(var(--chapter-rgb, 237,233,226), 0.22);
+  border-radius: 12px;
+  /* the tiles sit IN the chapter's light rather than on a grey card */
+  background: linear-gradient(
+    180deg,
+    rgba(var(--chapter-rgb, 237,233,226), 0.10),
+    rgba(var(--chapter-rgb, 237,233,226), 0.03)
+  );
+  text-decoration: none;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+.pt-link:hover,
+.pt-link:focus-visible {
+  border-color: rgba(var(--chapter-rgb, 237,233,226), 0.5);
+  background: linear-gradient(
+    180deg,
+    rgba(var(--chapter-rgb, 237,233,226), 0.18),
+    rgba(var(--chapter-rgb, 237,233,226), 0.06)
+  );
+  transform: translateY(-2px);
+}
+.pt-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.pt-name {
+  font-family: var(--font-display); font-size: clamp(17px, 1.5vw, 21px);
+  letter-spacing: -0.02em; color: var(--color-parch);
+}
+/* The raw chapter blue measured 4.12:1 on the tile: fine as LARGE text
+   at 25px, but the figure sets at 19px on a phone where it is normal
+   text and needs 4.5:1. A literal tint, not the live --chapter-rgb
+   token: color-mix() against that token did not resolve and collapsed
+   the figure to 1.13:1. This row is Ch3's alone, so the blue is the
+   chapter's own light lifted until it is legible — measured 8.6:1. */
+.pt-fig {
+  font-family: var(--font-display); font-size: clamp(19px, 1.8vw, 25px);
+  letter-spacing: -0.03em; color: rgb(167,186,255);
+}
+.pt-sector {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; text-align: right;
+  color: rgba(237,233,226,0.56);
+}
+.pt-line { font-size: 14px; line-height: 1.5; color: rgba(237,233,226,0.78); }
+.pt-go {
+  margin-top: auto; display: flex; align-items: baseline; gap: 8px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(237,233,226,0.6);
+}
+.pt-arrow { margin-left: auto; color: var(--color-parch); }
+@media (max-width: 860px) {
+  .pt-row { grid-template-columns: 1fr; }
+  .ob-pstack__card { width: 94%; margin: -30% 0 0 -47%; }
+}
