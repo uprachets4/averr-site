@@ -2640,6 +2640,131 @@ The three chapters read as one family without reading as one template: the fan, 
 
 ---
 
+---
+
+**SESSION 25b — Ch5–Ch8, the rail, and the light that was never on.** Five commits (`87c70b7`, `81eb118`, `11339a8`, `7c87f35`, `0f672cd`).
+
+### The ruling: the colour had to become visible — and it was not visible at all
+
+The brief raised the glow cap to ~0.5, added a ≤0.3 horizon wash, and tinted the word's edge and the active rail label. Those landed. Then the frames still read as near-black, so I sampled the pixel at the glow's own centre instead of trusting the screenshot:
+
+| | at the glow centre, before | after |
+|---|---|---|
+| ch-ai | rgb(20,20,18) | **rgb(78,62,113)** |
+| ch-marketing | rgb(20,20,18) | **rgb(85,74,49)** |
+| ch-founder | rgb(20,20,18) | **rgb(57,54,49)** |
+
+Every chapter sampled the bare ground. **`.home-dark` painted an opaque background over the fixed light layer**, so the chapter light has been invisible since it was built in 25a — what warmth showed in 25a's frames was each 3D object's own `box-shadow`. The ground moved to the wrapper, `.clight` sits on it at `z-index: 0`, content goes to `z-index: 1`.
+
+The lesson generalises: *a scroll-linked value can be correct and still never reach the screen.* 24a had the same shape (a `clipPath` that read its start value at the end of a pin). **Sample the pixel, not the stylesheet.**
+
+### Three colours that never flipped when their chapters stopped being cream
+
+A sweep of every text-owning element in all eight chapters, each against the ground actually behind it, found:
+
+1. **Ch7's CTA — "Meet the person who builds it" — at 1.00:1.** Ink on the dark ground: present in the DOM, invisible on screen, for a whole session. `MagneticCTA` takes `tone="dark"`; Hero passed it, `FounderChapter` did not.
+2. **`.st` and `.fc-wrap` still handed down `--color-ink`.** 25a overrode each *named* element to parch and missed everything that inherits.
+3. **The hero clock at 3.23:1, 13px.** `TorontoClock` paints `--color-muted` — a cream-ground token — **inline**, so no stylesheet rule could reach it. Only its own `style` prop can.
+
+The sweep now passes with **every visible text element on home ≥ 4.5:1**, nothing excluded but `sr-only`.
+
+### Contrast on the brightest lit pixel behind text
+
+Sampled with the text hidden, so the reading is ground and not an anti-aliased glyph edge:
+
+| chapter | brightest lit pixel behind text | parch contrast |
+|---|---|---|
+| ch-websites | rgb(35,30,27) | 13.63:1 |
+| ch-products | rgb(25,28,39) | 14.03:1 |
+| ch-ai | rgb(32,29,38) | 13.72:1 |
+| ch-marketing | rgb(43,40,29) | 12.19:1 |
+| ch-work | rgb(57,57,55) | 9.57:1 |
+| ch-start | rgb(98,74,47) | 6.83:1 |
+
+All clear the 4.5:1 minimum. **ch-start is 6.83:1, just under the 7:1 body target** — the dawn horizon is the brightest ground on the page and the figure is honest; it is a kicker and a note that sit there, not running body copy.
+
+### The giant words
+
+Measured on the rendered frames, not judged:
+
+- **PRODUCTS and AUTOMATE overran the ruled column by 45–61px** at 1440 and 1920 — the last letter sat outside the chapter's own measure and read as a broken effect. The per-character advance had been tuned on WEBSITES. 0.72em is the measured figure for the widest words, and the vh cap came down to 14vh because at 1920 the *cap*, not the formula, was what let the word overrun. Every word now sits inside the column at 1280, 1440 and 1920.
+- **One parch wash for four captures left PRODUCTS dull**: 13% of its glyph pixels under the legibility floor, median 145 against 226–240 for its siblings. The wash is per chapter now (`lift` on the spec); Products takes 0.80 → 6% and median 178. Its capture was illegible texture at any wash, so nothing was lost.
+- GROW is 403px of glyphs against AUTOMATE's 690px because it is a four-letter word at the same size. **That is left alone** — tracking it out to match would read as a spaced label, not a slab.
+
+### Ch5–Ch8 and the rail
+
+- **Ch5 Marketing** — gold: concentric rings on a tilted plane with five pins rising out of it, GROW, the five remaining Grow services.
+- **Ch6 The work wall** — every `/work/` capture in `SCREENSHOTS`, a 3D-tilted drifting wall, hover pulls a tile forward and dims its siblings. "This is the work." / "Open the vault →" to `/work`. `TemplateWall` and `WorkStrip` are **deleted**.
+- **Ch7 Who builds it** — the parch monogram with its warm glow on the dark ground, the claim, three credits, the CTA (now visible).
+- **Ch8 Your move** — the dawn horizon, the path cards, and the "runs on." slab. It had been built with `PillHl invert`, a dark pill on a dark ground that read as a stray rounded box; it matches the hero's parch slab now, so the bookend reads as the same object returning.
+- **The rail** tracks all eight chapters and the active label carries the chapter's light: terracotta → blue → violet → gold → white → warm parch → dawn.
+
+### The flow had a cream slab at the end of it
+
+The 5% trace found home's last frame at **mean luminance 204.6** against the page's own 29–71: the global footer is a full-viewport cream ground, and it was the one cream ground left on home. The footer now takes the tone of the page it closes, through the `usePageEndTone` mechanism that already existed for its reveal, and `Home` declares `"dark"`. Home's last frame measures **68**, and all 19 footer text elements pass ≥ 4.5:1.
+
+**Named side effect:** `/services` and `/about` already declared a dark end tone, so **their footers turn dark too**. Both close on a dark band, so the footer continues their own ground rather than cutting to cream — but it is a visible change to two pages outside home, and the owner should rule on it. `/work` and the other cream routes are untouched.
+
+### No dead frames
+
+Traced at every 5% of a 19,682px page: mean luminance 29.1–204.6, and **5–14 visible text elements in every single sample**. No empty frame anywhere.
+
+### The CLS regression, and how it was found
+
+Crash scroll put mobile CLS at **0.4363** against a 0.1 budget. Home's chapters pin for 320vh on a desktop and stand at about 100vh on a phone, and the reserve held the desktop figure at every width — each chunk mounting **collapsed the page by ~1,843px under the reader**.
+
+There are **two** reserves per chapter — `LazyBelowFold`'s placeholder and the `Suspense` fallback behind it — and fixing only the placeholder moved it to 0.3205, which is how the second one was found. They are one component now carrying a per-breakpoint height.
+
+| | before | after |
+|---|---|---|
+| 375×812 | 0.4363 | **0.0102** |
+| 1920×1080 | 0.0518 | **0.0086** |
+| 1440×900 | 0.0001 | 0.0001 |
+
+### Numbers
+
+| | 25a | 25b |
+|---|---|---|
+| Home initial JS (transferred, real load) | 146.53 kB | **146.92 kB** (+0.39) |
+| Mobile LCP (alias, standard harness) | ~1948 ms | **1788 ms** `[1780, 1788, 1796]` |
+| LCP element | — | `P.hx-sub` |
+| Mobile crash-scroll CLS | 0.4363 | **0.0102** |
+
+*Verified on the alias:* 1440 CLS 0.0001 / 375 CLS 0.0102, **zero horizontal overflow**, no console or page errors.
+*Mobile 375:* zero overflow, **no text under 13px**, **no control under 44px** inside `main`.
+*Reduced motion:* every chapter renders its content with no pin.
+Longest task after 2.5s during a three-speed crash scroll: 96ms at 1440, 71ms at 1920, none on mobile — above the 50ms line and worth a Ship-pass look.
+
+### Quality gate — honest critique
+
+**The colour reads as colour now, and it does not cheapen the page.** It is a soft directional wash with a low horizon, occluded by the object in front of it, and it falls off into black well before the text column. It does not read as neon and it does not read as a gradient blob — mostly because it is never the brightest thing in frame and never sits behind body copy. At 1920 it is better than at 1440: there is more black for it to fall into.
+
+**The strongest chapters are Ch1 and Ch6.** The hero's field of real captures and Ch6's wall of real screens make the breadth argument with no copy at all. **Ch5's rings and Ch3's orb are the best of the abstract objects.** 
+
+**Where it is still short.** Ch3 (Products) is the weakest: two services on the list leaves a visibly empty lower third, the exploded capture reads as muddy overlapping panels, and its word is the dullest of the four even after the lift. Ch6's head copy sits over the wall with no scrim — it measured 9.57:1 at this scroll position, but that is a property of which tiles happen to be behind it, not a guarantee.
+
+### Does home tell one engaging story about what we build?
+
+**Yes, and it is the first time I would say so plainly.** The spine is real: *we build the things your business runs on* → the four things, each with its own colour, its own object and its own real proof → *here is all of it* → *here is who makes it* → *your move*, closing on the hero's own slab. Every claim lands on a real capture. The colour flow is what makes it one film rather than eight sections.
+
+The honest qualifier: **the story is carried by the words and the real work, and the 3D objects are the weakest link** — they are competent CSS abstractions, and Products' is genuinely muddy. If a session is spent here, spend it there.
+
+### Deviations
+
+1. **The Session 21 headline ruling is no longer met and cannot be.** It required the h1 at **≥140px (target ~150px) at 1440×900**. The hero headline measures **67px at 1440 and 80px at 1920**, because 25a made it a 120-character sentence in a half-width column beside the real-work field. At 140px the first line alone would be ~1520px — wider than the viewport. **This needs an owner ruling:** shorter headline, full-width headline (losing the field beside it), or accept the current size.
+2. **The footer tone change reaches `/services` and `/about`** — see above.
+3. ch-start is 6.83:1, under the 7:1 body target, over the 4.5:1 minimum.
+4. The 12px "Studio"/"Resources"/"Contact" footer headings measure **3.10:1 on the cream footer** of the other routes — a pre-existing site-wide failure, not introduced here. It joins the global nav's 44px item in the Ship pass.
+
+### My own errors this session
+
+1. **I shipped a chapter light that never reached the screen and wrote critiques of frames that were lit only by box-shadows.** Two sessions of "the colour is too subtle" were one opaque background. I only found it by sampling the glow's own centre pixel.
+2. **I "fixed" the word sizing and reported two measurements of the same block box** — 645px for both GROW and WEBSITES — without noticing that a block-level span tells you nothing about glyphs.
+3. **I added a CSS rule for the hero clock that could never win** against the component's inline colour, and had to be shown it by the probe reporting the same 3.23:1 twice.
+4. **I fixed one of two reserves** and reported the CLS as improved before checking whether anything else reserved the same space.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -2740,6 +2865,43 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 ---
 
+## 3b. SITE STANDARD — the one colour flow
+
+**Owner instruction, Session 25, overriding the cream/ink chapter rhythm.** The site palette is **the dark ground + chapter light + parch type**. **Cream grounds are retired site-wide.** Home is migrated; the other pages migrate in later sessions. This section is the pattern to copy.
+
+### The three layers, in order
+
+1. **One ground.** A single wrapper (`.home-dark`) carries `--color-dark` from the first pixel to the last. No section paints its own ground. A chapter that used to be cream is made `background: transparent`.
+2. **The light, ON the ground.** One `position: fixed` layer (`.clight`) whose colour interpolates with scroll between chapter entries. It sits at `z-index: 0` **above the wrapper's background**; content sits at `z-index: 1`.
+   **The trap that cost two sessions:** if the wrapper's background is opaque and the light is a child painted behind it, the light is invisible and nothing errors. The wrapper needs `isolation: isolate` and the content needs an explicit `z-index` above the light.
+3. **Parch type on top**, never sitting on the hotspot — the glow is parked in the object column (x ≈ 24%), the text column stays off it.
+
+### The light's own shape
+
+Per chapter: `{ rgb, alpha ≤ 0.5, horizon ≤ 0.3, x, y }`. A tight glow radial (`34% 40%`) plus a wide low horizon radial (`118% 46% at 50% 108%`). The chapter's rgb is published as `--chapter-rgb` on `:root`, which is how the giant word's 1px edge stroke and the active rail label pick it up for free. Under reduced motion it snaps to the nearest chapter instead of interpolating.
+
+### What makes it read as colour and not as cheap
+
+Measured, not asserted: it is **never the brightest thing in frame**, it is **occluded by the object in front of it**, and it **falls off into black before the text column**. Those three together are why it does not look like a gradient blob. Raise any of them and it will.
+
+### The rules that come with the standard
+
+- **Every colour flips with the ground, including the inherited one.** Overriding each *named* element to parch is not enough — set `color` on the section wrapper too, or anything that inherits comes out ink-on-dark and is invisible without erroring. This bit three times in one session.
+- **`--color-muted`, `--color-ink`, `--color-ink-soft`, `--color-muted-2` are CREAM-ground tokens.** On the dark ground use `--color-parch`, `--color-muted-l`, or an explicit `rgba(237,233,226,…)`.
+- **An inline colour can only be beaten by that component's own `style` prop.** `TorontoClock` and `MagneticCTA` both paint inline; `MagneticCTA` takes `tone="dark"`.
+- **The global footer takes the tone of the page it closes**, via `useDeclarePageEndTone`. A page that ends dark declares `"dark"` and the footer follows. This is the migration hook: as each page moves to the dark ground, it declares its end tone and the footer comes with it.
+- **Verify by sampling the pixel, with the text hidden.** Sampling with glyphs present returns anti-aliased parch edges, not ground.
+
+### The migration checklist for the next page
+
+1. Wrap the page in the dark ground; make every section's own background transparent.
+2. Mount the light layer and give the page its chapter entries.
+3. Flip the inherited `color` on every section wrapper, not just the named elements.
+4. `useDeclarePageEndTone("dark")`.
+5. Sweep **every text-owning element against the ground actually behind it** and require ≥ 4.5:1. Expect to find ink-on-dark that renders in the DOM and is invisible on screen.
+6. Trace every 5% for dead frames, and crash-scroll for CLS — a lazy reserve written for one breakpoint will collapse the page on another.
+
+
 ## 4. LOCKED RULES + STANDING RULES
 
 **Never break these without Prachets explicitly unlocking them in the session brief.**
@@ -2748,6 +2910,16 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 - **THE PALETTE RULE IS UPDATED BY OWNER INSTRUCTION (25).** Cream grounds are RETIRED site-wide. The palette is the dark ink ground + chapter LIGHT + parch type. A page is one continuous ground; the story is told by a fixed light layer whose colour interpolates with scroll, not by switching grounds. Home is the pilot (Session 25); the other pages migrate in later sessions. Screen and photo interiors still keep their own colours.
 - **THE SITE STANDARD, as the owner approved it (25).** Three patterns carry every page from here: (1) the 3D room of real work, (2) the giant word with real captures moving inside the letterforms, (3) dark plus parch typographic confidence. A chapter is: a 3D object that answers the cursor, the giant word, a line addressed to the reader, and a ruled list that links onward.
+- **THE SITE PALETTE IS THE DARK GROUND + CHAPTER LIGHT + PARCH TYPE (25, OWNER INSTRUCTION).** This **UPDATES** the earlier locked palette rule: **cream grounds are retired site-wide.** Home is migrated; the other pages migrate in later sessions. The pattern, the traps and the per-page checklist are in **§3b SITE STANDARD**. The global footer takes the tone of the page it closes (`useDeclarePageEndTone`), which is the migration hook.
+
+- **HOME IS EIGHT CHAPTERS ON ONE GROUND (25).** What we build (the hero) · Websites · Products · Automation · Marketing · The work (/work) · Who builds it (/about) · Your move (/contact). This **supersedes** the five- and six-chapter rules below. The rail carries all eight and its active label is tinted by the chapter light.
+
+- **A COLOUR IS VERIFIED BY SAMPLING THE PIXEL, NOT THE STYLESHEET (25b).** The chapter light was computed correctly, written to the node correctly, and invisible for two whole sessions because an opaque background painted over it — and nothing errored. Sample the glow's own centre; sample the ground **with the text hidden**, because glyphs present return anti-aliased parch edges.
+
+- **EVERY COLOUR FLIPS WITH THE GROUND, INCLUDING THE INHERITED ONE (25b).** Overriding each *named* element to parch leaves anything that inherits rendering ink-on-dark: in the DOM, invisible on screen, no error. Three separate instances in one session, including Ch7's entire CTA. Set `color` on the section wrapper, and remember an inline colour can only be beaten by that component's own `style` prop.
+
+- **A LAZY RESERVE IS PER BREAKPOINT, AND THERE ARE TWO OF THEM (25b).** Home's chapters pin for 320vh on a desktop and stand at ~100vh on a phone; one reserve for both collapsed the page by ~1,843px under the reader and took mobile CLS to 0.4363. `LazyBelowFold`'s placeholder **and** the `Suspense` fallback behind it both reserve, and both have to agree.
+
 - **BUNDLE SIZE IS MEASURED ON A REAL LOAD (25a).** Rollup's split is a function of the module graph, so the entry chunk's gzip is not comparable across a restructure — rearranging home moved React into the entry and read as a 14 kB regression that did not exist. `vite.config.ts` pins react and motion into their own chunks, and the metric is the total JS transferred on a real page load.
 
 - **HOME IMPORTS NOTHING FROM ANOTHER PAGE'S COMPONENTS (24b ruling).** Every plane in the hero field is a real case-study capture, and no home module imports from `services/build`. The screen chunks (37.12 kB gzip) are off home's graph and live inside /services' own lazy `ServicesBuild`.
