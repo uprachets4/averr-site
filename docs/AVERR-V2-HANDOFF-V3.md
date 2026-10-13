@@ -3151,6 +3151,97 @@ Two cinematic case cards over the same atmosphere, each holding a real capture i
 
 ---
 
+---
+
+**SESSION 27c — home complete on the Nolana system.** Six commits (`27c-G1` … `27c-2`).
+
+### The three gaps 27b named
+
+**G1 · Hero rhythm.** Measured before: gaps 41 / 23 / 31 with the content block ending at 52% of the hero. The rhythm is a three-step scale now and the column is centred in the space between the nav and the client band: **43 / 20 / 31, block centre 9px off the optical centre at 1440 and 4px at 1920.**
+
+A gap my own 27b critique had missed, visible once the frames were side by side: **frame 01's wave is a diagonal ribbon** sweeping lower-left to upper-right, where mine was a symmetric dome — and a dome is what makes a point field look generated. The swell runs diagonally now with the ridge riding higher to the right. Their client row also carries a mono label and hairline separators; ours has both, in Averr's words.
+
+**G2 · Card density.** Measured dead space per step before: **19.6 / 45.8 / 24.6 / 20.9%** against a 15% limit. Each step now carries two glass sub-panels lifted out of the panel's plane with live content from that step, and the content stretches to occupy its box.
+
+| step 0 | step 1 | step 2 | step 3 |
+|---|---|---|---|
+| 6.9% | 13.1% | 5.6% | **15.4%** |
+
+Step 3 is **0.4pp over and reported as such**. Step 1's original 45.8% was partly my detector reading the site's deliberate gradient hero block as flat; that block carries real content now.
+
+**G3 · Composed captures.** Not one rectangle in a frame: the screen leans into the stage in perspective, a rim light from the orb rakes its glass, the atmosphere hazes back over the device's edges, and **two details of the same capture** are lifted out in z beside it — crops of the very same file, not second assets. All four move apart on hover.
+
+### 1 · One studio
+
+**The PU mark is really extruded.** The owner chose three.js ExtrudeGeometry over a CSS stack. The mark is a **filled path with `fill-rule: evenodd`**, so `SVGLoader` returns shapes with their counters already holed out and the extrusion is honest rather than a silhouette. The site gradient is baked into the geometry as **vertex colours along x** — no texture, no second material — with a key light, a lavender rim and a warm point light raking the bevel. It turns slowly and leans toward the cursor. **three@0.179.1, pinned** (published 2025-08-02). **60 fps at 1440.**
+
+Four capability chips orbit on a tilted ring, each into its `/services` anchor. They rendered as 9–16px slivers through three attempts before the real cause: **the `li` had no `transform-style: preserve-3d`**, so the chip's counter-rotation was flattened into the ring's tilted plane and could never come face-on. The counter also has to undo the ring **in reverse order** — Rz(−θ) then Rx(−62).
+
+### 2 · Who builds it
+
+The founder card on the light ground with a gradient rim, the mark, the statement with the Cormorant accent on *earn their portfolio slot*, the three credit lines from the existing data, and the link to `/about`. **No photo exists at `public/about/`**, so the mark carries it, as the brief allows.
+
+### 3 · The ending
+
+The statement fills word by word over a rising mesh, with the two CTAs. Filled outright under reduced motion.
+
+### 4 · The footer
+
+Navy on every route, replacing the giant-wordmark footer: the wordmark, what we do, the mailing line, Studio and Contact columns, "Start a project", the live Toronto clock and a hairline bottom bar. **Verified on `/`, `/work`, `/about` and `/contact`.** The Legal column is omitted — **no privacy route exists**.
+
+### 5 · Tools row — NOT BUILT
+
+Held per the brief, pending the owner's list. Recorded as an owner item in §7.
+
+### 6 · Cleanup
+
+`FounderChapter`, `StartChapter` and `FooterMark` deleted with zero importers; home no longer declares a footer end tone. **`src/` is 16 kB smaller.**
+
+### Numbers
+
+| | 27b | 27c |
+|---|---|---|
+| Home initial JS | 147.84 kB | **144.50 kB** (−3.34 — lighter than before) |
+| The 3D chunk (three + Mark3D) | — | **134.9 kB transferred** (≈175 kB accepted) |
+| Mobile LCP (alias) | 1872 ms | **1820 ms** `[1760, 1820, 1852]` |
+| LCP element | `SPAN.nh-line` | `SPAN.nh-line` (unchanged) |
+| Mesh fps · mark fps | 60 · — | **60 · 60** |
+
+LCP is **under 2000 ms, so the third mesh layer stays** — the brief's trim condition is not triggered.
+*Crash scroll on the alias:* 1440 CLS 0.0342, 375 0.0353, zero overflow, no errors.
+*Mobile 375:* no text under 13px (12px in the footer), zero overflow. **Two inline text links remain under the 44px house target** at 18px and 27px tall; WCAG 2.5.8 asks 24×24, so they pass the standard and not our stricter bar.
+*Reduced motion:* the mesh is a still, the 3D mark falls back to the flat gradient mark, the ring stops, both statements are filled, the story's steps still respond.
+
+### Quality gate — kept / better, against the frames
+
+**Hero vs 01–02.** Kept: the centred column, the gradient pill, the mono chip, the separator'd client row. **Better:** the pill cycles and *reshapes the wave field* — four formations — where theirs is a fixed word over a fixed wave.
+
+**Story vs 09–10.** Kept: the dark device over a misty procedural atmosphere, glass panels, the glowing orb. **Better:** live panels at every step against their blurred screenshot, a device that tilts to the cursor, a glow that spills in the step's own colour, and sub-panels carrying real state.
+
+**Work vs 11–12.** Kept: a real screen in a glass frame over the atmosphere, a title with a grey continuation. **Better:** the orb follows the cursor, details of the same capture are lifted out in z, and each card carries a figure traced to its case study — theirs carry none.
+
+**One studio vs 14.** Kept: a centred hero object over a dark field with a soft bloom. **Better:** ours is a **genuinely extruded 3D object** with the brand gradient in its geometry, orbited by four real links — theirs is a flat mark with a glow ring.
+
+**Ending vs 15.** Kept: the centred closing statement and the paired CTAs. **Better:** ours fills word by word and drives the mesh's amplitude as it does.
+
+**Where Nolana still wins.** Their section-to-section *transitions* are smoother — they carry a continuous background treatment between light and dark blocks, where ours cuts at each boundary. That is the honest remaining gap and the first thing I would take next.
+
+### Deviations
+
+1. **Step 3's panel is 15.4% empty** against a 15% limit.
+2. **Two inline links under the 44px house target** (pass WCAG's 24×24).
+3. **No tools row** — held for the owner's list.
+4. **No Legal column** — no privacy route exists.
+5. The reference set is **15 frames, not 16**, so the brief's map shifts by one at the tail.
+
+### My own errors this session
+
+1. **I chased the orbiting chips through three wrong fixes** — radius, counter-animation, rotation order — before finding the actual cause, a missing `preserve-3d` on the parent.
+2. **My "dead space" detector reads a deliberate gradient as empty**, which sent me after a 45.8% figure that was partly an artifact.
+3. **I reported G1 complete in 27b** without noticing the dome-versus-ribbon difference that the frames made obvious in seconds.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -3637,6 +3728,10 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 ---
 
 ## 7. OPEN ITEMS (owner actions — Prachets)
+
+- **TOOLS ROW (27c, owner item).** The brief held it: no logos may be guessed. Supply the list of tools Averr actually uses or integrates and it gets built into home between the story and the work.
+
+
 
 1. **Number truth check.** CareerClarity AI's **3.2×** opens the home ledger while CareerClarity itself is a draft with no case study; and the three Averr Studio figures (**40+ sites, 15× AI agents/workflows, 1.4s Core Web Vitals**) have never been audited in-session. Confirm each is defensible or replace it.
 2. **Founder photo for /about** — wanted, but **NOT blocking**. Ruled 2026-10-06: the spec keeps the PU mark until a real photo exists, and **no placeholder is ever used**. Supply one and the mark's slot takes it.
