@@ -1,10 +1,12 @@
-import { Suspense, lazy, useCallback, type CSSProperties } from "react";
+import { Suspense, lazy, useCallback, useEffect, type CSSProperties } from "react";
 import NolanaHero from "../components/nolana/NolanaHero";
 import LazyBelowFold from "../components/LazyBelowFold";
 import ChapterRail from "../components/home/ChapterRail";
 import ChapterLightLayer from "../components/home/ChapterLight";
 import { GradientDefs } from "../components/nolana/Bits";
+import { Problem, WhatWeBuild, Numbers } from "../components/nolana/Sections";
 import { useDeclarePageEndTone } from "../lib/pageTone";
+import { useSetNavDarkOverride } from "../lib/navTone";
 
 /**
  * Home, as one storytelling film on ONE colour flow.
@@ -52,6 +54,20 @@ export default function Home() {
      otherwise paint cream until it mounted. */
   useDeclarePageEndTone("dark");
 
+  /* Session 27: the dark glass bar sits on EVERY section of home, light
+     ones included — it is part of the system, not a reaction to what is
+     under it. */
+  const setNavDark = useSetNavDarkOverride();
+  useEffect(
+    function navAlwaysDark() {
+      setNavDark(true);
+      return function reset() {
+        setNavDark(false);
+      };
+    },
+    [setNavDark]
+  );
+
   const loadWebsites = useCallback(() => import("../components/home/WebsitesChapter"), []);
   const loadProducts = useCallback(() => import("../components/home/ProductsChapter"), []);
   const loadAI = useCallback(() => import("../components/home/AutomationChapter"), []);
@@ -67,6 +83,9 @@ export default function Home() {
 
       <GradientDefs />
       <NolanaHero />
+      <Problem />
+      <WhatWeBuild />
+      <Numbers />
 
       <section id="ch-websites" data-tone="dark">
         <LazyBelowFold load={loadWebsites} minHeight="320vh" minHeightSm="107vh" background="transparent">
