@@ -81,7 +81,19 @@ function Card({ slug, i }: { slug: string; i: number }) {
             sizes="(min-width: 1024px) 44vw, 90vw"
             loading="lazy"
           />
+          <span className="wc-frame__rim" aria-hidden />
         </span>
+        {/* G3 — two details lifted OUT of the same capture, so the
+            screen is composed into the scene rather than sitting in
+            front of it. Each is a crop of the very same file, scaled
+            and offset, not a second asset. */}
+        <span className="wc-crop wc-crop--a" aria-hidden>
+          <Screenshot src={SHOT[slug]} alt="" sizes="220px" loading="lazy" />
+        </span>
+        <span className="wc-crop wc-crop--b" aria-hidden>
+          <Screenshot src={SHOT[slug]} alt="" sizes="180px" loading="lazy" />
+        </span>
+        <span className="wc-haze" aria-hidden />
       </span>
       <span className="wc-card__foot">
         <span className="wc-card__row">

@@ -3416,3 +3416,54 @@ a { color: inherit; text-decoration: none; }
 .dsub--d { bottom: 36%; right: 5%; animation-delay: 0.9s; }
 .dp-chat__msg { max-width: 96%; padding: 15px 18px; }
 .dp-chat__in { max-width: 72%; padding: 12px 16px; }
+
+/* ══ G3 — the captures are COMPOSED into the scene ═════════════════ */
+.wc-card__stage { perspective: 1400px; transform-style: preserve-3d; }
+/* the screen leans into the frame rather than facing it flat */
+.wc-frame {
+  transform: rotateY(-7deg) rotateX(3deg) translateZ(0);
+  transform-origin: left center;
+}
+.wc-card:hover .wc-frame { transform: rotateY(-4deg) rotateX(2deg) scale(1.04) translateY(-6px); }
+/* the rim light the orb throws across the glass */
+.wc-frame__rim {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(118deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 34%);
+  mix-blend-mode: screen;
+}
+/* two crops of the SAME capture, lifted in z */
+.wc-crop {
+  position: absolute; overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(12,16,22,0.9);
+  box-shadow: 0 24px 46px -22px rgba(0,0,0,0.95);
+  transition: transform 700ms cubic-bezier(0.22,1,0.36,1);
+}
+.wc-crop img { display: block; width: 300%; max-width: none; height: auto; }
+.wc-crop--a {
+  width: 38%; aspect-ratio: 16 / 7; left: -4%; top: 16%;
+  transform: rotateY(9deg) translateZ(42px);
+}
+.wc-crop--a img { margin: -14% 0 0 -6%; }
+.wc-crop--b {
+  width: 30%; aspect-ratio: 4 / 3; right: 4%; bottom: 14%;
+  transform: rotateY(-11deg) translateZ(66px);
+}
+/* aimed at the KPI band of the same capture; the previous offset
+   landed on an empty dark region and the crop read as a black card */
+.wc-crop--b img { margin: -26% 0 0 -72%; }
+.wc-card:hover .wc-crop--a { transform: rotateY(7deg) translateZ(62px) translateY(-5px); }
+.wc-card:hover .wc-crop--b { transform: rotateY(-9deg) translateZ(92px) translateY(-7px); }
+/* the atmosphere wraps back over the device's edges */
+.wc-haze {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(70% 50% at 10% 100%, rgba(18,26,38,0.85), transparent 70%),
+    radial-gradient(60% 40% at 96% 8%, rgba(175,158,224,0.22), transparent 72%);
+}
+@media (max-width: 860px) {
+  .wc-crop--a { width: 44%; }
+  .wc-crop--b { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .wc-crop, .wc-frame { transition: none; } }
