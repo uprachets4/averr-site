@@ -3,8 +3,7 @@ import NolanaHero from "../components/nolana/NolanaHero";
 import LazyBelowFold from "../components/LazyBelowFold";
 import { GradientDefs } from "../components/nolana/Bits";
 import { Problem, WhatWeBuild, Numbers } from "../components/nolana/Sections";
-import DeviceStory from "../components/nolana/DeviceStory";
-import WorkCards from "../components/nolana/WorkCards";
+
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useSetNavDarkOverride } from "../lib/navTone";
 
@@ -24,6 +23,10 @@ import { useSetNavDarkOverride } from "../lib/navTone";
  * surface and carries nothing it does not need.
  */
 
+/* Below the fold, so they stay out of the initial graph: with both in
+   it home's initial JS was +4.43 kB against a +3 budget. */
+const DeviceStory = lazy(() => import("../components/nolana/DeviceStory"));
+const WorkCards = lazy(() => import("../components/nolana/WorkCards"));
 const FounderChapter = lazy(() => import("../components/home/FounderChapter"));
 const StartChapter = lazy(() => import("../components/home/StartChapter"));
 
@@ -69,6 +72,8 @@ export default function Home() {
     [setNavDark]
   );
 
+  const loadStory = useCallback(() => import("../components/nolana/DeviceStory"), []);
+  const loadWorkCards = useCallback(() => import("../components/nolana/WorkCards"), []);
   const loadFounder = useCallback(() => import("../components/home/FounderChapter"), []);
   const loadStart = useCallback(() => import("../components/home/StartChapter"), []);
 
@@ -79,14 +84,22 @@ export default function Home() {
       <NolanaHero />
       <Problem />
       <WhatWeBuild />
-      <DeviceStory />
+      <LazyBelowFold load={loadStory} minHeight="420vh" minHeightSm="119vh" background="transparent">
+        <Suspense fallback={<Reserve h="420vh" sm="119vh" />}>
+          <DeviceStory />
+        </Suspense>
+      </LazyBelowFold>
       <Numbers />
 
 
 
 
 
-      <WorkCards />
+      <LazyBelowFold load={loadWorkCards} minHeight="110vh" minHeightSm="158vh" background="transparent">
+        <Suspense fallback={<Reserve h="110vh" sm="158vh" />}>
+          <WorkCards />
+        </Suspense>
+      </LazyBelowFold>
 
       <section id="ch-founder" data-tone="dark">
         <LazyBelowFold load={loadFounder} minHeight="72vh" minHeightSm="118vh" background="transparent">
