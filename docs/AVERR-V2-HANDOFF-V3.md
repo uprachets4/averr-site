@@ -3060,6 +3060,97 @@ Kept until 27b/27c, restyled to the new tokens: the work wall (black ground — 
 
 ---
 
+---
+
+**SESSION 27b — the 27a fixes, the pinned device story, and the work.** Seven commits (`27b-F3` … `065c0a0`).
+
+**THE REFERENCE FRAMES ARE IN.** Not at the path the brief gave — `docs/reference/` did not exist and `~/Downloads/nolana-reference-frames.zip` was not there either. They were on the Desktop at `~/Desktop/Nolana/`: **15 frames**, not 16, which shifts the brief's map by one at the tail. They are installed at `docs/reference/nolana/01–15.png` and **`docs/reference/` is gitignored** — the repo is public and they are the owner's material.
+
+### REFERENCE RULE — exceed, don't replicate
+
+Recorded as a locked rule. Nolana is the quality bar, not a template. Every critique below names what we kept from its craft and what ours does better; where I cannot name the second, I say so.
+
+### F1 · The hero is centred
+
+The chip row, headline, subline and CTAs now share one axis — measured at **0px off centre** for all four. The clock moved into the chip row so the top line is one centred unit rather than two things in opposite corners.
+
+**Two of my own edits had silently not matched** earlier in the session, so the h1 was still 1150px and left-aligned and `.nh-inner` was never made a centred column. Found by measuring, not by looking.
+
+### F2 · Depth, and a mesh that answers the pill
+
+Three fields at three depths from one buffer: the far one denser, dimmer, slower, barely moving with the cursor; the near one with bigger points, a brighter crest and real parallax. **60 fps at 1440 on the alias with all three.**
+
+**BEYOND NOLANA — the mesh is the headline's subject, not its wallpaper.** Each pill phrase reshapes the whole field over 1.1s: *a website* a calm ordered lattice · *software* stepped terraces · *automation* flowing parallel streams · *customers* every point drawn toward one bright focus. Nolana's hero field is beautiful and inert; ours is an argument.
+
+### F3 · Two-tone continuations
+
+Both headings ran to three lines. The continuations were already inside 60 characters, so the length was the whole sentence *and* the measure — 22ch is about 484px at 44px.
+
+| | before | after |
+|---|---|---|
+| what we build | "— from the first search to the booked job." (42) | **"— from first search to booked job."** (34) |
+| numbers | "Measured on real projects, or promised in writing." (50) | **"Measured, or promised in writing."** (33) |
+
+Two lines at 1440 and 1920.
+
+### 1 · The pinned device story
+
+One scroll value drives the step and the panel — no timers. **420vh of wrap gives each step 80vh of dwell** against the 25vh floor, the step list is a real control that takes over from the scroll for good once clicked, and each step links to its `/services` chapter. **No dead frames across 21 samples** of the whole page.
+
+**Kept from Nolana (frame 09):** the material language — a dark device over a misty procedural atmosphere, glass panels with a low-alpha fill and a hairline light border, a glowing orb.
+
+**What ours does better:** Nolana's device is a still image inside a card, and the panel inside it is a *blurred screenshot*. Ours is the subject — it **tilts toward the cursor (±4°)**, its **glow spills onto the page in that step's own colour**, and the panel is **live at every step**: a search typing with Northgate climbing to #1 and a pulsing map pin; a site building itself headline-first; a calendar with a ghost cursor taking the 2:00 slot and confirming; an agent reply with the held time in **Cormorant italic on the gradient** and a ghost cursor pressing Approve.
+
+The atmosphere is procedural — an SVG sky gradient, a lavender bloom, three ridge silhouettes and an `feTurbulence` mist. No photographs.
+
+### 2 · The work
+
+Two cinematic case cards over the same atmosphere, each holding a real capture in a glass device frame, with the project, its thesis verbatim from `caseStudies.ts`, and its **verified figure where one exists** — SIFT carries 42%, CapitalCommand carries none because it has none. Then the roster row and "Open the vault". `WorkWall` is deleted and **captures still appear exactly once on home**, audited per section.
+
+**Kept from Nolana (frames 09, 11):** a real screen in a glass frame over the atmosphere, a glowing ring, a title with one grey continuation line.
+
+**What ours does better:** Nolana's orb is fixed to the centre of its card. Ours **follows the cursor** across the card while the frame pushes in, so the light behaves like a light in the room rather than a decal — and ours carries a **traced figure** where Nolana's cards carry none.
+
+### Numbers
+
+| | 27a | 27b |
+|---|---|---|
+| Home initial JS | 146.54 kB | **147.84 kB** (+1.30, budget +3) |
+| Mobile LCP (alias) | 1768 ms | **1872 ms** `[1832, 1872, 1888]` |
+| LCP element | `SPAN.nh-line` | `SPAN.nh-line` (unchanged) |
+| Mesh fps at 1440 (alias) | 60 (1 layer) | **60** (3 layers) |
+
+*Crash scroll:* 1440 CLS 0.0365, 1920 0.0173, 375 0.0424; zero overflow; no task over 50ms after 2.5s; no errors.
+*Dead frames:* none across 21 samples.
+*Mobile 375:* no text under 13px, no control under 44px, zero overflow, the story's steps become tabs.
+*Reduced motion:* the mesh is a still, the words are filled, the story shows one panel and its steps still respond to clicks.
+
+### Quality gate — honest critique against the frames
+
+**Hero vs frames 01–02.** Ours is at least as refined and more alive: the centred column, the 60px headline and the gradient pill match their discipline, and the pill-reactive mesh is something their hero does not attempt. **Theirs is still better in one respect** — their hero carries more vertical rhythm; mine has a quiet band between the CTAs and the mesh crest.
+
+**Problem vs frame 02.** Theirs runs ~62% of the frame in four lines; mine was a 20ch column and is now 1180px in three. Equal, not better — the difference is only that ours is shorter.
+
+**Story vs frames 09–10.** Ours is clearly ahead: live panels against their blurred screenshot, a device that reacts to the cursor, and a glow that belongs to the step. **Where theirs wins:** their card compositions are denser — floating sub-panels above and below the focal object — where my glass panel still has visible dead space top and bottom at 1440.
+
+**Work vs frames 11–12.** Ours is ahead on substance (a traced figure, a cursor-tracking orb). **Where theirs wins:** their captures are composed *into* the scene with overlapping UI fragments; mine is one rectangle in a frame.
+
+### Deviations
+
+1. **15 reference frames, not 16**, and not at the stated path — found on the Desktop.
+2. **LCP rose 104 ms** (1768 → 1872). Still well inside 2.5s, but it is a regression and the third field in the mesh is the likely cause.
+3. **The story's glass panel has dead space** at 1440 — named above rather than hidden.
+4. The `01`/`02` step numerals and the panels' inner labels were under 13px on mobile until fixed; they depict interfaces but their type is still type.
+
+### My own errors this session
+
+1. **Two CSS edits silently did not match** and I reported F1 as done before measuring it — the hero was still left-aligned at 1150px.
+2. **I replaced a working React `onMouseMove` with a window listener on a false signal.** My probe moved the mouse in one jump, which Playwright coalesces into no intermediate `pointermove`; with `steps: 8` the original would have passed too.
+3. **I left a 27a carry-over rule** (`#ch-work { background: black }`) that outranked the new section and painted it dark.
+4. **I shipped both new sections into the initial graph**, +4.43 kB against a +3 budget, and only caught it on the bundle measurement.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -3216,6 +3307,8 @@ Measured, not asserted: it is **never the brightest thing in frame**, it is **oc
 - **THE HERO TYPE SIZE IS A MEASUREMENT, NOT A STYLE (25c).** The divisor in `--type-hero-size` is the longest line's length in this face, and the vh term is the other half of the `min()`. When the copy changes, both change: the 25c headline is 13 characters where the old one was 38, and the vh term — not the column — was what held the type at 67px when the ruling asked for >= 120px. The field's safe zone is downstream of this: the headline's ink box moved from x 0-46% to x 8-58%, and planes that cleared the old zone did not clear the new one.
 
 - **A LAZY RESERVE IS ONLY CORRECT UNTIL ITS CHAPTER CHANGES (25c).** Ch3's proof tiles took it from 93vh to 159vh on a phone. Any session that changes a chapter's height re-measures and updates BOTH of its reserves.
+
+- **EXCEED, DON'T REPLICATE (27b, OWNER INSTRUCTION).** Nolana is the QUALITY BAR, not a template. Keep its palette discipline, material language and step-by-step storytelling; never copy its layouts, copy, icons, chip wording or section order one-to-one. Every section's critique must state (1) what we kept from Nolana's craft and (2) what ours does BETTER — if you cannot name what is better, it is not done. Averr's voice stays: the Cormorant italic accent on one key word per section, Averr's own copy throughout. The frames live in `docs/reference/nolana/` and **`docs/reference/` is gitignored — the repo is public.**
 
 - **THE SITE PALETTE IS THE NOLANA SYSTEM (27, OWNER DIRECTION).** This **SUPERSEDES** the Session 25 dark-ground + chapter-light rule. Light dominates: `--bg #F5F4F9`, `--bg-alt #EFEEF5`, hairlines `--hair #D4D4DA`, ink `--n-ink #0F1117`. Navy (`#121C27`/`#182633`/`#232837`) and black (`#080A0A`) are **cinematic moments only**. ONE gradient, `--grad`, applied PER ELEMENT — `background-clip: text` for words and numbers, `fill` for pills and glyphs — never as a wash. Home is migrated; the other pages follow in later sessions. The shared parts live in `src/components/nolana/Bits.tsx`: the mono chip, the two-tone heading, the corner index, the hairline guides, the gradient icon tile. The dark glass nav bar sits on EVERY section of home.
 
