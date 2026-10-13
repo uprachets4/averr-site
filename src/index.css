@@ -1713,3 +1713,21 @@ a { color: inherit; text-decoration: none; }
 .hx-jump:hover { background: rgba(237,233,226,0.08); border-color: var(--color-parch); }
 .hx-jump:focus-visible { outline: 2px solid var(--color-parch); outline-offset: 3px; }
 .hx-line--a { max-width: 18ch; }
+
+/* ── home is ONE ground: the chapters that still carried their own
+   cream are made transparent so the page-wide light shows through.
+   Ch7 and Ch8 get their full Session 25 treatment in 25b; this is the
+   minimum that keeps the colour flow unbroken today. */
+.home-dark .fc-wrap,
+.home-dark .st,
+.home-dark .ws,
+.home-dark .ws--stacked { background: transparent; }
+.home-dark .fc-eyebrow,
+.home-dark .fc-credit dt { color: rgba(237,233,226,0.6); }
+.home-dark .fc-h2,
+.home-dark .fc-credit dd { color: var(--color-parch); }
+.home-dark .fc-line,
+.home-dark .fc-statement { color: rgba(237,233,226,0.74); }
+.home-dark .fc-credit { border-top-color: rgba(237,233,226,0.16); }
+.home-dark .fc-svg path { stroke: var(--color-parch); }
+.home-dark .fc-glow { background: radial-gradient(closest-side, rgba(237,233,226,0.18), transparent 72%); }
