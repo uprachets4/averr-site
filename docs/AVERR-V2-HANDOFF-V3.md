@@ -2808,6 +2808,29 @@ The lower third carries **a proof tile per product**: the name, that study's own
 
 **Largest empty rectangle at dwell, against the 15% rule:** **9.6% at 1440** and **13.6% at 1920**, at each of three dwell positions. (Measured as the largest all-empty axis-aligned rectangle over a 48×30 grid, a cell counting as empty when it is both flat and near the bare ground.)
 
+### 25c ruling · the three products take turns at the front
+
+**A card's place in the stack is its RANK FROM THE FRONT, not its index**, and **the rank itself is what springs**. That is the whole mechanism: a swap reads as one plate sliding back while another rises, it stays transforms only (no layout, no repaint), and because the chapter's scroll still drives a separate `spread` scalar, the reorder and the opening **compose** instead of fighting each other.
+
+| | |
+|---|---|
+| Hover / focus / click / tap a tile | brings that product to the front |
+| At dwell, no interaction yet | the stack turns itself every **3s** |
+| First interaction | rotation stops **permanently** |
+| Front card | **100% unobstructed** at 1440 and 1920, all three products |
+| Reduced motion | no rotation; the spring is **bypassed**, not sped up, so a swap is instant |
+| Active tile | lit border + ground, and `aria-pressed` |
+
+**Legibility is measured by PAINT ORDER, not by box overlap.** The front card is nearest the camera, so the other two intersect its rect by 65–78% while covering none of it — the first probe I wrote reported that 65–78% as "covered" and it was meaningless. `elementFromPoint` over a 7×5 lattice inside the front card answers the real question: 35/35 samples hit the front card, for every product, at both widths.
+
+**THE TILE IS A BUTTON, with the case-study link as its own control underneath.** It was one `Link` doing both jobs, and **a tap could not be made to swap without navigating**: react-router runs the navigation in a transition **~240ms after the click**, and `preventDefault` did not hold it — not from React's handler, not from a capture-phase listener that also called `stopPropagation`. A button has no default to fight, so hover, focus, click and tap all mean the same thing on every input, and "read the case study" is explicit. Two tab stops per tile, both useful; all six controls ≥ 44px at 1440 and 375.
+
+**The dwell observer watches the viewport's middle band, not a ratio of the section.** At `threshold: 0.4` the rotation could never start: this chapter pins for 320vh, so in a 900px viewport its intersection ratio tops out near **0.31**. It is `rootMargin: "-40% 0px -40% 0px"` with threshold 0.
+
+*Verified:* all three products reach the front under auto-rotation; hover swaps each one and stops the rotation (7s idle, no further change); keyboard focus on a tile's button swaps and Tab reaches its link; on touch, tapping the tile body swaps **without navigating** and tapping the link opens the study. Worst text in the tiles **5.44:1**.
+
+**Honestly, where this leaves Ch3.** The rotation is the right call — it shows all three products without asking for anything, and it gets out of the way the moment the reader takes over. The two rear captures are still **named more than seen**, but that matters far less now that any of them can be brought forward. The chapter went from the weakest on the page to one that rewards pointing at it.
+
 ### Numbers
 
 | | 25b | 25c |
@@ -2993,6 +3016,12 @@ Measured, not asserted: it is **never the brightest thing in frame**, it is **oc
 
 - **THE PALETTE RULE IS UPDATED BY OWNER INSTRUCTION (25).** Cream grounds are RETIRED site-wide. The palette is the dark ink ground + chapter LIGHT + parch type. A page is one continuous ground; the story is told by a fixed light layer whose colour interpolates with scroll, not by switching grounds. Home is the pilot (Session 25); the other pages migrate in later sessions. Screen and photo interiors still keep their own colours.
 - **THE SITE STANDARD, as the owner approved it (25).** Three patterns carry every page from here: (1) the 3D room of real work, (2) the giant word with real captures moving inside the letterforms, (3) dark plus parch typographic confidence. A chapter is: a 3D object that answers the cursor, the giant word, a line addressed to the reader, and a ruled list that links onward.
+- **VISUAL OCCLUSION IS PAINT ORDER, NOT BOX OVERLAP (25c ruling).** In a 3D stack the front plane is nearest the camera: the planes behind it intersect its rect by 65-78% while covering none of it. `getBoundingClientRect()` cannot answer "is this covered" — sample `elementFromPoint` over a lattice inside the element and require every point to hit it.
+
+- **A CONTROL THAT MUST DO TWO THINGS IS TWO CONTROLS (25c ruling).** Ch3's tile was one `Link` meant to both reorder the stack and open a case study, and a tap could not be made to do the first without the second: react-router navigates in a transition ~240ms after the click, and `preventDefault` does not hold it — not from React's handler, not from a capture-phase listener with `stopPropagation`. The tile body is a `<button>` and the case-study link is its own control. Anything reaching for `pointerType`, `(hover: none)` or a "first tap arms it" ref is working around a structure that is wrong: a tap synthesizes `mouseenter` BEFORE `pointerdown`, so no ordering-based test is sound either.
+
+- **AN INTERSECTION THRESHOLD IS A RATIO OF THE OBSERVED ELEMENT (25c ruling).** Home's chapters pin for 320vh, so in a 900px viewport a chapter's intersection ratio tops out near 0.31 and `threshold: 0.4` never fires. For "is the reader at this chapter", observe the viewport's middle band with `rootMargin: "-40% 0px -40% 0px"` and threshold 0.
+
 - **A SELECTOR THAT SETS `position` MUST NAME WHAT IT MEANS (25c).** `.home-dark > *:not(.clight)` was written to lift the chapters above the light layer and also caught the fixed chapter RAIL, overriding `position: fixed` to `relative`: a 1440x256 nav sat in the document flow and pushed the whole page down 256px for a session. It is `.home-dark > section`. Verifying a component's BEHAVIOUR is not verifying its POSITION — the rail tracked chapters and tinted correctly the whole time.
 
 - **THE HERO TYPE SIZE IS A MEASUREMENT, NOT A STYLE (25c).** The divisor in `--type-hero-size` is the longest line's length in this face, and the vh term is the other half of the `min()`. When the copy changes, both change: the 25c headline is 13 characters where the old one was 38, and the vh term — not the column — was what held the type at 67px when the ruling asked for >= 120px. The field's safe zone is downstream of this: the headline's ink box moved from x 0-46% to x 8-58%, and planes that cleared the old zone did not clear the new one.
