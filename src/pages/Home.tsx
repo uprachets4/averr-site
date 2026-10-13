@@ -4,7 +4,6 @@ import LazyBelowFold from "../components/LazyBelowFold";
 import { GradientDefs } from "../components/nolana/Bits";
 import { Problem, WhatWeBuild, Numbers } from "../components/nolana/Sections";
 
-import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useSetNavDarkOverride } from "../lib/navTone";
 
 /**
@@ -27,8 +26,9 @@ import { useSetNavDarkOverride } from "../lib/navTone";
    it home's initial JS was +4.43 kB against a +3 budget. */
 const DeviceStory = lazy(() => import("../components/nolana/DeviceStory"));
 const WorkCards = lazy(() => import("../components/nolana/WorkCards"));
-const FounderChapter = lazy(() => import("../components/home/FounderChapter"));
-const StartChapter = lazy(() => import("../components/home/StartChapter"));
+const OneStudio = lazy(() => import("../components/nolana/Closing").then(m => ({ default: m.OneStudio })));
+const WhoBuildsIt = lazy(() => import("../components/nolana/Closing").then(m => ({ default: m.WhoBuildsIt })));
+const Ending = lazy(() => import("../components/nolana/Closing").then(m => ({ default: m.Ending })));
 
 /** The reserve a chapter holds while its chunk is in flight.
  *  There are TWO of these per chapter -- LazyBelowFold's placeholder and
@@ -46,12 +46,8 @@ function Reserve({ h, sm }: { h: string; sm: string }) {
 }
 
 export default function Home() {
-  /* Home ends dark, so the global footer closes on the same ground instead
-     of ending the colour flow with a cream slab. Declared here rather than
-     in StartChapter because that chapter is lazy and the footer would
-     otherwise paint cream until it mounted. */
-  /* home now ENDS on the light ground, so the footer follows it back */
-  useDeclarePageEndTone("cream");
+  /* 27c: the footer is navy on every route now, so home no longer
+     declares an end tone for it. */
 
   /* Session 27: the dark glass bar sits on EVERY section of home, light
      ones included — it is part of the system, not a reaction to what is
@@ -74,8 +70,7 @@ export default function Home() {
 
   const loadStory = useCallback(() => import("../components/nolana/DeviceStory"), []);
   const loadWorkCards = useCallback(() => import("../components/nolana/WorkCards"), []);
-  const loadFounder = useCallback(() => import("../components/home/FounderChapter"), []);
-  const loadStart = useCallback(() => import("../components/home/StartChapter"), []);
+  const loadClosing = useCallback(() => import("../components/nolana/Closing"), []);
 
   return (
     <div className="home-nolana">
@@ -91,31 +86,19 @@ export default function Home() {
       </LazyBelowFold>
       <Numbers />
 
-
-
-
-
       <LazyBelowFold load={loadWorkCards} minHeight="110vh" minHeightSm="158vh" background="transparent">
         <Suspense fallback={<Reserve h="110vh" sm="158vh" />}>
           <WorkCards />
         </Suspense>
       </LazyBelowFold>
 
-      <section id="ch-founder" data-tone="dark">
-        <LazyBelowFold load={loadFounder} minHeight="72vh" minHeightSm="118vh" background="transparent">
-          <Suspense fallback={<Reserve h="72vh" sm="118vh" />}>
-            <FounderChapter />
-          </Suspense>
-        </LazyBelowFold>
-      </section>
-
-      <section id="ch-start" data-tone="dark">
-        <LazyBelowFold load={loadStart} minHeight="93vh" minHeightSm="107vh" background="transparent">
-          <Suspense fallback={<Reserve h="93vh" sm="107vh" />}>
-            <StartChapter />
-          </Suspense>
-        </LazyBelowFold>
-      </section>
+      <LazyBelowFold load={loadClosing} minHeight="150vh" minHeightSm="150vh" background="transparent">
+        <Suspense fallback={<Reserve h="150vh" sm="150vh" />}>
+          <OneStudio />
+          <WhoBuildsIt />
+          <Ending />
+        </Suspense>
+      </LazyBelowFold>
     </div>
   );
 }
