@@ -162,6 +162,16 @@ export default function NolanaHero() {
     setI((v) => (v + 1) % TOKENS.length);
   }, []);
 
+  /* The mesh is the headline's subject, not its wallpaper: every pill
+     phrase reshapes the wave field. Broadcast rather than prop-drilled,
+     because the mesh is lazy and may not be mounted yet. */
+  useEffect(
+    function tellMesh() {
+      window.dispatchEvent(new CustomEvent("nl-form", { detail: i }));
+    },
+    [i, meshOn]
+  );
+
   /* THE FOCAL ROW. The item nearest the middle of the frame is full
      strength and larger; the flanks fall away. It is read per frame
      because the row is a marquee — there is no scroll event to hang it
