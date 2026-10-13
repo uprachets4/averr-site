@@ -3001,3 +3001,14 @@ a { color: inherit; text-decoration: none; }
 }
 .home-nolana #ch-start .st-path:hover { background: var(--bg-alt); border-color: var(--hair-strong); }
 .home-nolana #ch-start .st-path__arrow { color: var(--n-ink); }
+
+@media (max-width: 860px) {
+  /* the mono labels and indices sit at 11px on desktop; the mobile
+     floor is 13px */
+  .nl-chip { font-size: 13px; letter-spacing: 0.08em; }
+  .nl-idx { font-size: 13px; }
+  /* the pill is a real control, so it carries a real tap target. The
+     line box grows with it rather than the pill overflowing it. */
+  .nh-pill { min-height: 44px; padding: 0 0.5em; }
+  .nh-line { line-height: 1.3; }
+}
