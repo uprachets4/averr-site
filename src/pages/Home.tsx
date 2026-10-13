@@ -3,6 +3,7 @@ import Hero from "../components/Hero";
 import LazyBelowFold from "../components/LazyBelowFold";
 import ChapterRail from "../components/home/ChapterRail";
 import ChapterLightLayer from "../components/home/ChapterLight";
+import { useDeclarePageEndTone } from "../lib/pageTone";
 
 /**
  * Home, as one storytelling film on ONE colour flow.
@@ -29,6 +30,12 @@ const FounderChapter = lazy(() => import("../components/home/FounderChapter"));
 const StartChapter = lazy(() => import("../components/home/StartChapter"));
 
 export default function Home() {
+  /* Home ends dark, so the global footer closes on the same ground instead
+     of ending the colour flow with a cream slab. Declared here rather than
+     in StartChapter because that chapter is lazy and the footer would
+     otherwise paint cream until it mounted. */
+  useDeclarePageEndTone("dark");
+
   const loadWebsites = useCallback(() => import("../components/home/WebsitesChapter"), []);
   const loadProducts = useCallback(() => import("../components/home/ProductsChapter"), []);
   const loadAI = useCallback(() => import("../components/home/AutomationChapter"), []);
