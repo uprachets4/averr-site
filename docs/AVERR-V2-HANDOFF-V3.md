@@ -2765,6 +2765,89 @@ The honest qualifier: **the story is carried by the words and the real work, and
 
 ---
 
+---
+
+**SESSION 25c — the 25b rulings.** Five commits (`67a3dfd`, `c2c12c2`, `ab529db`, `aff9749`, + this log).
+
+### 1 · The headline is the claim
+
+`h1` is **"We build what your business" + the "runs on." slab**. The four services were never the headline's job — the subline already lists them — and a 13-character lead is what lets the type reach the size the hero needs. The accessible name is still the plain sentence, `We build what your business runs on.`
+
+The size was never a style choice: the divisor in `--type-hero-size` is **the longest line's length in this face**, calibrated at `/9.8` for the old 38-character sentence. And the **vh term, not the column, was what held the type at 67px** — so both moved.
+
+| | font | eyebrow gap | primary CTA |
+|---|---|---|---|
+| 1280×720 | 98px | 18px | 673/720 — above the fold |
+| **1440×900** | **121px** | 24px | 855/900 — above the fold |
+| 1680×1050 | 132px | 94px | 959/1050 — above the fold |
+| 1920×1080 | 132px | 112px | 977/1080 — above the fold |
+
+"runs on." sets on one line in the slab at every width, mobile included.
+
+**The field's safe zone moves with the headline.** Its ink box went from x 0–46% to **x 8–58%, y 6–55%**, and two planes that cleared the old zone did not clear the new one: `cg-testimonials` and `sift-insights` move, the z ladder is untouched. **Zero overlap at 1280, 1440, 1680 and 1920.**
+
+**A 720px-tall desktop cannot hold everything.** Top row + 98px headline + subline + kicker + CTA row overran by 26px and the headline struck the eyebrow. The **kicker is hidden below 820px of height** — it is the one piece that restates the subline. Reported as a deviation rather than absorbed.
+
+### The rail had been sitting in the document flow
+
+Found while measuring the hero, and it is a **Session 25b regression of mine**: `.home-dark > *:not(.clight)` also matched the chapter **rail** and overrode its `position: fixed` to `relative`. A **1440×256 nav was in the document flow at the top of the page, pushing home — hero included — down by 256px.** It is scoped to `.home-dark > section` now.
+
+**Every 25b measurement was taken against that shifted page.** The 25b numbers were real measurements of a page that had this bug in it; 25c's are the corrected ones.
+
+### 2 · The dark footer is accepted
+
+Logged as a locked rule beside the palette instruction. `/services` and `/about` keep the dark footer they get from `usePageEndTone`; the site is moving to the dark standard and this is the migration hook, not a side effect to undo.
+
+### 3 · Ch3 is three real products and their proof
+
+The masked-band object was **one capture cut into five strips**, which read as muddy overlapping panels rather than as work. It is three real captures now — **CapitalCommand's overview, SIFT's command overview, CadenceStack's command centre** — each through the WebP pipeline with a thin window chrome carrying its product name, stacked in depth and sliding apart along z/x as the chapter is read. **`Exploded` is deleted.**
+
+**The cascade rises.** Going down, every card behind put its own chrome bar underneath the plate in front of it, so only the front product was ever named — the one thing the chrome exists to do did not happen. Measured chrome occlusion, rising: **0% / 0% / 0%** at the 0.6 and 0.8 dwells, worst case 27% at 0.4, at both 1440 and 1920.
+
+The lower third carries **a proof tile per product**: the name, that study's own `hero.thesis` verbatim, its verified figure, and a link to its case study. **NO UNVERIFIED FIGURES holds** — of these three only SIFT has a `headlineFigure`, so only SIFT's tile prints one (**42%**); the other two carry their `sector`, which is a fact the data already holds.
+
+**Largest empty rectangle at dwell, against the 15% rule:** **9.6% at 1440** and **13.6% at 1920**, at each of three dwell positions. (Measured as the largest all-empty axis-aligned rectangle over a 48×30 grid, a cell counting as empty when it is both flat and near the bare ground.)
+
+### Numbers
+
+| | 25b | 25c |
+|---|---|---|
+| Home initial JS (local, same method) | 146.92 kB | **146.91 kB** (−0.01) |
+| Mobile LCP (alias, standard harness) | 1788 ms | **1776 ms** `[1768, 1776, 1776]` |
+| LCP element | `P.hx-sub` | `P.hx-sub` |
+
+*On the alias:* 1440 CLS 0.0001/0.0003 · 1920 0.0000/0.0001 · 375 0.0090/0.0178 — **zero horizontal overflow at all three, no console or page errors.** The h1 reads 121px at 1440 and 132px at 1920 on the alias with the CTA above the fold, and Ch3 serves its three named cards, three tiles and the single 42% figure.
+*Full-page sweeps:* every visible text element on home **≥ 4.5:1**; **no dead frames** across 21 samples at every 5%.
+*Mobile 375:* no text under 13px, no control under 44px, zero overflow.
+*Reduced motion:* every chapter renders, Ch3 included — three cards, three tiles, no pin.
+
+Note on the alias JS figure: measured there it reads **152.64 kB**, because by then the first lazy chapter chunk has been fetched. The comparable local figure, measured exactly as 25b's was, is 146.91 kB.
+
+### Quality gate — honest critique
+
+**The hero is materially better.** At 121px the headline is finally the first thing in the frame, the parch slab is a real anchor rather than a detail, and "We build what your business runs on." is a claim instead of an inventory. The field reads as the room behind it rather than as competition. The 256px the rail was stealing was quietly hurting every frame above the fold.
+
+**Ch3 is no longer the weak chapter.** Three window title bars reading CADENCESTACK / SIFT / CAPITALCOMMAND, a sharp console in front, and three tiles underneath with a real number on one of them — it now makes its argument. The blue light reads clearly as blue without going neon.
+
+**Where Ch3 is still short, honestly.** The two rear captures are **named but barely seen** — you get their chrome bars and a sliver of edge, not their screens. Spreading them further pushes them out of the object column, and shrinking the cards to buy room costs the front capture its legibility; the current balance favours one readable product plus three named windows. The band between the services list and the tiles is the frame's emptiest area — it passes the 15% rule at 9.6%/13.6%, but it passes rather than excels.
+
+**Ch3's two-item service list is still the shortest on the page.** The tiles cover for it now, but the asymmetry with Websites' four and Automation's five is still visible.
+
+### Deviations
+
+1. **The kicker is hidden below 820px of viewport height** on desktop. It restates the subline, and at 1280×720 the block does not otherwise fit.
+2. **`.pt-fig` uses a literal lifted blue**, not the live `--chapter-rgb` token: `color-mix()` against that token did not resolve and collapsed the figure to 1.13:1. This row is Ch3's alone, so a literal is honest, but it does not follow the chapter light if the light changes.
+3. The 12px footer column headings still measure 3.10:1 on the cream footer of the remaining cream routes — pre-existing, site-wide, still queued for the Ship pass.
+
+### My own errors this session
+
+1. **I shipped the 25b rail regression** — a `:not()` selector broad enough to catch a fixed nav and put it in the flow — and did not catch it in 25b because I verified the rail's *behaviour* (which chapter was active, what colour the label was) and never its *position*.
+2. **I reused `.ob-stack__card`**, a class Ch2's website fan already owns, so my new card styles silently restyled Ch2 for several builds.
+3. **I deleted the `Exploded` block by range and took the orb's node count with it**, which the type-checker caught and I had to restore.
+4. **I reported two identical "glyph widths" for GROW and WEBSITES in 25b** that were block boxes, and repeated the same class of mistake here by first measuring `.hx-h1` (which holds the sr-only sentence) at 17px.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -2910,6 +2993,12 @@ Measured, not asserted: it is **never the brightest thing in frame**, it is **oc
 
 - **THE PALETTE RULE IS UPDATED BY OWNER INSTRUCTION (25).** Cream grounds are RETIRED site-wide. The palette is the dark ink ground + chapter LIGHT + parch type. A page is one continuous ground; the story is told by a fixed light layer whose colour interpolates with scroll, not by switching grounds. Home is the pilot (Session 25); the other pages migrate in later sessions. Screen and photo interiors still keep their own colours.
 - **THE SITE STANDARD, as the owner approved it (25).** Three patterns carry every page from here: (1) the 3D room of real work, (2) the giant word with real captures moving inside the letterforms, (3) dark plus parch typographic confidence. A chapter is: a 3D object that answers the cursor, the giant word, a line addressed to the reader, and a ruled list that links onward.
+- **A SELECTOR THAT SETS `position` MUST NAME WHAT IT MEANS (25c).** `.home-dark > *:not(.clight)` was written to lift the chapters above the light layer and also caught the fixed chapter RAIL, overriding `position: fixed` to `relative`: a 1440x256 nav sat in the document flow and pushed the whole page down 256px for a session. It is `.home-dark > section`. Verifying a component's BEHAVIOUR is not verifying its POSITION — the rail tracked chapters and tinted correctly the whole time.
+
+- **THE HERO TYPE SIZE IS A MEASUREMENT, NOT A STYLE (25c).** The divisor in `--type-hero-size` is the longest line's length in this face, and the vh term is the other half of the `min()`. When the copy changes, both change: the 25c headline is 13 characters where the old one was 38, and the vh term — not the column — was what held the type at 67px when the ruling asked for >= 120px. The field's safe zone is downstream of this: the headline's ink box moved from x 0-46% to x 8-58%, and planes that cleared the old zone did not clear the new one.
+
+- **A LAZY RESERVE IS ONLY CORRECT UNTIL ITS CHAPTER CHANGES (25c).** Ch3's proof tiles took it from 93vh to 159vh on a phone. Any session that changes a chapter's height re-measures and updates BOTH of its reserves.
+
 - **THE FOOTER TAKES THE TONE OF THE PAGE IT CLOSES (25b, ACCEPTED BY OWNER IN 25c).** `useDeclarePageEndTone` drives it: a page that ends dark gets the dark footer. Home, `/services` and `/about` are dark today; `/work` and the remaining cream routes keep the cream footer until they migrate. **The owner has accepted the dark footer on `/services` and `/about`** — the site is moving to the dark standard and this is the migration hook, not a side effect to undo.
 
 - **THE SITE PALETTE IS THE DARK GROUND + CHAPTER LIGHT + PARCH TYPE (25, OWNER INSTRUCTION).** This **UPDATES** the earlier locked palette rule: **cream grounds are retired site-wide.** Home is migrated; the other pages migrate in later sessions. The pattern, the traps and the per-page checklist are in **§3b SITE STANDARD**. The global footer takes the tone of the page it closes (`useDeclarePageEndTone`), which is the migration hook.
