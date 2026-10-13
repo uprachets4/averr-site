@@ -15,6 +15,7 @@ const SPEC: ChapterSpec = {
     "/work/capitalcommand/w/01-overview-1680.webp",
     "/work/sift/w/01-command-overview-1680.webp",
   ],
+  lift: 0.8,
   proof: "capitalcommand",
 };
 

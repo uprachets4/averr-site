@@ -27,8 +27,13 @@ const PROOF_SHOT: Record<string, string> = {
 };
 
 /** A parch wash over every fill: three of the captures are dark
- *  dashboards and a dark image inside dark letters is a smudge (§5.88). */
-const LIFT = "rgba(238,233,221,0.56)";
+ *  dashboards and a dark image inside dark letters is a smudge (§5.88).
+ *  MEASURED per chapter, not guessed: with one wash for all four,
+ *  PRODUCTS put 13% of its glyph pixels under the legibility floor and
+ *  its median glyph read 145 against 226-240 for the others — the word
+ *  went dull and the tail letters sank into the capture's dark panels.
+ *  A chapter whose capture is dark asks for more wash. */
+const LIFT_DEFAULT = 0.56;
 
 export type ChapterSpec = {
   id: string;
@@ -42,6 +47,8 @@ export type ChapterSpec = {
   services: Array<{ pillar: PillarId; name: string }>;
   /** The two captures that fill the letterforms. */
   fill: [string, string];
+  /** Parch wash over the fill, 0-1. Raise it for a dark capture. */
+  lift?: number;
   /** The strongest case study for this chapter. */
   proof: string;
 };
@@ -154,7 +161,10 @@ export default function ServiceChapter({
           style={
             {
               "--sc-chars": spec.word.length,
-              backgroundImage: `linear-gradient(0deg, ${LIFT}, ${LIFT}), url(${spec.fill[0]}), url(${spec.fill[1]})`,
+              backgroundImage: (function wash() {
+                const l = `rgba(238,233,221,${spec.lift ?? LIFT_DEFAULT})`;
+                return `linear-gradient(0deg, ${l}, ${l}), url(${spec.fill[0]}), url(${spec.fill[1]})`;
+              })(),
               /* the edge carries the LIVE chapter colour, so the word
                  belongs to the light it is standing in */
               WebkitTextStroke: `1px rgba(var(--chapter-rgb, 237,233,226), 0.55)`,

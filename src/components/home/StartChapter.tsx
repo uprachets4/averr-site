@@ -43,7 +43,7 @@ export default function StartChapter() {
         <h2 className="type-display-l st-h2">
           <span className="st-h2__a">Let's build what your business</span>{" "}
           <span className="st-slab">
-            <PillHl invert>runs on.</PillHl>
+            <PillHl>runs on.</PillHl>
           </span>
         </h2>
 
