@@ -3,6 +3,7 @@ import NolanaHero from "../components/nolana/NolanaHero";
 import LazyBelowFold from "../components/LazyBelowFold";
 import { GradientDefs } from "../components/nolana/Bits";
 import { Problem, WhatWeBuild, Numbers } from "../components/nolana/Sections";
+import DeviceStory from "../components/nolana/DeviceStory";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useSetNavDarkOverride } from "../lib/navTone";
 
@@ -56,8 +57,13 @@ export default function Home() {
   useEffect(
     function navAlwaysDark() {
       setNavDark(true);
+      /* Over a LIGHT section the default translucent bar washes out to
+         grey. On home it is the solid dark bar the system calls for. */
+      const root = document.documentElement;
+      root.style.setProperty("--nav-dark-bar", "#13161E");
       return function reset() {
         setNavDark(false);
+        root.style.removeProperty("--nav-dark-bar");
       };
     },
     [setNavDark]
@@ -74,6 +80,7 @@ export default function Home() {
       <NolanaHero />
       <Problem />
       <WhatWeBuild />
+      <DeviceStory />
       <Numbers />
 
 
