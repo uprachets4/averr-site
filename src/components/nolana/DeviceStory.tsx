@@ -101,9 +101,36 @@ export function Atmosphere({ id }: { id: string }) {
 
 /* ── the four panels ───────────────────────────────────────────────── */
 
+/** A small glass card lifted out of the panel's plane. Each carries
+ *  live content from its own step — a source, a status, a metric —
+ *  which is what makes the panel read as a working surface rather than
+ *  one object on a background. */
+function Sub({
+  cls,
+  label,
+  value,
+  tone,
+}: {
+  cls: string;
+  label: string;
+  value: string;
+  tone?: "ok" | "grad";
+}) {
+  return (
+    <span className={`dsub ${cls}`} aria-hidden>
+      <span className="dsub__l">{label}</span>
+      <span className={tone === "grad" ? "dsub__v dsub__v--grad" : tone === "ok" ? "dsub__v dsub__v--ok" : "dsub__v"}>
+        {value}
+      </span>
+    </span>
+  );
+}
+
 function PanelFound({ on }: { on: boolean }) {
   return (
     <div className={on ? "dp dp--on" : "dp"}>
+      <Sub cls="dsub--a" label="Source" value="Google · local pack" />
+      <Sub cls="dsub--b" label="Position" value="#1" tone="grad" />
       <div className="dp-search">
         <span className="dp-search__i" aria-hidden>⌕</span>
         <span className="dp-typed">basement renovation near me</span>
@@ -128,6 +155,8 @@ function PanelFound({ on }: { on: boolean }) {
 function PanelChosen({ on }: { on: boolean }) {
   return (
     <div className={on ? "dp dp--on" : "dp"}>
+      <Sub cls="dsub--a" label="Loads in" value="1.1s" tone="grad" />
+      <Sub cls="dsub--c" label="Built with" value="Next.js" />
       <div className="dp-site">
         <div className="dp-site__bar" aria-hidden><i /><i /><i /></div>
         <div className="dp-site__body">
@@ -135,7 +164,9 @@ function PanelChosen({ on }: { on: boolean }) {
           <span className="dp-site__h">
             Rooms that <em>feel finished.</em>
           </span>
-          <span className="dp-site__img" aria-hidden />
+          <span className="dp-site__img" aria-hidden>
+            <i /><i /><i />
+          </span>
           <span className="dp-site__cta">Get a quote</span>
         </div>
       </div>
@@ -146,6 +177,8 @@ function PanelChosen({ on }: { on: boolean }) {
 function PanelBooked({ on }: { on: boolean }) {
   return (
     <div className={on ? "dp dp--on" : "dp"}>
+      <Sub cls="dsub--a" label="Status" value="Confirmed" tone="ok" />
+      <Sub cls="dsub--b" label="No phone call" value="0 min" tone="grad" />
       <div className="dp-cal">
         <div className="dp-cal__head">
           <span>October</span>
@@ -173,6 +206,8 @@ function PanelBooked({ on }: { on: boolean }) {
 function PanelRuns({ on }: { on: boolean }) {
   return (
     <div className={on ? "dp dp--on" : "dp"}>
+      <Sub cls="dsub--d" label="Drafted in" value="4s" tone="grad" />
+      <Sub cls="dsub--c" label="Awaiting" value="Your approval" tone="ok" />
       <div className="dp-chat">
         {/* the customer's message, so the panel reads as a conversation
             rather than one floating reply in a large empty pane */}
@@ -188,6 +223,9 @@ function PanelRuns({ on }: { on: boolean }) {
           Hi Priya — thanks for the details on the Ravenscroft basement.{" "}
           <em>I&apos;ve held Thursday at 2:00</em> for the estimate.
         </p>
+        <div className="dp-chat__meta" aria-hidden>
+          <span>Thread · Ravenscroft basement</span>
+        </div>
         <div className="dp-chat__row">
           <span className="dp-chat__btn">Approve &amp; send</span>
           <span className="dp-ghost dp-ghost--btn" aria-hidden />
