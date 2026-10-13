@@ -6,3 +6,6 @@ dist
 .env
 .env.local
 *.tsbuildinfo
+
+# Owner's reference frames — never pushed (public repo)
+docs/reference/
