@@ -1604,15 +1604,15 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
   --cl-rgb: 237,233,226;
   --cl-beam: 0.2;
-  --cl-x: 40%;
-  --cl-y: 48%;
+  --cl-x: 40vw;
+  --cl-y: 48vh;
 }
 /* Two soft diagonal shafts crossing where the chapter's scene sits.
    Blurred and masked at BOTH ends so they read as light through air;
    a radial would read as a blob, which is what this replaces. */
 .clight__beam {
   position: absolute;
-  left: var(--cl-x); top: var(--cl-y);
+  left: 0; top: 0;
   width: 165vmax; height: 30vmax;
   transform-origin: 50% 50%;
   background: linear-gradient(
@@ -1626,9 +1626,9 @@ a { color: inherit; text-decoration: none; }
   filter: blur(30px);
   will-change: transform;
 }
-.clight__beam--a { transform: translate(-54%, -128%) rotate(-21deg); }
+.clight__beam--a { transform: translate(calc(var(--cl-x) - 54%), calc(var(--cl-y) - 128%)) rotate(-21deg); }
 .clight__beam--b {
-  transform: translate(-38%, 4%) rotate(-13deg);
+  transform: translate(calc(var(--cl-x) - 38%), calc(var(--cl-y) + 4%)) rotate(-13deg);
   opacity: 0.62;
   height: 22vmax;
 }
@@ -2197,8 +2197,9 @@ a { color: inherit; text-decoration: none; }
 .pc--specimen:hover .pc-spec__b, .pc--specimen:focus-visible .pc-spec__b { opacity: 1; transform: translate(-50%, -58%); }
 .pc-spec__meta {
   position: absolute; bottom: 11px; left: 0; right: 0; text-align: center;
-  font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em;
-  text-transform: uppercase; color: rgba(20,20,18,0.5);
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em;
+  /* 0.5 alpha measured 3.33:1 on the parch paper */
+  text-transform: uppercase; color: rgba(20,20,18,0.76);
 }
 
 /* ── 5 · colour chips: fan out ── */
@@ -2340,7 +2341,8 @@ a { color: inherit; text-decoration: none; }
 .pc-cal__tick {
   width: 24px; height: 24px; border-radius: 50%;
   display: grid; place-items: center; font-size: 13px;
-  background: var(--accent); color: #fff;
+  /* white on the accent is 3.44:1; ink on it is 5.9:1 */
+  background: var(--accent); color: var(--color-ink);
   transform: scale(0); transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .pc--calendar:hover .pc-cal__tick, .pc--calendar:focus-visible .pc-cal__tick { transform: scale(1); }
@@ -2596,7 +2598,8 @@ a { color: inherit; text-decoration: none; }
 }
 .wb-chip__tick {
   width: 17px; height: 17px; border-radius: 50%; display: grid; place-items: center;
-  background: var(--accent); color: #fff; font-size: 10px;
+  /* white on the accent is 3.44:1; ink on it is 5.9:1 */
+  background: var(--accent); color: var(--color-ink); font-size: 10px;
 }
 @media (max-width: 1023px) {
   .wb-axon { transform: rotateX(8deg) rotateZ(-4deg); }

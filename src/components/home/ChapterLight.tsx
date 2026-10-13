@@ -59,8 +59,12 @@ export default function ChapterLightLayer() {
         el.style.background = out.horizonCss;
         el.style.setProperty("--cl-rgb", out.rgb.join(","));
         el.style.setProperty("--cl-beam", out.alpha.toFixed(3));
-        el.style.setProperty("--cl-x", out.x.toFixed(1) + "%");
-        el.style.setProperty("--cl-y", out.y.toFixed(1) + "%");
+        /* vw/vh, not %, because the beams are MOVED BY TRANSFORM.
+           Writing left/top every frame is a layout change, and the
+           browser scores it as a layout shift: these two spans alone
+           took the crash-scroll CLS to 6.64 against a 0.1 budget. */
+        el.style.setProperty("--cl-x", out.x.toFixed(1) + "vw");
+        el.style.setProperty("--cl-y", out.y.toFixed(1) + "vh");
         /* published so anything else can read where the room's light is.
            Session 26: FOREGROUND accents no longer consume this — they
            use the one accent set — but the chapter hue still drives the
