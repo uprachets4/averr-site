@@ -31,10 +31,12 @@ import Screenshot from "./Screenshot";
 /* ── copy ──────────────────────────────────────────────────────────── */
 
 const EYEBROW = "A boutique studio · Toronto";
-const LEAD = "Your next customer is";
-const SLAB = "already looking.";
-const H1_SENTENCE = "Your next customer is already looking.";
-const SUBLINE = "We make sure they find a business worth choosing.";
+const LEAD_A = "We build the websites, software and AI";
+const LEAD_B = "your business";
+const SLAB = "runs on.";
+const H1_SENTENCE = "We build the websites, software and AI your business runs on.";
+const SUBLINE =
+  "Websites, web apps and SaaS products, AI automation and marketing for businesses across the GTA. One studio, start to finish.";
 const KICKER =
   "We design premium websites, build AI automations, and run the marketing engines that grow businesses like yours across the GTA.";
 
@@ -143,8 +145,11 @@ function HeroCopy({ skip }: { skip: boolean }) {
       <h1 className="hx-h1">
         <span className="sr-only">{H1_SENTENCE}</span>
         <span aria-hidden="true">
+          <span className="type-hero hx-line hx-line--a">
+            <LineReveal paint delay={d(T.lead)}>{LEAD_A}</LineReveal>
+          </span>
           <span className="type-hero hx-line">
-            <LineReveal paint delay={d(T.lead)}>{LEAD}</LineReveal>
+            <LineReveal paint delay={d(T.lead + 0.08)}>{LEAD_B}</LineReveal>
           </span>
           <span className="type-hero hx-line hx-line--slab">
             <LineReveal paint delay={d(T.slab)}>
@@ -191,9 +196,9 @@ function HeroCopy({ skip }: { skip: boolean }) {
           transition={instant ? { duration: 0 } : { delay: d(T.ctaSecondary), ...spring.snappy }}
           style={{ display: "inline-flex" }}
         >
-          <MagneticCTA to="/work" variant="ghost" tone="dark">
-            See the work
-          </MagneticCTA>
+          <a className="hx-jump" href="#ch-websites">
+            See what we build <span aria-hidden>↓</span>
+          </a>
         </motion.div>
       </div>
     </div>
@@ -259,8 +264,10 @@ function PinnedHero({ skip, narrow }: { skip: boolean; narrow: boolean }) {
      through the pin's tail, so the cream chapter's slab rises over a
      frame that is already leaving rather than cutting from a static
      one. One value, same as everything else here. */
-  const recede = useTransform(scrollYProgress, [0.9, 1], [1, 0.72], { ease: easing.inOut });
-  const recedeDark = useTransform(scrollYProgress, [0.9, 1], [0, 0.38]);
+  /* The camera does not park on the capture any more: it passes THROUGH
+     it into chapter 2, so the copper light blooms as the hero ends. */
+  const recede = useTransform(scrollYProgress, [0.72, 1], [1, 1.9], { ease: easing.inOut });
+  const recedeDark = useTransform(scrollYProgress, [0.78, 1], [0, 1]);
   const recedeDarkRef = useScrollStyle<HTMLDivElement>(recedeDark);
 
   const [cueGone, setCueGone] = useState(false);

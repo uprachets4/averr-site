@@ -1557,3 +1557,159 @@ a { color: inherit; text-decoration: none; }
    and MagneticCTA's text variant (22-27px), which are shared with every
    other page — a site-wide decision, not a home one, and recorded in the
    handoff rather than changed from here. */
+
+/* ══ Session 25: ONE colour flow ═══════════════════════════════════ */
+.clight {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+  transition: none;
+}
+/* Home is one dark ground from top to bottom. */
+.home-dark { background: var(--color-dark); position: relative; z-index: 1; }
+.home-dark > * { position: relative; }
+
+/* ── the service chapter template ── */
+.sc-wrap { position: relative; height: 320vh; }
+.sc {
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  display: flex; align-items: center;
+}
+.sc--still { position: static; height: auto; padding: 84px 0; }
+.sc-inner {
+  width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter);
+  display: grid; grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+  gap: clamp(28px, 4vw, 64px); align-items: center;
+}
+.sc-object {
+  position: relative; height: min(66vh, 580px);
+  display: grid; place-items: center;
+  perspective: 1400px;
+}
+.sc-object--still { height: 280px; }
+.sc-text { min-width: 0; display: flex; flex-direction: column; gap: clamp(14px, 2vh, 26px); }
+
+.sc-word { margin: 0; line-height: 0.84; }
+.sc-word__fill {
+  display: block;
+  font-family: var(--font-display); font-weight: 600;
+  letter-spacing: -0.055em; text-transform: uppercase;
+  /* Measured, not guessed: the longest word is PRODUCTS at 8 characters,
+     about 0.63em each in this face at -0.055em. 5.3 is that with
+     headroom — at 4.6 the final S was cut off by the frame at 1440. */
+  font-size: min(calc(var(--container-wide) * 0.56 / 5.3), 15.5vh);
+  background-repeat: no-repeat; background-size: cover;
+  background-position: 8% 50%;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+}
+.sc-copy { max-width: 46ch; }
+.sc-line-main {
+  margin: 0 0 8px;
+  font-family: var(--font-display); font-size: clamp(19px, 1.9vw, 26px);
+  letter-spacing: -0.02em; color: var(--color-parch);
+}
+.sc-support { margin: 0; font-size: 15px; line-height: 1.6; color: rgba(237,233,226,0.72); max-width: 52ch; }
+
+.sc-list { list-style: none; margin: 0; padding: 0; }
+.sc-line { border-top: 1px solid rgba(237,233,226,0.16); }
+.sc-line:last-child { border-bottom: 1px solid rgba(237,233,226,0.16); }
+.sc-link {
+  position: relative; display: flex; align-items: center; gap: 14px;
+  padding: clamp(7px, 1vh, 12px) 0; min-height: 44px;
+  text-decoration: none; color: var(--color-parch); overflow: hidden;
+}
+.sc-link__text {
+  display: block; font-family: var(--font-display);
+  font-size: clamp(16px, 1.3vw, 20px); letter-spacing: -0.02em;
+  transition: transform 320ms var(--ease-out-quart);
+}
+.sc-link--on .sc-link__text { transform: translateX(13px); }
+.sc-arrow { width: 28px; height: 10px; opacity: 0; transform: translateX(-8px);
+  transition: opacity 260ms ease, transform 320ms var(--ease-out-quart); }
+.sc-arrow path { stroke-dasharray: 36; stroke-dashoffset: 36; transition: stroke-dashoffset 420ms var(--ease-out-quart); }
+.sc-link--on .sc-arrow { opacity: 1; transform: translateX(0); }
+.sc-link--on .sc-arrow path { stroke-dashoffset: 0; }
+.sc-link:focus-visible { outline: 2px solid var(--color-parch); outline-offset: 3px; }
+.sc-proof {
+  position: absolute; right: 0; top: 50%;
+  display: flex; align-items: center; gap: 10px;
+  transform: translate(10px, -50%); opacity: 0; pointer-events: none;
+  transition: opacity 260ms ease, transform 320ms var(--ease-out-quart);
+}
+.sc-link--on .sc-proof { opacity: 1; transform: translate(0, -50%); }
+.sc-proof img { display: block; width: 86px; height: auto; border-radius: 4px; box-shadow: 0 0 0 1px rgba(237,233,226,0.2); }
+.sc-proof em { font-style: normal; font-family: var(--font-mono); font-size: 13px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: rgba(237,233,226,0.66); }
+.sc-proof-link { margin: 0; }
+.sc-proof-link a {
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(237,233,226,0.72); text-decoration: none;
+  display: inline-flex; align-items: center; min-height: 44px;
+}
+.sc-proof-link a:hover { color: var(--color-parch); }
+
+/* ── the objects ── */
+.ob { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
+.ob-stack__card {
+  position: absolute; left: 50%; top: 50%;
+  width: 86%; aspect-ratio: 16 / 10; margin: -23% 0 0 -37%;
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 30px 70px -32px rgba(0,0,0,0.8), 0 0 0 1px rgba(237,233,226,0.16);
+  transform-style: preserve-3d;
+}
+.ob-explode__band {
+  position: absolute; left: 50%; top: 50%;
+  width: 92%; aspect-ratio: 16 / 10; margin: -29% 0 0 -46%;
+  border-radius: 6px; overflow: hidden;
+  box-shadow: 0 24px 60px -30px rgba(0,0,0,0.85), 0 0 0 1px rgba(61,107,255,0.22);
+}
+.ob-orb { display: grid; place-items: center; }
+.ob-orb__spin {
+  position: relative; width: 1px; height: 1px;
+  transform-style: preserve-3d;
+  animation: ob-rotate 44s linear infinite;
+}
+@keyframes ob-rotate { from { transform: rotateY(0deg) rotateX(12deg); } to { transform: rotateY(360deg) rotateX(12deg); } }
+.ob-orb__node {
+  position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%; background: rgba(170,148,255,0.95);
+  box-shadow: 0 0 10px rgba(123,92,255,0.75);
+  animation: ob-pulse 3.6s ease-in-out infinite;
+}
+@keyframes ob-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+@media (max-width: 1023px) {
+  .sc-wrap { height: auto; }
+  .sc { position: static; height: auto; padding: 72px 0; }
+  .sc-inner { grid-template-columns: 1fr; gap: 26px; }
+  .sc-object { height: 240px; }
+  .sc-word__fill { font-size: min(calc(var(--container-wide) / 4.4), 15vw); }
+  .sc-proof { display: none; }
+  .sc-support { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ob-orb__spin, .ob-orb__node { animation: none; }
+  .sc-link__text, .sc-arrow, .sc-arrow path, .sc-proof { transition: none; }
+}
+
+/* Home is one ground now: the rail is always on dark. */
+.rail { --rail-tint: var(--color-parch); }
+.rail .rail-track { background: rgba(237,233,226,0.2); }
+.rail .rail-fill { background: var(--rail-tint); }
+.rail .rail-item { color: rgba(237,233,226,0.6); }
+.rail .rail-item:hover, .rail .rail-item--on { color: var(--rail-tint); }
+.rail .rail-item:focus-visible { outline-color: var(--color-parch); }
+.rail .rail-label { background: #22231f; color: var(--color-parch); box-shadow: 0 2px 14px rgba(0,0,0,0.5); }
+
+/* the hero's second CTA scrolls rather than navigates */
+.hx-jump {
+  display: inline-flex; align-items: center; gap: 9px;
+  min-height: 44px; padding: 13px 24px; border-radius: 999px;
+  border: 1px solid rgba(237,233,226,0.34);
+  color: var(--color-parch); text-decoration: none;
+  font-size: 15px;
+  transition: background-color 220ms ease, border-color 220ms ease;
+}
+.hx-jump:hover { background: rgba(237,233,226,0.08); border-color: var(--color-parch); }
+.hx-jump:focus-visible { outline: 2px solid var(--color-parch); outline-offset: 3px; }
+.hx-line--a { max-width: 18ch; }

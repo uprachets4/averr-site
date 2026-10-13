@@ -1,95 +1,98 @@
 import { Suspense, lazy, useCallback } from "react";
 import Hero from "../components/Hero";
-import Chapter from "../components/Chapter";
 import LazyBelowFold from "../components/LazyBelowFold";
-import ChapterRail, { CHAPTERS } from "../components/home/ChapterRail";
+import ChapterRail from "../components/home/ChapterRail";
+import ChapterLightLayer from "../components/home/ChapterLight";
 
 /**
- * Home, as one journey in five chapters.
+ * Home, as one storytelling film on ONE colour flow.
  *
- * Each chapter previews a destination and sends you there: the hero is
- * the sketch of your own business, then the real work (/work), then what
- * we do (/services), then who builds it (/about), then start (/contact).
- * The rail down the left edge is the table of contents.
+ * There is a single dark ground from the first pixel to the last. The
+ * story is told with LIGHT — a fixed layer whose colour interpolates
+ * with scroll — rather than with the cream/ink chapter grounds the site
+ * used until Session 25. Every chapter sits on the same ground and is
+ * coloured by where the reader is in the page.
  *
- * Chapters 2–5 load below the fold. The hero is the LCP surface and
- * carries nothing it does not need.
+ * Chapter order: what we build (the hero) → websites → products →
+ * automation → marketing → the work → who builds it → your move.
  *
- * `data-tone` is what the rail reads to flip its own contrast, so a
- * chapter that changes tone takes the rail with it.
+ * Everything below the hero loads below the fold; the hero is the LCP
+ * surface and carries nothing it does not need.
  */
 
-const TemplateWall = lazy(() => import("../components/home/TemplateWall"));
+const WebsitesChapter = lazy(() => import("../components/home/WebsitesChapter"));
+const ProductsChapter = lazy(() => import("../components/home/ProductsChapter"));
+const AutomationChapter = lazy(() => import("../components/home/AutomationChapter"));
 const WorkStrip = lazy(() => import("../components/home/WorkStrip"));
-const ServiceActs = lazy(() => import("../components/home/ServiceActs"));
 const FounderChapter = lazy(() => import("../components/home/FounderChapter"));
 const StartChapter = lazy(() => import("../components/home/StartChapter"));
 
 export default function Home() {
-  const loadWall = useCallback(() => import("../components/home/TemplateWall"), []);
+  const loadWebsites = useCallback(() => import("../components/home/WebsitesChapter"), []);
+  const loadProducts = useCallback(() => import("../components/home/ProductsChapter"), []);
+  const loadAI = useCallback(() => import("../components/home/AutomationChapter"), []);
   const loadWork = useCallback(() => import("../components/home/WorkStrip"), []);
-  const loadServices = useCallback(() => import("../components/home/ServiceActs"), []);
   const loadFounder = useCallback(() => import("../components/home/FounderChapter"), []);
   const loadStart = useCallback(() => import("../components/home/StartChapter"), []);
 
   return (
-    <>
+    <div className="home-dark">
+      <ChapterLightLayer />
       <ChapterRail />
 
-      <section id={CHAPTERS[0].id} data-tone="cream">
+      <section id="ch-build" data-tone="dark">
         <Hero />
       </section>
 
-      {/* 2 · you've seen this website before */}
-      <Chapter tone="cream" from="dark">
-        <section id={CHAPTERS[1].id} data-tone="cream">
-          <LazyBelowFold load={loadWall} minHeight="420vh" background="var(--color-bg)">
-            <Suspense fallback={<div aria-hidden style={{ minHeight: "420vh", background: "var(--color-bg)" }} />}>
-              <TemplateWall />
-            </Suspense>
-          </LazyBelowFold>
-        </section>
-      </Chapter>
+      <section id="ch-websites" data-tone="dark">
+        <LazyBelowFold load={loadWebsites} minHeight="320vh" background="transparent">
+          <Suspense fallback={<div aria-hidden style={{ minHeight: "320vh" }} />}>
+            <WebsitesChapter />
+          </Suspense>
+        </LazyBelowFold>
+      </section>
 
-      {/* 3 · the work */}
-      <section id={CHAPTERS[2].id} data-tone="dark">
-        <LazyBelowFold load={loadWork} minHeight="420vh" background="var(--color-dark)">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "420vh", background: "var(--color-dark)" }} />}>
+      <section id="ch-products" data-tone="dark">
+        <LazyBelowFold load={loadProducts} minHeight="320vh" background="transparent">
+          <Suspense fallback={<div aria-hidden style={{ minHeight: "320vh" }} />}>
+            <ProductsChapter />
+          </Suspense>
+        </LazyBelowFold>
+      </section>
+
+      <section id="ch-ai" data-tone="dark">
+        <LazyBelowFold load={loadAI} minHeight="320vh" background="transparent">
+          <Suspense fallback={<div aria-hidden style={{ minHeight: "320vh" }} />}>
+            <AutomationChapter />
+          </Suspense>
+        </LazyBelowFold>
+      </section>
+
+      {/* ch-marketing lands in 25b; the light plan already carries it. */}
+
+      <section id="ch-work" data-tone="dark">
+        <LazyBelowFold load={loadWork} minHeight="420vh" background="transparent">
+          <Suspense fallback={<div aria-hidden style={{ minHeight: "420vh" }} />}>
             <WorkStrip />
           </Suspense>
         </LazyBelowFold>
       </section>
 
-      {/* 4 · what we do */}
-      <section id={CHAPTERS[3].id} data-tone="dark">
-        <LazyBelowFold load={loadServices} minHeight="420vh" background="var(--color-dark)">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "420vh", background: "var(--color-dark)" }} />}>
-            <ServiceActs />
+      <section id="ch-founder" data-tone="dark">
+        <LazyBelowFold load={loadFounder} minHeight="92vh" background="transparent">
+          <Suspense fallback={<div aria-hidden style={{ minHeight: "92vh" }} />}>
+            <FounderChapter />
           </Suspense>
         </LazyBelowFold>
       </section>
 
-      {/* 5 · who you'll work with */}
-      <Chapter tone="cream" from="dark">
-        <section id={CHAPTERS[4].id} data-tone="cream">
-        <LazyBelowFold load={loadFounder} minHeight="92vh" background="var(--color-bg)">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "92vh", background: "var(--color-bg)" }} />}>
-            <FounderChapter />
+      <section id="ch-start" data-tone="dark">
+        <LazyBelowFold load={loadStart} minHeight="82vh" background="transparent">
+          <Suspense fallback={<div aria-hidden style={{ minHeight: "82vh" }} />}>
+            <StartChapter />
           </Suspense>
         </LazyBelowFold>
-        </section>
-      </Chapter>
-
-      {/* 6 · your move */}
-      <Chapter tone="dark" from="cream">
-        <section id={CHAPTERS[5].id} data-tone="dark">
-          <LazyBelowFold load={loadStart} minHeight="82vh" background="var(--color-dark)">
-            <Suspense fallback={<div aria-hidden style={{ minHeight: "82vh", background: "var(--color-dark)" }} />}>
-              <StartChapter />
-            </Suspense>
-          </LazyBelowFold>
-        </section>
-      </Chapter>
-    </>
+      </section>
+    </div>
   );
 }
