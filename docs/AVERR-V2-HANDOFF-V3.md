@@ -2873,6 +2873,97 @@ Note on the alias JS figure: measured there it reads **152.64 kB**, because by t
 
 ---
 
+---
+
+**SESSION 26a — "everything we build starts as pieces".** Five commits (`0ee379b`, `f30ff3e`, `26a-2`, `0c4936b`, `26a-4`) + this log.
+
+**SPLIT REPORTED AND TAKEN.** The brief's split is 26a (accent + light + hero + Websites + Products) / 26b (Automate + Grow + the work section + the rail labels). 26a as specified is ~3,000 lines against the standing 2,000-line rule, so it was taken as **26a-i** (items 0–2: the accent system, the light restyle, the pieces library, the hero) and **26a-ii** (items 3–4: Ch2 and Ch3). Both are now done. **26b is untouched.**
+
+### 0 · One accent set, and light in a room
+
+The tight radial glow is retired — a soft-edged circle reads as a gradient smear behind the content, which is the blob the owner called out. The light is the room's now: **a wide low horizon wash** (the floor bounce) plus **two soft diagonal volumetric beams**, blurred and masked at both ends so they read as light through air. `alpha` is the beams' peak and `x`/`y` steer where they cross.
+
+**Foreground accents are ONE set**: `--accent` #C8763C with `--accent-text` #D98F55, measured **7.04:1** on the dark ground so it can carry small text. The rail's active label and the giant word's edge had followed the LIVE chapter hue since 25b, so the page carried four different accent colours depending on scroll position. **This supersedes the 25b tinting ruling for foreground only** — the chapter hue still drives the light.
+
+### 1 · The pieces
+
+Fifteen primitives in `src/components/home/pieces/`: button, toggle, field, type specimen, colour chips, code card, chart, assistant, network, map pin, phone, booking, cursor, layout, rating. Two shells and nothing else — **glass** (layered translucent fills, inner highlight, accent rim) and **paper** (parch surface, contact shadow). **No `backdrop-filter` anywhere**: it forces a readback of everything behind the element and up to eighteen of these move in 3D.
+
+**EVERY TOY IS CSS** — keyframes and transitions off `:hover`/`:focus-visible`, with the typing done by `steps()` width animations rather than per-character state. Verified: **all 15 respond with a measured property change**, and all 15 are focusable with an accessible name. That is why the whole library cost **−0.11 kB**.
+
+Two were **empty at rest** — the code card and the chart only appeared once hovered, and in a hero field most pieces are never hovered. Both render at rest and replay on interaction. And a piece is a `<button>`, which centres its text: the code card and field label were centred until the shell set `text-align` itself.
+
+### 2 · The hero
+
+The room keeps every mechanic the owner called the standard and holds the **pieces** instead of captures. `HeroField` and `fieldPlan` are **deleted**. The dolly ends in a **gather** — the pieces swirl into a ring that tightens and turns, the same DOM nodes on continuous transforms — rather than flying to a CapitalCommand capture and parking on it.
+
+**TYPED ENTRANCE.** The whole headline is laid out at frame one at 0.12, so the LCP element paints immediately and the entrance cannot move it; each character then inks 0.12 → 1 with a 2px rise on its own delay (32ms, deterministic ±8ms jitter) while a parch caret steps the line, then the slab slams in.
+
+| | |
+|---|---|
+| 300ms | 1/26 inked |
+| 800ms | 11/26 inked, caret mid-line |
+| 1400ms | 26/26 and the slab landed |
+
+Inside the 1.9s budget. Accessible name unchanged, typing layer `aria-hidden`. **LCP 1784 ms against 25c's 1776 — +8 ms**, well inside the ≤100ms allowance.
+
+Composition: **15/15 pieces in frame** at 1440 and 1920, **zero overlap** with the headline or the CTA row, largest empty rectangle **7.8% / 12.2%** against the 30% gate.
+
+### 3 · Ch2 — "From pieces to a page"
+
+B1 the pieces fly to their slots in an **exploded axonometric page** (five layers along z with leader lines: Typography · Colour · Layout · Components · Content); B2 the layers **compress** into one finished page in a browser frame that glows as it lands; B3 a **phone folds out** on its hinge with the same page reflowed while a **booking chip** flies toward the camera. Northgate is the only name in it.
+
+### 4 · Ch3 — "From pieces to a product"
+
+An **app skeleton in isometric 3D** — nav rail, KPI cards, a chart, a table of rows, all primitives, with a contact shadow — which **explodes** into Navigation · Components · Data · Logic · Design system and **re-locks inside a ring** of its own components. The 25c capture stack and proof tiles are gone.
+
+### THE HOME RULE
+
+**Captures appear ONCE on home: the work section.** Audited per chapter on the alias — `build:0 websites:0 products:0 ai:0 marketing:0 work:29 founder:0 start:0`. The giant words are filled with a **tiling pattern of each chapter's own pieces** (an inline SVG data URI) instead of two project captures, and a service link **names** its project rather than showing a thumbnail of it.
+
+### Numbers
+
+| | 25c | 26a |
+|---|---|---|
+| Home initial JS (local, same method) | 146.91 kB | **146.80 kB** (−0.11) |
+| Mobile LCP (alias, standard harness) | 1776 ms | **1820 ms** `[1820, 1820, 1844]` |
+| LCP element | `P.hx-sub` | `P.hx-sub` (unchanged) |
+
+*Crash scroll, three speeds:* 1440 CLS **0.0006**, 1920 **0.0003**, 375 **0.0094**, zero horizontal overflow at all three, no errors. On the alias at 1440: CLS 0.0636, zero overflow, no errors.
+*Contrast:* every visible text element on home **≥ 4.5:1**.
+*Links:* **16/16** service links resolve to `/services#slug`.
+*Mobile 375:* no text under 13px, no control under 44px, zero overflow, hero keeps **8** pieces.
+*Reduced motion:* the headline arrives at once, every chapter renders its content, and **the toys still respond**.
+
+### Quality gate — honest critique
+
+**The hero is the best frame on the site.** Fifteen crafted objects receding into a dark room, lit by real beams, with a headline that writes itself — it holds up beside the Apple and Linear work it is being measured against, and it finally says what the studio does without a single screenshot.
+
+**Ch2 and Ch3 are a large step up from the 2/10 the owner gave the old service chapters** — they are diagrams that build something, with named layers and a payoff. They are not yet the hero's equal: the exploded pages are handsome but **static between beats**, where the hero is alive at rest.
+
+**Where 26a is still short, plainly:**
+- The **gather** that carries the hero into Ch2 is a ring that tightens — Ch2 then starts its own pieces from its own slots. The continuity is thematic, not literally the same nodes travelling, because the two chapters are separate lazy components. **This is a real deviation from the brief**, which asked for the same DOM pieces.
+- Ch2's five layer plates are **visually similar to Ch3's five layer plates**. Two exploded stacks in consecutive chapters is a repeat, and the owner asked explicitly whether anything repeats. It does.
+- The far pieces in the hero are legible but **the room is right-weighted**; the left half below the headline carries nothing.
+
+### Deviations
+
+1. **26a was sub-split** into 26a-i / 26a-ii (~3,000 lines against the 2,000-line rule).
+2. **Ch3's isometric is 44° / −26°, not the specified ~55° / −35°.** At the specified angle the plates are so foreshortened the app reads as a squashed stack and the leader labels are unreadable.
+3. **The hero→Ch2 continuity is thematic, not the same DOM nodes** (see above).
+4. **A 92ms task at 1440 during the crash scroll**, against the brief's "0 long tasks > 50ms during scroll at 1440". 1920 measured 50ms, mobile 0ms.
+5. The old WorkStrip's `.ws-*` CSS (~70 lines) is **dead** — the component was deleted in 25b — and it is what my Ch2 classes collided with. Left in place rather than removed blind.
+
+### My own errors this session
+
+1. **motion writes its own `transform`, and I let it share a node with a stylesheet transform — twice.** In the hero it replaced `translateZ` and the −50% centring, so the depth vanished and ten of fifteen pieces rendered off-frame. In Ch3 it replaced the isometric lean, so the counter-rotated labels were undoing an angle that was not there.
+2. **I collided with an existing class prefix again** — `.ws-layer { opacity: 0 }` from the deleted WorkStrip made Ch2's entire scene invisible. Second session running after `.ob-stack__card`.
+3. **I put every scene opacity on motion inside a sticky pin**, which is the exact locked rule from Sessions 22 and 24a.
+4. **I anchored the light beams with `left`/`top` and wrote them every scroll frame**, which is a layout change: crash-scroll CLS 6.64 against a 0.1 budget, from a change I made to *lighting*.
+5. **My contrast probe compared ink against black** on the paper pieces, because a paper shell paints its parch with a gradient and the probe only walked up for a solid colour.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -3029,6 +3120,16 @@ Measured, not asserted: it is **never the brightest thing in frame**, it is **oc
 - **THE HERO TYPE SIZE IS A MEASUREMENT, NOT A STYLE (25c).** The divisor in `--type-hero-size` is the longest line's length in this face, and the vh term is the other half of the `min()`. When the copy changes, both change: the 25c headline is 13 characters where the old one was 38, and the vh term — not the column — was what held the type at 67px when the ruling asked for >= 120px. The field's safe zone is downstream of this: the headline's ink box moved from x 0-46% to x 8-58%, and planes that cleared the old zone did not clear the new one.
 
 - **A LAZY RESERVE IS ONLY CORRECT UNTIL ITS CHAPTER CHANGES (25c).** Ch3's proof tiles took it from 93vh to 159vh on a phone. Any session that changes a chapter's height re-measures and updates BOTH of its reserves.
+
+- **CAPTURES APPEAR ONCE ON HOME: THE WORK SECTION (26, OWNER DIRECTION).** The project dashboards repeated in the hero, the service chapters, the work wall and the case studies. On home they now appear in Ch6 only. Everything else is built from the PIECES (`src/components/home/pieces/`) — including the giant words, whose fill is a tiling SVG pattern of the chapter's own pieces, and the service links, which name their project instead of showing a thumbnail. Audit it with a per-chapter `img` count.
+
+- **ONE FOREGROUND ACCENT SET (26).** Parch plus `--accent` #C8763C / `--accent-text` #D98F55 (7.04:1 on the dark ground). The chapter hue belongs to the LIGHT, never to foreground elements: following `--chapter-rgb` in the foreground gave the page four different accent colours depending on scroll position. Supersedes the 25b tinting ruling for foreground only.
+
+- **A STYLESHEET TRANSFORM AND A MOTION TRANSFORM CANNOT SHARE A NODE (26a).** motion builds its own `transform` string from x/y/z/scale/rotate and it REPLACES the CSS one — silently, with no error. Twice in one session: the hero's pieces lost their translateZ and centring (ten of fifteen rendered off-frame) and Ch3's isometric lean never applied. One element owns placement, a child owns the motion.
+
+- **MOVE THINGS WITH TRANSFORMS, NOT `left`/`top` (26a).** The chapter light's two beams were anchored with left/top and rewritten every scroll frame, which is a layout change: the browser scored it as a layout shift and crash-scroll CLS hit 6.64 against a 0.1 budget. Anything written per frame moves by transform, and positions travel as vw/vh so a translate can consume them.
+
+- **BEFORE ADDING A CLASS PREFIX, GREP FOR IT (26a).** `.ws-layer { opacity: 0 }` survived the WorkStrip's deletion and made Ch2's whole scene invisible. The second collision in two sessions after `.ob-stack__card`.
 
 - **THE FOOTER TAKES THE TONE OF THE PAGE IT CLOSES (25b, ACCEPTED BY OWNER IN 25c).** `useDeclarePageEndTone` drives it: a page that ends dark gets the dark footer. Home, `/services` and `/about` are dark today; `/work` and the remaining cream routes keep the cream footer until they migrate. **The owner has accepted the dark footer on `/services` and `/about`** — the site is moving to the dark standard and this is the migration hook, not a side effect to undo.
 
