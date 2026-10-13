@@ -262,6 +262,7 @@ export default function NolanaHero() {
       </div>
 
       <div className="nh-clients" aria-label="Selected clients">
+        <p className="nh-clients__label">Trusted by businesses across the GTA</p>
         <div ref={rowRef} className={reduce ? "nh-clients__row nh-clients__row--still" : "nh-clients__row"}>
           {[0, 1].map(function pass(k) {
             return (

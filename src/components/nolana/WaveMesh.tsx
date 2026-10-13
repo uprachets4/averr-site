@@ -82,11 +82,17 @@ void main(){
   float h = mix(hA, hB, uMorph);
   g += mix(pA, pB, uMorph);
 
-  // the standing swell underneath every formation
-  h += (sin(g.x * 7.0 + uTime * 0.55) * 0.26
+  /* The swell runs DIAGONALLY and the crest is biased to one side, so
+     the field reads as a ribbon crossing the frame rather than a
+     symmetric dome. Frame 01's wave sweeps lower-left to upper-right;
+     a dome is the thing that makes a point field look generated. */
+  float diag = g.x * 0.82 + g.y * 0.58;
+  h += (sin(diag * 7.4 + uTime * 0.55) * 0.3
      +  sin((g.x * 3.1 - g.y * 4.4) + uTime * 0.37) * 0.18
      + (noise(g * 4.0 + vec2(uTime * 0.12, uTime * 0.08)) - 0.5) * 0.5)
      * (0.6 + uLayer * 0.3);
+  /* the ridge rides higher toward the right, as a real swell does */
+  h += smoothstep(0.1, 0.95, g.x) * 0.42;
 
   // the cursor's travelling ring
   if (uMouse.x > -0.5) {
