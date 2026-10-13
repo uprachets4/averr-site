@@ -1,3 +1,4 @@
+import { PRODUCTS_FILL } from "./piecePattern";
 import ServiceChapter, { type ChapterSpec } from "./ServiceChapter";
 import { Rings } from "./chapterObjects";
 
@@ -17,10 +18,7 @@ const SPEC: ChapterSpec = {
     { pillar: "grow", name: "Content" },
     { pillar: "grow", name: "Reporting" },
   ],
-  fill: [
-    "/work/cgwalls/w/gallery-1400.webp",
-    "/work/cadencestack/w/04-performance-analytics-1680.webp",
-  ],
+  fill: PRODUCTS_FILL,
   proof: "cg-walls-and-floors",
 };
 

@@ -19,12 +19,6 @@ import { caseStudies } from "../../data/caseStudies";
  * colour it is standing in.
  */
 
-const PROOF_SHOT: Record<string, string> = {
-  "cg-walls-and-floors": "/work/cgwalls/w/hero-640.webp",
-  capitalcommand: "/work/capitalcommand/w/01-overview-640.webp",
-  sift: "/work/sift/w/01-command-overview-640.webp",
-  cadencestack: "/work/cadencestack/w/01-command-center-640.webp",
-};
 
 /** A parch wash over every fill: three of the captures are dark
  *  dashboards and a dark image inside dark letters is a smudge (§5.88).
@@ -45,8 +39,9 @@ export type ChapterSpec = {
   support: string;
   /** Which services, by pillar and name. */
   services: Array<{ pillar: PillarId; name: string }>;
-  /** The two captures that fill the letterforms. */
-  fill: [string, string];
+  /** The pattern that fills the letterforms — a `url(...)` of the
+   *  chapter's own pieces. Captures appear once on home (Ch6). */
+  fill: string;
   /** Parch wash over the fill, 0-1. Raise it for a dark capture. */
   lift?: number;
   /** The strongest case study for this chapter. */
@@ -79,7 +74,6 @@ function ServiceLine({
   const svc = PILLAR_SERVICES[pillar].find(function f(s) {
     return s.name === name;
   });
-  const shot = svc && svc.proof.length ? PROOF_SHOT[svc.proof[0]] : null;
   const client = svc && svc.proof.length ? caseStudies[svc.proof[0]]?.client : null;
 
   return (
@@ -98,9 +92,11 @@ function ServiceLine({
         <svg className="sc-arrow" viewBox="0 0 28 10" aria-hidden>
           <path d="M0 5 H24 M19 1 L24 5 L19 9" fill="none" stroke="currentColor" strokeWidth="1.5" />
         </svg>
-        {shot ? (
+        {client ? (
+          /* Session 26: the proof thumbnail was a real capture, and
+             captures appear once on home now (the work section). The
+             project is named instead. */
           <span className="sc-proof" aria-hidden>
-            <img src={shot} alt="" width="112" height="63" loading="lazy" decoding="async" />
             <em>{client}</em>
           </span>
         ) : null}
@@ -168,7 +164,7 @@ export default function ServiceChapter({
               "--sc-chars": spec.word.length,
               backgroundImage: (function wash() {
                 const l = `rgba(238,233,221,${spec.lift ?? LIFT_DEFAULT})`;
-                return `linear-gradient(0deg, ${l}, ${l}), url(${spec.fill[0]}), url(${spec.fill[1]})`;
+                return `linear-gradient(0deg, ${l}, ${l}), ${spec.fill}`;
               })(),
               /* Session 26: the edge carries the ONE accent, not the
                  live chapter hue — foreground accents are a single set

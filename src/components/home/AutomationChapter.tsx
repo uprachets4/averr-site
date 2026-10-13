@@ -1,3 +1,4 @@
+import { WEBSITES_FILL } from "./piecePattern";
 import ServiceChapter, { type ChapterSpec } from "./ServiceChapter";
 import { Orb } from "./chapterObjects";
 
@@ -15,10 +16,7 @@ const SPEC: ChapterSpec = {
     { pillar: "automate", name: "Human review built in" },
     { pillar: "automate", name: "Handoff documentation" },
   ],
-  fill: [
-    "/work/cadencestack/w/01-command-center-1680.webp",
-    "/work/capitalcommand/w/05-signal-desk-1680.webp",
-  ],
+  fill: WEBSITES_FILL,
   proof: "cadencestack",
 };
 

@@ -1682,7 +1682,8 @@ a { color: inherit; text-decoration: none; }
     calc(var(--container-wide) * 0.56 / (var(--sc-chars, 8) * 0.72)),
     14vh
   );
-  background-repeat: no-repeat; background-size: cover;
+  /* the pattern TILES — it is texture, not a photograph */
+  background-repeat: repeat; background-size: auto 44%;
   background-position: 8% 50%;
   -webkit-background-clip: text; background-clip: text;
   color: transparent; -webkit-text-fill-color: transparent;
@@ -2476,4 +2477,220 @@ a { color: inherit; text-decoration: none; }
   .hx-ch { opacity: 1; translate: none; animation: none; }
   .hx-caret { display: none; }
   .hx-slam .pill-hl, .hx-slam .pill-hl__slab { animation: none; }
+}
+
+/* ── Session 26 · Ch2: from pieces to a page ──────────────────────── */
+.wb-stage { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+.wb-axon {
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  /* the axonometric read: a fixed lean, with the cursor camera on top */
+  transform: rotateX(12deg) rotateZ(-7deg);
+  display: grid; place-items: center;
+}
+.wb-layer {
+  position: absolute; left: 50%; top: 50%;
+  width: 72%; aspect-ratio: 16 / 11;
+  margin: -24.75% 0 0 -36%;
+  transform-style: preserve-3d;
+}
+/* Each face sits in ITS OWN corner of its plate. Centred, all five
+   landed on the same point and the exploded view read as one pile. */
+.wb-layer__plate {
+  position: absolute; inset: 0;
+  place-items: start;
+  padding: calc(8% + var(--slot, 0) * 13%) 0 0 calc(7% + var(--slot, 0) * 11%);
+  border-radius: 10px;
+  background: linear-gradient(158deg, rgba(237,233,226,0.09), rgba(237,233,226,0.03));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 0 0 1px rgba(237,233,226,0.12),
+    0 24px 50px -30px rgba(0,0,0,0.9);
+  display: grid; place-items: center;
+}
+.wb-layer__lead { position: absolute; right: -6%; top: calc(14% + var(--i-lead, 0) * 1%); display: flex; align-items: center; gap: 8px; }
+.wb-layer__rule { width: 46px; height: 1px; background: rgba(var(--accent-rgb), 0.6); }
+.wb-layer__name {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent-text); white-space: nowrap;
+}
+.wb-face { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.wb-face--type b { font-family: var(--font-display); font-weight: 600; font-size: 34px; color: var(--color-parch); }
+.wb-face--type i { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; font-size: 34px; color: var(--accent-text); }
+.wb-face--colour i { width: 26px; height: 26px; border-radius: 6px; background: var(--c); box-shadow: inset 0 0 0 1px rgba(237,233,226,0.2); }
+.wb-face--layout { display: grid; grid-template-columns: repeat(3, 26px); gap: 7px; }
+.wb-face--layout i { height: 16px; border-radius: 3px; background: rgba(237,233,226,0.2); }
+.wb-face--comp em {
+  font-style: normal; font-size: 12px; padding: 7px 14px; border-radius: 8px;
+  background: rgba(var(--accent-rgb), 0.3); color: var(--color-parch);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.5);
+}
+.wb-face__sw { width: 34px; height: 18px; border-radius: 999px; background: rgba(237,233,226,0.2); }
+.wb-face--content { flex-direction: column; gap: 6px; }
+.wb-face--content b { font-family: var(--font-display); font-size: 15px; color: var(--color-parch); }
+.wb-face--content i { width: 72px; height: 5px; border-radius: 3px; background: rgba(237,233,226,0.18); }
+.wb-face--content i:last-child { width: 48px; }
+
+/* B2 — the finished page */
+.wb-page {
+  position: absolute; left: 50%; top: 50%;
+  width: 74%; aspect-ratio: 16 / 11; margin: -25.4% 0 0 -37%;
+  border-radius: 11px; overflow: hidden;
+  background: linear-gradient(180deg, #16150F, #121210);
+  box-shadow: inset 0 0 0 1px rgba(237,233,226,0.16), 0 30px 64px -30px rgba(0,0,0,0.95);
+}
+.wb-page__chrome {
+  display: flex; align-items: center; gap: 5px; padding: 7px 10px;
+  background: rgba(237,233,226,0.06); border-bottom: 1px solid rgba(237,233,226,0.1);
+}
+.wb-page__chrome i { width: 6px; height: 6px; border-radius: 50%; background: rgba(237,233,226,0.26); }
+.wb-page__body { display: block; padding: 14px 16px; }
+.wb-page__mark {
+  display: block; font-family: var(--font-display); font-weight: 600;
+  font-size: 11px; letter-spacing: 0.02em; color: var(--accent-text); margin-bottom: 9px;
+}
+.wb-page__h {
+  display: block; font-family: var(--font-display); font-size: clamp(15px, 2.1vw, 25px);
+  line-height: 1.05; letter-spacing: -0.03em; color: var(--color-parch); margin-bottom: 11px;
+}
+.wb-page__h em { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; color: var(--accent-text); }
+.wb-page__hero {
+  display: block; height: 34%; border-radius: 7px; margin-bottom: 10px;
+  background: linear-gradient(135deg, rgba(var(--accent-rgb),0.26), rgba(237,233,226,0.06));
+}
+.wb-page__cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.wb-page__cards i { height: 26px; border-radius: 5px; background: rgba(237,233,226,0.1); box-shadow: inset 0 0 0 1px rgba(237,233,226,0.12); }
+.wb-page__glow {
+  position: absolute; inset: -14%;
+  background: radial-gradient(closest-side, rgba(var(--accent-rgb), 0.4), transparent 72%);
+  pointer-events: none;
+}
+
+/* B3 — the phone, on its hinge */
+.wb-phone {
+  position: absolute; left: 86%; top: 56%;
+  width: 20%; aspect-ratio: 9 / 18; margin-top: -18%;
+  transform-origin: left center;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #16150F, #121210);
+  box-shadow: inset 0 0 0 1px rgba(237,233,226,0.18), 0 26px 54px -28px rgba(0,0,0,0.95);
+}
+.wb-phone__screen { display: block; padding: 13px 9px 9px; }
+.wb-phone__mark { display: block; font-family: var(--font-display); font-size: 8px; color: var(--accent-text); margin-bottom: 6px; }
+.wb-phone__h { display: block; font-family: var(--font-display); font-size: 11px; line-height: 1.1; letter-spacing: -0.02em; color: var(--color-parch); margin-bottom: 8px; }
+.wb-phone__h em { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; color: var(--accent-text); }
+.wb-phone__hero { display: block; height: 54px; border-radius: 5px; margin-bottom: 7px; background: linear-gradient(135deg, rgba(var(--accent-rgb),0.26), rgba(237,233,226,0.06)); }
+.wb-phone__screen i { display: block; height: 5px; border-radius: 3px; background: rgba(237,233,226,0.16); margin-bottom: 5px; }
+.wb-phone__screen i:last-child { width: 62%; }
+
+/* B3 — the booking */
+.wb-chip {
+  position: absolute; left: 26%; top: 80%;
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 15px; border-radius: 999px;
+  background: linear-gradient(180deg, #F3EFE7, #E4DFD4);
+  color: var(--color-ink);
+  font-family: var(--font-display); font-size: 13px;
+  box-shadow: 0 20px 40px -20px rgba(0,0,0,0.9);
+  white-space: nowrap;
+}
+.wb-chip__tick {
+  width: 17px; height: 17px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent); color: #fff; font-size: 10px;
+}
+@media (max-width: 1023px) {
+  .wb-axon { transform: rotateX(8deg) rotateZ(-4deg); }
+  .wb-phone { left: 78%; width: 26%; }
+  .wb-chip { left: 10%; font-size: 11px; }
+}
+
+/* ── Session 26 · Ch3: from pieces to a product ───────────────────── */
+.pr-stage { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+.pr-orbit { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; display: grid; place-items: center; }
+.pr-iso {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  /* The brief asks for ~55deg / -35deg. At that angle the plates are so
+     foreshortened that the app reads as a squashed stack and the leader
+     labels are unreadable, so this is pulled back to 44/-26: still
+     unmistakably isometric, legible at 1440 and 1920. Reported as a
+     deviation. */
+  transform: rotateX(44deg) rotateZ(-26deg);
+  display: grid; place-items: center;
+}
+.pr-shadow {
+  position: absolute; left: 50%; top: 56%;
+  width: 70%; height: 46%; margin: 0 0 0 -35%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0,0,0,0.75), transparent 72%);
+  filter: blur(16px);
+}
+.pr-layer {
+  position: absolute; left: 50%; top: 50%;
+  width: 76%; aspect-ratio: 5 / 4; margin: -30.4% 0 0 -38%;
+  transform-style: preserve-3d;
+}
+/* Each face sits in its own band of its plate; centred, all five
+   stacked on the same point. */
+.pr-layer__plate {
+  position: absolute; inset: 0; border-radius: 12px;
+  place-items: center start;
+  padding-left: calc(9% + var(--slot, 0) * 7%);
+  background: linear-gradient(158deg, rgba(237,233,226,0.10), rgba(237,233,226,0.035));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 0 0 1px rgba(237,233,226,0.13),
+    0 26px 54px -32px rgba(0,0,0,0.9);
+  display: grid; place-items: center;
+}
+.pr-layer__lead {
+  position: absolute; right: -8%; top: 42%;
+  display: flex; align-items: center; gap: 8px;
+  /* The labels are read by the VIEWER, so they undo the isometric
+     exactly — the inverse of .pr-iso's transform, in reverse order. */
+  transform: rotateZ(26deg) rotateX(-44deg);
+  transform-origin: left center;
+}
+.pr-layer__rule { width: 40px; height: 1px; background: rgba(var(--accent-rgb), 0.6); }
+.pr-layer__name {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent-text); white-space: nowrap;
+}
+.pr-nav { display: flex; flex-direction: column; gap: 9px; align-self: center; }
+.pr-nav i { width: 54px; height: 9px; border-radius: 4px; background: rgba(237,233,226,0.26); }
+.pr-nav i:first-child { background: rgba(var(--accent-rgb), 0.7); }
+.pr-kpis { display: flex; gap: 11px; }
+.pr-kpis b { width: 58px; height: 38px; border-radius: 8px; background: rgba(237,233,226,0.18); box-shadow: inset 0 0 0 1px rgba(237,233,226,0.2); }
+.pr-table { display: flex; flex-direction: column; gap: 7px; }
+.pr-table u { width: 150px; height: 8px; border-radius: 4px; background: rgba(237,233,226,0.16); text-decoration: none; }
+.pr-table u:nth-child(2) { width: 112px; }
+.pr-table u:nth-child(4) { width: 128px; }
+.pr-line { width: 62%; }
+.pr-line path { stroke: var(--accent-text); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.pr-sys { display: flex; align-items: center; gap: 10px; }
+.pr-sys em { font-family: var(--font-display); font-style: normal; font-weight: 600; font-size: 26px; color: var(--color-parch); }
+.pr-sys i { width: 22px; height: 22px; border-radius: 6px; background: var(--c); }
+
+/* B3 — the design-system ring orbiting the assembled app */
+.pr-ring {
+  position: absolute; left: 50%; top: 50%;
+  width: 0; height: 0;
+  transform-style: preserve-3d;
+}
+.pr-ring__chip {
+  position: absolute; left: 0; top: 0;
+  transform: rotateZ(var(--a)) translateX(clamp(140px, 19vw, 230px));
+}
+.pr-ring__chip > span {
+  display: block;
+  padding: 6px 12px; border-radius: 999px;
+  transform: rotateZ(var(--a)) rotateZ(26deg) rotateX(-44deg);
+  background: linear-gradient(180deg, rgba(237,233,226,0.14), rgba(237,233,226,0.05));
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.4);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--color-parch); white-space: nowrap;
+}
+@media (max-width: 1023px) {
+  .pr-iso { transform: rotateX(38deg) rotateZ(-20deg); }
+  .pr-ring__chip { transform: rotateZ(var(--a)) translateX(120px); }
 }

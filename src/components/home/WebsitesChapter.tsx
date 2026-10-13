@@ -1,5 +1,6 @@
 import ServiceChapter, { type ChapterSpec } from "./ServiceChapter";
-import { SiteStack } from "./chapterObjects";
+import WebsitesScene from "./scenes/WebsitesScene";
+import { WEBSITES_FILL } from "./piecePattern";
 
 const SPEC: ChapterSpec = {
   id: "ch-websites",
@@ -14,10 +15,10 @@ const SPEC: ChapterSpec = {
     { pillar: "grow", name: "Landing pages" },
     { pillar: "design", name: "Post-launch refinement" },
   ],
-  fill: ["/work/cgwalls/w/hero-1400.webp", "/work/cgwalls/w/gallery2-1400.webp"],
+  fill: WEBSITES_FILL,
   proof: "cg-walls-and-floors",
 };
 
 export default function WebsitesChapter() {
-  return <ServiceChapter spec={SPEC} object={SiteStack} />;
+  return <ServiceChapter spec={SPEC} object={WebsitesScene} />;
 }
