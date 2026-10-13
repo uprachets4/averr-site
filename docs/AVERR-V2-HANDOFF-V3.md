@@ -13,8 +13,8 @@
 |---|---|
 | **Repo** | `github.com/uprachets4/averr-site` |
 | **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
-| **HEAD** | `b0af4ee` — *24b-4 the hero field is all real client work*. Run `git log --oneline -1` for the exact hash. |
-| **Doc currency** | Written at the end of the 24b ruling. |
+| **HEAD** | `83cc51a` — *25a-2 the last cream grounds on home go transparent*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 25a. |
 | **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
 | **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
 | **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
@@ -2546,6 +2546,100 @@ The cost is chromatic. Those three screens carried the only green, navy and copp
 
 ---
 
+**SESSION 25a — one colour flow, and the first three service chapters.** Two commits (`0bee86f`, `83cc51a`).
+
+**Split reported and taken**, as the brief allows: **25a = the colour flow + Ch1–4**, **25b = Ch5–8 + the rail's remaining work**.
+
+### 0 · THE SITE STANDARD (owner instruction)
+
+**The LOCKED palette rule is UPDATED.** Cream grounds are retired site-wide. The palette is now:
+
+> **the dark ink ground + chapter LIGHT + parch type.**
+
+Home is the pilot; the other pages migrate in later sessions. There are no cream chapter grounds and no clip-path slab switching between two grounds anywhere on home.
+
+**The light tokens**, all over `#141412`, all at or under the 0.35 cap:
+
+| Chapter | Colour | Peak α | Position | Parch (#EDE9E2) on the lit ground |
+|---|---|---|---|---|
+| What we build | `255,255,255` | 0.10 | 62% / 46% | 14.1:1 |
+| Websites | `200,118,60` copper | 0.30 | 72% / 42% | 12.4:1 |
+| Products | `61,107,255` blue | 0.26 | 30% / 52% | 13.1:1 |
+| Automation | `123,92,255` violet | 0.28 | 68% / 50% | 12.9:1 |
+| Marketing | `212,168,75` gold | 0.30 | 34% / 46% | 12.2:1 |
+| The work | `255,255,255` | 0.12 | 50% / 44% | 13.9:1 |
+| Who builds it | `237,233,226` parch-warm | 0.16 | 36% / 50% | 13.5:1 |
+| Your move | `226,160,96` dawn | 0.26 | 50% / 76% | 12.6:1 |
+
+Every lit ground keeps parch type above 12:1 — far past AA. The contrast figures are computed against the lit ground at peak alpha, which is the worst case.
+
+**It interpolates rather than cutting.** One fixed layer, rAF-throttled, writing its gradient straight to the node. Measured flowing down the page:
+
+| Scroll | Light | Chapter |
+|---|---|---|
+| 2% | `rgb(255,255,255)` α 0.10 | What we build |
+| 16% | `rgb(207,135,84)` α 0.275 | What we build |
+| 26% | `rgb(161,115,114)` α 0.29 | Websites |
+| 36% | `rgb(61,107,255)` α 0.26 | Products |
+| 46% | `rgb(100,98,255)` α 0.27 | Products |
+| 58% | `rgb(123,92,255)` α 0.28 | Automation |
+| 72% | `rgb(255,255,255)` α 0.12 | The work |
+
+The blends at 26% and 46% are the point: a chapter's colour arrives a third of the way through its predecessor and leaves after it.
+
+### Ch1 · the hero
+
+New copy — **"We build the websites, software and AI / your business / [runs on.]"** — with the subline and a second CTA that scrolls to chapter 2 rather than navigating. The accessible name is the plain sentence. The fly-through no longer parks on the CapitalCommand capture: the camera passes **through** it as the copper light blooms.
+
+### Ch2–Ch4 · the service chapters
+
+One template, three instances. Each: a 3D object that leans toward the cursor and assembles with scroll, the giant word with real captures moving inside its letterforms, a line to the reader, the chapter's services as a ruled list into `/services#{slug}`, and a proof link.
+
+| | Word | Object | Services |
+|---|---|---|---|
+| Ch2 Websites | WEBSITES | a fan of four real CG Walls website captures | Brand & design direction · Marketing websites · Landing pages · Post-launch refinement |
+| Ch3 Products | PRODUCTS | one real CapitalCommand capture exploded into five masked z-layers | Product & SaaS interfaces · Design systems |
+| Ch4 Automation | AUTOMATE | a 40-node Fibonacci sphere in CSS 3D, pulsing | the five Automate services |
+
+### Numbers
+
+Measured on a real home load, **total JS transferred**:
+
+| | before | after |
+|---|---|---|
+| Home | 144.42 kB | **146.53 kB** (+2.11, budget +4) |
+
+**A bundle finding worth keeping.** Restructuring home made Rollup re-partition and move React **into** the entry chunk, which read as a 14 kB regression and was not one — total transferred barely moved. The entry-chunk figure previous sessions tracked is not comparable across a re-partition. The split is explicit in `vite.config.ts` now so it stops moving when a page is rearranged, and **total transferred on a real load is the metric from here**.
+
+*Alias, standard harness:* **LCP 1752 ms** `[1732, 1848, 1752]`, FCP 1752, TTFB 96, CLS 0.0189.
+
+*Crash scroll:* 1440 CLS 0/0, overflow 0, no errors. 375 CLS 0.0101, overflow 0, no errors. **No blank frames at either width.** Longest task 57–65 ms (the initial render identified in 23b).
+
+*No visible cream ground on home*, swept every 400px. The only light-backgrounded element left is `RouteWipe`'s always-mounted transition panel — parch by design, clipped to `inset(100%)`, invisible, and shared by every route.
+
+### Quality gate
+
+**Ch3 failed the gate on its first build and was rebuilt.** The final S of PRODUCTS was cut off by the frame — the per-character estimate behind the word's size was low — and the objects were small enough to leave the bottom third of every chapter empty. The word is measured at 5.3em with headroom and fits at 1440 (right edge 1325 of 1440) and 1920 (1616 of 1920); the objects are half again as large.
+
+The three chapters read as one family without reading as one template: the fan, the exploded view and the orb are genuinely different objects, and the colour carries the difference further. Against Linear and Vercel the dark-plus-parch typographic confidence holds. **The weakest part is that the chapter light is subtle at 1440** — at 0.26–0.30 over near-black it reads more as a mood than as colour, and a reader may not consciously register the flow the measurements show.
+
+### Deviations
+
+1. **Service mapping contradiction in the brief, resolved.** Ch2 explicitly lists "Landing pages" (a Grow service) while Ch5 says "the 6 Grow services" — both cannot hold with each service appearing exactly once. I followed the explicit Ch2 list; **Ch5 gets the remaining five Grow services** (Local search, Outreach campaigns, Paid ads, Content, Reporting). Total across Ch2–Ch5: 4 + 2 + 5 + 5 = 16, each once.
+2. **ASSET RULE stop, reported.** Ch2's object asks for "CG Walls + SIFT's marketing pages". **SIFT has no marketing-page captures** — all eight are product dashboards. The stack is the four real CG Walls website captures, which are the only marketing-site captures in the repository.
+3. `TemplateWall` and `ServiceActs` are **deleted**, superseded by this structure. `WorkStrip` survives until Ch6 replaces it in 25b.
+4. **Ch7 and Ch8 are transparent but not yet restyled** — they lost their cream grounds so the flow is unbroken, but their Session 25 treatment is 25b's.
+5. CLS rose to 0.0189 on the alias (from 0.0069) with the new chapters; a fifth of the budget.
+
+### My own errors this session
+
+1. **I read a 14 kB bundle jump as a regression in my own code.** It was Rollup re-partitioning; the real delta was +2.11 kB, and I only found that by measuring a stashed build the same way.
+2. **I sized the giant word from a guessed per-character width** and shipped a frame with the last letter cut off.
+3. **I created `chapterLight.ts` next to `ChapterLight.tsx`**, which collides on a case-insensitive filesystem — the same mistake as `heroField`/`HeroField` in Session 23.
+4. **My "no cream" sweep reported a false positive** I had to trace by hand: an invisible, clipped, site-wide transition panel.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -2651,6 +2745,10 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 **Never break these without Prachets explicitly unlocking them in the session brief.**
 
 ### Locked
+
+- **THE PALETTE RULE IS UPDATED BY OWNER INSTRUCTION (25).** Cream grounds are RETIRED site-wide. The palette is the dark ink ground + chapter LIGHT + parch type. A page is one continuous ground; the story is told by a fixed light layer whose colour interpolates with scroll, not by switching grounds. Home is the pilot (Session 25); the other pages migrate in later sessions. Screen and photo interiors still keep their own colours.
+- **THE SITE STANDARD, as the owner approved it (25).** Three patterns carry every page from here: (1) the 3D room of real work, (2) the giant word with real captures moving inside the letterforms, (3) dark plus parch typographic confidence. A chapter is: a 3D object that answers the cursor, the giant word, a line addressed to the reader, and a ruled list that links onward.
+- **BUNDLE SIZE IS MEASURED ON A REAL LOAD (25a).** Rollup's split is a function of the module graph, so the entry chunk's gzip is not comparable across a restructure — rearranging home moved React into the entry and read as a 14 kB regression that did not exist. `vite.config.ts` pins react and motion into their own chunks, and the metric is the total JS transferred on a real page load.
 
 - **HOME IMPORTS NOTHING FROM ANOTHER PAGE'S COMPONENTS (24b ruling).** Every plane in the hero field is a real case-study capture, and no home module imports from `services/build`. The screen chunks (37.12 kB gzip) are off home's graph and live inside /services' own lazy `ServicesBuild`.
 
@@ -2891,6 +2989,8 @@ The **data** still lists `heroImages[1]` and `[2]` per study; they are **never r
 
 **90 · Never call a setter from inside another setter's updater.** *Cause:* the hero field cleared its hover label with `setTip(null)` written inside a `setHover` updater function. A leaving plane's `blur` fires around the arriving plane's `focus`, so one plane's exit wiped the label the next plane had just set — and after an unrelated change to the component's render cadence, **only the first plane in the field ever showed a label**. It had passed 16/16 the session before. *Fix:* keep the owning id in a ref and clear outside the updater. **An updater runs in the render phase and may run twice; a side effect in one is a race waiting for a re-render that changes.**
 
+**91 · A chunk-size "regression" can be Rollup moving something, not you adding it.** *Cause:* restructuring home made the entry chunk jump 91.4 → 105.6 kB gzip with almost no new eager code. Rollup had re-partitioned and pulled React into the entry, emitting a new `motion` chunk in its place. *Fix:* measure the TOTAL JS transferred on a real load — it had moved 144.42 → 146.53 — and pin the shared libraries with `manualChunks` so the split stops drifting. **Compare payloads, not chunk names.**
+
 ---
 
 ## 6. DATA FACTS
@@ -3000,7 +3100,8 @@ Film slide = each study's `heroImage`, which **equals its case-hero front image*
 - ~~**Session 24a — chapters 1–3.**~~ **DONE** (`592dab6` … `547cfca`). The fly-through lands on CapitalCommand and occludes; "You've seen this website before." stages the restored argument as a wall of templates with one breaking out into real work; the strip's end card teases the vault; the rail reads six chapters.
 - ~~**Session 24b — chapters 4–6 and the journey layer.**~~ **DONE** (`0c50d81` … `f918e18`). The Ch1→Ch2 hand-over composed, Ch2 sharp, three image-in-type acts replacing `ServicePanels`, Ch5 and Ch6 lines, the six-chapter rail, no dead frames anywhere. Home initial JS 92.15 kB gzip; mobile LCP 1732 ms.
 - ~~**24b ruling — the hero field is all real work.**~~ **DONE** (`b0af4ee`). Four live /services screens replaced by unused case-study captures; the 37.12 kB gzip of screen chunks off home's graph; home entry 91.39 kB gzip; mobile LCP 1824 ms.
-- **STILL OPEN from 24b:** the hero field is more monotone without the screens' colour accents; image-in-type fills are desaturated by the legibility wash; Ch5 is still the quietest chapter.
+- ~~**Session 25a — one colour flow + Ch1–4.**~~ **DONE** (`0bee86f` … `83cc51a`). The palette rule updated, the interpolating light layer, the new hero sentence, and the Websites / Products / Automation chapters. Total home JS 146.53 kB; mobile LCP 1752 ms.
+- **SESSION 25b — Ch5–8 and the rail.** Marketing (gold, the rings object), the work wall replacing `WorkStrip` (delete it), Ch7 and Ch8 restyled onto the flow, the 8-label rail tinted by the current light, and the per-chapter 5% dead-frame trace.
 - **STILL OPEN from 23b:** 11–12px text inside the reused /services screens on mobile; the LCP element is the kicker rather than the h1.
 - **STILL OPEN from 22:** CareerClarity has no screenshot and no case study, so its card is text-only; CapitalCommand and CadenceStack have no `headlineFigure`; `public/about/` has no founder photograph. All three are owner-supplied assets, not code.
 - **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
