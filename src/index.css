@@ -3206,7 +3206,9 @@ a { color: inherit; text-decoration: none; }
   .ds-steps li { flex: 0 0 auto; }
   .ds-step { width: auto; padding: 10px 14px; }
   .ds-step__l { display: none; }
-  .ds-step__more { margin-left: 0; }
+  /* the mobile floors: 13px text, 44px targets */
+  .ds-step__n { font-size: 13px; letter-spacing: 0.08em; }
+  .ds-step__more { margin-left: 0; min-height: 44px; font-size: 13px; letter-spacing: 0.08em; }
   .ds-panel { min-height: 56vh; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -3296,4 +3298,16 @@ a { color: inherit; text-decoration: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .wc-orb, .wc-frame { transition: none; }
+}
+
+@media (max-width: 860px) {
+  /* the glass-UI panels depict interfaces, but their type is still type:
+     the 13px floor applies inside them too */
+  .dp-res__rank, .dp-res__stars, .dp-site__mark, .dp-cal__head,
+  .dp-slot, .dp-confirm, .dp-chat__who, .dp-chat__inwho,
+  .dp-confirm__tick, .dp-chat__in, .wc-vault, .wc-vault span { font-size: 13px; }
+  .dp-confirm__tick { width: 22px; height: 22px; }
+  .dp-res__name, .dp-site__cta, .dp-chat__btn { font-size: 14px; }
+  /* the roster links carry real tap targets */
+  .wc-also a { display: inline-flex; align-items: center; min-height: 44px; }
 }
