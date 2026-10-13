@@ -141,7 +141,13 @@
      it. 7.4vh keeps the h1, subline, kicker and CTAs inside the fold
      at 720. */
   --hero-copy-w: calc(var(--container-wide) * 0.55);
-  --type-hero-size: clamp(34px, min(calc(var(--hero-copy-w) / 9.8), 7.4vh), 112px);
+  /* The divisor is the LONGEST LINE's length in this face, not a style
+     choice: at /9.8 it was calibrated for a 38-character sentence, and
+     Session 25c's lead is 13 characters ("We build what"), so the same
+     column carries far bigger type. The vh term rises with it — at
+     7.4vh the viewport height, not the column, was what held the hero
+     at 67px when the ruling asked for >= 120px. */
+  --type-hero-size: clamp(34px, min(calc(var(--hero-copy-w) / 6.0), 13.6vh), 170px);
   --type-hero-weight: 500;
   --type-hero-tracking: -0.05em;
   --type-hero-leading: 0.92;
@@ -1139,9 +1145,14 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* the copy */
+/* The copy block centres in the frame MINUS the top row. At 67px the
+   headline never reached that high; at 121px its first line rose to
+   y=84 and struck through "A BOUTIQUE STUDIO · TORONTO", which sits at
+   top: 118px. The padding is the top row's own reserve. */
 .hx-copylayer {
   position: absolute; inset: 0; z-index: 3;
   display: flex; align-items: center;
+  padding-top: clamp(140px, 17vh, 190px);
   pointer-events: none;
 }
 .hx-copylayer :is(a, button) { pointer-events: auto; }
@@ -1172,6 +1183,13 @@ a { color: inherit; text-decoration: none; }
   color: rgba(244,240,230,0.6);
 }
 .hx-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+/* A 720px-tall desktop cannot hold the top row, a 98px headline, the
+   subline, the kicker AND the CTA row: measured, the block overran by
+   26px and the headline struck the eyebrow. The kicker is the one piece
+   that restates what the subline already says, so it is what gives. */
+@media (min-width: 1024px) and (max-height: 820px) {
+  .hx-kicker { display: none; }
+}
 
 /* the landing frame */
 /* Opaque, so the capture never blends with the room behind it. */
@@ -1573,7 +1591,11 @@ a { color: inherit; text-decoration: none; }
   z-index: 0;
   pointer-events: none;
 }
-.home-dark > *:not(.clight) { position: relative; z-index: 1; }
+/* ONLY the chapters. `.home-dark > *:not(.clight)` also matched the
+   chapter rail and overrode its position:fixed to relative, which put a
+   1440x256 nav into the document flow and pushed the whole page -- hero
+   included -- down by 256px. The rail carries its own z-index: 40. */
+.home-dark > section { position: relative; z-index: 1; }
 
 /* ── the service chapter template ── */
 .sc-wrap { position: relative; height: 320vh; }

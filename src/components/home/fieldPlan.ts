@@ -15,8 +15,12 @@ import { caseStudies } from "../../data/caseStudies";
  *
  * The layout is deliberate rather than scattered:
  *
- *   SAFE ZONE   the headline owns x 0–46%, y 16–74%. No plane's box may
+ *   SAFE ZONE   the headline owns x 0–60%, y 0–58%. No plane's box may
  *               enter it at any width — measured, not eyeballed.
+ *               WIDENED in 25c: the ruling took the h1 from 67px to
+ *               121px at 1440, and its ink box went from x 0–46% to
+ *               x 8–58%, y 6–55%. Two planes that cleared the old zone
+ *               did not clear the new one.
  *   DEPTH       an EVEN ladder from +80 to −2000, roughly 139px a rung.
  *               Clustering the planes near the camera left a stretch of
  *               the fly-through with nothing at a visible distance and
@@ -109,7 +113,7 @@ export const PLANES: Plane[] = [
     src: "/work/cgwalls/testimonials.jpg",
     slug: "cg-walls-and-floors",
     label: "CG Walls & Floors",
-    x: 64, y: 7, w: 15, z: -337,
+    x: 73, y: 10, w: 15, z: -337,
     drift: [3, 25], yaw: -5, mobile: true,
   },
   {
@@ -174,7 +178,7 @@ export const PLANES: Plane[] = [
     src: "/work/sift/08-command-insights.jpg",
     slug: "sift",
     label: "SIFT",
-    x: 47, y: 7, w: 10, z: -1449,
+    x: 67, y: 4, w: 10, z: -1449,
     drift: [2, 28], yaw: 7,
   },
   {

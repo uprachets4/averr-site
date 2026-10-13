@@ -31,10 +31,15 @@ import Screenshot from "./Screenshot";
 /* ── copy ──────────────────────────────────────────────────────────── */
 
 const EYEBROW = "A boutique studio · Toronto";
-const LEAD_A = "We build the websites, software and AI";
+/* Session 25c: the headline is the claim, not the inventory. The four
+   services are the subline's job — it already lists them — and a short
+   lead is what lets the type reach the size the hero needs. The break
+   is explicit rather than left to wrapping so the two lead lines are
+   always the same two lines. */
+const LEAD_A = "We build what";
 const LEAD_B = "your business";
 const SLAB = "runs on.";
-const H1_SENTENCE = "We build the websites, software and AI your business runs on.";
+const H1_SENTENCE = "We build what your business runs on.";
 const SUBLINE =
   "Websites, web apps and SaaS products, AI automation and marketing for businesses across the GTA. One studio, start to finish.";
 const KICKER =
