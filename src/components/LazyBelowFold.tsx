@@ -15,12 +15,19 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
  * ground colour, so even a mistimed swap cannot shift anything that is
  * on screen.
  *
+ * The reserve is PER BREAKPOINT. A single figure is a desktop figure:
+ * home's chapters pin for 320vh on desktop and stand at about 100vh on
+ * a phone, so one 320vh reserve collapsed the page by ~1,843px the
+ * moment each chunk mounted and took mobile CLS to 0.4363 on a crash
+ * scroll. `minHeightSm` is the phone's reserve.
+ *
  * Without IntersectionObserver (or with it unsupported) the section
  * loads immediately rather than never.
  */
 export default function LazyBelowFold({
   load,
   minHeight,
+  minHeightSm,
   background,
   children,
 }: {
@@ -28,6 +35,8 @@ export default function LazyBelowFold({
   load: () => Promise<unknown>;
   /** Reserved height while the chunk is in flight. */
   minHeight: string;
+  /** The same, at phone width. Defaults to `minHeight`. */
+  minHeightSm?: string;
   /** The section's own ground, so the reserve is invisible. */
   background: string;
   /** Rendered once `load` has resolved. */
@@ -74,5 +83,18 @@ export default function LazyBelowFold({
   );
 
   if (ready) return <>{children}</>;
-  return <div ref={ref} aria-hidden style={{ minHeight, background }} />;
+  return (
+    <div
+      ref={ref}
+      aria-hidden
+      className="lbf-reserve"
+      style={
+        {
+          "--lbf-h": minHeight,
+          "--lbf-h-sm": minHeightSm ?? minHeight,
+          background,
+        } as React.CSSProperties
+      }
+    />
+  );
 }

@@ -1861,3 +1861,10 @@ a { color: inherit; text-decoration: none; }
 }
 @media (prefers-reduced-motion: reduce) { .ww-tile, .ww-meta { transition: none; } }
 .sc-arrow-tail { margin-left: 0.6em; }
+
+/* The lazy reserve, per breakpoint. One figure is a desktop figure: see
+   LazyBelowFold. 860px is where home's chapters stop pinning. */
+.lbf-reserve { min-height: var(--lbf-h); }
+@media (max-width: 860px) {
+  .lbf-reserve { min-height: var(--lbf-h-sm, var(--lbf-h)); }
+}

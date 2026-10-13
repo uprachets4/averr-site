@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback } from "react";
+import { Suspense, lazy, useCallback, type CSSProperties } from "react";
 import Hero from "../components/Hero";
 import LazyBelowFold from "../components/LazyBelowFold";
 import ChapterRail from "../components/home/ChapterRail";
@@ -29,6 +29,21 @@ const WorkWall = lazy(() => import("../components/home/WorkWall"));
 const FounderChapter = lazy(() => import("../components/home/FounderChapter"));
 const StartChapter = lazy(() => import("../components/home/StartChapter"));
 
+/** The reserve a chapter holds while its chunk is in flight.
+ *  There are TWO of these per chapter -- LazyBelowFold's placeholder and
+ *  the Suspense fallback behind it -- and they have to agree. A 320vh
+ *  fallback left on the Suspense boundary was still collapsing the page
+ *  by ~1,843px on a phone after the placeholder itself was fixed. */
+function Reserve({ h, sm }: { h: string; sm: string }) {
+  return (
+    <div
+      aria-hidden
+      className="lbf-reserve"
+      style={{ "--lbf-h": h, "--lbf-h-sm": sm } as CSSProperties}
+    />
+  );
+}
+
 export default function Home() {
   /* Home ends dark, so the global footer closes on the same ground instead
      of ending the colour flow with a cream slab. Declared here rather than
@@ -54,56 +69,56 @@ export default function Home() {
       </section>
 
       <section id="ch-websites" data-tone="dark">
-        <LazyBelowFold load={loadWebsites} minHeight="320vh" background="transparent">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "320vh" }} />}>
+        <LazyBelowFold load={loadWebsites} minHeight="320vh" minHeightSm="107vh" background="transparent">
+          <Suspense fallback={<Reserve h="320vh" sm="107vh" />}>
             <WebsitesChapter />
           </Suspense>
         </LazyBelowFold>
       </section>
 
       <section id="ch-products" data-tone="dark">
-        <LazyBelowFold load={loadProducts} minHeight="320vh" background="transparent">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "320vh" }} />}>
+        <LazyBelowFold load={loadProducts} minHeight="320vh" minHeightSm="93vh" background="transparent">
+          <Suspense fallback={<Reserve h="320vh" sm="93vh" />}>
             <ProductsChapter />
           </Suspense>
         </LazyBelowFold>
       </section>
 
       <section id="ch-ai" data-tone="dark">
-        <LazyBelowFold load={loadAI} minHeight="320vh" background="transparent">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "320vh" }} />}>
+        <LazyBelowFold load={loadAI} minHeight="320vh" minHeightSm="113vh" background="transparent">
+          <Suspense fallback={<Reserve h="320vh" sm="113vh" />}>
             <AutomationChapter />
           </Suspense>
         </LazyBelowFold>
       </section>
 
       <section id="ch-marketing" data-tone="dark">
-        <LazyBelowFold load={loadMarketing} minHeight="320vh" background="transparent">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "320vh" }} />}>
+        <LazyBelowFold load={loadMarketing} minHeight="320vh" minHeightSm="106vh" background="transparent">
+          <Suspense fallback={<Reserve h="320vh" sm="106vh" />}>
             <MarketingChapter />
           </Suspense>
         </LazyBelowFold>
       </section>
 
       <section id="ch-work" data-tone="dark">
-        <LazyBelowFold load={loadWork} minHeight="320vh" background="transparent">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "320vh" }} />}>
+        <LazyBelowFold load={loadWork} minHeight="320vh" minHeightSm="254vh" background="transparent">
+          <Suspense fallback={<Reserve h="320vh" sm="254vh" />}>
             <WorkWall />
           </Suspense>
         </LazyBelowFold>
       </section>
 
       <section id="ch-founder" data-tone="dark">
-        <LazyBelowFold load={loadFounder} minHeight="92vh" background="transparent">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "92vh" }} />}>
+        <LazyBelowFold load={loadFounder} minHeight="72vh" minHeightSm="118vh" background="transparent">
+          <Suspense fallback={<Reserve h="72vh" sm="118vh" />}>
             <FounderChapter />
           </Suspense>
         </LazyBelowFold>
       </section>
 
       <section id="ch-start" data-tone="dark">
-        <LazyBelowFold load={loadStart} minHeight="82vh" background="transparent">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "82vh" }} />}>
+        <LazyBelowFold load={loadStart} minHeight="93vh" minHeightSm="107vh" background="transparent">
+          <Suspense fallback={<Reserve h="93vh" sm="107vh" />}>
             <StartChapter />
           </Suspense>
         </LazyBelowFold>
