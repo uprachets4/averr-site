@@ -3242,6 +3242,81 @@ LCP is **under 2000 ms, so the third mesh layer stays** — the brief's trim con
 
 ---
 
+---
+
+**SESSION 28a — the fidelity pass, items 1–4.** Four commits. Owner's verdict on 27c: **2/10 — too small, empty, not premium, the italic must go.**
+
+**SPLIT REPORTED AND TAKEN:** 28a = items 1–4 (the most visible), 28b = items 5–7. **28b is untouched.**
+
+### 1 · One typeface
+
+**Cormorant is retired from home.** Every italic accent is gone — the story's site headline and agent reply, the One studio heading, the founder heading and statement. Emphasis is now only: the two-tone heading, the scroll word-fill, or the gradient on one key word.
+
+*Audited on the rendered DOM:* **zero elements carrying text are italic**, and zero use Cormorant. (A first audit reported 47 italic elements; they are decorative `<i>` bars with no text content — `<i>` is italic by default. The audit now tests for text.)
+
+### 2 · Scale, measured from the frames
+
+The owner said "too small". Measured at the frames' own proportions:
+
+| | Nolana | ours (before) |
+|---|---|---|
+| frame 01 hero headline | 15.57% of frame | **15.56%** — already there |
+| frame 01 content block | 37.43% | 41.0% — already there |
+| frame 02 statement | 22.98% tall / 61.9% wide | 19.9% / **81.9%** |
+| frame 09 card row | 67.94% / 90% | **72.9% / 92%** — already larger |
+
+**So the big headings and the device were never the problem.** The hero headline already matched Nolana to within 0.01%, and the device was larger than theirs. What was small was every **interior**: card type, panel content, the step list, labels and figures. All of those scale up.
+
+The statement takes Nolana's treatment properly — their ~52px in a 1040px measure at **1.02 leading**, four tight lines. Mine was a wide thin band at 1.2 leading across 81.9% of the frame; it is a 1000px measure at 1.08 now.
+
+### 3 · Atmosphere imagery — BLOCKED, reported
+
+Six candidate Unsplash photos downloaded cleanly. **Every route to the photographer's name is behind a bot challenge**: the photo pages are JS-rendered and `/oembed` returns an HTML challenge instead of JSON. The brief requires each photo's URL **and photographer** in `docs/credits.md`. I will not ship images whose authors I cannot verify, and I will not invent credits. **The files are deleted and no `docs/credits.md` was written.**
+
+**What shipped instead**, carrying the same weight: the procedural atmosphere is rebuilt — a four-stop sky, a lavender bloom and a warm secondary, a deterministic **90-star field**, **drifting low cloud** from two-axis turbulence, **five ridges** instead of three with haze pooling in front of each, and film grain over all of it.
+
+**To unblock:** either supply the photos with their photographers, or an Unsplash API key, and the duotone/grain processing and credits file go in next session.
+
+### 4 · The device story, fully populated
+
+No grey placeholder blocks at any step.
+
+- **01 Found** — panel header, typed search, three real result rows with names and categories, a "Highly rated" chip, a map card with the position chip and pin tag, a views-this-week stat with bars.
+- **02 Chosen** — a full browser card (nav, wordmark, headline, sub, hero, CTA, three-card row) beside a phone card running the same page.
+- **03 Booked** — day-of-week header, month grid, slots with the ghost cursor, the confirmation, an SMS-style reminder card.
+- **04 Runs itself** — a four-message thread, a sources chip, the approve bar, a "3 drafts waiting" toast.
+
+| step 0 | step 1 | step 2 | step 3 |
+|---|---|---|---|
+| 2.6% | 10.0% | 3.7% | 5.8% |
+
+Against the **10%** limit, and **zero sub-panel collisions** at every step. No figure appears that is not illustrative — the stat reads "Up", not an invented number.
+
+### Verification
+
+*Crash scroll:* 1440 CLS 0.0375, 375 CLS 0.0171, zero overflow, no errors.
+*Mobile 375:* no text under 13px, zero overflow.
+
+### Honest critique
+
+**This is the first version that looks like the reference.** The panels are dense working UIs rather than grey bars, the atmosphere has real depth, and one typeface reads cleaner and more confident than the italic did.
+
+**Where it is still short:** the light sections (what we build, the numbers, the work) are *scaled* but still **compositionally sparse** — four cards in a row on a flat ground is the weakest thing left on the page, and item 5's cursor interactivity plus item 6's blended transitions are what will carry them. The missing atmosphere imagery is also most felt there.
+
+### Deviations
+
+1. **Item 3 not delivered** — attribution unobtainable; procedural atmosphere shipped instead.
+2. Step 1 sits exactly at the 10.0% limit.
+3. 28b (items 5–7) untouched.
+
+### My own errors
+
+1. **I assumed "too small" meant the headings** and only found out by measuring that they already matched Nolana exactly — the interiors were the whole problem.
+2. **My 28a scale block outranked my own earlier mobile floors**, putting three labels back under 13px until I re-ordered them.
+3. **My italic audit counted decorative `<i>` bars**, which reported 47 italic elements on a page that had none carrying text.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
@@ -3400,6 +3475,8 @@ Measured, not asserted: it is **never the brightest thing in frame**, it is **oc
 - **A LAZY RESERVE IS ONLY CORRECT UNTIL ITS CHAPTER CHANGES (25c).** Ch3's proof tiles took it from 93vh to 159vh on a phone. Any session that changes a chapter's height re-measures and updates BOTH of its reserves.
 
 - **EXCEED, DON'T REPLICATE (27b, OWNER INSTRUCTION).** Nolana is the QUALITY BAR, not a template. Keep its palette discipline, material language and step-by-step storytelling; never copy its layouts, copy, icons, chip wording or section order one-to-one. Every section's critique must state (1) what we kept from Nolana's craft and (2) what ours does BETTER — if you cannot name what is better, it is not done. Averr's voice stays: the Cormorant italic accent on one key word per section, Averr's own copy throughout. The frames live in `docs/reference/nolana/` and **`docs/reference/` is gitignored — the repo is public.**
+
+- **ONE TYPEFACE ON HOME (28, OWNER RULING).** Cormorant is retired from home. Emphasis is only: a two-tone heading (ink lead + `--ink-2` continuation), the scroll word-fill, or `--grad` on ONE key word per section via `background-clip: text`. Other pages migrate later. Audit it by testing elements that CARRY TEXT — a decorative `<i>` is italic by default and will false-positive.
 
 - **THE SITE PALETTE IS THE NOLANA SYSTEM (27, OWNER DIRECTION).** This **SUPERSEDES** the Session 25 dark-ground + chapter-light rule. Light dominates: `--bg #F5F4F9`, `--bg-alt #EFEEF5`, hairlines `--hair #D4D4DA`, ink `--n-ink #0F1117`. Navy (`#121C27`/`#182633`/`#232837`) and black (`#080A0A`) are **cinematic moments only**. ONE gradient, `--grad`, applied PER ELEMENT — `background-clip: text` for words and numbers, `fill` for pills and glyphs — never as a wash. Home is migrated; the other pages follow in later sessions. The shared parts live in `src/components/nolana/Bits.tsx`: the mono chip, the two-tone heading, the corner index, the hairline guides, the gradient icon tile. The dark glass nav bar sits on EVERY section of home.
 
