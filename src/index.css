@@ -3811,3 +3811,19 @@ a { color: inherit; text-decoration: none; }
   .dp-row2 { grid-template-columns: 1fr; }
   .dp-stat { display: none; }
 }
+
+/* the low cloud drifts across the ridges */
+.ds-atmos__cloud { animation: atmos-drift 90s linear infinite; }
+@keyframes atmos-drift { to { transform: translateX(-800px); } }
+@media (prefers-reduced-motion: reduce) { .ds-atmos__cloud { animation: none; } }
+/* the Chosen panel's phone card occupies the right edge, so its two
+   sub-panels sit on the left instead — they were landing on the phone's
+   headline and its CTA */
+.dsub--e { top: 24%; left: 3%; animation-delay: 0.4s; }
+.dsub--f { bottom: 7%; left: 3%; animation-delay: 1.8s; }
+@media (max-width: 860px) { .dsub--f { display: none; } }
+/* the agent bubble is the widest thing in the Runs-itself panel; at
+   96% it reached under the floating sub-panels */
+.dp-chat__msg { max-width: 76%; }
+.dsub--d { bottom: 42%; right: 4%; }
+.dsub--g { top: 6%; left: 3%; animation-delay: 0.7s; }

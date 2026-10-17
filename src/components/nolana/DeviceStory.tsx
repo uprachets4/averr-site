@@ -69,35 +69,84 @@ export function Atmosphere({ id }: { id: string }) {
     <svg className="ds-atmos" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden>
       <defs>
         <linearGradient id={`${id}-sky`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#273246" />
-          <stop offset="52%" stopColor="#1B2433" />
-          <stop offset="100%" stopColor="#121A24" />
+          <stop offset="0%" stopColor="#2B3650" />
+          <stop offset="34%" stopColor="#243047" />
+          <stop offset="68%" stopColor="#1A2333" />
+          <stop offset="100%" stopColor="#111823" />
         </linearGradient>
-        <radialGradient id={`${id}-sun`} cx="0.62" cy="0.26" r="0.45">
-          <stop offset="0%" stopColor="#AF9EE0" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#AF9EE0" stopOpacity="0" />
+        <radialGradient id={`${id}-sun`} cx="0.64" cy="0.3" r="0.5">
+          <stop offset="0%" stopColor="#C7B4F0" stopOpacity="0.62" />
+          <stop offset="45%" stopColor="#8E7FD6" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="#8E7FD6" stopOpacity="0" />
         </radialGradient>
-        <filter id={`${id}-mist`}>
-          <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="7" />
+        <radialGradient id={`${id}-warm`} cx="0.78" cy="0.42" r="0.4">
+          <stop offset="0%" stopColor="#F9AF97" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#F9AF97" stopOpacity="0" />
+        </radialGradient>
+        {/* the valley haze that separates each ridge from the next */}
+        <linearGradient id={`${id}-haze`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#8EA2C8" stopOpacity="0.34" />
+          <stop offset="100%" stopColor="#8EA2C8" stopOpacity="0" />
+        </linearGradient>
+        <filter id={`${id}-grain`}>
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11" />
           <feColorMatrix type="saturate" values="0" />
           <feComponentTransfer>
-            <feFuncA type="linear" slope="0.13" intercept="0" />
+            <feFuncA type="linear" slope="0.09" />
+          </feComponentTransfer>
+        </filter>
+        <filter id={`${id}-cloud`}>
+          <feTurbulence type="fractalNoise" baseFrequency="0.004 0.015" numOctaves="4" seed="3" />
+          <feColorMatrix type="saturate" values="0" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.3" />
           </feComponentTransfer>
         </filter>
       </defs>
+
       <rect width="800" height="500" fill={`url(#${id}-sky)`} />
       <rect width="800" height="500" fill={`url(#${id}-sun)`} />
-      {/* three ridges, far to near */}
-      <path d="M0 318 L96 286 L186 306 L286 262 L388 298 L486 258 L592 292 L700 262 L800 288 L800 500 L0 500Z"
-        fill="#1C2535" opacity="0.72" />
-      <path d="M0 362 L110 334 L208 356 L318 318 L430 352 L540 316 L652 346 L764 318 L800 332 L800 500 L0 500Z"
-        fill="#182030" opacity="0.85" />
-      <path d="M0 410 L128 388 L246 408 L372 376 L498 404 L624 374 L742 400 L800 388 L800 500 L0 500Z"
-        fill="#131A26" />
-      <rect width="800" height="500" filter={`url(#${id}-mist)`} opacity="0.5" />
+      <rect width="800" height="500" fill={`url(#${id}-warm)`} />
+
+      {/* a faint field of stars in the upper sky */}
+      <g fill="#E9EEFF">
+        {STARS.map(function st(s, i) {
+          return <circle key={i} cx={s[0]} cy={s[1]} r={s[2]} opacity={s[3]} />;
+        })}
+      </g>
+
+      {/* low cloud, drifting */}
+      <rect className="ds-atmos__cloud" width="1600" height="190" y="120" filter={`url(#${id}-cloud)`} opacity="0.5" />
+
+      {/* FIVE ridges, each with the haze pooling in front of it */}
+      <path d="M0 266 L84 240 L158 258 L244 222 L330 252 L420 216 L508 246 L600 214 L692 242 L800 220 L800 500 L0 500Z" fill="#232E44" opacity="0.5" />
+      <rect y="250" width="800" height="70" fill={`url(#${id}-haze)`} opacity="0.5" />
+      <path d="M0 304 L96 280 L186 300 L286 266 L388 296 L486 262 L592 292 L700 264 L800 286 L800 500 L0 500Z" fill="#1F2939" opacity="0.72" />
+      <rect y="288" width="800" height="72" fill={`url(#${id}-haze)`} opacity="0.44" />
+      <path d="M0 348 L110 324 L208 346 L318 310 L430 342 L540 308 L652 338 L764 312 L800 324 L800 500 L0 500Z" fill="#1A2231" opacity="0.88" />
+      <rect y="332" width="800" height="76" fill={`url(#${id}-haze)`} opacity="0.34" />
+      <path d="M0 396 L128 374 L246 394 L372 362 L498 390 L624 360 L742 386 L800 374 L800 500 L0 500Z" fill="#151C28" />
+      <path d="M0 448 L140 430 L268 448 L400 422 L532 446 L664 420 L780 442 L800 436 L800 500 L0 500Z" fill="#101620" />
+
+      <rect width="800" height="500" filter={`url(#${id}-grain)`} opacity="0.55" />
     </svg>
   );
 }
+
+/** A fixed star field — deterministic, so the sky never reshuffles. */
+const STARS: Array<[number, number, number, number]> = (function make() {
+  const out: Array<[number, number, number, number]> = [];
+  let seed = 7;
+  function rnd() {
+    seed = (seed * 1103515245 + 12345) % 2147483648;
+    return seed / 2147483648;
+  }
+  for (let i = 0; i < 90; i++) {
+    const y = rnd() * 210;
+    out.push([rnd() * 800, y, rnd() * 0.9 + 0.3, (1 - y / 240) * (rnd() * 0.5 + 0.22)]);
+  }
+  return out;
+})();
 
 /* ── the four panels ───────────────────────────────────────────────── */
 
@@ -176,8 +225,8 @@ function PanelFound({ on }: { on: boolean }) {
 function PanelChosen({ on }: { on: boolean }) {
   return (
     <div className={on ? "dp dp--on" : "dp"}>
-      <Sub cls="dsub--a" label="Loads in" value="1.1s" tone="grad" />
-      <Sub cls="dsub--c" label="Built with" value="Next.js" />
+      <Sub cls="dsub--e" label="Loads in" value="1.1s" tone="grad" />
+      <Sub cls="dsub--f" label="Built with" value="Next.js" />
       <div className="dp-hd">
         <span className="dp-hd__t">The site</span>
         <span className="dp-hd__s">Desktop and mobile, one build</span>
@@ -251,8 +300,9 @@ function PanelBooked({ on }: { on: boolean }) {
 function PanelRuns({ on }: { on: boolean }) {
   return (
     <div className={on ? "dp dp--on" : "dp"}>
-      <Sub cls="dsub--d" label="Drafted in" value="4s" tone="grad" />
-      <Sub cls="dsub--c" label="Awaiting" value="Your approval" tone="ok" />
+      {/* one sub-panel here: the Approve bar and the waiting toast
+          already say the rest, and two more landed on the thread */}
+      <Sub cls="dsub--g" label="Drafted in" value="4s" tone="grad" />
       <div className="dp-chat">
         {/* the customer's message, so the panel reads as a conversation
             rather than one floating reply in a large empty pane */}
