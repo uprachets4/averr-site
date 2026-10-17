@@ -131,6 +131,10 @@ function PanelFound({ on }: { on: boolean }) {
     <div className={on ? "dp dp--on" : "dp"}>
       <Sub cls="dsub--a" label="Source" value="Google · local pack" />
       <Sub cls="dsub--b" label="Position" value="#1" tone="grad" />
+      <div className="dp-hd">
+        <span className="dp-hd__t">Local search</span>
+        <span className="dp-hd__s">Oshawa · Whitby · Ajax</span>
+      </div>
       <div className="dp-search">
         <span className="dp-search__i" aria-hidden>⌕</span>
         <span className="dp-typed">basement renovation near me</span>
@@ -138,15 +142,32 @@ function PanelFound({ on }: { on: boolean }) {
       <ul className="dp-results">
         <li className="dp-res dp-res--win">
           <span className="dp-res__rank">1</span>
-          <span className="dp-res__name">Northgate Renovations</span>
-          <span className="dp-res__stars" aria-hidden>★★★★★</span>
+          <span className="dp-res__col">
+            <b>Northgate Renovations</b>
+            <i>Basement finishing · Open now</i>
+          </span>
+          <span className="dp-res__rate">Highly rated</span>
         </li>
-        <li className="dp-res"><span className="dp-res__rank">2</span><span className="dp-res__bar" /></li>
-        <li className="dp-res"><span className="dp-res__rank">3</span><span className="dp-res__bar" /></li>
+        <li className="dp-res">
+          <span className="dp-res__rank">2</span>
+          <span className="dp-res__col"><b>Lakeshore Interiors</b><i>General contractor</i></span>
+        </li>
+        <li className="dp-res">
+          <span className="dp-res__rank">3</span>
+          <span className="dp-res__col"><b>Rideau Build Co.</b><i>Renovations</i></span>
+        </li>
       </ul>
-      <div className="dp-map" aria-hidden>
-        <span className="dp-map__grid" />
-        <span className="dp-map__pin" />
+      <div className="dp-row2">
+        <div className="dp-map" aria-hidden>
+          <span className="dp-map__grid" />
+          <span className="dp-map__pin" />
+          <span className="dp-map__tag">Northgate</span>
+        </div>
+        <div className="dp-stat">
+          <span className="dp-stat__l">Views this week</span>
+          <span className="dp-stat__v">Up</span>
+          <span className="dp-stat__b" aria-hidden><i /><i /><i /><i /><i /><i /></span>
+        </div>
       </div>
     </div>
   );
@@ -157,17 +178,32 @@ function PanelChosen({ on }: { on: boolean }) {
     <div className={on ? "dp dp--on" : "dp"}>
       <Sub cls="dsub--a" label="Loads in" value="1.1s" tone="grad" />
       <Sub cls="dsub--c" label="Built with" value="Next.js" />
-      <div className="dp-site">
-        <div className="dp-site__bar" aria-hidden><i /><i /><i /></div>
-        <div className="dp-site__body">
-          <span className="dp-site__mark">Northgate</span>
-          <span className="dp-site__h">
-            Rooms that <em>feel finished.</em>
-          </span>
-          <span className="dp-site__img" aria-hidden>
-            <i /><i /><i />
-          </span>
-          <span className="dp-site__cta">Get a quote</span>
+      <div className="dp-hd">
+        <span className="dp-hd__t">The site</span>
+        <span className="dp-hd__s">Desktop and mobile, one build</span>
+      </div>
+      <div className="dp-two">
+        <div className="dp-site">
+          <div className="dp-site__bar" aria-hidden><i /><i /><i /><u /></div>
+          <div className="dp-site__body">
+            <span className="dp-site__nav" aria-hidden><i /><i /><i /><b /></span>
+            <span className="dp-site__mark">Northgate</span>
+            <span className="dp-site__h">
+              Rooms that <em>feel finished.</em>
+            </span>
+            <span className="dp-site__sub" aria-hidden />
+            <span className="dp-site__img" aria-hidden><i /><i /><i /></span>
+            <span className="dp-site__cta">Get a quote</span>
+            <span className="dp-site__cards" aria-hidden><i /><i /><i /></span>
+          </div>
+        </div>
+        <div className="dp-mob">
+          <span className="dp-mob__notch" aria-hidden />
+          <span className="dp-mob__mark">Northgate</span>
+          <span className="dp-mob__h">Rooms that feel finished.</span>
+          <span className="dp-mob__img" aria-hidden />
+          <span className="dp-mob__cta">Get a quote</span>
+          <span className="dp-mob__row" aria-hidden><i /><i /></span>
         </div>
       </div>
     </div>
@@ -180,9 +216,12 @@ function PanelBooked({ on }: { on: boolean }) {
       <Sub cls="dsub--a" label="Status" value="Confirmed" tone="ok" />
       <Sub cls="dsub--b" label="No phone call" value="0 min" tone="grad" />
       <div className="dp-cal">
-        <div className="dp-cal__head">
-          <span>October</span>
-          <span className="dp-cal__dots" aria-hidden><i /><i /></span>
+        <div className="dp-hd">
+          <span className="dp-hd__t">Book an estimate</span>
+          <span className="dp-hd__s">October</span>
+        </div>
+        <div className="dp-cal__days" aria-hidden>
+          <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
         </div>
         <div className="dp-cal__grid" aria-hidden>
           {Array.from({ length: 21 }).map(function d(_, k) {
@@ -197,6 +236,12 @@ function PanelBooked({ on }: { on: boolean }) {
         </div>
         <div className="dp-confirm">
           <span className="dp-confirm__tick" aria-hidden>✓</span> Confirmed — Thu 2:00 PM
+        </div>
+        <div className="dp-sms">
+          <span className="dp-sms__w">SMS reminder</span>
+          <span className="dp-sms__b">
+            Northgate: we&apos;re booked for Thursday at 2:00. Reply R to reschedule.
+          </span>
         </div>
       </div>
     </div>
@@ -218,13 +263,19 @@ function PanelRuns({ on }: { on: boolean }) {
         <div className="dp-chat__who">
           <span className="dp-chat__orb" aria-hidden />
           Averr agent
+          <span className="dp-chat__src">3 sources</span>
         </div>
         <p className="dp-chat__msg">
           Hi Priya — thanks for the details on the Ravenscroft basement.{" "}
           <em>I&apos;ve held Thursday at 2:00</em> for the estimate.
         </p>
+        <div className="dp-chat__in dp-chat__in--2">
+          <span className="dp-chat__inwho">Priya · 8:51 AM</span>
+          Thursday works. Do you need the floor plans before you come?
+        </div>
         <div className="dp-chat__meta" aria-hidden>
           <span>Thread · Ravenscroft basement</span>
+          <span className="dp-chat__toast">3 drafts waiting</span>
         </div>
         <div className="dp-chat__row">
           <span className="dp-chat__btn">Approve &amp; send</span>
