@@ -3160,7 +3160,7 @@ a { color: inherit; text-decoration: none; }
 .dp-site__body { flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; }
 .dp-site__mark { font-family: var(--font-display); font-size: 12px; color: var(--glow-peach); }
 .dp-site__h { font-family: var(--font-display); font-size: clamp(17px, 1.9vw, 26px); line-height: 1.1; letter-spacing: -0.03em; color: #fff; }
-.dp-site__h em { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.dp-site__h em { font-style: normal; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
 .dp--on .dp-site__h { animation: dp-rise 600ms cubic-bezier(0.22,1,0.36,1) 0.25s both; }
 .dp-site__img { flex: 1; min-height: 46px; border-radius: 8px; background: linear-gradient(135deg, rgba(166,179,235,0.3), rgba(249,175,151,0.16)); }
 .dp--on .dp-site__img { animation: dp-fade 700ms ease 0.6s both; }
@@ -3208,7 +3208,7 @@ a { color: inherit; text-decoration: none; }
 .dp-chat__who { display: flex; align-items: center; gap: 9px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
 .dp-chat__orb { width: 17px; height: 17px; border-radius: 50%; background: var(--grad); box-shadow: 0 0 14px rgba(166,179,235,0.7); }
 .dp-chat__msg { margin: 0; font-size: clamp(13px, 1.25vw, 16px); line-height: 1.6; color: #fff; }
-.dp-chat__msg em { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.dp-chat__msg em { font-style: normal; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
 .dp--on .dp-chat__msg { animation: dp-fade 900ms ease 0.3s both; }
 .dp-chat__row { position: relative; }
 .dp-chat__btn { display: inline-block; padding: 9px 17px; border-radius: 999px; background: #fff; color: var(--n-ink); font-size: 13px; font-weight: 500; }
@@ -3491,8 +3491,11 @@ a { color: inherit; text-decoration: none; }
   font-family: var(--font-display); font-weight: 500;
   font-size: clamp(27px, 3.6vw, 52px); letter-spacing: -0.035em; line-height: 1.06;
 }
+/* Session 28: ONE TYPEFACE on home. Emphasis is the gradient on one
+   key word, the two-tone heading, or the scroll word-fill — never a
+   second face. */
 .os-h2 em {
-  font-family: "Cormorant Garamond", Georgia, serif; font-style: italic;
+  font-style: normal;
   background: var(--grad); -webkit-background-clip: text; background-clip: text;
   color: transparent; -webkit-text-fill-color: transparent;
 }
@@ -3546,7 +3549,7 @@ a { color: inherit; text-decoration: none; }
 .wb-inner { width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter); }
 .wb-h2 { margin: 16px 0 clamp(30px, 5vh, 52px); max-width: min(100%, 1000px); font-size: clamp(26px, 3.1vw, 44px); }
 .wb-h2 .nl-h__rest {
-  font-family: "Cormorant Garamond", Georgia, serif; font-style: italic;
+  font-style: normal;
   background: var(--grad); -webkit-background-clip: text; background-clip: text;
   color: transparent; -webkit-text-fill-color: transparent;
 }
@@ -3569,7 +3572,7 @@ a { color: inherit; text-decoration: none; }
 .wb-card__mark .os-flat { width: clamp(96px, 11vw, 150px); filter: none; }
 .wb-stmt { margin: 0 0 22px; font-family: var(--font-display); font-size: clamp(19px, 2.1vw, 28px); line-height: 1.25; letter-spacing: -0.025em; color: var(--n-ink); }
 .wb-stmt em {
-  font-family: "Cormorant Garamond", Georgia, serif; font-style: italic;
+  font-style: normal;
   background: var(--grad); -webkit-background-clip: text; background-clip: text;
   color: transparent; -webkit-text-fill-color: transparent;
 }
@@ -3673,4 +3676,77 @@ a { color: inherit; text-decoration: none; }
   /* every remaining inline link reaches a 44px target */
   .wc-also a, .wc-vault, .wc-vault span { min-height: 44px; display: inline-flex; align-items: center; }
   .nf-cols li a { min-width: 44px; }
+}
+
+/* ══ Session 28 · SCALE, measured against the frames ═══════════════
+   The hero headline already matched Nolana (15.56% of frame vs their
+   15.57%) and the device was larger (72.9% vs 67.9%). What was small
+   was every INTERIOR: card type, panel content, labels. The owner's
+   "too small, empty" was about density, not about the big headings.   */
+
+/* the statement: NARROWER and BIGGER, as frame 02 (61.9% wide, 22.98%
+   of frame tall — ours was 81.9% wide and only 19.9% tall, which reads
+   as a wide thin band rather than a statement) */
+/* Nolana sets this at ~52px in a 1040px measure with 1.02 leading --
+   four tight lines. Mine was 1.2 leading in a 900px measure and ran to
+   six, which reads as a paragraph rather than a statement. */
+.np-stmt { max-width: min(100%, 1000px); font-size: clamp(30px, 4.1vw, 58px); line-height: 1.08; }
+.en-stmt { line-height: 1.08; }
+
+/* the four cards */
+.nw-card { padding: 32px 30px 36px; gap: 18px; }
+.nw-card__t { font-size: clamp(21px, 1.8vw, 26px); }
+.nw-card__b { font-size: clamp(15px, 1.15vw, 16px); line-height: 1.62; }
+.nl-icon { width: 52px; height: 52px; border-radius: 13px; }
+.nl-icon svg { width: 26px; height: 26px; }
+.nl-idx { font-size: 12px; }
+
+/* the numbers */
+.nn-cell { padding: 38px 32px 42px; }
+.nn-v { font-size: clamp(44px, 5.2vw, 72px); margin-bottom: 18px; }
+.nn-l { font-size: 15px; line-height: 1.6; max-width: 30ch; }
+
+/* the story's step list */
+.ds-step { padding: 16px 20px 16px 22px; gap: 5px; }
+.ds-step__t { font-size: clamp(19px, 1.7vw, 26px); }
+.ds-step__l { font-size: 15px; line-height: 1.55; }
+.ds-step__n { font-size: 12px; }
+.ds-h2, .nw-h2, .nn-h2, .wc-h2, .wb-h2 { font-size: clamp(28px, 3.5vw, 50px); }
+
+/* the panel interiors — everything inside the device grows with it */
+.dp { padding: clamp(20px, 2.2vw, 32px); gap: 14px; }
+.dp-search { padding: 14px 18px; }
+.dp-typed { font-size: clamp(14px, 1.2vw, 17px); }
+.dp-res { padding: 13px 16px; }
+.dp-res__name { font-size: clamp(14px, 1.2vw, 17px); }
+.dp-res__rank { font-size: 12px; }
+.dp-site__h { font-size: clamp(18px, 2.3vw, 30px); }
+.dp-site__mark { font-size: 13px; }
+.dp-site__cta { font-size: 14px; padding: 10px 18px; }
+.dp-chat__msg { font-size: clamp(14px, 1.35vw, 18px); }
+.dp-chat__in { font-size: clamp(13px, 1.2vw, 16px); }
+.dp-slot { font-size: 14px; padding: 10px 17px; }
+.dp-confirm { font-size: 15px; padding: 13px 17px; }
+.dsub__v { font-size: 17px; }
+.dsub__l { font-size: 10px; }
+.dsub { padding: 11px 15px; }
+
+/* the work cards */
+.wc-card__foot { padding: 26px 28px 30px; }
+.wc-card__t { font-size: clamp(20px, 1.9vw, 28px); }
+.wc-card__fig { font-size: clamp(22px, 2.2vw, 34px); }
+.wc-card__l { font-size: 15px; line-height: 1.6; }
+
+/* the founder card */
+.wb-stmt { font-size: clamp(21px, 2.4vw, 32px); }
+.wb-credits dd { font-size: 16px; }
+
+/* one studio + the ending */
+.os-h2 { font-size: clamp(30px, 4.1vw, 58px); }
+.os-line { font-size: clamp(15px, 1.25vw, 18px); max-width: 56ch; }
+.en-stmt { max-width: min(100%, 980px); font-size: clamp(30px, 4.1vw, 58px); }
+
+@media (max-width: 860px) {
+  .nw-card { padding: 24px 22px 28px; }
+  .nn-cell { padding: 28px 22px 30px; }
 }
