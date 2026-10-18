@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { useReducedMotion } from "motion/react";
 import { Chip, TwoTone } from "./Bits";
 import { Atmosphere } from "./DeviceStory";
 import Atmos from "./Atmos";
+import { useTilt, useSpotlight, Magnetic } from "./Motion";
 import Screenshot from "../Screenshot";
 import { caseStudies } from "../../data/caseStudies";
 
@@ -39,29 +39,11 @@ const ALSO = [
 ];
 
 function Card({ slug, i }: { slug: string; i: number }) {
-  const reduce = !!useReducedMotion();
   const ref = useRef<HTMLAnchorElement | null>(null);
-
-  /* A window listener, not React's onMouseMove: the same pattern the
-     device tilt uses. The synthetic handler fired once and then stopped
-     updating, and the orb sat where the pointer first entered. */
-  useEffect(
-    function orb() {
-      const el = ref.current;
-      if (!el || reduce) return;
-      function move(e: PointerEvent) {
-        const r = el!.getBoundingClientRect();
-        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
-        el!.style.setProperty("--ox", `${(((e.clientX - r.left) / r.width) * 100).toFixed(2)}%`);
-        el!.style.setProperty("--oy", `${(((e.clientY - r.top) / r.height) * 100).toFixed(2)}%`);
-      }
-      window.addEventListener("pointermove", move, { passive: true });
-      return function off() {
-        window.removeEventListener("pointermove", move);
-      };
-    },
-    [reduce]
-  );
+  /* 28b: one hook now does the tilt, the sheen and the orb. It
+     publishes --mx/--my, which the orb reads as a transform — it used
+     to drive left/top per frame, which is a layout write. */
+  useTilt(ref, 4);
 
   const cs = caseStudies[slug];
   if (!cs) return null;
@@ -113,17 +95,19 @@ function Card({ slug, i }: { slug: string; i: number }) {
 }
 
 export default function WorkCards() {
+  const sec = useRef<HTMLElement | null>(null);
+  useSpotlight(sec);
   return (
-    <section className="wc" id="ch-work">
+    <section className="wc" id="ch-work" ref={sec}>
       <div className="wc-inner">
         <div className="wc-head">
           <div>
             <Chip>The work</Chip>
             <TwoTone className="wc-h2" lead="Real projects," rest="real numbers." />
           </div>
-          <Link to="/work" className="wc-all">
+          <Magnetic as={Link} to="/work" className="wc-all">
             See all work
-          </Link>
+          </Magnetic>
         </div>
 
         <div className="wc-grid">

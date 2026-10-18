@@ -3,6 +3,7 @@ import NolanaHero from "../components/nolana/NolanaHero";
 import LazyBelowFold from "../components/LazyBelowFold";
 import { GradientDefs } from "../components/nolana/Bits";
 import { Problem, WhatWeBuild, Numbers } from "../components/nolana/Sections";
+import { Blend } from "../components/nolana/Motion";
 
 import { useSetNavDarkOverride } from "../lib/navTone";
 
@@ -77,6 +78,10 @@ export default function Home() {
 
       <GradientDefs />
       <NolanaHero />
+      {/* 28b item 6 — every light/dark boundary on home is now a 34vh
+          blend rather than a cut. Each one names the two grounds it
+          joins, taken from the sections themselves. */}
+      <Blend from="var(--navy-3)" to="var(--bg)" />
       <Problem />
       <WhatWeBuild />
       <LazyBelowFold load={loadStory} minHeight="420vh" minHeightSm="119vh" background="transparent">
@@ -84,7 +89,9 @@ export default function Home() {
           <DeviceStory />
         </Suspense>
       </LazyBelowFold>
+      <Blend from="var(--bg)" to="var(--black)" />
       <Numbers />
+      <Blend from="var(--black)" to="var(--bg)" />
 
       <LazyBelowFold load={loadWorkCards} minHeight="110vh" minHeightSm="158vh" background="transparent">
         <Suspense fallback={<Reserve h="110vh" sm="158vh" />}>
@@ -92,10 +99,13 @@ export default function Home() {
         </Suspense>
       </LazyBelowFold>
 
+      <Blend from="var(--bg)" to="var(--navy-1)" />
       <LazyBelowFold load={loadClosing} minHeight="150vh" minHeightSm="150vh" background="transparent">
         <Suspense fallback={<Reserve h="150vh" sm="150vh" />}>
           <OneStudio />
+          <Blend from="var(--navy-3)" to="var(--bg)" />
           <WhoBuildsIt />
+          <Blend from="var(--bg)" to="var(--navy-2)" />
           <Ending />
         </Suspense>
       </LazyBelowFold>

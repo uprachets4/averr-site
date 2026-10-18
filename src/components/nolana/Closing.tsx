@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useReducedMotion } from "motion/react";
 import { Chip, TwoTone } from "./Bits";
 import Atmos from "./Atmos";
+import { useSpotlight, Magnetic } from "./Motion";
 import { MARK_PATH_D } from "../MonogramMark";
 
 /**
@@ -118,8 +119,10 @@ const CREDITS = [
 ];
 
 export function WhoBuildsIt() {
+  const sec = useRef<HTMLElement | null>(null);
+  useSpotlight(sec);
   return (
-    <section className="wb">
+    <section className="wb" ref={sec}>
       <div className="wb-inner">
         <Chip>Who builds it</Chip>
         <TwoTone
@@ -171,17 +174,31 @@ export function Ending() {
       if (!el || reduce) return;
       const spans = el.querySelectorAll<HTMLElement>(".en-w");
       let raf = 0;
+      /* The fill LATCHES. 28b item 7 asks for it to start at >= 45%
+         visibility and finish at full white; without a latch the words
+         un-filled again as the section scrolled away, so the reader who
+         scrolled past and back saw it half-lit. */
+      let peak = 0;
       function read() {
         raf = 0;
         const r = el!.getBoundingClientRect();
-        const t = (window.innerHeight * 0.88 - r.top) / (r.height + window.innerHeight * 0.45);
-        const k = Math.max(0, Math.min(1, t));
-        const lit = k * spans.length * 1.2;
+        const vh = window.innerHeight;
+        /* how much of the statement is on screen, as a fraction of the
+           most of it that COULD be — a statement taller than the
+           viewport can never be 100% visible */
+        const shown = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+        const vis = shown / Math.max(1, Math.min(r.height, vh));
+        /* 0 at 45% visible, 1 by 92% */
+        const k = Math.max(0, Math.min(1, (vis - 0.45) / 0.47));
+        if (k > peak) peak = k;
+        /* one past the last span at peak 1, so the final word always
+           lands on full white rather than stopping one short */
+        const lit = peak * (spans.length + 0.5);
         spans.forEach(function one(s, i) {
-          s.style.color = i < lit ? "#fff" : "rgba(255,255,255,0.3)";
+          s.style.color = i < lit ? "#fff" : "rgba(255,255,255,0.58)";
         });
         /* the mesh rises as the words fill */
-        window.dispatchEvent(new CustomEvent("nl-amp", { detail: 1 + k * 0.9 }));
+        window.dispatchEvent(new CustomEvent("nl-amp", { detail: 1 + peak * 0.9 }));
       }
       function on() {
         if (!raf) raf = requestAnimationFrame(read);
@@ -220,7 +237,7 @@ export function Ending() {
           })}
         </p>
         <div className="en-ctas">
-          <Link to="/contact" className="nh-cta">
+          <Magnetic as={Link} to="/contact" className="nh-cta">
             <span className="nh-cta__i" aria-hidden>
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <rect x="3" y="4.5" width="18" height="16" rx="3" />
@@ -228,10 +245,10 @@ export function Ending() {
               </svg>
             </span>
             Book a discovery call
-          </Link>
-          <Link to="/contact#brief" className="nh-ghost">
+          </Magnetic>
+          <Magnetic as={Link} to="/contact#brief" className="nh-ghost">
             Send a brief
-          </Link>
+          </Magnetic>
         </div>
       </div>
     </section>

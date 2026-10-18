@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useReducedMotion } from "motion/react";
 import { Chip, TwoTone, Index, Guides, GradIcon, type GlyphId } from "./Bits";
 import { caseStudies } from "../../data/caseStudies";
+import { useTilt, useSpotlight, Magnetic } from "./Motion";
 
 /**
  * The light sections of the Nolana home.
@@ -61,8 +62,11 @@ function Problem() {
     [reduce]
   );
 
+  const sec = useRef<HTMLElement | null>(null);
+  useSpotlight(sec);
+
   return (
-    <section className="np" id="how">
+    <section className="np" id="how" ref={sec}>
       <Guides />
       <div className="np-inner">
         <p ref={ref} className={reduce ? "np-stmt np-stmt--all" : "np-stmt"}>
@@ -108,9 +112,27 @@ const CARDS: Array<{ icon: GlyphId; title: string; body: string; href: string }>
   },
 ];
 
-function WhatWeBuild() {
+/** One build card: it leans toward the cursor and carries the sheen. */
+function BuildCard({ c, i }: { c: (typeof CARDS)[number]; i: number }) {
+  const ref = useRef<HTMLAnchorElement | null>(null);
+  useTilt(ref, 4);
   return (
-    <section className="nw">
+    <Link ref={ref} to={c.href} className="nw-card">
+      <span className="nw-card__top">
+        <GradIcon id={c.icon} />
+        <Index n={i + 1} />
+      </span>
+      <span className="nw-card__t">{c.title}</span>
+      <span className="nw-card__b">{c.body}</span>
+    </Link>
+  );
+}
+
+function WhatWeBuild() {
+  const sec = useRef<HTMLElement | null>(null);
+  useSpotlight(sec);
+  return (
+    <section className="nw" ref={sec}>
       <Guides />
       <div className="nw-inner">
         <div className="nw-head">
@@ -122,23 +144,16 @@ function WhatWeBuild() {
               rest="— from first search to booked job."
             />
           </div>
-          <Link to="/contact" className="nw-cta">
+          <Magnetic as={Link} to="/contact" className="nw-cta">
             Book a call
-          </Link>
+          </Magnetic>
         </div>
 
         <ul className="nw-grid">
           {CARDS.map(function card(c, i) {
             return (
               <li key={c.title}>
-                <Link to={c.href} className="nw-card">
-                  <span className="nw-card__top">
-                    <GradIcon id={c.icon} />
-                    <Index n={i + 1} />
-                  </span>
-                  <span className="nw-card__t">{c.title}</span>
-                  <span className="nw-card__b">{c.body}</span>
-                </Link>
+                <BuildCard c={c} i={i} />
               </li>
             );
           })}

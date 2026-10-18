@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useReducedMotion } from "motion/react";
 import TorontoClock from "../TorontoClock";
 import { Chip } from "./Bits";
+import { Magnetic } from "./Motion";
 
 /**
  * The hero.
@@ -246,7 +247,7 @@ export default function NolanaHero() {
         <p className="nh-sub">{SUBLINE}</p>
 
         <div className="nh-ctas">
-          <Link to="/contact" className="nh-cta">
+          <Magnetic as={Link} to="/contact" className="nh-cta">
             <span className="nh-cta__i" aria-hidden>
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <rect x="3" y="4.5" width="18" height="16" rx="3" />
@@ -254,10 +255,10 @@ export default function NolanaHero() {
               </svg>
             </span>
             Book a discovery call
-          </Link>
-          <a className="nh-ghost" href="#how">
+          </Magnetic>
+          <Magnetic as="a" className="nh-ghost" href="#how">
             See how it works <span aria-hidden>↓</span>
-          </a>
+          </Magnetic>
         </div>
       </div>
 

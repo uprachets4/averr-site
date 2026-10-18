@@ -3261,17 +3261,27 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 40px 70px -46px rgba(8,10,14,0.85);
   --ox: 50%; --oy: 40%;
 }
-.wc-card__stage { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; }
+.wc-card__stage { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden;
+  container-type: size; }
 .wc-card .ds-atmos { position: absolute; inset: 0; width: 100%; height: 100%; }
-/* the orb follows the cursor across the card */
+/* The orb follows the cursor across the card.
+   28b: this used to be `left: var(--ox); top: var(--oy)` rewritten
+   every pointer frame. Per-frame left/top writes are LAYOUT changes and
+   get scored as layout shift — the same pattern cost CLS 6.64 on the
+   light beams. It is a transform now, and reads the shared --mx/--my
+   the tilt hook already publishes. */
 .wc-orb {
-  position: absolute; left: var(--ox); top: var(--oy);
+  position: absolute; left: 0; top: 0;
   width: 128px; height: 128px; margin: -64px 0 0 -64px;
   border-radius: 50%;
   background: radial-gradient(closest-side, rgba(255,255,255,0.42), rgba(166,179,235,0.18) 58%, transparent 72%);
   box-shadow: 0 0 60px 12px rgba(166,179,235,0.3);
-  transition: left 420ms cubic-bezier(0.22,1,0.36,1), top 420ms cubic-bezier(0.22,1,0.36,1);
+  /* cqw/cqh turn the percentage into a length against the stage, so no
+     JS has to know the card's size */
+  transform: translate3d(calc(var(--mx, 50%) / 1% * 1cqw), calc(var(--my, 40%) / 1% * 1cqh), 0);
+  transition: transform 420ms cubic-bezier(0.22,1,0.36,1);
   pointer-events: none;
+  will-change: transform;
 }
 .wc-orb::after {
   content: ""; position: absolute; inset: 30%;
@@ -3614,7 +3624,12 @@ a { color: inherit; text-decoration: none; }
   font-family: var(--font-display); font-weight: 500;
   font-size: clamp(27px, 3.6vw, 52px); line-height: 1.2; letter-spacing: -0.03em;
 }
-.en-w { color: rgba(255,255,255,0.3); transition: color 280ms ease; }
+/* 28b item 7: the unfilled state is still TEXT a reader can be looking
+   at, so it has to clear AA on its own. Measured against the ending's
+   actual ground (rgb(53,55,60) through the scrim), 0.3 alpha gave
+   2.4:1 and 0.46 gave 3.7:1 -- both under. 0.58 clears it, and the
+   fill to full white is still a clear lift. */
+.en-w { color: rgba(255,255,255,0.58); transition: color 280ms ease; }
 .en-stmt--all .en-w { color: #fff; }
 .en-ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: clamp(26px, 4vh, 48px); }
 
@@ -3897,3 +3912,115 @@ a { color: inherit; text-decoration: none; }
   padding: 10px;
 }
 .ds-step--on { background: rgba(255,255,255,0.1); }
+
+/* ══ 28b · the cursor system + the section blends ═══════════════════
+   Everything here is driven by CUSTOM PROPERTIES written from
+   Motion.tsx. Nothing writes `transform` from script, so each element's
+   own stylesheet transform still composes — the rule that cost two
+   sessions when motion silently replaced one. */
+
+/* ── item 6 · a tall band that carries one ground into the next ─────
+   34vh, pulled 17vh into each neighbour, so it costs the page no
+   height: it occupies padding that was already empty. The outer 34% at
+   each end is held FLAT at that neighbour's exact ground colour, so for
+   the first ~11.5vh the band is the same colour as what it covers and
+   is invisible; the whole change happens in the middle third, which
+   straddles the boundary where no section has content. The mid stops
+   mix in oklab — straight sRGB between #F5F4F9 and navy runs through a
+   muddy grey that reads as banding. */
+.nl-blend {
+  position: relative; z-index: 1;
+  height: 34vh; margin: -17vh 0; pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--from) 0%,
+    var(--from) 30%,
+    color-mix(in oklab, var(--from) 72%, var(--to)) 42%,
+    color-mix(in oklab, var(--from) 50%, var(--to)) 50%,
+    color-mix(in oklab, var(--from) 28%, var(--to)) 58%,
+    var(--to) 70%,
+    var(--to) 100%
+  );
+  /* The ends are MASKED OUT, not just colour-matched. Colour-matched
+     was not enough: the band is a sibling at z-index 1, so an opaque
+     end would paint over any text inside the neighbour's padding and
+     erase it. Masked, the ends show the real ground — which is the same
+     colour anyway, so the blend is unchanged — and only the middle
+     third is opaque. That third straddles the section boundary, and
+     every section here carries at least 80px of padding there, so it
+     never covers content. */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 74%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 74%, transparent 100%);
+}
+.nl-blend--mist::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(62% 40% at 50% 50%, rgba(166,179,235,0.2), transparent 72%),
+    radial-gradient(34% 26% at 22% 56%, rgba(249,175,151,0.1), transparent 74%);
+}
+
+/* ── item 5 · cards lean toward the cursor ─────────────────────────
+   The lift moves to a `--lift` var so the hover state and the tilt can
+   share one transform instead of overwriting each other. */
+.nw-card, .wc-card {
+  transform:
+    perspective(900px)
+    rotateX(var(--tilt-x, 0deg))
+    rotateY(var(--tilt-y, 0deg))
+    translateY(var(--lift, 0px));
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
+  will-change: transform;
+}
+.nw-card:hover { transform:
+    perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(-4px); }
+.wc-card:hover { --lift: -4px; }
+
+/* the sheen: the site gradient raked across the card, following the
+   cursor, and only while the cursor is on it */
+.nw-card, .wc-card { position: relative; }
+.nw-card::after, .wc-card::after {
+  content: ""; position: absolute; inset: 0; z-index: 3;
+  border-radius: inherit; pointer-events: none;
+  background: radial-gradient(
+    38% 56% at var(--mx, 50%) var(--my, 50%),
+    rgba(255,255,255,0.5), rgba(166,179,235,0.22) 42%, transparent 72%);
+  opacity: calc(var(--sheen, 0) * 0.16);
+  transition: opacity 340ms ease;
+}
+.wc-card::after { mix-blend-mode: screen; opacity: calc(var(--sheen, 0) * 0.3); }
+
+/* ── item 5 · the cursor spotlight on the light sections ───────────
+   Capped at 6% by the brief: on #F5F4F9 anything stronger is a smudge
+   rather than light in the room. */
+.has-spot { position: relative; }
+.has-spot::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(
+    460px circle at var(--sx, 50%) var(--sy, 50%),
+    rgba(152,116,232,0.06), rgba(152,116,232,0.025) 42%, transparent 70%);
+  opacity: var(--spot, 0); transition: opacity 340ms ease;
+}
+.np-inner, .nw-inner, .wc-inner, .wb-inner { position: relative; z-index: 1; }
+
+/* ── item 5 · magnetic controls ────────────────────────────────────── */
+.mag { transform: translate(var(--tx, 0px), var(--ty, 0px)) translateY(var(--lift, 0px)); }
+.nh-cta.mag:hover, .wc-all.mag:hover { --lift: -1px; }
+.mag { transition: transform 0.28s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease, border-color 0.3s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nw-card, .wc-card, .mag { transform: none; transition: none; }
+  .nw-card::after, .wc-card::after, .has-spot::after { display: none; }
+}
+
+/* ── 28b item 7 · the ending's CTAs are solid and legible always ────
+   The ghost button was a border on transparency. Over a photograph
+   that reads as a hint rather than a control, and its legibility
+   depended entirely on whatever pixel sat behind it. It carries its
+   own ground now. */
+.en-ctas .nh-ghost {
+  background: rgba(10,14,22,0.58);
+  border-color: rgba(255,255,255,0.26);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+}
+.en-ctas .nh-ghost:hover { background: rgba(10,14,22,0.72); border-color: rgba(255,255,255,0.42); }
