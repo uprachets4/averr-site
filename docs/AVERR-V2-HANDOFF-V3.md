@@ -3366,6 +3366,46 @@ WITH ATMOSPHERE   LCP 1660 ms   initial transfer 330.2 kB
 
 ---
 
+**28b** `7232912` — **Items 5–7: the cursor system, the section blends, the ending fill.**
+
+**Item 5 — cursor response.** New `src/components/nolana/Motion.tsx` holds the whole system: one rAF-coalesced `window` pointer listener per effect, writing **custom properties only**. Nothing writes `transform` from script, which is what lets each element's own stylesheet transform still compose — the rule that cost two earlier sessions when motion silently replaced one.
+
+- `useTilt(ref, 4)` — cards lean ±4° toward the cursor and publish `--mx`/`--my` for the sheen. Measured: 2.56° at 82% across, −2.91° at 15%, zero off-card.
+- `useSpotlight(ref)` — a cursor-following radial on the light sections, **capped at 6%** per the brief. Anything stronger on `#F5F4F9` reads as a smudge rather than light in the room. Measured at exactly 0.06.
+- `useMagnetic(ref, 7, 90)` / `<Magnetic>` — the CTAs drift toward the cursor and release. Measured: 0 at centre, 4.25px at +60, 1.59px at +120, **0 at +200 and beyond**.
+- Everything is off under `prefers-reduced-motion`, and behind `(hover: hover) and (pointer: fine)` so a touch device never carries the listeners.
+
+**It also fixed a latent CLS bug.** `.wc-orb` positioned itself with `left: var(--ox); top: var(--oy)`, rewritten every pointer frame. **Per-frame `left`/`top` writes are layout changes** — the same pattern that scored CLS 6.64 on the light beams. It is a transform now (`cqw`/`cqh` against the stage, so no JS needs the card's size) and reads the `--mx`/`--my` the tilt hook already publishes, so each card runs one listener instead of two.
+
+**Item 6 — the boundaries.** Six light/dark seams on home are now 34vh blends instead of cuts: hero→Problem, device story→Numbers, Numbers→work, work→One studio, One studio→founder, founder→ending. Each `<Blend from to />` names the two grounds it joins.
+
+Two things make it work:
+
+1. **They cost the page no height.** 34vh tall, pulled 17vh into each neighbour with negative margins, so they occupy padding that was already empty rather than adding 100vh of new emptiness to a page the owner already called empty.
+2. **The ends are MASKED, not merely colour-matched.** Colour-matching was my first attempt and it was wrong: the band is a sibling at `z-index: 1`, so an opaque end paints over any text inside the neighbour's padding and **erases** it. With a mask the ends show the real ground — the same colour either way, so the blend is unchanged — and only the middle third is solid. That third straddles the boundary, where no section has content.
+
+The mid stops mix **in oklab**. Straight sRGB between `#F5F4F9` and navy runs through a muddy grey that reads as banding.
+
+**Item 7 — the ending.** The fill starts at **45% visibility**, **latches**, and finishes on full white. Measured on a fresh approach: first word lights at **48% visible**, all 12 white by 100%. The latch matters — it used to un-fill as the section left, so a reader who scrolled past and back saw it half-lit.
+
+The unlit word is **still text somebody is reading**, so it has to clear AA on its own. Against the ending's measured ground `rgb(51,55,60)`: 0.3 alpha was 2.4:1 and 0.46 was 3.7:1 — both under. The floor is **0.58**, which computes to **5.2:1** against that ground, and the lift to full white still reads. The ghost CTA now carries its own ground (`rgba(10,14,22,0.58)` + blur) instead of depending on whichever pixel happens to sit behind it; lit CTAs measured 14.69:1 at 1440 and 9.26:1 at 390.
+
+**Verified** at 1440 and 390: CLS **0.0143 / 0.0120**, six blends present at 34vh between the right neighbours, tilt in range, spotlight at the cap, magnet releasing, reduced motion fully off (no tilt, no spotlight class, no magnet, sheen `display: none`, ending all-white at rest). **Entry JS 24.72 → 25.62 kB gzip (+0.90)**, CSS 29.74 → 30.33 (+0.59) — inside the +12 kB gate.
+
+### Deviations
+
+1. **Verified on a local preview, not the alias** — it still returns 403 (see the 28a item 3 entry). Unchanged from that session.
+2. Under reduced motion the build card keeps its static 4px hover lift: `.nw-card:hover` outranks the reduced-motion `transform: none`. It is an offset, not an animation, and the transition is removed, so it was left alone.
+
+### My own errors
+
+1. **I called my own working code broken, twice, on bad probe readings.** The tilt and magnet vars came back empty and I was ready to debug the hooks — the cause was `scroll-behavior: smooth`, so every rect I read immediately after `scrollIntoView` was the pre-scroll one and I was hovering empty space. **Read rects AFTER the scroll settles, or pass `behavior: "instant"`.**
+2. **I measured the ending fill after scrolling to the bottom**, which latched it, then reported "12/12 white at 0% visibility" as if it were a result. It was my own scroll path.
+3. **I measured `.en-stmt`'s computed `color` instead of the spans'** — the container inherits, so it reported 1.25:1 on text that was actually white. It did surface a real fault underneath, which is the only reason the unlit floor got fixed.
+4. **My first blend design would have erased text.** Opaque ends matched to the ground colour look identical but still paint over whatever is under them. Caught by reasoning about the padding, not by a probe.
+
+---
+
 ## 3. SITE MAP AS BUILT
 
 ### `/` — Home (`src/pages/Home.tsx`)
