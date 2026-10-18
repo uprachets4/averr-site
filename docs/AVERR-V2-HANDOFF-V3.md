@@ -3305,7 +3305,7 @@ Against the **10%** limit, and **zero sub-panel collisions** at every step. No f
 
 ### Deviations
 
-1. **Item 3 not delivered** — attribution unobtainable; procedural atmosphere shipped instead.
+1. **Item 3 not delivered** — attribution unobtainable; procedural atmosphere shipped instead. *(Resolved in the 28a item 3 entry below, once the owner supplied owner-generated images.)*
 2. Step 1 sits exactly at the 10.0% limit.
 3. 28b (items 5–7) untouched.
 
@@ -3314,6 +3314,55 @@ Against the **10%** limit, and **zero sub-panel collisions** at every step. No f
 1. **I assumed "too small" meant the headings** and only found out by measuring that they already matched Nolana exactly — the interiors were the whole problem.
 2. **My 28a scale block outranked my own earlier mobile floors**, putting three labels back under 13px until I re-ordered them.
 3. **My italic audit counted decorative `<i>` bars**, which reported 47 italic elements on a page that had none carrying text.
+
+---
+
+**28a item 3** `9d1d30b` — **Atmosphere imagery** (the item 28a could not deliver). Prachets supplied ten **owner-generated Midjourney images on a paid plan — owned, no attribution required**, which removed the blocker that killed the Unsplash attempt.
+
+**What shipped**
+
+- `tools/derive-atmosphere.mjs` — the derivative pipeline. Sources live in `assets-src/atmosphere/` (**gitignored**, ~60 MB of PNG); only derivatives ship. The grade is deliberately light, per the owner: the images already sit in the Nolana palette, so a duotone would flatten the mist they exist for. Black point lifted to the site navy `#121C27` per channel, saturation 0.88, the site's deterministic grain laid over in `soft-light`, WebP q76. Widths 960/1440/1920/2560, **never upscaled** — a source gets only the widths below its own, plus its native width. Output: **38 derivatives, 2.92 MB.**
+- `src/data/atmosphere.ts` — generated manifest (`{w, h, widths}` per image), so the srcset can never offer a width the source cannot fill.
+- `src/components/nolana/Atmos.tsx` — the plate. `<picture>` with a `(max-width: 860px)` portrait source where a landscape crop has nothing left in it; everything below the fold is `loading="lazy"` + `fetchPriority="low"`.
+- Placements: ridges behind the device story's glass UI, warm/cool behind the two work cards, the valley behind the 3D PU mark, the lake behind the ending — each with a portrait plate on mobile where the owner supplied one. **No spare (07/08/09) was needed**; every placement passed legibility.
+- `docs/credits.md` — provenance, pipeline, placement map and the measured contrast table.
+
+**Measured AA scrims.** The section-wide gradients were not enough. Each text block now carries its own band on `.en-inner::before` / `.os-inner::before`, sized to the text and feathered **only outside it**, so no glyph sits on a partly-faded edge; the story's step list got its own panel so it never depends on the sky. Both inners are already `position: relative; z-index: 1`, which is what makes the pseudo's `z-index: -1` land above the plate and below the type. Measured with the text hidden, brightest ground pixel:
+
+| | 1440 | 390 |
+|---|---|---|
+| ending statement | 11.91:1 | 12.05:1 |
+| ending chip | 12.83:1 | 10.89:1 |
+| ending CTAs | 14.69:1 | 9.26:1 |
+| One studio heading | 15.67:1 | 13.46:1 |
+| One studio line | 14.72:1 | 13.51:1 |
+| story steps (worst run) | 6.26:1 | — |
+
+The first pass of this scrim measured 19:1 — which meant it had blacked the photograph out entirely. Dialling it back to 0.62/0.5 keeps AA with margin *and* lets the image read; **a contrast probe passing is not the same as the design being right.**
+
+**Also fixed:** on mobile the device story's `Learn more →` rendered at **x = -40**, off the horizontal scroller's left edge, as a clipped `E →` fragment. Hidden there, consistent with `.ds-step__l` which was already hidden for the same reason.
+
+**Cost.** Built `HEAD~1` in a throwaway worktree and measured both under one harness (390×844, 4× CPU, 1.6 Mbps/150 ms, cache disabled, fresh context, median of 3):
+
+```
+BASE (HEAD~1)     LCP 1644 ms   initial transfer 329.9 kB
+WITH ATMOSPHERE   LCP 1660 ms   initial transfer 330.2 kB
+```
+
+**+16 ms LCP (inside run-to-run noise: 1660/2008/1652 against 1644/1636/1652) and +0.3 kB initial.** The plates are all lazy and below the fold, so none of the 2.92 MB touches the critical path.
+
+> ⚠️ **The alias could not be used for this.** `https://averr-git-redesign-v2-...vercel.app` now returns **403 "Vercel Security Checkpoint"** — Vercel deployment protection is on, to both `curl` and a real browser. The owner's 1820 ms / 144.5 kB baseline was taken on the alias, so these local absolutes are **not comparable to it**; the delta above is, because both sides were measured identically. **Until protection is lifted or a bypass token is supplied, the handoff's standing "verify against the alias, not localhost" rule cannot be followed** — verification in this entry is against local `vite preview`.
+
+### Deviations
+
+1. **The alias is unreachable** (403). Everything here was verified on a local preview build instead. This supersedes the standing alias rule until the owner acts.
+2. 28b (items 5–7) still untouched at the time of this entry.
+
+### My own errors
+
+1. **I read the first scrim failures as real and the pass as success — both backwards.** The ending's `rgb(243,243,244)` was the light section bleeding into an unclamped clip box, and the step list's reading came from hiding the very element that carried the scrim I had just added. Then when the numbers finally said 19:1 I nearly took it as done, when what it actually meant was that I had obliterated the photograph.
+2. **Two bright-pixel readings were edge artifacts, not grounds** — a 1px antialiased corner at the step panel's `border-radius`, and a step scrolled outside its own horizontal scroller so the clip landed on the page background. The fix was measuring each text run's own box, not the container's.
+3. The brightest-pixel method is **conservative by construction**: it reports the worst pixel anywhere in a box, whether or not a glyph sits on it. Useful as a floor, misleading as a verdict.
 
 ---
 
