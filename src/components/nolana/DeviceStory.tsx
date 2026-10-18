@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useReducedMotion } from "motion/react";
 import { Chip, TwoTone } from "./Bits";
+import Atmos from "./Atmos";
 
 /**
  * The story: Found → Chosen → Booked → Runs itself.
@@ -416,6 +417,9 @@ export default function DeviceStory() {
             style={{ "--glow": active.glow } as React.CSSProperties}
           >
             <span className="ds-spill" aria-hidden />
+            {/* the photographic plate carries the room; the procedural
+                ridges stay on top at low opacity for the near depth */}
+            <Atmos name="01-device-story-ridges" sizes="(min-width: 1024px) 92vw, 100vw" className="ds-plate" />
             <Atmosphere id="ds" />
             <div className="ds-screen">
               <ol className="ds-steps">

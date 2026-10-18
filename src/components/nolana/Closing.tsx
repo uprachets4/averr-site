@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useReducedMotion } from "motion/react";
 import { Chip, TwoTone } from "./Bits";
+import Atmos from "./Atmos";
 import { MARK_PATH_D } from "../MonogramMark";
 
 /**
@@ -50,6 +51,12 @@ export function OneStudio() {
 
   return (
     <section className="os" ref={ref}>
+      <Atmos
+        name="04-one-studio-valley"
+        portrait="10-mobile-one-studio"
+        sizes="100vw"
+        className="os-plate"
+      />
       <div className="os-sky" aria-hidden />
       <div className="os-inner">
         <Chip tone="dark">One studio</Chip>
@@ -193,6 +200,12 @@ export function Ending() {
 
   return (
     <section className="en" id="ch-start">
+      <Atmos
+        name="05-ending-lake"
+        portrait="06-mobile-ending"
+        sizes="100vw"
+        className="en-plate"
+      />
       <div className="en-sky" aria-hidden />
       <div className="en-mesh-still" aria-hidden />
       <div className="en-inner">

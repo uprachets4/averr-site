@@ -9,3 +9,6 @@ dist
 
 # Owner's reference frames — never pushed (public repo)
 docs/reference/
+
+# Atmosphere sources (owner-generated, 60MB of PNG) — derivatives ship, sources do not
+assets-src/

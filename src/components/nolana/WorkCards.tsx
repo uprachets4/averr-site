@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useReducedMotion } from "motion/react";
 import { Chip, TwoTone } from "./Bits";
 import { Atmosphere } from "./DeviceStory";
+import Atmos from "./Atmos";
 import Screenshot from "../Screenshot";
 import { caseStudies } from "../../data/caseStudies";
 
@@ -69,6 +70,11 @@ function Card({ slug, i }: { slug: string; i: number }) {
   return (
     <Link ref={ref} to={`/work/${slug}`} className="wc-card">
       <span className="wc-card__stage">
+        <Atmos
+          name={i === 0 ? "02-work-card-warm" : "03-work-card-cool"}
+          sizes="(min-width: 1024px) 46vw, 92vw"
+          className="wc-plate"
+        />
         <Atmosphere id={`wc${i}`} />
         <span className="wc-orb" aria-hidden />
         <span className="wc-frame">
