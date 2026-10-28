@@ -195,22 +195,36 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   const pts = L[0].p;
 
   /* ── formations, built progressively ───────────────────────────────
-     HERO and LOOSE first so the planet can render; the four chapter
-     objects follow in their own idle callbacks, one task each, long
-     before the reader can scroll to them. */
-  const LOOSE = kit.fHero(true);
-  const HERO = kit.fHero(false);
-  kit.rings().forEach((r, k) => {
-    for (let i = r[0]; i < r[1]; i++) ringA[i] = k + 1;
-  });
+     ONE FORMATION PER IDLE TASK. Building LOOSE and HERO together in
+     mount() made a single ~480ms task — the spec's "split formation
+     building if needed". They are two tasks now, and the loop does not
+     start until HERO exists; the hero's text has already painted by
+     then, so nothing the reader can see is waiting on this. The four
+     chapter objects follow, long before the reader can scroll to them. */
+  let LOOSE: Formation | null = null;
+  let HERO: Formation | null = null;
+  const K: Array<Formation | null> = [null, null, null, null, null, null];
 
-  const K: Array<Formation | null> = [HERO, null, null, null, null, HERO];
-  const builders: Array<[number, () => Formation]> = [
-    [1, kit.fWeb],
-    [2, kit.fApps],
-    [3, kit.fFlow],
-    [4, kit.fMap],
+  const builders: Array<() => void> = [
+    function loose() {
+      LOOSE = kit.fHero(true);
+    },
+    function hero() {
+      HERO = kit.fHero(false);
+      /* the ring ranges are defined by the first fHero call */
+      kit.rings().forEach((r, k) => {
+        for (let i = r[0]; i < r[1]; i++) ringA[i] = k + 1;
+      });
+      K[0] = HERO;
+      K[5] = HERO;
+      start();
+    },
+    function web() { K[1] = kit.fWeb(); },
+    function apps() { K[2] = kit.fApps(); },
+    function flow() { K[3] = kit.fFlow(); },
+    function map() { K[4] = kit.fMap(); },
   ];
+
   let cancelIdle: (() => void) | null = null;
   let disposed = false;
 
@@ -221,7 +235,7 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
       opts.onReady?.();
       return;
     }
-    K[next[0]] = next[1]();
+    next();
     /* a formation landing can complete a pair the loop was waiting for */
     lastSeg = -9;
     cancelIdle = idle(buildNext);
@@ -312,6 +326,14 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   io.observe(story);
 
   let raf = 0;
+  let started = false;
+  /** Called by the `hero` build step: nothing renders before HERO. */
+  function start() {
+    if (started || disposed) return;
+    started = true;
+    raf = requestAnimationFrame(frame);
+  }
+
   function frame(now: number) {
     raf = requestAnimationFrame(frame);
     if (document.hidden || !onScreen) return;
@@ -327,8 +349,13 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     if (intro < 1 && smoothQ < 0.02) seg = -1;
     if (seg !== lastSeg) {
       if (seg < 0) {
-        setPair(LOOSE, HERO);
-        lastSeg = seg;
+        /* LOOSE lands one idle task before HERO, so on the very first
+           frames the scattered intro may not exist yet; the planet then
+           simply starts locked rather than morphing from nothing. */
+        if (LOOSE && HERO) {
+          setPair(LOOSE, HERO);
+          lastSeg = seg;
+        }
       } else {
         const a = K[seg];
         const b = K[seg + 1];
@@ -433,8 +460,6 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
 
     L.forEach((l) => l.r.render(l.s, camera));
   }
-  raf = requestAnimationFrame(frame);
-
   function dispose() {
     disposed = true;
     cancelAnimationFrame(raf);
