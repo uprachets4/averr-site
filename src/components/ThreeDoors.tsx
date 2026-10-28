@@ -14,7 +14,6 @@ import MagneticCTA from "./MagneticCTA";
 import Screenshot from "./Screenshot";
 import { DESIGN_PREVIEW_SHOTS } from "../data/homeScenes";
 import {
-  GROW_METRICS,
   ILLUSTRATIVE_LABEL,
   PILLAR_SERVICES,
   PILLAR_TIMELINE,
@@ -157,18 +156,14 @@ function AutomatePreview({ reduce }: { reduce: boolean }) {
   );
 }
 
-const MONO_MICRO = {
-  fontFamily: "var(--font-mono)",
-  fontSize: 10,
-  letterSpacing: "0.14em",
-  textTransform: "uppercase",
-} as const;
-
-/** Grow — a mini of the /services dashboard: two tiles off the same sample
- *  figures, plus the trend line. Labelled, because the numbers are invented. */
+/** Grow — a mini of the /services dashboard.
+ *
+ *  Session 29, owner instruction: the two metric tiles that led this
+ *  preview carried `GROW_METRICS` sample numbers (Impressions 48.2K +42%,
+ *  Engagement 6.8% +18%). They are removed with every other figure on
+ *  home, and the trend line now has the frame to itself. The ILLUSTRATIVE
+ *  tag stays: the curve is still a drawn shape, not measured data. */
 function GrowPreview({ reduce }: { reduce: boolean }) {
-  const tiles = GROW_METRICS.slice(0, 2);
-
   return (
     <div
       aria-hidden
@@ -183,40 +178,6 @@ function GrowPreview({ reduce }: { reduce: boolean }) {
         padding: "28px 16px 16px",
       }}
     >
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 8 }}>
-        {tiles.map(function drawTile(m) {
-          return (
-            <div
-              key={m.label}
-              style={{
-                border: "1px solid var(--hair)",
-                borderRadius: 6,
-                padding: "8px 10px",
-                background: "rgba(200,175,120,0.06)",
-              }}
-            >
-              <div style={{ ...MONO_MICRO, color: "var(--color-muted)" }}>{m.label}</div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  gap: 6,
-                  marginTop: 4,
-                }}
-              >
-                <span
-                  className="tnum"
-                  style={{ fontSize: 17, lineHeight: 1, color: "var(--color-ink)" }}
-                >
-                  {m.format(m.end)}
-                </span>
-                <span style={{ ...MONO_MICRO, color: "#B18544" }}>{m.delta}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
       <svg
         viewBox="0 0 240 48"
         preserveAspectRatio="none"

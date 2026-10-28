@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { duration, ease } from "../lib/motion";
-import { caseStudies } from "../data/caseStudies";
 
 
 const FEATURED = {
@@ -13,8 +12,10 @@ const FEATURED = {
   href: "/work/cg-walls-and-floors",
 };
 
-/** Single source: the study's own record. */
-const FEATURED_FIGURE = caseStudies["cg-walls-and-floors"].headlineFigure;
+/* Session 29, owner instruction: the card's result block — CG Walls'
+   85% and its caption, read from the study's own record — is removed
+   along with every other figure on home. The card still leads to the
+   study, where the figure is still sourced and still shown. */
 
 
 export function FeaturedCard({ reduce }: { reduce: boolean }) {
@@ -158,38 +159,8 @@ export function FeaturedCard({ reduce }: { reduce: boolean }) {
         </div>
 
         <div>
-          {/* Result */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              gap: 16,
-              marginBottom: 24,
-            }}
-          >
-            <div
-              className="num-gradient-dark tnum"
-              style={{
-                fontFamily: "var(--font-display)",
-                fontWeight: 500,
-                fontSize: 72,
-                lineHeight: 0.9,
-                letterSpacing: "-0.04em",
-              }}
-            >
-              {FEATURED_FIGURE?.value}
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: 14,
-                lineHeight: 1.4,
-                color: "var(--color-muted-l)",
-              }}
-            >
-              {FEATURED_FIGURE?.caption}
-            </div>
-          </div>
+          {/* The result block that sat here is removed — see the note at
+              the head of this file. */}
 
           {/* Link */}
           <div
