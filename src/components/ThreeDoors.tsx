@@ -1,28 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import DoorPreviewLive from "./home/DoorPreviewLive";
-import type { PillarId } from "../data/servicePillars";
 import { Link } from "react-router-dom";
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useReducedMotion,
-} from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { duration, ease, spring } from "../lib/motion";
 import LineReveal from "./LineReveal";
 import MagneticCTA from "./MagneticCTA";
-import Screenshot from "./Screenshot";
-import { DESIGN_PREVIEW_SHOTS } from "../data/homeScenes";
-import {
-  ILLUSTRATIVE_LABEL,
-  PILLAR_SERVICES,
-  PILLAR_TIMELINE,
-} from "../data/servicePillars";
-import {
-  PILLAR_SERVICE,
-  SERVICE_COLOR,
-  serviceGlow,
-} from "../data/serviceColors";
+import { PILLAR_SERVICES, PILLAR_TIMELINE } from "../data/servicePillars";
+import { PILLAR_SERVICE, SERVICE_COLOR, serviceGlow, withAlpha } from "../data/serviceColors";
 
 const MOBILE_QUERY = "(max-width: 767px)";
 
@@ -53,194 +36,25 @@ const DOORS = [
   },
 ] as const;
 
-/* Preview panel geometry. 360x225 (16:10) where the row has room at 1280+,
-   easing down to 260 wide at 1024 so the name, preview and promise still fit
-   one line each. */
-const PANEL_W = "clamp(260px, 39.0625vw - 140px, 360px)";
-const PANEL_MAX_H = 225;
-/** Clear space the panel must leave on either side — the row's name to its
- *  left, the promise copy to its right. */
-/** How many service names each door prints. Four fits the right column at
- *  1440 without pushing the preview's clearance; the brief's range is 3-4. */
+/** How many service names each door prints. */
 const DOOR_SERVICE_COUNT = 4;
-
-/** A door preview is never more than ~40% of the viewport. */
-const SMALL_SIZES = "(min-width: 900px) 640px, 60vw";
-
-const EDGE_CLEARANCE = 24;
-const DRIFT = 40;
-
-/* ── previews ──────────────────────────────────────────────────────── */
-
-function DesignPreview() {
-  return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {DESIGN_PREVIEW_SHOTS.map(function drawShot(shot, i) {
-        return (
-          <Screenshot
-            key={shot.src}
-            src={shot.src}
-            alt=""
-            sizes={SMALL_SIZES}
-            style={{
-              position: "absolute",
-              width: "72%",
-              height: "auto",
-              left: `${i * 13}%`,
-              top: `${i * 12}%`,
-              borderRadius: 6,
-              border: "1px solid var(--hair)",
-              boxShadow: "0 8px 24px rgba(8,10,10,0.45)",
-              transform: `rotate(${(i - 1) * 3}deg)`,
-              objectFit: "contain",
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
-const FLOW_NODES = ["Trigger", "AI", "Review", "Publish"];
-
-function AutomatePreview({ reduce }: { reduce: boolean }) {
-  return (
-    <div
-      aria-hidden
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        gap: 10,
-        padding: 16,
-      }}
-    >
-      {FLOW_NODES.map(function drawNode(label, i) {
-        return (
-          <motion.div
-            key={label}
-            initial={reduce ? false : { opacity: 0.35 }}
-            animate={reduce ? undefined : { opacity: [0.35, 1, 0.35] }}
-            transition={
-              reduce
-                ? undefined
-                : {
-                    duration: 2.4,
-                    repeat: Infinity,
-                    ease: ease.inOut,
-                    delay: i * 0.3,
-                  }
-            }
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontFamily: "var(--font-mono)",
-              fontSize: 10,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              color: "var(--color-ink)",
-            }}
-          >
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                background: "var(--color-ink)",
-                flexShrink: 0,
-              }}
-            />
-            {label}
-          </motion.div>
-        );
-      })}
-    </div>
-  );
-}
-
-/** Grow — a mini of the /services dashboard.
- *
- *  Session 29, owner instruction: the two metric tiles that led this
- *  preview carried `GROW_METRICS` sample numbers (Impressions 48.2K +42%,
- *  Engagement 6.8% +18%). They are removed with every other figure on
- *  home, and the trend line now has the frame to itself. The ILLUSTRATIVE
- *  tag stays: the curve is still a drawn shape, not measured data. */
-function GrowPreview({ reduce }: { reduce: boolean }) {
-  return (
-    <div
-      aria-hidden
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        // top pad clears the ILLUSTRATIVE tag; the card fills its frame so the
-        // tag sits on the dashboard rather than floating above it
-        padding: "28px 16px 16px",
-      }}
-    >
-      <svg
-        viewBox="0 0 240 48"
-        preserveAspectRatio="none"
-        style={{ width: "100%", flex: 1, minHeight: 30, display: "block" }}
-      >
-        <motion.path
-          d="M4 42 C 40 39, 62 30, 92 27 S 150 19, 178 11 S 220 5, 236 3"
-          fill="none"
-          /* 29: the old sand accent becomes Grow's own service colour —
-             an illustration highlight, which the system allows. */
-          stroke={SERVICE_COLOR[PILLAR_SERVICE.grow]}
-          strokeWidth={2}
-          strokeLinecap="round"
-          initial={reduce ? false : { pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={
-            reduce ? { duration: 0 } : { duration: duration.slow * 2, ease: ease.outQuart }
-          }
-        />
-      </svg>
-    </div>
-  );
-}
-
-/** Sits on any preview whose numbers are made up. */
-function IllustrativeTag() {
-  return (
-    <div
-      aria-hidden
-      className="type-eyebrow"
-      style={{
-        position: "absolute",
-        top: 6,
-        right: 8,
-        zIndex: 3,
-        fontFamily: "var(--font-mono)",
-        color: "var(--color-muted-2)",
-        pointerEvents: "none",
-      }}
-    >
-      {ILLUSTRATIVE_LABEL}
-    </div>
-  );
-}
-
-function Preview({ id, reduce }: { id: string; reduce: boolean }) {
-  if (id === "design") return <DesignPreview />;
-  if (id === "automate") return <AutomatePreview reduce={reduce} />;
-  return (
-    <>
-      <GrowPreview reduce={reduce} />
-      <IllustrativeTag />
-    </>
-  );
-}
 
 /* ── one door ──────────────────────────────────────────────────────── */
 
+/**
+ * Session 29, owner decision: the hover previews are gone.
+ *
+ * Each door used to open a live miniature of the real /services screens
+ * (`DoorPreviewLive`, now deleted) with the hand-made stills behind it.
+ * Those screens are the Northgate simulation and carry invented figures —
+ * "★ 4.8 · 186 reviews" and the rest — which may not appear on home, and
+ * they could not be stripped here because they belong to /services and
+ * this session may not edit that page.
+ *
+ * What replaces them is a static hover in the door's own service colour:
+ * the top hairline, a soft wash across the row and the glow. No imagery,
+ * no numbers, nothing to keep in sync with another page.
+ */
 function Door({
   door,
   index,
@@ -260,53 +74,22 @@ function Door({
   mobile: boolean;
   reduce: boolean;
 }) {
-  const rowRef = useRef<HTMLAnchorElement | null>(null);
   const nameRef = useRef<HTMLSpanElement | null>(null);
-  const cellRef = useRef<HTMLDivElement | null>(null);
-  const promiseRef = useRef<HTMLDivElement | null>(null);
-  const px = useMotionValue(0);
-  const sx = useSpring(px, spring.soft);
-
-  function onMove(e: React.MouseEvent<HTMLAnchorElement>) {
-    if (reduce || mobile || !rowRef.current) return;
-    const r = rowRef.current.getBoundingClientRect();
-    const raw = (e.clientX - r.left) / r.width;
-    let next = Math.max(-DRIFT, Math.min(DRIFT, (raw - 0.5) * 160));
-
-    // the panel drifts with the cursor, so cap that travel against its
-    // neighbours' measured edges — otherwise it slides over the name one way
-    // and the promise the other (/work clamps its cursor preview the same
-    // way). cellRef is the untranslated grid cell, so its box is the panel's
-    // rest position.
-    const name = nameRef.current?.getBoundingClientRect();
-    const promise = promiseRef.current?.getBoundingClientRect();
-    const cell = cellRef.current?.getBoundingClientRect();
-    if (name && promise && cell) {
-      const lo = name.right + EDGE_CLEARANCE - cell.left;
-      const hi = promise.left - EDGE_CLEARANCE - cell.right;
-      // lo wins when the row is too tight for both: never cover the name
-      next = Math.max(lo, Math.min(hi, next));
-    }
-
-    px.set(next);
-  }
-
   const dim = anyActive && !active && !mobile && !reduce;
 
-  /* 29, the service colour system. One colour per door: its top hairline,
-     the dot before its name, and the glow it lifts on while active. The
-     colour never touches type — §4 forbids service colour on body text,
-     and the violet would break the 14px floor on the mono list. */
+  /* One colour per door: the dot before its name, the top hairline, the
+     wash and the glow. The colour never touches type — the system forbids
+     service colour on body text, and the violet would break its own 14px
+     floor on the mono list. */
   const service = PILLAR_SERVICE[door.id];
   const accent = SERVICE_COLOR[service];
+  const lit = active && !reduce;
 
   return (
     <Link
-      ref={rowRef}
       to={`/services#${door.id}`}
       onMouseEnter={onActivate}
       onMouseLeave={onDeactivate}
-      onMouseMove={onMove}
       onFocus={function focus(e) {
         if (e.currentTarget.matches(":focus-visible")) onActivate();
       }}
@@ -314,10 +97,13 @@ function Door({
       style={{
         display: "block",
         borderTop: `1px solid ${active ? accent : "var(--hair)"}`,
-        boxShadow: active && !reduce ? serviceGlow(service) : "none",
+        boxShadow: lit ? serviceGlow(service) : "none",
+        background: lit
+          ? `linear-gradient(90deg, ${withAlpha(accent, 0.07)} 0%, ${withAlpha(accent, 0.02)} 55%, transparent 100%)`
+          : "transparent",
         transition: reduce
           ? "none"
-          : `border-color ${duration.base * 1000}ms ease, box-shadow ${duration.base * 1000}ms ease`,
+          : `border-color ${duration.base * 1000}ms ease, box-shadow ${duration.base * 1000}ms ease, background-color ${duration.base * 1000}ms ease`,
         textDecoration: "none",
         color: "inherit",
       }}
@@ -326,15 +112,11 @@ function Door({
         style={{
           maxWidth: "var(--container-wide)",
           margin: "0 auto",
-          // fixed height so hover never animates layout
-          minHeight: mobile ? undefined : PANEL_MAX_H + 24,
-          padding: mobile ? "28px 0" : 0,
+          padding: mobile ? "28px 0" : "48px 0",
           display: mobile ? "block" : "grid",
           // max-content on the name: a fractional track squeezes it and
           // LineReveal's overflow:hidden then clips the word.
-          gridTemplateColumns: mobile
-            ? undefined
-            : `max-content ${PANEL_W} minmax(0, 1fr) 20px`,
+          gridTemplateColumns: mobile ? undefined : "max-content minmax(0, 1fr) 20px",
           alignItems: "center",
           gap: mobile ? 16 : 24,
           opacity: dim ? 0.4 : 1,
@@ -344,9 +126,6 @@ function Door({
         }}
       >
         <motion.div
-          // display-l, not -xl: at display-xl "Automate" is ~633px at 1440 and
-          // ~450px at 1024, which leaves no room for the preview and promise
-          // in the same row.
           className="type-display-l"
           style={{
             color: "var(--color-ink)",
@@ -372,51 +151,7 @@ function Door({
           </span>
         </motion.div>
 
-        {/* preview panel — lives inside the row, between name and promise */}
         <div
-          ref={cellRef}
-          style={{
-            position: "relative",
-            // 16:10, capped so the panel never outgrows the row
-            height: mobile ? 120 : undefined,
-            aspectRatio: mobile ? undefined : "16 / 10",
-            maxHeight: mobile ? undefined : PANEL_MAX_H,
-            marginTop: mobile ? 16 : 0,
-            pointerEvents: "none",
-          }}
-        >
-          <motion.div
-            style={{
-              position: "absolute",
-              inset: 0,
-              x: mobile || reduce ? 0 : sx,
-              overflow: "hidden",
-              borderRadius: 8,
-            }}
-            initial={false}
-            animate={{
-              opacity: mobile || active ? 1 : 0,
-              scale: mobile || active ? 1 : 0.96,
-            }}
-            transition={
-              reduce
-                ? { duration: 0 }
-                : { duration: duration.base, ease: ease.outQuart }
-            }
-          >
-            {/* the live miniature replaces the hand-made still while the
-                door is active; it is lazy, so home's initial JS is
-                unchanged, and it is only mounted while hovered/focused */}
-            {active && !mobile ? (
-              <DoorPreviewLive pillar={door.id as PillarId} />
-            ) : (
-              <Preview id={door.id} reduce={reduce} />
-            )}
-          </motion.div>
-        </div>
-
-        <div
-          ref={promiseRef}
           style={{
             textAlign: mobile ? "left" : "right",
             marginTop: mobile ? 16 : 0,
