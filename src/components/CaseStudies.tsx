@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { duration, ease } from "../lib/motion";
+import { CHIP_SERVICE, SERVICE_COLOR } from "../data/serviceColors";
 
 
 const FEATURED = {
@@ -111,8 +112,27 @@ export function FeaturedCard({ reduce }: { reduce: boolean }) {
                   border: "1px solid rgba(245,244,249,.16)",
                   color: "var(--color-muted-l)",
                   borderRadius: 4,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 7,
                 }}
               >
+                {/* 29: the chip's service colour as a dot. The chip's own
+                    label stays muted — these are 10px, and the system
+                    allows no service colour on type at all, let alone the
+                    violet below its 14px floor. */}
+                {CHIP_SERVICE[tag] ? (
+                  <span
+                    aria-hidden
+                    style={{
+                      width: 7,
+                      height: 7,
+                      flex: "none",
+                      borderRadius: "50%",
+                      background: SERVICE_COLOR[CHIP_SERVICE[tag]],
+                    }}
+                  />
+                ) : null}
                 {tag}
               </span>
             ))}

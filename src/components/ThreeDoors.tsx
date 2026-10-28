@@ -18,6 +18,11 @@ import {
   PILLAR_SERVICES,
   PILLAR_TIMELINE,
 } from "../data/servicePillars";
+import {
+  PILLAR_SERVICE,
+  SERVICE_COLOR,
+  serviceGlow,
+} from "../data/serviceColors";
 
 const MOBILE_QUERY = "(max-width: 767px)";
 
@@ -186,7 +191,9 @@ function GrowPreview({ reduce }: { reduce: boolean }) {
         <motion.path
           d="M4 42 C 40 39, 62 30, 92 27 S 150 19, 178 11 S 220 5, 236 3"
           fill="none"
-          stroke="#B18544"
+          /* 29: the old sand accent becomes Grow's own service colour —
+             an illustration highlight, which the system allows. */
+          stroke={SERVICE_COLOR[PILLAR_SERVICE.grow]}
           strokeWidth={2}
           strokeLinecap="round"
           initial={reduce ? false : { pathLength: 0 }}
@@ -286,6 +293,13 @@ function Door({
 
   const dim = anyActive && !active && !mobile && !reduce;
 
+  /* 29, the service colour system. One colour per door: its top hairline,
+     the dot before its name, and the glow it lifts on while active. The
+     colour never touches type — §4 forbids service colour on body text,
+     and the violet would break the 14px floor on the mono list. */
+  const service = PILLAR_SERVICE[door.id];
+  const accent = SERVICE_COLOR[service];
+
   return (
     <Link
       ref={rowRef}
@@ -299,7 +313,11 @@ function Door({
       onBlur={onDeactivate}
       style={{
         display: "block",
-        borderTop: "1px solid var(--hair)",
+        borderTop: `1px solid ${active ? accent : "var(--hair)"}`,
+        boxShadow: active && !reduce ? serviceGlow(service) : "none",
+        transition: reduce
+          ? "none"
+          : `border-color ${duration.base * 1000}ms ease, box-shadow ${duration.base * 1000}ms ease`,
         textDecoration: "none",
         color: "inherit",
       }}
@@ -336,7 +354,20 @@ function Door({
           }}
           transition={spring.soft}
         >
-          <span ref={nameRef} style={{ display: "inline-block" }}>
+          <span
+            ref={nameRef}
+            style={{ display: "inline-flex", alignItems: "center", gap: 14 }}
+          >
+            <span
+              aria-hidden
+              style={{
+                width: 7,
+                height: 7,
+                flex: "none",
+                borderRadius: "50%",
+                background: accent,
+              }}
+            />
             <LineReveal delay={0.08 * index}>{door.name}</LineReveal>
           </span>
         </motion.div>
