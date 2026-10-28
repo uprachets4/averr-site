@@ -522,6 +522,7 @@ export default function Nav() {
               variant="primary"
               size="sm"
               icon={null}
+              className="nav-cta--nowrap"
               tone={navDark ? "dark" : "light"}
             >
               Book a call

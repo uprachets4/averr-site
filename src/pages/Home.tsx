@@ -1,6 +1,5 @@
 import { useEffect, type CSSProperties } from "react";
-import NolanaHero from "../components/nolana/NolanaHero";
-import { GradientDefs } from "../components/nolana/Bits";
+import PlanetHero from "../components/home/planet/PlanetHero";
 
 import ThreeScenes from "../components/ThreeScenes";
 import ThreeDoors from "../components/ThreeDoors";
@@ -20,10 +19,10 @@ import { useSetNavDarkOverride } from "../lib/navTone";
  * Same components, same copy, same order; the sections themselves are
  * untouched.
  *
- * The hero slot still holds `NolanaHero`. Step 2 of the spec replaces it
- * with the Planet hero, and this import goes with it. Both grounds end
- * dark, so the handoff into the first cream chapter is the same
- * `Chapter tone="cream" from="dark"` September used.
+ * The hero is the Planet: a pinned 780vh WebGL story that ends on its
+ * takeover panel. The takeover opens into --navy-2, so the handoff into
+ * the first chapter is dark-to-dark and the page never flashes a ground
+ * the site has retired.
  */
 
 /**
@@ -94,8 +93,7 @@ export default function Home() {
 
   return (
     <>
-      <GradientDefs />
-      <NolanaHero />
+      <PlanetHero />
 
       <div className="home-sept" style={SEPT_DARK}>
         {/* The closer's pill, inverted for the dark ground.

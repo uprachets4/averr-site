@@ -4024,3 +4024,8 @@ a { color: inherit; text-decoration: none; }
   -webkit-backdrop-filter: blur(10px) saturate(1.1);
 }
 .en-ctas .nh-ghost:hover { background: rgba(10,14,22,0.72); border-color: rgba(255,255,255,0.42); }
+
+/* Session 29, owner instruction: the nav CTA never wraps to two lines at
+   narrow widths. Scoped to the nav's own pill rather than applied to
+   MagneticCTA, whose longer labels elsewhere are meant to wrap. */
+.nav-cta--nowrap { white-space: nowrap; }
