@@ -42,7 +42,6 @@ export default function TorontoClock({ style }: { style?: React.CSSProperties })
   return (
     <div
       className="type-eyebrow tnum"
-      aria-label={`Local time in Toronto, ${time}`}
       style={{
         fontFamily: "var(--font-mono)",
         color: "var(--color-muted)",
@@ -50,6 +49,12 @@ export default function TorontoClock({ style }: { style?: React.CSSProperties })
         ...style,
       }}
     >
+      {/* The name used to sit in an `aria-label` on this div, which axe
+          reports as a serious `aria-prohibited-attr`: a div has no role
+          that permits naming, so the label was silently doing nothing.
+          A visually-hidden sentence carries it instead, with the visible
+          pieces hidden from the tree as before. */}
+      <span className="sr-only">{`Local time in Toronto, ${time}`}</span>
       <span aria-hidden>TORONTO · </span>
       <span aria-hidden style={{ display: "inline-block", minWidth: "7.5ch" }}>
         {time}

@@ -32,6 +32,12 @@
   /* kept for the no-WebGL path: the hero still reads as a lit room */
   background: radial-gradient(120% 95% at 50% 46%, #182633 0%, #121C27 42%, #080A0A 100%);
   color: #F5F4F9;
+  /* The reference sets its display face on html/body; ported without
+     this line the whole hero inherited the site's BODY face (Inter) and
+     every measurement shifted — "Found first. Chosen more." wrapped to
+     two lines against the reference's one, because `max-width: 16ch`
+     resolves against the rendering font's own "0" advance. */
+  font-family: var(--font-display);
 }
 
 .ph-stage canvas {
