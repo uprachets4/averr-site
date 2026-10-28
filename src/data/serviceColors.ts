@@ -47,28 +47,17 @@ export function withAlpha(hex: string, a: number): string {
 }
 
 /**
- * September's three pillars are NOT the four services, so this mapping is
- * a judgement, not a fact, and it is the one thing here to check.
+ * Chip label -> service. One to one, by name.
  *
- * The restored sections name **Design**, **Automate** and **Grow** — the
- * pillar vocabulary — and the spec says not to rename them. Their content
- * is what decides the colour: Automate's services are the AI ones and
- * Grow's are the marketing ones, so those two are the same offering under
- * an older name. Design covers both "Marketing websites" and "Product &
- * SaaS interfaces", so it spans Websites and Web Apps and is given
- * Websites, the larger half.
- *
- * Web Apps therefore has no surface on home until the doors are renamed.
+ * Session 29 opened with September's three pillars — Design, Automate,
+ * Grow — and a judgement mapping them onto these four. The owner has
+ * since renamed home's section to the four services, so that mapping is
+ * gone: every surface on home now names a service directly and takes its
+ * colour by name.
  */
-export const PILLAR_SERVICE: Record<string, ServiceId> = {
-  design: "websites",
-  automate: "aiAutomation",
-  grow: "marketing",
-};
-
-/** The same mapping for the case-study chips, which use the pillar words. */
 export const CHIP_SERVICE: Record<string, ServiceId> = {
-  Design: "websites",
-  Automate: "aiAutomation",
-  Grow: "marketing",
+  Websites: "websites",
+  "Web Apps": "webApps",
+  "AI Automation": "aiAutomation",
+  Marketing: "marketing",
 };

@@ -2,7 +2,7 @@ import { useEffect, type CSSProperties } from "react";
 import PlanetHero from "../components/home/planet/PlanetHero";
 
 import ThreeScenes from "../components/ThreeScenes";
-import ThreeDoors from "../components/ThreeDoors";
+import ServiceDoors from "../components/ServiceDoors";
 import ProofLedger from "../components/ProofLedger";
 import Manifesto from "../components/Manifesto";
 import FinalCTA from "../components/FinalCTA";
@@ -134,7 +134,7 @@ export default function Home() {
             tone names are September's; only their values have moved. */}
         <Chapter tone="cream" from="dark">
           <ThreeScenes />
-          <ThreeDoors />
+          <ServiceDoors />
         </Chapter>
 
         {/* One darker chapter: the work, then the manifesto. */}

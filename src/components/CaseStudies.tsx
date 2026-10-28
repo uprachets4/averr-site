@@ -6,7 +6,8 @@ import { CHIP_SERVICE, SERVICE_COLOR } from "../data/serviceColors";
 
 const FEATURED = {
   client: "CG Walls & Floors · 2026",
-  tags: ["Design", "Automate"],
+  /* 29: the chips name services, not the retired pillars. */
+  tags: ["Websites", "AI Automation"],
   title: "Realtor outreach automation + website rebuild",
   desc:
     "Custom marketing site + AI agent scraping realtor listings to identify renovation-ready properties, generating personalized outreach at scale.",
