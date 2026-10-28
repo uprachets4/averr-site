@@ -340,7 +340,7 @@ function SceneThree() {
         <SceneHeading scene={SCENES[2]} style={{ marginBottom: 32 }} />
 
         <div style={{ marginBottom: 56 }}>
-          <MagneticCTA to="/work" variant="text" size="md">
+          <MagneticCTA to="/work" variant="text" size="md" tone="dark">
             See the work
           </MagneticCTA>
         </div>

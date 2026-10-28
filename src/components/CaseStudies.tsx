@@ -33,7 +33,7 @@ export function FeaturedCard({ reduce }: { reduce: boolean }) {
         gridTemplateColumns: "1.2fr 1fr",
         minHeight: 400,
         background: "var(--color-dark-alt)",
-        border: "1px solid rgba(237,231,218,0.10)",
+        border: "1px solid rgba(245,244,249,.16)",
         borderRadius: 20,
         overflow: "hidden",
         transition: "transform 0.4s cubic-bezier(0.25,0.1,0.25,1), border-color 0.4s ease",
@@ -45,12 +45,12 @@ export function FeaturedCard({ reduce }: { reduce: boolean }) {
         setHovered(true);
         if (reduce) return;
         e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.borderColor = "rgba(237,231,218,0.18)";
+        e.currentTarget.style.borderColor = "rgba(245,244,249,.28)";
       }}
       onMouseLeave={(e) => {
         setHovered(false);
         e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.borderColor = "rgba(237,231,218,0.10)";
+        e.currentTarget.style.borderColor = "rgba(245,244,249,.16)";
       }}
     >
       {/* Project visual */}
@@ -108,7 +108,7 @@ export function FeaturedCard({ reduce }: { reduce: boolean }) {
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   padding: "4px 10px",
-                  border: "1px solid rgba(237,231,218,0.18)",
+                  border: "1px solid rgba(245,244,249,.16)",
                   color: "var(--color-muted-l)",
                   borderRadius: 4,
                 }}
@@ -148,7 +148,8 @@ export function FeaturedCard({ reduce }: { reduce: boolean }) {
           <div
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: 15,
+              /* 29: body copy is 16px minimum on the dark ground. */
+              fontSize: 16,
               lineHeight: 1.6,
               color: "var(--color-muted-l)",
               marginBottom: 32,
@@ -166,7 +167,8 @@ export function FeaturedCard({ reduce }: { reduce: boolean }) {
           <div
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: 14,
+              /* 29: ditto — this reads as a sentence, not a chrome label. */
+              fontSize: 16,
               fontWeight: 500,
               color: "var(--color-parch)",
               display: "inline-flex",

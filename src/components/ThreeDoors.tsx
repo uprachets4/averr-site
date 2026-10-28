@@ -85,7 +85,7 @@ function DesignPreview() {
               top: `${i * 12}%`,
               borderRadius: 6,
               border: "1px solid var(--hair)",
-              boxShadow: "0 8px 24px rgba(20,20,18,0.12)",
+              boxShadow: "0 8px 24px rgba(8,10,10,0.45)",
               transform: `rotate(${(i - 1) * 3}deg)`,
               objectFit: "contain",
             }}
@@ -520,7 +520,7 @@ export default function ThreeDoors() {
           zIndex: 2,
         }}
       >
-        <MagneticCTA to="/services" variant="text" size="md">
+        <MagneticCTA to="/services" variant="text" size="md" tone="dark">
           Explore services
         </MagneticCTA>
       </div>

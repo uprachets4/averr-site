@@ -25,7 +25,9 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse 1000px 600px at 50% 50%, rgba(232,225,208,0.6), transparent 60%)",
+            /* 29: the warm cream bloom becomes the navy one, so the glow
+               lifts off #121C27 instead of washing it out. */
+            "radial-gradient(ellipse 1000px 600px at 50% 50%, rgba(35,40,55,0.6), transparent 60%)",
           pointerEvents: "none",
         }}
       />
@@ -130,10 +132,11 @@ export default function FinalCTA({ markerNumber }: { markerNumber: string }) {
           <MagneticCTA
             to="/contact"
             variant="primary"
+            tone="dark"
           >
             Book a discovery call
           </MagneticCTA>
-          <MagneticCTA to="/work" variant="ghost">
+          <MagneticCTA to="/work" variant="ghost" tone="dark">
             See our work
           </MagneticCTA>
         </motion.div>

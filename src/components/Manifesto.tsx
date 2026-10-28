@@ -34,7 +34,8 @@ export default function Manifesto() {
           marginTop: "-40vmin",
           marginLeft: "-40vmin",
           background:
-            "radial-gradient(circle at 50% 50%, rgba(237,233,226,0.12), transparent 60%)",
+            /* 29: parch wash -> the dark system's light, same weight */
+            "radial-gradient(circle at 50% 50%, rgba(245,244,249,0.12), transparent 60%)",
           pointerEvents: "none",
         }}
         animate={
