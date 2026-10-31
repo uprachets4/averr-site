@@ -66,22 +66,47 @@ export const T = {
   pS: 0, pE: 0.1,
   vS: 0.1, vI: 0.165, vE: 0.425,
   wS: 0.425, wE: 0.68,
-  sS: 0.68, sE: 0.835,
+  sS: 0.68, sE: 0.8255,
   fS: 0.82,
 };
 
 /**
- * Signature -> Finale, approved change to two timeline numbers.
+ * ACT HANDOVERS ARE SEQUENCED, NOT CROSSFADED — owner rule.
  *
- * The reference faded Signature out by .82 and only began Finale at
- * .855, so for ~0.06 of the film — about 90vh of scroll — no heading
- * was near full opacity. The two now CROSSFADE across .82 to .835:
- * Signature runs 1 -> 0 and Finale 0 -> 1 over the same 0.015.
+ * Two acts' text is never visible at once: the outgoing act is under
+ * 0.15 before the incoming one passes 0.15. And the longest run with no
+ * heading at >= 0.9 is at most 0.01 of film progress.
+ *
+ * Those two together fix the arithmetic. With a linear fade out over
+ * [a,b] and in over [b,c], the window where neither side is at 0.9 is
+ *     0.9 * (c - a)
+ * so the whole handover has to fit inside 0.01111 of progress. The
+ * .82 -> .8275 -> .835 numbers span 0.015 and would leave a 0.0135 gap —
+ * over the rule by a third. Each handover therefore spans HALF_* = 0.011
+ * (gap 0.0099), starting where the owner put it.
  *
  * The particle morph windows are untouched: WIN still carries
  * ['calm','NAME',.82,.865].
  */
-const CROSSFADE = 0.015;
+/** Signature leaves .82 -> .8255, Finale arrives .8255 -> .831. */
+const SIG_OUT_FROM = 0.82;
+const SIG_OUT_TO = 0.8255;
+const FIN_IN_TO = 0.831;
+/** Services leave .425 -> .4305, Work arrives .4305 -> .436. */
+const SVC_OUT_FROM = 0.425;
+const SVC_OUT_TO = 0.4305;
+const WORK_IN_TO = 0.436;
+/** Work leaves .68 -> .6855, Signature arrives .6855 -> .691.
+ *  The owner named two handovers; the rule says every one, and this was
+ *  the longest run left once the other two were sequenced. */
+const WORK_OUT_FROM = 0.68;
+const WORK_OUT_TO = 0.6855;
+const SIG_IN_TO = 0.691;
+
+/** 1 before `from`, 0 after `to`. */
+const fadeOut = (P: number, from: number, to: number) => clamp((to - P) / (to - from), 0, 1);
+/** 0 before `from`, 1 after `to`. */
+const fadeIn = (P: number, from: number, to: number) => clamp((P - from) / (to - from), 0, 1);
 const BEAT = [0.165, 0.23, 0.295, 0.36, 0.425];
 const WIN: Array<[string, string, number, number]> = [
   ["calm", "web", 0.152, 0.172],
@@ -605,19 +630,33 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
       m.style.transform = `translateZ(${((1 - k) * -420).toFixed(0)}px) translateY(${((1 - k) * 30).toFixed(1)}px)`;
     });
     // services
-    layers.services.style.opacity = win(P, T.vS, T.vE + 0.005, 0.018).toFixed(3);
+    layers.services.style.opacity = Math.min(
+      fadeIn(P, T.vS, T.vS + 0.018),
+      fadeOut(P, SVC_OUT_FROM, SVC_OUT_TO),
+    ).toFixed(3);
     const iu = (P - T.vS) / (T.vI - T.vS);
     vIntro.style.opacity = clamp(Math.min(iu * 6, (1 - iu) * 5), 0, 1).toFixed(3);
     vIntro.style.transform = `scale(${(1 + clamp(iu - 0.6, 0, 1) * 0.4).toFixed(3)})`;
     let cur = -1;
-    BEAT.slice(0, 4).forEach((s, i) => { if (P >= s - 0.004 && P < BEAT[i + 1] - 0.004) cur = i; });
+    BEAT.slice(0, 4).forEach((s, i) => {
+      /* The LAST beat holds until the sequenced handover begins. Its
+         window used to end at BEAT[4]-0.004 = .421, so the beat's own
+         `.gone` class blanked it four thousandths before the layer fade
+         even started and the services->work handover was never actually
+         sequenced — the text just vanished early. */
+      const end = i === 3 ? SVC_OUT_FROM : BEAT[i + 1] - 0.004;
+      if (P >= s - 0.004 && P < end) cur = i;
+    });
     beats.forEach((el, i) => {
       el.classList.toggle("on", i === cur);
       el.classList.toggle("gone", (cur > i && cur !== -1) || (cur === -1 && P >= T.vE));
     });
     rail.forEach((r, i) => r.classList.toggle("on", i === cur));
     // work
-    layers.work.style.opacity = win(P, T.wS + 0.01, T.wE, 0.02).toFixed(3);
+    layers.work.style.opacity = Math.min(
+      fadeIn(P, SVC_OUT_TO, WORK_IN_TO),
+      fadeOut(P, WORK_OUT_FROM, WORK_OUT_TO),
+    ).toFixed(3);
     const wu = (P - T.wS) / (T.wE - T.wS);
     wTop.style.opacity = (1 - sm((wu - 0.07) / 0.06)).toFixed(3);
     const wi = wu < 0.48 ? 0 : wu < 0.79 ? 1 : 2;
@@ -626,9 +665,12 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
     credits.forEach((c) => { c.style.visibility = creditVisible ? "visible" : "hidden"; });
     counter.style.opacity = wu > 0.15 ? "1" : "0";
     // signature
-    layers.signature.style.opacity = win(P, T.sS, T.sE, 0.015).toFixed(3);
+    layers.signature.style.opacity = Math.min(
+      fadeIn(P, WORK_OUT_TO, SIG_IN_TO),
+      fadeOut(P, SIG_OUT_FROM, SIG_OUT_TO),
+    ).toFixed(3);
     // finale
-    const fo = clamp((P - T.fS) / CROSSFADE, 0, 1);
+    const fo = fadeIn(P, SIG_OUT_TO, FIN_IN_TO);
     layers.finale.style.opacity = fo.toFixed(3);
     layers.finale.style.pointerEvents = fo > 0.5 ? "auto" : "none";
     if (fo > 0.6 && !finaleOn) { finaleOn = true; placeOuts(); playFinale(); }
