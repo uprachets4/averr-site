@@ -232,11 +232,14 @@ export default function PlanetHero() {
           })}
         </nav>
 
+        {/* The takeover carries no text (spec 30, step 1). The circle
+            opens out of the planet's core into the film's own background
+            and the film's first act sits directly beneath it, so there is
+            no seam and nothing to read twice. `ph-take-in` stays as the
+            engine's opacity target — the loop writes to it every frame —
+            but it is empty and hidden from the accessibility tree. */}
         <div className="ph-take" ref={takeRef}>
-          <div className="ph-take-in" ref={takeInRef}>
-            <div className="ph-eyebrow">The work</div>
-            <h2>Here's what that looks like.</h2>
-          </div>
+          <div className="ph-take-in" ref={takeInRef} aria-hidden="true" />
         </div>
       </div>
     </div>

@@ -107,13 +107,18 @@
   opacity: 0.6;
 }
 
+/* Spec 30 step 1 — readability. The supporting lines were the muted 66%
+   the hero reference used; over a moving particle field that is not
+   enough, so they are full light with the big lines' own navy glow
+   behind them. Eyebrow labels stay muted: they are labels, not reading. */
 .ph-setup {
   margin: 16px 0 0;
-  font-size: clamp(19px, 1.9vw, 30px);
+  font-size: clamp(20px, 2vw, 32px);
   line-height: 1.25;
   letter-spacing: -0.02em;
   font-weight: 400;
-  color: rgba(245, 244, 249, 0.66);
+  color: #F5F4F9;
+  text-shadow: 0 0 24px rgba(18, 28, 39, 0.9);
   max-width: 34ch;
   text-wrap: balance;
 }
@@ -161,9 +166,10 @@
 
 .ph-sub {
   margin: 22px 0 0;
-  font-size: clamp(15px, 1.15vw, 18px);
+  font-size: clamp(16px, 1.25vw, 20px);
   line-height: 1.55;
-  color: rgba(245, 244, 249, 0.66);
+  color: #F5F4F9;
+  text-shadow: 0 0 24px rgba(18, 28, 39, 0.9);
   max-width: 56ch;
   text-wrap: balance;
 }
@@ -224,13 +230,17 @@
   outline-offset: 4px;
 }
 
-/* The takeover. Owner instruction: it opens into the navy, not the light,
-   so the page never flashes to a cream ground the site has retired. */
+/* The takeover. Spec 30 step 1: the circle still opens out of the
+   planet's core, but it opens into THE FILM'S OWN BACKGROUND and carries
+   no text, so the film's first act sits directly beneath with no seam.
+   The gradient is the film stage's, verbatim.
+   "Here's what that looks like." moved out of here — it belongs to the
+   film's Work act now. */
 .ph-take {
   position: absolute;
   inset: 0;
   z-index: 6;
-  background: #182633;
+  background: radial-gradient(120% 95% at 50% 46%, #182633 0%, #121C27 45%, #080A0A 100%);
   color: #F5F4F9;
   clip-path: circle(0px at 50% 46%);
   display: flex;
@@ -239,23 +249,6 @@
   text-align: center;
   pointer-events: none;
 }
-.ph-take-in {
-  opacity: 0;
-  padding: 0 16px;
-}
-.ph-take .ph-eyebrow {
-  color: rgba(245, 244, 249, 0.66);
-  justify-content: center;
-}
-.ph-take h2 {
-  font-size: clamp(44px, 7.4vw, 136px);
-  letter-spacing: -0.055em;
-  line-height: 0.92;
-  font-weight: 500;
-  margin: 18px 0 0;
-  color: #F5F4F9;
-}
-
 /* The accessible headline: one h1 carrying the whole sentence. */
 .ph-sr {
   position: absolute;
@@ -282,7 +275,8 @@
   .ph-sub { font-size: 15px; }
 }
 
-/* Owner instruction: below 380 the setup line must clear the top ring. */
+/* Owner instruction: below 380 the setup line must clear the top ring,
+   so it keeps 17px even though step 1 raised the clamp above it. */
 @media (max-width: 379px) {
   .ph-setup { font-size: 17px; }
 }
