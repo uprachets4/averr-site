@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 import PlanetHero from "../components/home/planet/PlanetHero";
+import HomeFilm from "../components/home/film/HomeFilm";
 
 import { useSetNavDarkOverride } from "../lib/navTone";
 
 /**
  * Home — Session 30, step 2.
  *
- * The restored September sections below the hero are gone. The page is
- * the Planet hero and nothing else until step 3 puts the film beneath
- * it: five acts on one pinned stage, which the hero's takeover now
- * opens straight into.
+ * The Planet hero, then the film: five acts on one pinned stage. The
+ * hero's takeover opens into the film's own background, so the two
+ * stages meet with no seam.
  *
  * What went with them, each verified to have no importer outside this
  * page before it was deleted: ThreeScenes, ServiceDoors, ProofLedger,
@@ -42,5 +42,10 @@ export default function Home() {
     [setNavDark]
   );
 
-  return <PlanetHero />;
+  return (
+    <>
+      <PlanetHero />
+      <HomeFilm />
+    </>
+  );
 }
