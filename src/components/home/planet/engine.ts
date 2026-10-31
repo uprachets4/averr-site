@@ -108,6 +108,23 @@ function idle(fn: () => void): () => void {
   return () => window.clearTimeout(h);
 }
 
+/**
+ * Does this browser actually give us a WebGL context?
+ *
+ * Checked BEFORE three.js is asked for a renderer: its constructor logs
+ * "THREE.WebGLRenderer: Error creating WebGL context." to the console
+ * before it throws, and the spec's no-WebGL path requires no errors at
+ * all. Probing on a throwaway canvas keeps the real one untouched.
+ */
+function hasWebGL(): boolean {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+
 export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   const { story, beats, rail, take, takeIn, sweep } = opts;
 
@@ -121,6 +138,7 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   const backCanvas = stage.querySelector<HTMLCanvasElement>("canvas[data-layer='back']");
   const frontCanvas = stage.querySelector<HTMLCanvasElement>("canvas[data-layer='front']");
   if (!backCanvas || !frontCanvas) throw new Error("planet: canvases missing");
+  if (!hasWebGL()) throw new Error("planet: no WebGL");
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
   camera.position.set(0, 0, 17);
