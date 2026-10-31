@@ -45,6 +45,8 @@ export function svcPlace(): [number, number, number, number] {
   return isSmall() ? [0.4, 0, 2.0, 0] : [0.62, 4.6, 0.1, 0];
 }
 
+type Place = [number, number, number, number];
+
 export type FilmFormations = {
   calm: Formation;
   web: Formation;
@@ -350,19 +352,28 @@ export function createFilmFormations(N: number) {
     return b;
   }
 
-  /** The five world formations, each already placed. */
-  function buildWorld(screenTints: number[]): FilmFormations {
+  /**
+   * The six world formations as SEPARATE steps, one per idle callback.
+   *
+   * The spec asks for one formation per callback; building all six in
+   * one task cost a measured 352ms, against a target of none over 100ms.
+   * `calm` is first because the loop can start on it alone.
+   */
+  type Step = [keyof FilmFormations, () => Formation];
+  function worldSteps(screenTints: number[]): Step[] {
     const pl = svcPlace();
-    const wide: [number, number, number, number] = isSmall() ? [0.27, 0.6, 2.0, 0] : pl;
-    return {
-      calm: fCalm(),
-      web: shift(fBrowser(), ...pl),
-      app: shift(fTiles(), ...(isSmall() ? pl : ([0.72, 4.6, 0.1, 0] as [number, number, number, number]))),
-      flow: shift(fLoop(), ...wide),
-      map: shift(fMegaphone(), ...(isSmall() ? ([0.3, 0.15, 2.0, 0] as [number, number, number, number]) : ([0.56, 3.7, 0.1, 0] as [number, number, number, number]))),
-      scr: fScreens(screenTints),
-    };
+    const wide: Place = isSmall() ? [0.27, 0.6, 2.0, 0] : pl;
+    const appPlace: Place = isSmall() ? pl : [0.72, 4.6, 0.1, 0];
+    const mapPlace: Place = isSmall() ? [0.3, 0.15, 2.0, 0] : [0.56, 3.7, 0.1, 0];
+    return [
+      ["calm", () => fCalm()],
+      ["web", () => shift(fBrowser(), ...pl)],
+      ["app", () => shift(fTiles(), ...appPlace)],
+      ["flow", () => shift(fLoop(), ...wide)],
+      ["map", () => shift(fMegaphone(), ...mapPlace)],
+      ["scr", () => fScreens(screenTints)],
+    ];
   }
 
-  return { DUST, buildWorld, fName, fCalm, fBrowser, fTiles, fLoop, fMegaphone, fScreens, textPts, rrect, shift };
+  return { DUST, worldSteps, fName, fCalm, fBrowser, fTiles, fLoop, fMegaphone, fScreens, textPts, rrect, shift };
 }

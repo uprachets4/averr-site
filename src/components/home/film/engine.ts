@@ -278,16 +278,46 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
 
   let disposed = false;
   let cancelIdle: (() => void) | null = null;
+
+  /**
+   * ONE FORMATION PER IDLE TASK, which is what the spec asks for.
+   * Building all six in one call measured 352ms against a target of no
+   * film task over 100ms. `calm` lands first and the loop starts on it
+   * alone — the opening act is the calm field — and each later formation
+   * resets `lastKey` so the pair it completes is picked up on the next
+   * frame. A pair whose halves have not both landed holds the previous
+   * one rather than morphing to nothing.
+   */
   function buildWorld() {
     if (disposed) return;
-    F = kit.buildWorld(screenTints);
-    NAME = kit.fName(nameStr());
-    NAME.id = ++nid;
-    NPREV = NAME;
-    lastKey = "";
-    start();
+    cancelIdle?.();
+    F = {} as FilmFormations;
+    const steps = kit.worldSteps(screenTints);
+    const queue: Array<() => void> = steps.map(([key, make]) => () => {
+      (F as unknown as Record<string, Formation>)[key] = make();
+      if (key === "calm") {
+        /* enough to render: the opening act is the calm field */
+        setPair(F!.calm, F!.calm);
+        start();
+      }
+      lastKey = "";
+    });
+    queue.push(() => {
+      NAME = kit.fName(nameStr());
+      NAME.id = ++nid;
+      NPREV = NAME;
+      lastKey = "";
+    });
+    const next = () => {
+      if (disposed) return;
+      const step = queue.shift();
+      if (!step) return;
+      step();
+      cancelIdle = idle(next);
+    };
+    cancelIdle = idle(next);
   }
-  cancelIdle = idle(buildWorld);
+  buildWorld();
 
   function nameStr() {
     const v = (opts.getName() || "").trim();
@@ -303,15 +333,20 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
   }
 
   function formations(P: number, t: number) {
-    if (!F || !NAME || !NPREV) return;
+    if (!F) return;
     let w = WIN[0];
     for (const x of WIN) if (P >= x[2]) w = x;
-    const pickF = (k: string) => (k === "NAME" ? NAME! : (F as unknown as Record<string, Formation>)[k]);
-    let A = pickF(w[0]);
-    let B = pickF(w[1]);
+    const pickF = (k: string) =>
+      k === "NAME" ? NAME : (F as unknown as Record<string, Formation>)[k];
+    const A0 = pickF(w[0]);
+    const B0 = pickF(w[1]);
+    /* a pair whose halves have not both been built yet holds the last one */
+    if (!A0 || !B0) return;
+    let A = A0;
+    let B = B0;
     let mix = clamp((P - w[2]) / (w[3] - w[2]), 0, 1);
     let key = w[0] + w[1];
-    if (w[1] === "NAME") {
+    if (w[1] === "NAME" && NAME && NPREV) {
       if (mix >= 1) {
         A = NPREV!;
         B = NAME!;
@@ -645,7 +680,7 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
 
   function frame(now: number) {
     raf = requestAnimationFrame(frame);
-    if (document.hidden || !onScreen || !F) return;
+    if (document.hidden || !onScreen || !F || !F.calm) return;
     const t = (now - t0) / 1000;
     uni.uTime.value = t;
     const P = progress();
