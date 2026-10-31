@@ -119,7 +119,13 @@ function idle(fn: () => void): () => void {
 function hasWebGL(): boolean {
   try {
     const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+    const gl = (c.getContext("webgl2") || c.getContext("webgl")) as WebGLRenderingContext | null;
+    if (!gl) return false;
+    /* Release it. A probe context is still a context: leaving two of
+       them around (one per engine) put the page at five live contexts
+       where it should hold three. */
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    return true;
   } catch {
     return false;
   }
