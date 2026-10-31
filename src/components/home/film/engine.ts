@@ -58,13 +58,30 @@ export type FilmHandle = {
 };
 
 /* ── the act timeline, verbatim ───────────────────────────────────── */
+/**
+ * The act timeline. Every value is the reference's except the Signature
+ * act's end, which the owner moved — see `CROSSFADE` below.
+ */
 export const T = {
   pS: 0, pE: 0.1,
   vS: 0.1, vI: 0.165, vE: 0.425,
   wS: 0.425, wE: 0.68,
-  sS: 0.68, sE: 0.82,
+  sS: 0.68, sE: 0.835,
   fS: 0.82,
 };
+
+/**
+ * Signature -> Finale, approved change to two timeline numbers.
+ *
+ * The reference faded Signature out by .82 and only began Finale at
+ * .855, so for ~0.06 of the film — about 90vh of scroll — no heading
+ * was near full opacity. The two now CROSSFADE across .82 to .835:
+ * Signature runs 1 -> 0 and Finale 0 -> 1 over the same 0.015.
+ *
+ * The particle morph windows are untouched: WIN still carries
+ * ['calm','NAME',.82,.865].
+ */
+const CROSSFADE = 0.015;
 const BEAT = [0.165, 0.23, 0.295, 0.36, 0.425];
 const WIN: Array<[string, string, number, number]> = [
   ["calm", "web", 0.152, 0.172],
@@ -611,7 +628,7 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
     // signature
     layers.signature.style.opacity = win(P, T.sS, T.sE, 0.015).toFixed(3);
     // finale
-    const fo = clamp((P - T.fS - 0.035) / 0.03, 0, 1);
+    const fo = clamp((P - T.fS) / CROSSFADE, 0, 1);
     layers.finale.style.opacity = fo.toFixed(3);
     layers.finale.style.pointerEvents = fo > 0.5 ? "auto" : "none";
     if (fo > 0.6 && !finaleOn) { finaleOn = true; placeOuts(); playFinale(); }

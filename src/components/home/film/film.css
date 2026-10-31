@@ -177,9 +177,13 @@
 .hf-cap { position: absolute; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 0 16px; }
 .hf-cap--t { top: clamp(80px, 13vh, 130px); }
 .hf-cap--b { bottom: calc(clamp(36px, 9vh, 90px) + env(safe-area-inset-bottom, 0px)); }
-/* The act's h2 is the eyebrow plus the line, laid out exactly as the
-   reference drew them as separate elements — owner ruling, spec 30. */
-.hf-cap h2 { margin: 0; display: contents; font-weight: inherit; }
+/* The act's h2 IS the cap — the eyebrow above the line, laid out exactly
+   as the reference drew them (owner ruling, spec 30).
+   It was an h2 with `display: contents` inside the cap, which looks the
+   same but generates NO BOX: getBoundingClientRect returns zeros, so the
+   heading is invisible to any on-screen check, including the spec's own
+   Step 4.3. The heading now carries the cap's own layout. */
+h2.hf-cap { margin: 0; font-weight: 400; }
 .hf-cap p, .hf-cap .hf-sigline { margin: 0; font-size: clamp(18px, 1.7vw, 28px); line-height: 1.35; letter-spacing: -0.015em; max-width: 40ch; text-wrap: balance; font-weight: 400; }
 .hf-hint { font: 500 11px/1 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgba(245, 244, 249, 0.66); }
 

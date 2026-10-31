@@ -267,12 +267,10 @@ export default function HomeFilm() {
             {/* Owner ruling: the act's h2 is the whole sentence, laid out
                 exactly as the reference drew it — the eyebrow above the
                 line — so nothing changes visually. */}
-            <div className="hf-cap hf-cap--t">
-              <h2>
-                <span className="hf-eyebrow">Every site we build</span>
-                <span className="hf-sigline">gets one thing nobody else has.</span>
-              </h2>
-            </div>
+            <h2 className="hf-cap hf-cap--t">
+              <span className="hf-eyebrow">Every site we build</span>
+              <span className="hf-sigline">gets one thing nobody else has.</span>
+            </h2>
             <div className="hf-cap hf-cap--b">
               <p>A signature moment, designed from your world.</p>
               <span className="hf-hint">Move your cursor through the letters</span>
