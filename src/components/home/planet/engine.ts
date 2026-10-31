@@ -24,7 +24,7 @@
  *     no colour-space chunks are added.
  */
 import * as THREE from "three";
-import { createToolkit, type Formation } from "./formations";
+import { createHeroFormations, type Formation } from "./formations";
 
 export type PlanetOpts = {
   story: HTMLElement;
@@ -125,7 +125,7 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
   camera.position.set(0, 0, 17);
 
-  const kit = createToolkit(N);
+  const kit = createHeroFormations(N);
 
   /* Shared attribute arrays — one morph write feeds both layers. */
   const fromA = new Float32Array(N * 3);
