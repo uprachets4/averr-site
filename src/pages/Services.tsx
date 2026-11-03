@@ -1,243 +1,123 @@
-import { Suspense, lazy, useCallback, useEffect } from "react";
-import { motion, useReducedMotion } from "motion/react";
-import { duration, ease } from "../lib/motion";
-import { CharReveal } from "../components/CharReveal";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Chapter from "../components/Chapter";
 import LazyBelowFold from "../components/LazyBelowFold";
 import NoList from "../components/services/NoList";
 import ServicesCloser from "../components/services/ServicesCloser";
-
-/**
- * The two heavy sections load off the critical path.
- *
- * The hero's subhead is this route's LCP element and cannot paint until
- * the route chunk has downloaded and run, so everything in that chunk
- * the hero does not need is delay. The build stage is ~4,800 lines of
- * screens and the start pass another ~1,000; neither is on screen when
- * the hero paints.
- */
-const ServicesBuild = lazy(() => import("../components/services/ServicesBuild"));
-const KickoffPass = lazy(() => import("../components/services/KickoffPass"));
+import Hero from "../components/services/v2/Hero";
+import Rail from "../components/services/v2/Rail";
+import BeatCards from "../components/services/v2/BeatCard";
+import BuildStage, { StageGlow } from "../components/services/v2/BuildStage";
+import { useBuildScroll } from "../components/services/v2/useBuildScroll";
+import { fieldsFor, type TradeId } from "../data/servicesBuild";
+import { useSetNavDarkOverride } from "../lib/navTone";
 import { useDeclarePageEndTone } from "../lib/pageTone";
-import { SERVICE_COUNT } from "../data/servicePillars";
+import "../components/services/v2/services.css";
+
+const KickoffPass = lazy(() => import("../components/services/KickoffPass"));
 
 /**
- * /services — "Watch us build your business".
+ * /services — "Built around your business" (spec 32).
  *
- * One continuous pinned scene: a generic GTA home-services business is
- * built as you scroll, and each of the sixteen services is the caption
- * of the step happening on screen. The story is the list — no service is
- * named twice on the page.
+ * The visitor names their business and picks a trade; one pinned stage
+ * then builds twelve real deliverables for it, three per service, and
+ * tiles four of them at the end.
  *
- * Built across 17c-1 … 17c-4 on a hidden /services/next route and
- * swapped in here in 17c-5, replacing the flat service index.
+ * The name and trade live here, in the page, because the hero, the
+ * twelve mocks and the start pass all read them. They never leave:
+ * no request, no storage, and the field is capped at 28 characters.
+ *
+ * Step 2 of the spec. The refusals, the start pass and the questions
+ * are still the old components below; they are replaced in step 3, and
+ * keeping them here means the page is never missing its call to action
+ * between two commits.
  */
-function BuildHero() {
-  const reduce = useReducedMotion();
-
-  return (
-    <section
-      style={{
-        position: "relative",
-        overflow: "hidden",
-        backgroundColor: "var(--color-bg)",
-        padding: "180px 40px 100px",
-        textAlign: "center",
-      }}
-    >
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(ellipse 1400px 900px at 30% 20%, rgba(232,225,208,0.55), transparent 60%), radial-gradient(ellipse 1000px 700px at 80% 80%, rgba(232,225,208,0.35), transparent 60%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div className="grain-light" aria-hidden="true" />
-
-      <div
-        style={{ position: "relative", zIndex: 2, maxWidth: 1000, margin: "0 auto" }}
-      >
-        <motion.div
-          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{
-            duration: reduce ? 0 : duration.base,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 0.2,
-          }}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 10,
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            color: "var(--color-muted)",
-            marginBottom: 40,
-          }}
-        >
-          <span
-            style={{ height: 1, width: 20, background: "currentColor", opacity: 0.6 }}
-          />
-          {`Services · ${SERVICE_COUNT} ways we help`}
-          <span
-            style={{ height: 1, width: 20, background: "currentColor", opacity: 0.6 }}
-          />
-        </motion.div>
-
-        <h1
-          className="type-display-l"
-          style={{
-            color: "var(--color-ink)",
-            maxWidth: 900,
-            margin: "0 auto 32px",
-          }}
-        >
-          <CharReveal
-            paint
-            delay={reduce ? 0 : 0.3}
-            segments={[
-              { text: "Watch us build " },
-              { text: "your", accent: true },
-              { text: " business." },
-            ]}
-          />
-        </h1>
-
-        {/* LCP element on mobile. Painted from the first frame. */}
-        <motion.p
-          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{
-            duration: reduce ? 0 : duration.base,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 1.1,
-          }}
-          className="type-body-lg"
-          style={{ color: "var(--color-muted)", maxWidth: 620, margin: "0 auto" }}
-        >
-          Websites, AI automation and growth marketing for small and mid-sized
-          businesses across the GTA.
-        </motion.p>
-      </div>
-
-      <BuildScrollCue reduce={reduce ?? false} />
-    </section>
-  );
-}
-
-/** The same cue the other page heroes use. */
-function BuildScrollCue({ reduce }: { reduce: boolean }) {
-  return (
-    <motion.div
-      aria-hidden
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: reduce ? 0 : duration.base, delay: reduce ? 0 : 1.6 }}
-      style={{
-        position: "absolute",
-        left: "var(--gutter)",
-        bottom: 28,
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        pointerEvents: "none",
-        zIndex: 2,
-      }}
-    >
-      <span className="type-eyebrow" style={{ color: "var(--color-muted)" }}>
-        SCROLL
-      </span>
-      <span
-        style={{
-          display: "block",
-          width: 1,
-          height: 40,
-          overflow: "hidden",
-          background: "rgba(20,20,18,0.12)",
-        }}
-      >
-        <motion.span
-          style={{
-            display: "block",
-            width: 1,
-            height: "100%",
-            background: "var(--color-ink)",
-            transformOrigin: "top",
-          }}
-          initial={{ scaleY: 0 }}
-          animate={reduce ? { scaleY: 1 } : { scaleY: [0, 1, 1, 0] }}
-          transition={
-            reduce
-              ? { duration: 0 }
-              : {
-                  duration: 2.4,
-                  times: [0, 0.4, 0.75, 1],
-                  repeat: Infinity,
-                  ease: ease.inOut,
-                  delay: 1.6,
-                }
-          }
-        />
-      </span>
-    </motion.div>
-  );
-}
-
 export default function Services() {
+  const [typed, setTyped] = useState("");
+  const [trade, setTrade] = useState<TradeId>("reno");
+
+  const buildRef = useRef<HTMLElement | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const railRef = useRef<HTMLDivElement | null>(null);
+
+  const { beat, step, jump } = useBuildScroll(buildRef, stageRef, railRef);
+  const f = useMemo(() => fieldsFor(typed, trade), [typed, trade]);
+
+  /* Dark from the first pixel, as on home and /work. */
+  const setNavDark = useSetNavDarkOverride();
+  useEffect(
+    function navAlwaysDark() {
+      setNavDark(true);
+      const root = document.documentElement;
+      const body = document.body;
+      const prevBg = body.style.backgroundColor;
+      root.style.setProperty("--nav-dark-bar", "#13161E");
+      body.style.backgroundColor = "#121C27";
+      return function reset() {
+        setNavDark(false);
+        root.style.removeProperty("--nav-dark-bar");
+        body.style.backgroundColor = prevBg;
+      };
+    },
+    [setNavDark]
+  );
+
+  useDeclarePageEndTone("dark");
+
   useEffect(function title() {
     const prev = document.title;
     document.title = "Services — Averr Studios";
-    const desc = document.querySelector('meta[name="description"]');
-    const prevDesc = desc ? desc.getAttribute("content") : null;
-    if (desc) {
-      desc.setAttribute(
-        "content",
-        "Websites, AI automation and growth marketing for small and mid-sized businesses across the GTA — sixteen services, shown as one build."
-      );
-    }
     return function restore() {
       document.title = prev;
-      if (desc && prevDesc) desc.setAttribute("content", prevDesc);
     };
   }, []);
 
-  useEffect(function scrollTopOnMount() {
-    // a chapter anchor is handled inside ServicesBuild
-    if (window.location.hash) return;
-    window.scrollTo(0, 0);
-  }, []);
-
-  // The closer is dark, so the footer reveals over dark.
-  useDeclarePageEndTone("dark");
-
-  // stable identities, so LazyBelowFold's effect does not re-run
-  const loadBuild = useCallback(() => import("../components/services/ServicesBuild"), []);
   const loadPass = useCallback(() => import("../components/services/KickoffPass"), []);
 
   return (
     <>
-      <BuildHero />
+      <div className="sv">
+        <div className="grain" aria-hidden="true" />
 
-      {/* 1300vh is the stage's real wrapper height (§5.4), so the
-          reserve is exactly what it will occupy. */}
-      <LazyBelowFold load={loadBuild} minHeight="1300vh" background="var(--color-bg)">
-        <Suspense fallback={<div aria-hidden style={{ minHeight: "1300vh", background: "var(--color-bg)" }} />}>
-          <ServicesBuild />
-        </Suspense>
-      </LazyBelowFold>
+        <Hero
+          typed={typed}
+          onTyped={setTyped}
+          trade={trade}
+          onTrade={setTrade}
+          onJump={jump}
+        />
 
-      {/* The pin releases straight into these — no dead space. */}
-      <Chapter tone="dark" from="cream">
+        <section
+          className="build"
+          id="build"
+          ref={buildRef}
+          aria-label="Twelve pieces, built for your business"
+        >
+          <div className="bstick gut">
+            <div className="floor" aria-hidden="true" />
+            <StageGlow beat={beat} />
+            <Rail beat={beat} onJump={jump} railRef={railRef} />
+            <div className="wrap bgrid">
+              <BeatCards beat={beat} />
+              <BuildStage f={f} beat={beat} step={step} stageRef={stageRef} />
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* Replaced in step 3. */}
+      <Chapter tone="dark" from="dark">
         <NoList />
       </Chapter>
       <Chapter tone="cream-warm" from="dark">
         <LazyBelowFold load={loadPass} minHeight="1120px" background="var(--color-bg-warm)">
-          <Suspense fallback={<div aria-hidden style={{ minHeight: "1120px", background: "var(--color-bg-warm)" }} />}>
+          <Suspense
+            fallback={
+              <div
+                aria-hidden
+                style={{ minHeight: "1120px", background: "var(--color-bg-warm)" }}
+              />
+            }
+          >
             <KickoffPass />
           </Suspense>
         </LazyBelowFold>

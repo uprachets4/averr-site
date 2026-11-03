@@ -554,3 +554,42 @@ export function shortName(name: string): string {
 export function initialOf(name: string): string {
   return name.trim()[0] || "N";
 }
+
+/**
+ * Everything the twelve mocks read, in one object.
+ *
+ * The reference computes this in `apply()` and writes it into the DOM
+ * through `[data-f]` attributes. Here the mocks take it as a prop and
+ * interpolate it, which is the same values by a shorter route.
+ */
+export type Fields = {
+  trade: Trade;
+  name: string;
+  domain: string;
+  short: string;
+  initial: string;
+  /** The project name, lowercased, as it reads mid-sentence. */
+  projl: string;
+  /** The portal's latest-update line. */
+  pupd: string;
+  /** The portal's next-visit line. */
+  pnext: string;
+  /** The hero headline's name, which falls back differently. */
+  hero: string;
+};
+
+export function fieldsFor(typed: string, tradeId: TradeId): Fields {
+  const trade = TRADES[tradeId];
+  const name = mockName(typed, tradeId);
+  return {
+    trade,
+    name,
+    domain: domainFor(name),
+    short: shortName(name),
+    initial: initialOf(name),
+    projl: trade.proj.toLowerCase(),
+    pupd: `${trade.pst[2]} started today. Photos are below.`,
+    pnext: trade.cal,
+    hero: heroName(typed),
+  };
+}
