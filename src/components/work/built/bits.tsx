@@ -54,14 +54,28 @@ export function Chips({ svc }: { svc: ServiceId[] }) {
   );
 }
 
-/** Splits `text` once on `phrase` and wraps the middle. */
+/**
+ * Splits `text` once on `phrase` and wraps the middle.
+ *
+ * Exact first, then case-insensitively. Two of CadenceStack's approach
+ * phrases are written with a lower-case "a" where the sentence they
+ * belong to opens with a capital, so an exact match misses and the
+ * reference silently drops the highlight. Matching loosely renders
+ * them; trying exact first means every phrase that already matched
+ * still matches in the same place.
+ *
+ * The slice comes from `text`, never from `phrase`, so the highlighted
+ * run keeps the sentence's own casing rather than the phrase's.
+ */
 function split(text: string, phrase: string, wrap: (s: string) => ReactNode) {
-  const at = phrase ? text.indexOf(phrase) : -1;
+  if (!phrase) return text;
+  let at = text.indexOf(phrase);
+  if (at < 0) at = text.toLowerCase().indexOf(phrase.toLowerCase());
   if (at < 0) return text;
   return (
     <>
       {text.slice(0, at)}
-      {wrap(phrase)}
+      {wrap(text.slice(at, at + phrase.length))}
       {text.slice(at + phrase.length)}
     </>
   );
