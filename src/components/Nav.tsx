@@ -13,7 +13,7 @@ import { duration, ease } from "../lib/motion";
 import Icon from "./icons/Icon";
 import MagneticCTA from "./MagneticCTA";
 import AverrMark from "./AverrMark";
-import { caseStudies } from "../data/caseStudies";
+import { BUILT } from "../data/builtByAverr";
 import { useNavDarkOverride } from "../lib/navTone";
 
 const LINKS = [
@@ -24,12 +24,8 @@ const LINKS = [
 
 const EMAIL = "prachets@averrstudios.com";
 
-/** Live case studies, counted from the data rather than hardcoded. */
-const WORK_COUNT = Object.values(caseStudies).filter(
-  function isLive(study) {
-    return study.status === "live";
-  }
-).length;
+/** The projects /work actually shows, counted from the same data. */
+const WORK_COUNT = BUILT.length;
 const MENU_ID = "mobile-nav";
 const MOBILE_QUERY = "(max-width: 767px)";
 

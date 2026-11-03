@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
 import { ease } from "../lib/motion";
 import { prefetchRoute } from "../lib/prefetchRoute";
-import { vault } from "../data/workIndex";
+import { BUILT_BY_SLUG } from "../data/builtByAverr";
 
 /**
  * The site's page transition: an ink panel sweeps up, says where you
@@ -46,7 +46,7 @@ function labelFor(path: string): string {
   if (NAMES[path]) return NAMES[path];
   const m = path.match(/^\/work\/(.+)$/);
   if (m) {
-    const entry = vault.find((v) => v.slug === m[1]);
+    const entry = BUILT_BY_SLUG[m[1]];
     if (entry) return entry.name;
   }
   return "Averr";
