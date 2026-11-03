@@ -1,142 +1,94 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigationType } from "react-router-dom";
-import { motion, useReducedMotion } from "motion/react";
-import { ease } from "../lib/motion";
-import Chapter from "../components/Chapter";
-import MagneticCTA from "../components/MagneticCTA";
-import { CharRevealInView } from "../components/CharReveal";
-import SectionBoundary from "../components/case-study/SectionBoundary";
-import VaultDoors from "../components/work/VaultDoors";
-import ProjectFilm from "../components/work/ProjectFilm";
-import WorkMobile from "../components/work/WorkMobile";
-import { useOpenTransition } from "../components/work/OpenTransition";
-
-const MOBILE_QUERY = "(max-width: 767px)";
-const SCROLL_KEY = "averr:work-scroll";
-/** Screens of scroll the doors occupy before project one begins. */
-const DOORS_LEAD = 1.5;
+import ScreenWall from "../components/work/built/ScreenWall";
+import ProofStrip from "../components/work/built/ProofStrip";
+import ProjectRows from "../components/work/built/ProjectRows";
+import { useSetNavDarkOverride } from "../lib/navTone";
+import { useDeclarePageEndTone } from "../lib/pageTone";
+import "../components/work/built/built.css";
 
 /**
- * Read on the FIRST render, not in an effect.
+ * Built by Averr — the index, spec 31.
  *
- * Starting at `false` meant every phone visit to /work mounted the whole
- * desktop film before the effect flipped it — four eager preview images,
- * 431 kB, requested on the critical path and then thrown away. That was
- * /work's LCP: its own mobile preview finished behind three images no one
- * would ever see. Nav.tsx already reads it this way.
+ * A title in front of a drifting wall of real product screens, the
+ * three measured figures, then one full-width row per project that
+ * opens into a live preview.
+ *
+ * No WebGL on this route. Everything that moves is a transform, an
+ * opacity or a clip-path, and the only images above the fold are the
+ * wall's middle columns.
+ *
+ * What it replaced, each checked for importers outside /work first:
+ * VaultDoors, ProjectFilm, WorkMobile, OpenTransition and the
+ * workIndex data. `Chapter`, `MagneticCTA` and `CharReveal` are no
+ * longer used here but stay — four other routes render them.
  */
-function useMedia(query: string) {
-  const [matches, setMatches] = useState(function initial() {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia(query).matches;
-  });
-  useEffect(
-    function watch() {
-      const mq = window.matchMedia(query);
-      setMatches(mq.matches);
-      function onChange(e: MediaQueryListEvent) {
-        setMatches(e.matches);
-      }
-      mq.addEventListener("change", onChange);
-      return function cleanup() {
-        mq.removeEventListener("change", onChange);
-      };
-    },
-    [query]
-  );
-  return matches;
-}
 
-function VaultCloser() {
-  const reduce = useReducedMotion();
-  return (
-    <section
-      style={{
-        backgroundColor: "var(--color-bg)",
-        padding: "128px 0 144px",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <div className="grain-light" aria-hidden="true" style={{ opacity: 0.05 }} />
-      <div
-        style={{
-          maxWidth: "var(--container-wide)",
-          margin: "0 auto",
-          position: "relative",
-          zIndex: 2,
-        }}
-      >
-        <h2 className="type-h2 measure-wide" style={{ color: "var(--color-ink)" }}>
-          <CharRevealInView
-            segments={[
-              { text: "Your project could be" },
-              { text: "the next row.", accent: true },
-            ]}
-            style={{ color: "var(--color-ink)" }}
-          />
-        </h2>
-
-        <motion.p
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: reduce ? 0 : 0.6, ease: ease.outQuart, delay: 0.2 }}
-          className="type-body-lg measure-body"
-          style={{ color: "var(--color-muted)", margin: "28px 0 40px" }}
-        >
-          A boutique design studio in Toronto. Building the websites, AI systems,
-          and marketing engines for businesses that expect craft.
-        </motion.p>
-
-        <div style={{ display: "inline-flex", flexWrap: "wrap", gap: 12 }}>
-          <MagneticCTA to="/contact" variant="primary">
-            Book a discovery call
-          </MagneticCTA>
-          <MagneticCTA to="/services" variant="ghost">
-            See services
-          </MagneticCTA>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── page ──────────────────────────────────────────────────────────── */
+const SCROLL_KEY = "averr:work-scroll";
 
 export default function Work() {
-  const mobile = useMedia(MOBILE_QUERY);
   const navType = useNavigationType();
-  const { open, overlay } = useOpenTransition();
+  const introRef = useRef<HTMLElement | null>(null);
+  const glowRef = useRef<HTMLDivElement | null>(null);
   const restored = useRef(false);
+
+  /* The dark glass bar belongs on this page the way it belongs on
+     home: the ground is navy from the first pixel to the footer.
+     The body ground goes with it — it is cream site-wide, and at
+     narrow widths a band of it showed above the wall before the nav
+     bar had anything to sit on. */
+  const setNavDark = useSetNavDarkOverride();
+  useEffect(
+    function navAlwaysDark() {
+      setNavDark(true);
+      const root = document.documentElement;
+      const body = document.body;
+      const prevBg = body.style.backgroundColor;
+      root.style.setProperty("--nav-dark-bar", "#13161E");
+      body.style.backgroundColor = "#121C27";
+      return function reset() {
+        setNavDark(false);
+        root.style.removeProperty("--nav-dark-bar");
+        body.style.backgroundColor = prevBg;
+      };
+    },
+    [setNavDark]
+  );
+
+  /* The last row sits on navy, so the footer reveals over dark. */
+  useDeclarePageEndTone("dark");
 
   useEffect(function title() {
     const prev = document.title;
-    document.title = "The vault — Averr Studios";
+    document.title = "Built by Averr — Averr Studios";
+    const meta = document.querySelector('meta[name="description"]');
+    const prevDesc = meta?.getAttribute("content") ?? null;
+    meta?.setAttribute(
+      "content",
+      "Every screen is a real product we built: websites, web apps, AI automation and marketing for businesses across the GTA."
+    );
     return function restore() {
       document.title = prev;
+      if (prevDesc !== null) meta?.setAttribute("content", prevDesc);
     };
   }, []);
 
-  /* Back from a case study should land on the project you opened, so the
-     scroll position is remembered on the way out and restored on POP. */
-  useEffect(
-    function rememberScroll() {
-      function store() {
-        try {
-          sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
-        } catch {
-          /* private mode: the restore simply won't happen */
-        }
+  /* Closing a case file should land you on the row you opened, so the
+     position is kept on the way out and put back on a POP. */
+  useEffect(function rememberScroll() {
+    function store() {
+      try {
+        sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+      } catch {
+        /* private mode: the restore simply will not happen */
       }
-      window.addEventListener("scroll", store, { passive: true });
-      return function cleanup() {
-        store();
-        window.removeEventListener("scroll", store);
-      };
-    },
-    []
-  );
+    }
+    window.addEventListener("scroll", store, { passive: true });
+    return function cleanup() {
+      store();
+      window.removeEventListener("scroll", store);
+    };
+  }, []);
 
   useEffect(
     function restoreScroll() {
@@ -152,7 +104,6 @@ export default function Work() {
       } catch {
         y = 0;
       }
-      // after layout, so the tall film wrapper exists to scroll into
       requestAnimationFrame(function apply() {
         window.scrollTo(0, y);
       });
@@ -161,29 +112,28 @@ export default function Work() {
   );
 
   return (
-    <>
-      {mobile ? (
-        <SectionBoundary name="work-mobile">
-          <WorkMobile />
-        </SectionBoundary>
-      ) : (
-        <div style={{ position: "relative" }}>
-          <SectionBoundary name="project-film">
-            <ProjectFilm lead={DOORS_LEAD} onOpen={open} />
-          </SectionBoundary>
-          {/* the doors sit over the film's first screens, so project one is
-              already behind them as they part */}
-          <SectionBoundary name="vault-doors">
-            <VaultDoors lead={DOORS_LEAD} />
-          </SectionBoundary>
+    <div className="bb-page">
+      <div className="bb-glow" ref={glowRef} aria-hidden="true" />
+      <div className="bb-grain" aria-hidden="true" />
+
+      <section className="bb-intro bb-gut" ref={introRef}>
+        <ScreenWall introRef={introRef} />
+        <div className="bb-wrap">
+          <span className="bb-eyebrow">The work</span>
+          <h1>Built by Averr.</h1>
+          <p className="bb-sub">
+            Every screen behind this title is a real product we built. Open any one to see
+            how.
+          </p>
+          <div className="bb-cue" aria-hidden="true">
+            <i />
+            Scroll to the work
+          </div>
         </div>
-      )}
+      </section>
 
-      <Chapter tone="cream" from="dark">
-        <VaultCloser />
-      </Chapter>
-
-      {overlay}
-    </>
+      <ProofStrip />
+      <ProjectRows glowRef={glowRef} />
+    </div>
   );
 }

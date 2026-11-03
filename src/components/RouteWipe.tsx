@@ -15,7 +15,7 @@ import { BUILT_BY_SLUG } from "../data/builtByAverr";
  * call site has to know the transition exists.
  *
  * It deliberately does NOT run for:
- *   · the /work → case-study clone-expand, which has its own transition
+ *   · /work → a case file, which has its own clip-path reveal
  *     (opted out with data-no-wipe)
  *   · back/forward, because browser history never fires a click
  *   · hash links, external links, downloads, new tabs, modified clicks
@@ -88,10 +88,9 @@ export default function RouteWipe() {
         }
         if (url.origin !== window.location.origin) return;
 
-        // /work → a case study keeps its own clone-expand transition
-        // (components/work/OpenTransition.tsx). That one is triggered
-        // from the link's own onClick, and a capture-phase listener
-        // here would preempt it.
+        // /work → a case file keeps its own clip-path reveal
+        // (pages/CaseStudy.tsx). Case file → case file is NOT caught by
+        // this check, which is why those links carry data-no-wipe.
         if (window.location.pathname === "/work" && /^\/work\/.+/.test(url.pathname)) return;
         // a hash on the page we are already on is not a navigation
         if (url.pathname === window.location.pathname && url.hash) return;
