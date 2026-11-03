@@ -48,7 +48,16 @@ export default function BeatCards({ beat }: { beat: number }) {
               {b.proof.map(function chip(key) {
                 const p = PROOF[key];
                 return (
-                  <Link className="pill" to={`/work/${p.slug}`} key={key} data-no-wipe>
+                  <Link
+                    className="pill"
+                    to={`/work/${p.slug}`}
+                    key={key}
+                    data-no-wipe
+                    /* a hidden card is aria-hidden, so its links must
+                       leave the tab order with it — axe, serious:
+                       aria-hidden-focus across eleven of them */
+                    tabIndex={on ? undefined : -1}
+                  >
                     <b>See it in</b>
                     {p.name} →
                   </Link>
@@ -70,7 +79,11 @@ export default function BeatCards({ beat }: { beat: number }) {
         </span>
         <h2>{ALL_FOUR.title}</h2>
         <p>{ALL_FOUR.line}</p>
-        <a className="book" href="#start">
+        <a
+          className="book"
+          href="#start"
+          tabIndex={beat === ALL_FOUR_BEAT ? undefined : -1}
+        >
           {ALL_FOUR.cta}
         </a>
       </article>

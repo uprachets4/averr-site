@@ -587,3 +587,39 @@
   .sv *::after {transition:none!important;animation:none!important}
   .sv .reveal {opacity:1;transform:none}
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   Hand-added after the generated port. Everything above is the
+   reference's; everything here is a fix the reference needs, each
+   with the measurement that found it.
+   ───────────────────────────────────────────────────────────────── */
+
+/* 320px: the pass column resolved to 330.39px on a 288px grid, because
+   a `1fr` column's automatic minimum is min-content and the calendar
+   will not go below 330. 26px of horizontal overflow, measured on the
+   reference too — it is its bug, ported, and the spec asks for zero. */
+@media (max-width: 900px) {
+  .sv .pass {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sv .steps,
+  .sv .stepq {
+    min-width: 0;
+  }
+  .sv .calg {
+    /* the grid itself may now be narrower than seven comfortable
+       columns; let the day buttons shrink rather than the page scroll */
+    min-width: 0;
+  }
+  .sv .calg button {
+    min-width: 0;
+  }
+}
+
+/* axe, serious: the email link sat at 2.1:1 against the sentence around
+   it, where a link distinguished by colour alone needs 3:1. Underlining
+   it is the fix that does not touch the palette. */
+.sv .faqfoot a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
