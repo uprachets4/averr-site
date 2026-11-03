@@ -813,8 +813,14 @@
   max-width: 20ch;
   margin: 0;
 }
+/* MEASURED, NOT ASSUMED: the reference dims unread words to .16, which
+   is #F5F4F9 at 1.60:1 on the navy ground — axe calls it 12 serious
+   contrast failures, and the spec asks for AA and a clean axe run. The
+   line is large text at every width (its clamp floors at 30px), so the
+   threshold is 3:1, and .3458 is the least that clears it. .35 is
+   3.04:1. It is the smallest change that keeps the effect and passes. */
 .bb-prob .bb-w {
-  opacity: 0.16;
+  opacity: 0.35;
   transition: opacity 0.35s var(--bb-ease);
 }
 .bb-prob .bb-w.bb-on {
@@ -856,13 +862,19 @@
   display: flex;
   flex-direction: column;
 }
+/* MEASURED, NOT ASSUMED: the reference dims the inactive steps to .26,
+   which is 2.25:1 on the navy ground — axe measures 2.24 on the
+   blended pixel and calls it serious. The binding element is the 12px
+   .bb-k label, normal text, so the threshold is 4.5:1 and .4759 is the
+   least that clears it. .48 is 4.56:1. The step still reads as dim
+   against the active one; it is simply legible while it does. */
 .bb-step {
   min-height: 60vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 16px;
-  opacity: 0.26;
+  opacity: 0.48;
   transition: opacity 0.5s var(--bb-ease);
 }
 .bb-step.bb-on {
