@@ -60,6 +60,16 @@
   font-weight: 500;
 }
 
+/* Section titles are h2s carrying .bb-eyebrow, and the heading reset
+   below is a class-plus-element selector, so it out-specifies the
+   eyebrow's own font shorthand. Put the eyebrow's metrics back. */
+.bb-page h2.bb-eyebrow {
+  letter-spacing: 0.16em;
+  line-height: 1;
+  font-weight: 500;
+  text-wrap: initial;
+}
+
 .bb-page h1,
 .bb-page h2,
 .bb-page h3 {

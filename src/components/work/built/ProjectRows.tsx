@@ -122,7 +122,7 @@ export default function ProjectRows({
                   type="button"
                   aria-expanded={isOpen}
                   onClick={function openOrGo() {
-                    if (isOpen) navigate(`/work/${p.slug}`);
+                    if (isOpen) navigate(`/work/${p.slug}`, { state: { from: "work" } });
                     else setOpen(p.slug);
                   }}
                 >
@@ -154,7 +154,12 @@ export default function ProjectRows({
                             <span>{p.figure.caption}</span>
                           </div>
                         ) : null}
-                        <Link className="bb-open-cta" to={`/work/${p.slug}`} data-no-wipe>
+                        <Link
+                          className="bb-open-cta"
+                          to={`/work/${p.slug}`}
+                          state={{ from: "work" }}
+                          data-no-wipe
+                        >
                           Open the case file →
                         </Link>
                       </div>

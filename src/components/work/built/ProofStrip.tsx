@@ -21,7 +21,13 @@ export default function ProofStrip() {
         <div className="bb-figs">
           {FIGURES.map(function figure(p) {
             return (
-              <Link className="bb-fig" to={`/work/${p.slug}`} key={p.slug} data-no-wipe>
+              <Link
+                className="bb-fig"
+                to={`/work/${p.slug}`}
+                key={p.slug}
+                state={{ from: "work" }}
+                data-no-wipe
+              >
                 <span className="bb-v bb-gt">{p.figure!.value}</span>
                 <span className="bb-cap">{p.figure!.caption}</span>
                 <span className="bb-who">
