@@ -1,9 +1,8 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Chapter from "../components/Chapter";
-import LazyBelowFold from "../components/LazyBelowFold";
-import NoList from "../components/services/NoList";
-import ServicesCloser from "../components/services/ServicesCloser";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Hero from "../components/services/v2/Hero";
+import Refusals from "../components/services/v2/Refusals";
+import StartPass from "../components/services/v2/StartPass";
+import Questions from "../components/services/v2/Questions";
 import Rail from "../components/services/v2/Rail";
 import BeatCards from "../components/services/v2/BeatCard";
 import BuildStage, { StageGlow } from "../components/services/v2/BuildStage";
@@ -12,8 +11,6 @@ import { fieldsFor, type TradeId } from "../data/servicesBuild";
 import { useSetNavDarkOverride } from "../lib/navTone";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import "../components/services/v2/services.css";
-
-const KickoffPass = lazy(() => import("../components/services/KickoffPass"));
 
 /**
  * /services — "Built around your business" (spec 32).
@@ -26,10 +23,14 @@ const KickoffPass = lazy(() => import("../components/services/KickoffPass"));
  * twelve mocks and the start pass all read them. They never leave:
  * no request, no storage, and the field is capped at 28 characters.
  *
- * Step 2 of the spec. The refusals, the start pass and the questions
- * are still the old components below; they are replaced in step 3, and
- * keeping them here means the page is never missing its call to action
- * between two commits.
+ * Then the three refusals, the start pass — where the same name picks
+ * a day and the ticket writes its own timeline — and the questions.
+ *
+ * What it replaced, each confirmed to have no importer outside this
+ * route first: ServicesBuild and its seven `build/*` screens, NoList,
+ * ServicesCloser, KickoffPass, DateToken and data/servicesProcess.
+ * `passBooking` stays and the new pass books through it; `servicePillars`
+ * stays because /contact reads it.
  */
 export default function Services() {
   const [typed, setTyped] = useState("");
@@ -71,11 +72,8 @@ export default function Services() {
     };
   }, []);
 
-  const loadPass = useCallback(() => import("../components/services/KickoffPass"), []);
-
   return (
-    <>
-      <div className="sv">
+    <div className="sv">
         <div className="grain" aria-hidden="true" />
 
         <Hero
@@ -102,29 +100,10 @@ export default function Services() {
             </div>
           </div>
         </section>
-      </div>
 
-      {/* Replaced in step 3. */}
-      <Chapter tone="dark" from="dark">
-        <NoList />
-      </Chapter>
-      <Chapter tone="cream-warm" from="dark">
-        <LazyBelowFold load={loadPass} minHeight="1120px" background="var(--color-bg-warm)">
-          <Suspense
-            fallback={
-              <div
-                aria-hidden
-                style={{ minHeight: "1120px", background: "var(--color-bg-warm)" }}
-              />
-            }
-          >
-            <KickoffPass />
-          </Suspense>
-        </LazyBelowFold>
-      </Chapter>
-      <Chapter tone="dark" from="cream-warm">
-        <ServicesCloser />
-      </Chapter>
-    </>
+        <Refusals />
+        <StartPass typed={typed} onTyped={setTyped} />
+        <Questions />
+      </div>
   );
 }

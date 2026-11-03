@@ -19,8 +19,8 @@ import { SERVICE_COLOR, SERVICE_NAMES, type ServiceId } from "./serviceColors";
  *   - Proof chips carry a real case-file slug, so a chip cannot point
  *     at a project that no longer exists.
  *
- * The refusals moved here from `servicesProcess.ts` with their verbatim
- * check intact; that module goes when `NoList` does.
+ * The refusals came here from `servicesProcess.ts` with their verbatim
+ * check intact; that module went with `NoList` in step 3.
  */
 
 /* ── the four services ─────────────────────────────────────────────── */
@@ -452,7 +452,7 @@ export const NOT_DOING: Refusal[] = [
 
 /**
  * The verbatim rule, enforced rather than trusted. Moved here from
- * `servicesProcess.ts` unchanged when `NoList` was replaced.
+ * `servicesProcess.ts` unchanged when `NoList` was replaced in step 3.
  *
  * A struck phrase that is not an exact substring of its own sentence is a
  * bug we would otherwise only catch by eye, so it throws in development and

@@ -25,7 +25,9 @@ export function warmEmbed(): Promise<CalApi> {
   apiPromise = import("@calcom/embed-react")
     .then((m) => m.getCalApi({}))
     .then((cal) => {
-      (cal as unknown as CalApi)("ui", { hideEventTypeDetails: false, theme: "light" });
+      /* dark since spec 32: /services is a dark page end to end, and a
+         white modal over it read as a different site opening. */
+      (cal as unknown as CalApi)("ui", { hideEventTypeDetails: false, theme: "dark" });
       return cal as unknown as CalApi;
     });
   return apiPromise;
