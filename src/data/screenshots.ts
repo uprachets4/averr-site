@@ -214,6 +214,146 @@ export const SCREENSHOTS: Record<string, ScreenshotMeta> = {
       1400
     ]
   },
+  "/work/express/01-home.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/02-hero-install.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/03-service-detail.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/04-kitchen.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/05-water-heater.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/06-recent-work.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/07-google-reviews.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/08-coverage-intro.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/09-coverage-map.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/10-about.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/11-booking.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/12-services.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/13-gas-cooktop.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
+  "/work/express/14-rating.jpg": {
+    "w": 1680,
+    "h": 926,
+    "widths": [
+      640,
+      960,
+      1280,
+      1680
+    ]
+  },
   "/work/sift/01-command-overview.jpg": {
     "w": 1680,
     "h": 926,
