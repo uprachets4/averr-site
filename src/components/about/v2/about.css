@@ -1,0 +1,35 @@
+/**
+ * /about — the page's own stylesheet, ported from
+ * docs/reference/about/index.html.
+ *
+ * The four trend faces live here rather than in the global sheet so
+ * they are fetched only by this route. They exist for one thing: the
+ * TIMELESS word cycling through this year's lettering before settling
+ * on clean type, and the trend card beside it. Nothing else may use
+ * them.
+ *
+ * Geist and Geist Mono are NOT declared here. The repo already
+ * self-hosts both as variable faces in src/index.css, and the
+ * reference's static per-weight copies are deliberately not ported.
+ */
+
+@font-face {
+  font-family: "T Chrome";
+  src: url("/fonts/bungee-latin-400-normal.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "T Neon";
+  src: url("/fonts/monoton-latin-400-normal.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "T Glitch";
+  src: url("/fonts/rubik-glitch-latin-400-normal.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "T Bubble";
+  src: url("/fonts/rubik-bubbles-latin-400-normal.woff2") format("woff2");
+  font-display: swap;
+}
