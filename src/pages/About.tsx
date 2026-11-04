@@ -1,576 +1,41 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { duration, ease } from "../lib/motion";
+import { ease } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
-import MonogramMark from "../components/MonogramMark";
-import ProcessScene from "../components/about/process/ProcessScene";
-import { CharReveal, CharRevealInView } from "../components/CharReveal";
+import { CharRevealInView } from "../components/CharReveal";
 import Chapter from "../components/Chapter";
-import PrincipleDesk from "../components/about/desk/PrincipleDesk";
-import FounderCredits from "../components/about/FounderCredits";
-import SignatureMark from "../components/about/SignatureMark";
 import { useDeclarePageEndTone } from "../lib/pageTone";
+import { useSetNavDarkOverride } from "../lib/navTone";
+import SignatureHero from "../components/about/v2/SignatureHero";
+import { useSectionProgress } from "../components/about/v2/useSectionProgress";
+import "../components/about/v2/about.css";
 
 /* ═══════════════════════════════════════════════════════════════
-   Band 1 — The Monogram Moment
-   ═══════════════════════════════════════════════════════════════ */
+   /about, spec 33.
 
-function MonogramHero() {
-  const reduce = useReducedMotion();
+   Step 2 ships the signature hero. Steps 3 to 5 add "How we think",
+   "How we work" and the close, in that order, between the hero and
+   the closing CTA below.
 
-  return (
-    <section
-      style={{
-        position: "relative",
-        overflow: "hidden",
-        backgroundColor: "var(--color-bg)",
-        minHeight: "100vh",
-        padding: "clamp(88px, 11vh, 120px) 40px clamp(64px, 8vh, 80px)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-      className="about-hero"
-      data-tone="dark"
-    >
+   The old page's four sections — SignatureMark, FounderCredits,
+   PrincipleDesk and ProcessScene — were removed here rather than in
+   step 5, because each one injects GLOBAL rules from a component
+   <style> block and three of those blocks reach the new hero:
 
-      <div
-        className="grain-light"
-        aria-hidden="true"
-        style={{ opacity: 0.05 }}
-      />
+     - SignatureMark declares `.sig { display: grid; place-items:
+       center }`, and `.sig` is the new hero section's own class. The
+       `display` was overridden; `place-items` never was, and an
+       `align-items`/`justify-items` centre stops the sticky stage
+       from stretching, which leaves a zero-width box that
+       `overflow: hidden` then clips the whole hero away.
 
-      {/* Ambient brand fragments — 5 total, varied primitives */}
-      {/* 1. Circle outline, top-left */}
-      <motion.div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: "12%",
-          left: "8%",
-          width: 32,
-          height: 32,
-          borderRadius: "50%",
-          border: "1px solid var(--color-ink)",
-          opacity: 0.25,
-          pointerEvents: "none",
-        }}
-        animate={
-          reduce
-            ? undefined
-            : { x: [0, 20, 0, -18, 0], y: [0, -14, 12, 0, 0] }
-        }
-        transition={{ duration: 40, repeat: Infinity, ease: ease.inOut }}
-      />
-      {/* 2. Square outline, bottom-right */}
-      <motion.div
-        aria-hidden
-        style={{
-          position: "absolute",
-          bottom: "10%",
-          right: "8%",
-          width: 24,
-          height: 24,
-          border: "1px solid var(--color-ink)",
-          opacity: 0.4,
-          pointerEvents: "none",
-        }}
-        animate={
-          reduce
-            ? undefined
-            : { x: [0, -22, 0, 18, 0], y: [0, 16, -12, 0, 0] }
-        }
-        transition={{ duration: 55, repeat: Infinity, ease: ease.inOut }}
-      />
-      {/* 3. Plus sign, top-right */}
-      <motion.div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: "14%",
-          right: "10%",
-          width: 20,
-          height: 20,
-          opacity: 0.2,
-          pointerEvents: "none",
-          color: "var(--color-ink)",
-        }}
-        animate={
-          reduce
-            ? undefined
-            : { x: [0, 14, 0, -14, 0], y: [0, 10, -10, 0, 0] }
-        }
-        transition={{ duration: 50, repeat: Infinity, ease: ease.inOut }}
-      >
-        <svg viewBox="0 0 20 20" fill="none" style={{ display: "block", width: "100%", height: "100%" }}>
-          <line x1="10" y1="2" x2="10" y2="18" stroke="currentColor" strokeWidth="1.5" />
-          <line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" strokeWidth="1.5" />
-        </svg>
-      </motion.div>
-      {/* 4. Small horizontal line, middle-left */}
-      <motion.div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "6%",
-          width: 40,
-          height: 2,
-          background: "var(--color-ink)",
-          opacity: 0.5,
-          pointerEvents: "none",
-        }}
-        animate={
-          reduce
-            ? undefined
-            : { x: [0, 18, 0, -12, 0], y: [0, -8, 8, 0, 0] }
-        }
-        transition={{ duration: 65, repeat: Infinity, ease: ease.inOut }}
-      />
-      {/* 5. Small filled dot, middle-right */}
-      <motion.div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: "48%",
-          right: "6%",
-          width: 8,
-          height: 8,
-          borderRadius: "50%",
-          background: "var(--color-ink)",
-          opacity: 0.3,
-          pointerEvents: "none",
-        }}
-        animate={
-          reduce
-            ? undefined
-            : { x: [0, -12, 0, 12, 0], y: [0, 10, -10, 0, 0] }
-        }
-        transition={{ duration: 45, repeat: Infinity, ease: ease.inOut }}
-      />
-
-      {/* The original composition, which the owner liked: one centred
-          column, the mark leading it. */}
-      <div
-        className="about-hero__copy"
-        style={{
-          position: "relative",
-          zIndex: 2,
-          maxWidth: 1000,
-          margin: "0 auto",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-          gap: "clamp(14px, 2.4vh, 30px)",
-        }}
-      >
-        <motion.div
-          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{
-            duration: reduce ? 0 : duration.base,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 0.15,
-          }}
-          className="type-eyebrow"
-          style={{ color: "var(--color-muted)" }}
-        >
-          The Studio · Founder-led
-        </motion.div>
-
-        {/* No founder photograph exists in the repo (public/about/ does
-            not exist), so the mark holds the hero and no placeholder is
-            used. It draws itself, then tilts toward the cursor. */}
-        <MonogramMark variant="hero" />
-
-
-        <motion.div
-          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{
-            duration: reduce ? 0 : duration.base,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 2.05,
-          }}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          <div
-            className="type-h3"
-            style={{
-              color: "var(--color-ink)",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-            }}
-          >
-            Prachets Upadhyay
-          </div>
-          <div
-            className="type-eyebrow"
-            style={{ color: "var(--color-muted)" }}
-          >
-            Founder, Averr Studios · Envisioning Future
-          </div>
-        </motion.div>
-
-        {/* The headline. Painted from the first frame per the hero LCP
-            rule; its place in the ladder is kept because the monogram
-            drawing above it is the non-text entrance these were always
-            waiting on. type-accent nests INSIDE the size class (§5.33). */}
-        <h1
-          /* display-l, not 2xl: 2xl was sized for a three-word line and
-             this sentence is nine words, which ran 900px tall. */
-          className="type-display-l"
-          style={{ color: "var(--color-ink)", margin: 0 }}
-        >
-          <CharReveal
-            paint
-            delay={reduce ? 0 : 2.2}
-            segments={[
-              { text: "You work directly with " },
-              { text: "the person who builds it.", accent: true },
-            ]}
-          />
-        </h1>
-
-        {/* Kept verbatim. LCP element on mobile. */}
-        <motion.p
-          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{
-            duration: reduce ? 0 : duration.base,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 2.7,
-          }}
-          className="type-body-lg"
-          style={{ color: "var(--color-muted)", maxWidth: "34ch", margin: 0 }}
-        >
-          The studio for founders who care how they show up.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 1, y: reduce ? 0 : 12 }}
-          animate={{ y: 0 }}
-          transition={{
-            duration: reduce ? 0 : duration.base,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 3.4,
-          }}
-          style={{
-            display: "flex",
-            gap: 16,
-            flexWrap: "wrap",
-            justifyContent: "center",
-            marginTop: 16,
-          }}
-        >
-          <MagneticCTA to="/work" variant="primary">
-            See the work
-          </MagneticCTA>
-          <MagneticCTA to="/contact" variant="ghost">
-            Book a call
-          </MagneticCTA>
-        </motion.div>
-      </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .about-hero { min-height: 90vh; }
-        }
-      `}</style>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Band 2 — Four principles
-
-   The four stacked full-height bands became the principles
-   playground in Session 18: one pinned stage, four panels on a
-   horizontal track, each carrying a live demo of the principle it
-   states. It lives in its own module because of the weight of those
-   demos — components/about/PrinciplesTrack.tsx. The copy moved to
-   data/principles.ts unchanged, grounds and all.
+   Scoping a sheet under `.ab` protects it from CONFLICTING
+   declarations, not from EXTRA ones. The files stay on disk; step 5
+   deletes them, along with ReadFill, which only these two import.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════════════
-   Band 3 — How we work
-   ═══════════════════════════════════════════════════════════════ */
-
-function HowWeWorkBand() {
-  const reduce = useReducedMotion();
-  return (
-    <section
-      id="process"
-      style={{
-        position: "relative",
-        backgroundColor: "var(--color-bg-alt)",
-        /* the scene is a pinned stage, so the band pads only above it */
-        padding: "160px 0 0",
-        scrollMarginTop: 96,
-      }}
-    >
-      <div className="grain-light" aria-hidden="true" />
-      <div style={{ maxWidth: "var(--container-wide)", margin: "0 auto", position: "relative", zIndex: 2 }}>
-        <div style={{ textAlign: "center", marginBottom: 72 }}>
-          <motion.div
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-20% 0px" }}
-            transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
-            className="type-eyebrow"
-            style={{
-              color: "var(--color-muted)",
-              marginBottom: 24,
-            }}
-          >
-            How we work
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-15% 0px" }}
-            transition={{
-              duration: reduce ? 0 : 0.7,
-              ease: ease.outQuart,
-              delay: reduce ? 0 : 0.1,
-            }}
-            className="type-display-l"
-            style={{
-              color: "var(--color-ink)",
-              margin: 0,
-              maxWidth: 900,
-              marginInline: "auto",
-            }}
-          >
-            Direction. Design. Build. Refine. Ship.
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-15% 0px" }}
-            transition={{
-              duration: reduce ? 0 : 0.6,
-              ease: ease.outQuart,
-              delay: reduce ? 0 : 0.25,
-            }}
-            className="type-body"
-            style={{
-              color: "var(--color-muted)",
-              marginTop: 24,
-              maxWidth: 640,
-              marginInline: "auto",
-            }}
-          >
-            Every project runs through the same five stages. No surprises.
-          </motion.p>
-        </div>
-
-        <ProcessScene />
-      </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Band 4 — The founder card
-   ═══════════════════════════════════════════════════════════════ */
-
-type Chip = { label: string; tooltip: string };
-
-const FOUNDER_CHIPS: Chip[] = [
-  {
-    label: "Design",
-    tooltip: "Marketing sites, SaaS product design, dashboards",
-  },
-  {
-    label: "Automate",
-    tooltip: "AI agents, workflow automation, CRM integration",
-  },
-  {
-    label: "Grow",
-    tooltip: "Social + organic content, paid ads, attribution",
-  },
-];
-
-function FounderBand() {
-  const reduce = useReducedMotion();
-
-  return (
-    <section
-      style={{
-        position: "relative",
-        backgroundColor: "var(--color-bg)",
-        padding: "200px 0 140px",
-      }}
-    >
-      <div className="grain-light" aria-hidden="true" />
-
-      <div
-        className="founder-band"
-        style={{ position: "relative", zIndex: 2, maxWidth: "var(--container-wide)", margin: "0 auto" }}
-      >
-        <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-20% 0px" }}
-          transition={{ duration: reduce ? 0 : duration.slow, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{ color: "var(--color-muted)", marginBottom: 56 }}
-        >
-          Who{String.fromCharCode(39)}s behind this
-        </motion.div>
-
-        <FounderCredits>
-          <div style={{ display: "flex", flexDirection: "column", gap: 18, marginTop: 30 }}>
-            <FounderChips reduce={!!reduce} />
-            <FounderLinks />
-          </div>
-        </FounderCredits>
-      </div>
-
-    </section>
-  );
-}
-
-function FounderChips({ reduce }: { reduce: boolean }) {
-  const [hasFinePointer, setHasFinePointer] = useState(false);
-  useEffect(function detect() {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    setHasFinePointer(mq.matches);
-    function onChange(e: MediaQueryListEvent) {
-      setHasFinePointer(e.matches);
-    }
-    mq.addEventListener("change", onChange);
-    return function cleanup() {
-      mq.removeEventListener("change", onChange);
-    };
-  }, []);
-
-  return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-      {FOUNDER_CHIPS.map(function drawChip(c, i) {
-        return (
-          <FounderChip
-            key={c.label}
-            chip={c}
-            index={i}
-            reduce={reduce}
-            enableTooltip={hasFinePointer}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
-function FounderChip({
-  chip,
-  index,
-  reduce,
-  enableTooltip,
-}: {
-  chip: Chip;
-  index: number;
-  reduce: boolean;
-  enableTooltip: boolean;
-}) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <motion.div
-      initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-30% 0px" }}
-      transition={{
-        duration: reduce ? 0.001 : 0.4,
-        ease: ease.outQuart,
-        delay: reduce ? 0 : 0.6 + index * 0.08,
-      }}
-      onHoverStart={function h() {
-        setHovered(true);
-      }}
-      onHoverEnd={function h() {
-        setHovered(false);
-      }}
-      className="type-eyebrow"
-      style={{
-        position: "relative",
-        padding: "8px 14px",
-        borderRadius: 100,
-        border: hovered
-          ? "1px solid var(--color-ink)"
-          : "1px solid var(--color-muted)",
-        background: hovered ? "var(--color-ink)" : "transparent",
-        color: hovered ? "var(--color-bg)" : "var(--color-ink)",
-        cursor: enableTooltip ? "help" : "default",
-        transform: hovered && !reduce ? "translateY(-2px)" : "translateY(0)",
-        transitionProperty: "background-color, border-color, color, transform",
-        transitionDuration: `${duration.fast * 1000}ms`,
-        transitionTimingFunction: `cubic-bezier(${ease.outQuart.join(",")})`,
-      }}
-    >
-      {chip.label}
-      {enableTooltip && hovered ? (
-        <motion.div
-          role="tooltip"
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: duration.fast, ease: ease.outQuart }}
-          className="type-small"
-          style={{
-            position: "absolute",
-            top: "calc(100% + 8px)",
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "var(--color-bg)",
-            color: "var(--color-ink)",
-            border: "1px solid rgba(20,20,18,0.18)",
-            borderRadius: 6,
-            padding: "8px 12px",
-            whiteSpace: "nowrap",
-            boxShadow: "0 8px 24px rgba(20,20,18,0.10)",
-            pointerEvents: "none",
-            zIndex: 10,
-          }}
-        >
-          {chip.tooltip}
-        </motion.div>
-      ) : null}
-    </motion.div>
-  );
-}
-
-function FounderLinks() {
-  return (
-    <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 6, marginLeft: -12 }}>
-      <MagneticCTA
-        variant="text"
-        size="sm"
-        to="https://www.linkedin.com/in/prachetsupadhyay"
-        ariaLabel="LinkedIn profile, opens in a new tab"
-      >
-        LinkedIn
-      </MagneticCTA>
-      <MagneticCTA
-        variant="text"
-        size="sm"
-        to="https://prachetsupadhyay.com"
-        ariaLabel="Portfolio, opens in a new tab"
-      >
-        Portfolio
-      </MagneticCTA>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Band 5 — Closing CTA
+   Closing CTA — replaced in step 5
    ═══════════════════════════════════════════════════════════════ */
 
 function ClosingCTA() {
@@ -630,9 +95,6 @@ function ClosingCTA() {
           textAlign: "center",
         }}
       >
-        {/* the page opened on the mark drawing; it closes on it too */}
-        <SignatureMark />
-
         <motion.div
           initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -704,17 +166,73 @@ export default function About() {
     };
   }, []);
 
+  /* Dark from the first pixel, as on home, /work and /services. */
+  const setNavDark = useSetNavDarkOverride();
+  useEffect(
+    function navAlwaysDark() {
+      setNavDark(true);
+      const root = document.documentElement;
+      const body = document.body;
+      const prevBg = body.style.backgroundColor;
+      root.style.setProperty("--nav-dark-bar", "#13161E");
+      body.style.backgroundColor = "#121C27";
+      return function reset() {
+        setNavDark(false);
+        root.style.removeProperty("--nav-dark-bar");
+        body.style.backgroundColor = prevBg;
+      };
+    },
+    [setNavDark]
+  );
+
+  /* The page's one rAF. `heroRef` is handed over as the ref OBJECT, not
+     as `.current`: the element does not exist during the render that
+     registers the section, so passing the current value would register
+     a permanent null and the hero would never receive a frame. */
+  const heroRef = useRef<HTMLElement | null>(null);
+  const heroProgress = useRef<(p: number) => void>(function noop() {});
+  useSectionProgress([
+    {
+      ref: heroRef,
+      onProgress: function toHero(p) {
+        heroProgress.current(p);
+      },
+    },
+  ]);
+
   return (
     <>
-      <MonogramHero />
-      <Chapter tone="dark" from="cream">
-        <PrincipleDesk />
-      </Chapter>
-      <Chapter tone="cream-alt" from="dark">
-        <HowWeWorkBand />
-      </Chapter>
-      <FounderBand />
-      <Chapter tone="dark" from="cream">
+      <div className="ab">
+        {/* The gradients the mark, its fill and its sheen paint with.
+            Hidden, shared, and referenced by id from the hero's SVG. */}
+        <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+          <defs>
+            <linearGradient id="mgrad" x1="60" y1="60" x2="240" y2="394" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stopColor="#F9AF97" />
+              <stop offset=".3" stopColor="#D5818C" />
+              <stop offset=".6" stopColor="#9874E8" />
+              <stop offset="1" stopColor="#569AFA" />
+            </linearGradient>
+            <linearGradient id="mfillg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#FFFFFF" />
+              <stop offset="1" stopColor="#E4E1F0" />
+            </linearGradient>
+            <linearGradient id="sheeng" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor="#fff" stopOpacity="0" />
+              <stop offset=".5" stopColor="#9874E8" stopOpacity=".55" />
+              <stop offset="1" stopColor="#fff" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div className="grain" aria-hidden="true" />
+
+        <SignatureHero sectionRef={heroRef} progressRef={heroProgress} />
+      </div>
+
+      {/* Steps 3 and 4 land between the hero and this. The hero is dark,
+          so the close now reveals over dark rather than over the cream
+          founder band that used to sit above it. */}
+      <Chapter tone="dark" from="dark">
         <ClosingCTA />
       </Chapter>
     </>

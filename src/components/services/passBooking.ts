@@ -13,7 +13,10 @@
  * identity at all. Nothing is stored, logged or sent anywhere.
  */
 
-export const CAL_LINK = "prachets/discoverycall";
+/* One declaration, in contact/calConfig.ts, imported here. It used to
+   be written out in both files. */
+export { CAL_LINK } from "../contact/calConfig";
+import { CAL_LINK } from "../contact/calConfig";
 
 type CalApi = (action: string, arg?: unknown) => void;
 
@@ -38,7 +41,10 @@ export function embedRequested() {
   return apiPromise !== null;
 }
 
-export type BookingConfig = { date: string; month: string; notes?: string };
+/** `date` and `month` are optional: /services always knows the day the
+ *  visitor picked, /about's CTA does not and opens Cal on its own next
+ *  available slot. */
+export type BookingConfig = { date?: string; month?: string; notes?: string };
 
 export async function openModal(config: BookingConfig) {
   const cal = await warmEmbed();
