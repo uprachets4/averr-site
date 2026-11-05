@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test:dates": "node --test tools/business-days.test.ts"
+    "test:dates": "node --test tools/business-days.test.ts",
+    "test:tokens": "node --test tools/about-tokens.test.ts"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",

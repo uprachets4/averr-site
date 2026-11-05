@@ -165,8 +165,14 @@
 .ab .pill:hover {border-color:var(--light)}
 
 /* ================= HOW WE THINK: four words that do what they say ================= */
-.ab .kw {position:relative;height:calc(4*90vh + 100vh)}
-.ab .kwstage {position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+/* `width` and `min-width` are declared for the same reason `.sigstage`
+   declares them: every child of a pinned stage is absolutely
+   positioned, so the stage has no intrinsic width of its own, and an
+   ancestor that centres rather than stretches its items would collapse
+   it to 0 — which `overflow:hidden` then turns into a blank section.
+   Step 2 lost a session to exactly that. Don't remove these. */
+.ab .kw {position:relative;width:100%;min-width:0;height:calc(4*90vh + 100vh)}
+.ab .kwstage {position:sticky;top:0;width:100%;min-width:0;height:100vh;height:100svh;overflow:hidden}
 .ab .kwbg {position:absolute;inset:0;background:radial-gradient(55% 45% at 50% 50%,color-mix(in srgb,var(--kc,#F9AF97) 16%,transparent),transparent 72%);transition:background .8s var(--ease)}
 .ab .kwtop {position:absolute;left:0;right:0;top:clamp(84px,12vh,120px);display:flex;justify-content:space-between;align-items:center}
 .ab .kwcount {color:var(--mute);font-variant-numeric:tabular-nums}
@@ -174,15 +180,15 @@
 .ab .word {position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);opacity:0;transition:opacity .25s linear;display:flex;flex-direction:column;align-items:center;gap:clamp(10px,2vh,20px)}
 .ab .word.on {opacity:1;transition:opacity .45s var(--ease)}
 .ab .wd {position:relative;display:flex;white-space:nowrap;font-weight:600;letter-spacing:-.04em;line-height:.8;font-size:var(--fs,160px);padding:.12em 0}
-.ab .l {display:inline-block;will-change:transform;transform-origin:50% 60%}
+.ab .kwl {display:inline-block;will-change:transform;transform-origin:50% 60%}
 .ab .wtag {font:500 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);display:inline-flex;gap:9px;align-items:center;transition:color .3s}
 .ab .wtag::before {content:"";width:7px;height:7px;border-radius:50%;background:var(--tc,rgba(245,244,249,.35));transition:background .3s}
 .ab .word.done .wtag {color:var(--light)}
 .ab .word.done .wtag::before {--tc:#8FD1A9}
 
 /* CRAFT */
-.ab .craft .l {color:rgba(245,244,249,.9)}
-.ab .craft.done .l {background:var(--grad);background-size:calc(var(--n)*100%) 100%;background-position:calc(var(--i)*100%/(var(--n) - 1)) 0;-webkit-background-clip:text;background-clip:text;color:transparent}
+.ab .craft .kwl {color:rgba(245,244,249,.9)}
+.ab .craft.done .kwl {background:var(--grad);background-size:calc(var(--n)*100%) 100%;background-position:calc(var(--i)*100%/(var(--n) - 1)) 0;-webkit-background-clip:text;background-clip:text;color:transparent}
 .ab .guide {position:absolute;left:-4%;right:-4%;height:1px;background:rgba(249,175,151,.55);transform:scaleX(0);transition:transform .7s var(--out)}
 .ab .guide.cap {top:calc(.12em + .085em)}
 .ab .guide.base {bottom:calc(.12em + .085em)}
@@ -191,30 +197,30 @@
 .ab .craft.done .tick {opacity:1}
 
 /* DIRECTION */
-.ab .dir .l {color:rgba(245,244,249,.55);transition:color .3s}
-.ab .dir .l.lk {color:var(--light)}
-.ab .dir.done .l {color:transparent;background:var(--grad);background-size:calc(var(--n)*100%) 100%;background-position:calc(var(--i)*100%/(var(--n) - 1)) 0;-webkit-background-clip:text;background-clip:text}
+.ab .dir .kwl {color:rgba(245,244,249,.55);transition:color .3s}
+.ab .dir .kwl.lk {color:var(--light)}
+.ab .dir.done .kwl {color:transparent;background:var(--grad);background-size:calc(var(--n)*100%) 100%;background-position:calc(var(--i)*100%/(var(--n) - 1)) 0;-webkit-background-clip:text;background-clip:text}
 
 /* MOTION */
-.ab .mot .l {color:var(--light)}
-.ab .mot.chaos .l {animation:boing var(--bd,.9s) cubic-bezier(.3,1.9,.5,1) infinite alternate;animation-delay:var(--dl,0s)}
+.ab .mot .kwl {color:var(--light)}
+.ab .mot.chaos .kwl {animation:ab-boing var(--bd,.9s) cubic-bezier(.3,1.9,.5,1) infinite alternate;animation-delay:var(--dl,0s)}
 @keyframes ab-boing {0%{transform:translate(var(--bx,0),var(--by,-30%)) rotate(var(--br,-12deg)) scale(var(--bs,1.15))}100%{transform:translate(calc(var(--bx,0)*-.6),calc(var(--by,-30%)*-.5)) rotate(calc(var(--br,-12deg)*-1)) scale(.86)}}
-.ab .mot.calm .l {animation:land .8s var(--out) both;animation-delay:calc(var(--i)*70ms);background:var(--grad);background-size:calc(var(--n)*100%) 100%;background-position:calc(var(--i)*100%/(var(--n) - 1)) 0;-webkit-background-clip:text;background-clip:text;color:transparent}
+.ab .mot.calm .kwl {animation:ab-land .8s var(--out) both;animation-delay:calc(var(--i)*70ms);background:var(--grad);background-size:calc(var(--n)*100%) 100%;background-position:calc(var(--i)*100%/(var(--n) - 1)) 0;-webkit-background-clip:text;background-clip:text;color:transparent}
 @keyframes ab-land {from{opacity:.3;transform:translateY(22%)}to{opacity:1;transform:translateY(var(--lift,0))}}
-.ab .mot.calm.settled .l {animation:none;transform:translateY(var(--lift,0));transition:transform .45s var(--out)}
+.ab .mot.calm.settled .kwl {animation:none;transform:translateY(var(--lift,0));transition:transform .45s var(--out)}
 
 /* TIMELESS */
 .ab .tim .wd {transition:filter .2s}
 .ab .tim[data-style="chrome"] .wd {font-family:"T Chrome",var(--display);font-weight:400;letter-spacing:.01em;filter:drop-shadow(0 3px 0 #3a3d4a) drop-shadow(0 10px 18px rgba(0,0,0,.6))}
-.ab .tim[data-style="chrome"] .l {background:linear-gradient(180deg,#fdfdff 0%,#c9cbd6 38%,#5d6070 50%,#e7e8ef 62%,#9a9caa 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ab .tim[data-style="chrome"] .kwl {background:linear-gradient(180deg,#fdfdff 0%,#c9cbd6 38%,#5d6070 50%,#e7e8ef 62%,#9a9caa 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .ab .tim[data-style="neon"] .wd {font-family:"T Neon",var(--display);font-weight:400;letter-spacing:0;color:#ffd6f6;text-shadow:0 0 6px #ff4fd8,0 0 18px #ff4fd8,0 0 42px #b23cff}
 .ab .tim[data-style="glitch"] .wd {font-family:"T Glitch",var(--display);font-weight:400;letter-spacing:0;color:#e9fff8;text-shadow:-.04em 0 #ff2d6f,.04em 0 #2dfcff}
-.ab .tim[data-style="glitch"] .l {animation:jit .18s steps(2) infinite}
+.ab .tim[data-style="glitch"] .kwl {animation:ab-jit .18s steps(2) infinite}
 @keyframes ab-jit {0%{transform:translate(0)}50%{transform:translate(.02em,-.015em)}}
 .ab .tim[data-style="bubble"] .wd {font-family:"T Bubble",var(--display);font-weight:400;letter-spacing:0;filter:drop-shadow(0 4px 0 #3b1a7a)}
-.ab .tim[data-style="bubble"] .l {background:linear-gradient(180deg,#c6ff3d,#2EC5FF 60%,#7B3CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ab .tim[data-style="bubble"] .kwl {background:linear-gradient(180deg,#c6ff3d,#2EC5FF 60%,#7B3CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
 .ab .tim[data-style="clean"] .wd {font-family:var(--display);font-weight:600;letter-spacing:-.04em}
-.ab .tim[data-style="clean"] .l {background:var(--grad);background-size:calc(var(--n)*100%) 100%;background-position:calc(var(--i)*100%/(var(--n) - 1)) 0;-webkit-background-clip:text;background-clip:text;color:transparent}
+.ab .tim[data-style="clean"] .kwl {background:var(--grad);background-size:calc(var(--n)*100%) 100%;background-position:calc(var(--i)*100%/(var(--n) - 1)) 0;-webkit-background-clip:text;background-clip:text;color:transparent}
 .ab .tim.flick .wd {animation:ab-flick .32s steps(1)}
 @keyframes ab-flick {0%{opacity:.15}35%{opacity:1}55%{opacity:.4}75%{opacity:1}}
 .ab .trends {display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
@@ -376,17 +382,22 @@
 .ab .demo button:focus-visible {outline:2px solid var(--light);outline-offset:3px}
 .ab .dstage {position:relative;flex:1;min-height:104px;display:flex;flex-direction:column;justify-content:center;gap:7px}
 .ab .dstage i {display:block;border-radius:4px}
-.ab .dstage .de {width:22%;height:6px;background:#F9AF97}
-.ab .dstage .dh {width:82%;height:14px;background:rgba(245,244,249,.92)}
-.ab .dstage .dh2 {width:58%;height:14px;background:rgba(245,244,249,.92)}
-.ab .dstage .db {width:90%;height:6px;background:rgba(245,244,249,.35)}
-.ab .dstage .db2 {width:70%;height:6px;background:rgba(245,244,249,.35)}
-.ab .dstage .dc {width:28%;height:20px;border-radius:999px;background:#9874E8;margin-top:4px}
-.ab .demo.play .dstage i {animation:dIn .6s cubic-bezier(.25,1,.5,1) both;animation-delay:calc(var(--o)*100ms + 150ms)}
+.ab .dstage .dsb-e {width:22%;height:6px;background:#F9AF97}
+.ab .dstage .dsb-h {width:82%;height:14px;background:rgba(245,244,249,.92)}
+.ab .dstage .dsb-h2 {width:58%;height:14px;background:rgba(245,244,249,.92)}
+.ab .dstage .dsb-b {width:90%;height:6px;background:rgba(245,244,249,.35)}
+.ab .dstage .dsb-b2 {width:70%;height:6px;background:rgba(245,244,249,.35)}
+.ab .dstage .dsb-c {width:28%;height:20px;border-radius:999px;background:#9874E8;margin-top:4px}
+/* The demo claims to play by the studio's real rules, so it is driven
+   by them: ProofMotion sets --demo-dur, --demo-ease and --demo-stag
+   from `--duration-slow`, `--ease-out-quart` and the 100ms stagger in
+   aboutTokens, which the token test keeps matching index.css. The
+   fallbacks are only for a demo rendered without them. */
+.ab .demo.play .dstage i {animation:ab-dIn var(--demo-dur,.6s) var(--demo-ease,cubic-bezier(.25,1,.5,1)) both;animation-delay:calc(var(--o)*var(--demo-stag,100ms) + 150ms)}
 @keyframes ab-dIn {from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .ab .dtl {display:flex;justify-content:space-between;border-top:1px solid var(--faint);padding-top:8px}
 .ab .dtl span {font:500 9px/1 var(--mono);letter-spacing:.08em;color:rgba(245,244,249,.4)}
-.ab .demo.play .dtl span {animation:tlOn .6s both;animation-delay:calc(var(--o)*100ms + 150ms)}
+.ab .demo.play .dtl span {animation:ab-tlOn var(--demo-dur,.6s) both;animation-delay:calc(var(--o)*var(--demo-stag,100ms) + 150ms)}
 @keyframes ab-tlOn {from{color:rgba(245,244,249,.4)}to{color:#D9CCF8}}
 .ab .pf-tim {display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .ab .pf-tim .trends {grid-column:1/-1}
@@ -419,7 +430,7 @@
 .ab #ticks line {stroke:rgba(249,175,151,.55);stroke-width:2}
 .ab .cl {font:500 22px var(--mono);fill:rgba(249,175,151,.75);text-anchor:middle}
 .ab .needle {transform-box:view-box;transform-origin:500px 300px;opacity:.95}
-.ab .d0.on .needle {animation:swing 2.2s cubic-bezier(.25,1,.5,1) both}
+.ab .d0.on .needle {animation:ab-swing 2.2s cubic-bezier(.25,1,.5,1) both}
 @keyframes ab-swing {0%{transform:rotate(-70deg)}35%{transform:rotate(28deg)}60%{transform:rotate(-12deg)}80%{transform:rotate(5deg)}100%{transform:rotate(0)}}
 .ab .cols {stroke:rgba(213,129,140,.3);stroke-width:1.2;stroke-dasharray:4 6;fill:none}
 .ab .blk {fill:rgba(213,129,140,.0);transition:fill .6s}
@@ -444,7 +455,7 @@
 .ab .d3.on .ck:nth-child(4) {opacity:1;transition-delay:1.5s}
 .ab .speed {stroke:rgba(86,154,250,.5);stroke-width:3;stroke-linecap:round;fill:none}
 .ab .stars circle {fill:#B6D2FF}
-.ab .d4.on .stars circle {animation:tw 1.8s ease-in-out infinite alternate}
+.ab .d4.on .stars circle {animation:ab-tw 1.8s ease-in-out infinite alternate}
 .ab .d4.on .stars circle:nth-child(2) {animation-delay:.5s}
 .ab .d4.on .stars circle:nth-child(3) {animation-delay:.9s}
 @keyframes ab-tw {from{opacity:.2}to{opacity:1}}

@@ -7,6 +7,7 @@ import Chapter from "../components/Chapter";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useSetNavDarkOverride } from "../lib/navTone";
 import SignatureHero from "../components/about/v2/SignatureHero";
+import Principles from "../components/about/v2/Principles";
 import { useSectionProgress } from "../components/about/v2/useSectionProgress";
 import "../components/about/v2/about.css";
 
@@ -191,11 +192,19 @@ export default function About() {
      a permanent null and the hero would never receive a frame. */
   const heroRef = useRef<HTMLElement | null>(null);
   const heroProgress = useRef<(p: number) => void>(function noop() {});
+  const wordsRef = useRef<HTMLElement | null>(null);
+  const wordsProgress = useRef<(p: number) => void>(function noop() {});
   useSectionProgress([
     {
       ref: heroRef,
       onProgress: function toHero(p) {
         heroProgress.current(p);
+      },
+    },
+    {
+      ref: wordsRef,
+      onProgress: function toWords(p) {
+        wordsProgress.current(p);
       },
     },
   ]);
@@ -227,11 +236,12 @@ export default function About() {
         <div className="grain" aria-hidden="true" />
 
         <SignatureHero sectionRef={heroRef} progressRef={heroProgress} />
+        <Principles sectionRef={wordsRef} progressRef={wordsProgress} />
       </div>
 
-      {/* Steps 3 and 4 land between the hero and this. The hero is dark,
-          so the close now reveals over dark rather than over the cream
-          founder band that used to sit above it. */}
+      {/* Step 4 lands between the words and this. Everything above is
+          dark, so the close reveals over dark rather than over the
+          cream founder band that used to sit above it. */}
       <Chapter tone="dark" from="dark">
         <ClosingCTA />
       </Chapter>
