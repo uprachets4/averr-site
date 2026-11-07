@@ -30,6 +30,8 @@ import {
   SERVICE_NAMES,
   STUDIO_GRADIENT,
 } from "../src/data/serviceColors.ts";
+import { BUILD_WINDOW, PROCESS } from "../src/data/aboutProcess.ts";
+import { PILLAR_TIMELINE } from "../src/data/servicePillars.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const css = readFileSync(join(here, "..", "src", "index.css"), "utf8");
@@ -127,6 +129,38 @@ test("the bridge stop really is in STUDIO_GRADIENT, between AI and Marketing", (
     GRADIENT_BRIDGE,
     SERVICE_COLOR.marketing,
   ].map((h) => h.toUpperCase()));
+});
+
+test("the build window is composed from the Websites pillar timeline", () => {
+  // Spec 33 step 4: this is the only place the section may state that
+  // timing, and it must equal PILLAR_TIMELINE for Websites.
+  assert.equal(PILLAR_TIMELINE.design, "2 – 3 weeks");
+  assert.equal(BUILD_WINDOW, "Within the 2 – 3 week build");
+  assert.ok(
+    BUILD_WINDOW.includes(PILLAR_TIMELINE.design.replace(/s$/, "")),
+    "BUILD_WINDOW no longer contains the pillar timeline"
+  );
+});
+
+test("the process states only the four timings the spec allows", () => {
+  const allowed = new Set([
+    "Starts at kickoff",
+    BUILD_WINDOW,
+    "Before launch",
+    "30-day window after launch",
+  ]);
+  assert.equal(PROCESS.length, 5);
+  for (const step of PROCESS) {
+    assert.ok(
+      allowed.has(step.when),
+      `"${step.when}" is not one of the four allowed timings`
+    );
+  }
+  // No price, no "$", nowhere in the step copy.
+  const prose = PROCESS.flatMap((s) => [s.line, s.you, s.prachets, s.receive]);
+  for (const t of prose) {
+    assert.equal(/\$|\bprice|\bpricing\b/i.test(t), false, `copy mentions price: "${t}"`);
+  }
 });
 
 test("the spacing scale is the studio scale, ascending and unique", () => {

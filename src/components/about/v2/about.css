@@ -241,8 +241,13 @@
 .ab .kdots button:focus-visible {outline:2px solid var(--light);outline-offset:4px}
 
 /* ================= HOW WE WORK: one continuous line ================= */
-.ab .ln {position:relative;height:calc(5*80vh + 100vh)}
-.ab .lnstage {position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:clamp(14px,2.6vh,28px)}
+/* `width`/`min-width` for the same reason `.sigstage` and `.kwstage`
+   declare them — a pinned stage must not depend on an ancestor
+   choosing to stretch it. This stage is a flex column, so its own
+   children stretch, but the stage itself is still a block-level box in
+   whatever contains it. See the note on `.sig`. */
+.ab .ln {position:relative;width:100%;min-width:0;height:calc(5*80vh + 100vh)}
+.ab .lnstage {position:sticky;top:0;width:100%;min-width:0;height:100vh;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:clamp(14px,2.6vh,28px)}
 .ab .lnhead {display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
 .ab .lnhead h2 {font-size:clamp(30px,3.4vw,56px);margin-top:14px}
 .ab .lnhead p {margin:0;font-size:15px;line-height:1.5;color:var(--mute);max-width:30ch}

@@ -8,6 +8,7 @@ import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useSetNavDarkOverride } from "../lib/navTone";
 import SignatureHero from "../components/about/v2/SignatureHero";
 import Principles from "../components/about/v2/Principles";
+import OneLine from "../components/about/v2/OneLine";
 import { useSectionProgress } from "../components/about/v2/useSectionProgress";
 import "../components/about/v2/about.css";
 
@@ -194,6 +195,8 @@ export default function About() {
   const heroProgress = useRef<(p: number) => void>(function noop() {});
   const wordsRef = useRef<HTMLElement | null>(null);
   const wordsProgress = useRef<(p: number) => void>(function noop() {});
+  const lineRef = useRef<HTMLElement | null>(null);
+  const lineProgress = useRef<(p: number) => void>(function noop() {});
   useSectionProgress([
     {
       ref: heroRef,
@@ -205,6 +208,12 @@ export default function About() {
       ref: wordsRef,
       onProgress: function toWords(p) {
         wordsProgress.current(p);
+      },
+    },
+    {
+      ref: lineRef,
+      onProgress: function toLine(p) {
+        lineProgress.current(p);
       },
     },
   ]);
@@ -237,11 +246,12 @@ export default function About() {
 
         <SignatureHero sectionRef={heroRef} progressRef={heroProgress} />
         <Principles sectionRef={wordsRef} progressRef={wordsProgress} />
+        <OneLine sectionRef={lineRef} progressRef={lineProgress} />
       </div>
 
-      {/* Step 4 lands between the words and this. Everything above is
-          dark, so the close reveals over dark rather than over the
-          cream founder band that used to sit above it. */}
+      {/* Step 5 replaces this close. Everything above is dark, so it
+          reveals over dark rather than over the cream founder band
+          that used to sit above it. */}
       <Chapter tone="dark" from="dark">
         <ClosingCTA />
       </Chapter>
