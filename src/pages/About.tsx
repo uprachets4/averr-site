@@ -1,157 +1,32 @@
 import { useEffect, useRef } from "react";
-import { motion, useReducedMotion } from "motion/react";
-import { ease } from "../lib/motion";
-import MagneticCTA from "../components/MagneticCTA";
-import { CharRevealInView } from "../components/CharReveal";
-import Chapter from "../components/Chapter";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useSetNavDarkOverride } from "../lib/navTone";
 import SignatureHero from "../components/about/v2/SignatureHero";
 import Principles from "../components/about/v2/Principles";
 import OneLine from "../components/about/v2/OneLine";
+import Close from "../components/about/v2/Close";
 import { useSectionProgress } from "../components/about/v2/useSectionProgress";
 import "../components/about/v2/about.css";
 
 /* ═══════════════════════════════════════════════════════════════
-   /about, spec 33.
+   /about, spec 33 — complete.
 
-   Step 2 ships the signature hero. Steps 3 to 5 add "How we think",
-   "How we work" and the close, in that order, between the hero and
-   the closing CTA below.
+   Four sections, all under one `.ab` root and all fed by one rAF:
+   the signature hero (step 2), "How we think" (step 3), "How we work"
+   (step 4) and the close (step 5).
 
-   The old page's four sections — SignatureMark, FounderCredits,
-   PrincipleDesk and ProcessScene — were removed here rather than in
-   step 5, because each one injects GLOBAL rules from a component
-   <style> block and three of those blocks reach the new hero:
-
-     - SignatureMark declares `.sig { display: grid; place-items:
-       center }`, and `.sig` is the new hero section's own class. The
-       `display` was overridden; `place-items` never was, and an
-       `align-items`/`justify-items` centre stops the sticky stage
-       from stretching, which leaves a zero-width box that
-       `overflow: hidden` then clips the whole hero away.
+   The old page's components are gone as of step 5. Four of them
+   injected GLOBAL rules from component <style> blocks, and one of
+   those cost a session: SignatureMark declared
+   `.sig { display: grid; place-items: center }`, and `.sig` is the
+   hero section's own class. `display` was overridden; `place-items`
+   never was, and a container that centres rather than stretches its
+   items leaves the sticky stage zero-width, which `overflow: hidden`
+   then clips away entirely.
 
    Scoping a sheet under `.ab` protects it from CONFLICTING
-   declarations, not from EXTRA ones. The files stay on disk; step 5
-   deletes them, along with ReadFill, which only these two import.
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ═══════════════════════════════════════════════════════════════
-   Closing CTA — replaced in step 5
-   ═══════════════════════════════════════════════════════════════ */
-
-function ClosingCTA() {
-  const reduce = useReducedMotion();
-  return (
-    <section
-      style={{
-        position: "relative",
-        overflow: "hidden",
-        backgroundColor: "var(--color-dark)",
-        color: "var(--color-parch)",
-        minHeight: "85vh",
-        padding: "160px 40px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div className="grain-dark" aria-hidden="true" style={{ opacity: 0.5 }} />
-
-      {/* Warm accent glow */}
-      <motion.div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          width: "80vmin",
-          height: "80vmin",
-          marginTop: "-40vmin",
-          marginLeft: "-40vmin",
-          background:
-            "radial-gradient(circle at 50% 50%, rgba(237,233,226,0.15), transparent 60%)",
-          pointerEvents: "none",
-        }}
-        animate={
-          reduce
-            ? undefined
-            : {
-                x: [-30, 30, -30],
-                y: [-20, 20, -20],
-              }
-        }
-        transition={{
-          duration: 60,
-          repeat: Infinity,
-          ease: ease.inOut,
-        }}
-      />
-
-      <div
-        style={{
-          position: "relative",
-          zIndex: 2,
-          maxWidth: 900,
-          margin: "0 auto",
-          textAlign: "center",
-        }}
-      >
-        <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-20% 0px" }}
-          transition={{ duration: reduce ? 0 : 0.5, ease: ease.outQuart }}
-          className="type-eyebrow"
-          style={{
-            color: "var(--color-parch)",
-            opacity: 0.6,
-            marginBottom: 32,
-          }}
-        >
-          Start here
-        </motion.div>
-
-        <div
-          className="type-display-l"
-          style={{ color: "var(--color-parch)", marginBottom: 48 }}
-        >
-          <CharRevealInView
-            text="Ready to build a site that earns its place?"
-            style={{ color: "var(--color-parch)" }}
-          />
-        </div>
-
-        <motion.div
-          initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-15% 0px" }}
-          transition={{
-            duration: reduce ? 0 : 0.6,
-            ease: ease.outQuart,
-            delay: reduce ? 0 : 1.6,
-          }}
-          style={{
-            display: "flex",
-            gap: 16,
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
-          <MagneticCTA to="/contact" variant="primary" tone="dark">
-            Book a call
-          </MagneticCTA>
-          <MagneticCTA to="/work" variant="ghost" tone="dark">
-            See the work
-          </MagneticCTA>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Page
+   declarations, not from EXTRA ones — in either direction. See the
+   notes on `.sig` and on `.ab`'s font-size in about.css.
    ═══════════════════════════════════════════════════════════════ */
 
 export default function About() {
@@ -247,14 +122,8 @@ export default function About() {
         <SignatureHero sectionRef={heroRef} progressRef={heroProgress} />
         <Principles sectionRef={wordsRef} progressRef={wordsProgress} />
         <OneLine sectionRef={lineRef} progressRef={lineProgress} />
+        <Close />
       </div>
-
-      {/* Step 5 replaces this close. Everything above is dark, so it
-          reveals over dark rather than over the cream founder band
-          that used to sit above it. */}
-      <Chapter tone="dark" from="dark">
-        <ClosingCTA />
-      </Chapter>
     </>
   );
 }
