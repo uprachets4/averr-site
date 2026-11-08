@@ -7,6 +7,7 @@ import OneLine from "../components/about/v2/OneLine";
 import Close from "../components/about/v2/Close";
 import { useSectionProgress } from "../components/about/v2/useSectionProgress";
 import "../components/about/v2/about.css";
+import { useDocumentMeta, META } from "../lib/documentMeta";
 
 /* ═══════════════════════════════════════════════════════════════
    /about, spec 33 — complete.
@@ -34,14 +35,11 @@ export default function About() {
   // page still ends dark and the footer still reveals over dark.
   useDeclarePageEndTone("dark");
 
-  useEffect(function scrollTopAndTitle() {
+  useEffect(function scrollTop() {
     window.scrollTo(0, 0);
-    const prev = document.title;
-    document.title = "About — Averr Studios";
-    return function restore() {
-      document.title = prev;
-    };
   }, []);
+
+  useDocumentMeta(META.about.title, META.about.description);
 
   /* Dark from the first pixel, as on home, /work and /services. */
   const setNavDark = useSetNavDarkOverride();

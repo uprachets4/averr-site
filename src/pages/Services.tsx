@@ -11,6 +11,7 @@ import { fieldsFor, type TradeId } from "../data/servicesBuild";
 import { useSetNavDarkOverride } from "../lib/navTone";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import "../components/services/v2/services.css";
+import { useDocumentMeta, META } from "../lib/documentMeta";
 
 /**
  * /services — "Built around your business" (spec 32).
@@ -64,13 +65,7 @@ export default function Services() {
 
   useDeclarePageEndTone("dark");
 
-  useEffect(function title() {
-    const prev = document.title;
-    document.title = "Services — Averr Studios";
-    return function restore() {
-      document.title = prev;
-    };
-  }, []);
+  useDocumentMeta(META.services.title, META.services.description);
 
   return (
     <div className="sv">

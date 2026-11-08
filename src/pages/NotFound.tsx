@@ -1,9 +1,9 @@
-import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { duration, ease } from "../lib/motion";
 import MagneticCTA from "../components/MagneticCTA";
 import MonogramMark from "../components/MonogramMark";
 import { CharReveal } from "../components/CharReveal";
+import { useDocumentMeta, META } from "../lib/documentMeta";
 
 /**
  * 404.
@@ -27,13 +27,7 @@ const ROUTES = [
 export default function NotFound() {
   const reduce = useReducedMotion();
 
-  useEffect(function title() {
-    const prev = document.title;
-    document.title = "Not found — Averr Studios";
-    return function restore() {
-      document.title = prev;
-    };
-  }, []);
+  useDocumentMeta(META.notFound.title, META.notFound.description);
 
   return (
     <section className="nf">

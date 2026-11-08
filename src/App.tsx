@@ -40,12 +40,16 @@ function ScrollToTop() {
  * never collapses the document to zero height. A collapsed main is what
  * makes the footer jump up and the scroll position lurch — the same
  * class of problem as the AnimatePresence gap (§5.6), one level up.
+ *
+ * Navy, not cream: this is the screen between routes, so cream here was
+ * a cream flash on EVERY route change, whichever two dark pages you
+ * moved between.
  */
 function RouteFallback() {
   return (
     <div
       aria-hidden
-      style={{ minHeight: "100vh", backgroundColor: "var(--color-bg)" }}
+      style={{ minHeight: "100vh", backgroundColor: "var(--color-navy)" }}
     />
   );
 }

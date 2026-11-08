@@ -6,6 +6,7 @@ import ProjectRows from "../components/work/built/ProjectRows";
 import { useSetNavDarkOverride } from "../lib/navTone";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import "../components/work/built/built.css";
+import { useDocumentMeta, META } from "../lib/documentMeta";
 
 /**
  * Built by Averr — the index, spec 31.
@@ -58,20 +59,7 @@ export default function Work() {
   /* The last row sits on navy, so the footer reveals over dark. */
   useDeclarePageEndTone("dark");
 
-  useEffect(function title() {
-    const prev = document.title;
-    document.title = "Built by Averr — Averr Studios";
-    const meta = document.querySelector('meta[name="description"]');
-    const prevDesc = meta?.getAttribute("content") ?? null;
-    meta?.setAttribute(
-      "content",
-      "Every screen is a real product we built: websites, web apps, AI automation and marketing for businesses across the GTA."
-    );
-    return function restore() {
-      document.title = prev;
-      if (prevDesc !== null) meta?.setAttribute("content", prevDesc);
-    };
-  }, []);
+  useDocumentMeta(META.work.title, META.work.description);
 
   /* Closing a case file should land you on the row you opened, so the
      position is kept on the way out and put back on a POP. */

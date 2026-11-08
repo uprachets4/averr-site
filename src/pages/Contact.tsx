@@ -9,6 +9,7 @@ import DirectRow from "../components/contact/DirectRow";
 import { CharReveal, CharRevealInView } from "../components/CharReveal";
 import Chapter from "../components/Chapter";
 import { useDeclarePageEndTone } from "../lib/pageTone";
+import { useDocumentMeta, META } from "../lib/documentMeta";
 
 /* ═══════════════════════════════════════════════════════════════
    Band 1 — Editorial hero
@@ -481,14 +482,11 @@ export default function Contact() {
   // The closing band is dark, so the footer reveals over dark on this route.
   useDeclarePageEndTone("dark");
 
-  useEffect(function scrollTopAndTitle() {
+  useEffect(function scrollTop() {
     window.scrollTo(0, 0);
-    const prev = document.title;
-    document.title = "Contact — Averr Studios";
-    return function restore() {
-      document.title = prev;
-    };
   }, []);
+
+  useDocumentMeta(META.contact.title, META.contact.description);
 
   return (
     <>

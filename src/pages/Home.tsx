@@ -3,6 +3,7 @@ import PlanetHero from "../components/home/planet/PlanetHero";
 import HomeFilm from "../components/home/film/HomeFilm";
 
 import { useSetNavDarkOverride } from "../lib/navTone";
+import { useDocumentMeta, META } from "../lib/documentMeta";
 
 /**
  * Home — Session 30, step 2.
@@ -26,6 +27,11 @@ import { useSetNavDarkOverride } from "../lib/navTone";
  */
 
 export default function Home() {
+  /* Home's pair is also the document default in index.html, but it is
+     set here too: without it, arriving at Home from another route
+     would leave that route's title and description in place. */
+  useDocumentMeta(META.home.title, META.home.description);
+
   /* Session 27, still true: the dark glass bar sits on every section of
      home — it is part of the system, not a reaction to what is under it. */
   const setNavDark = useSetNavDarkOverride();

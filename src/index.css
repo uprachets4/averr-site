@@ -89,10 +89,15 @@
   --color-bg:         #F4F0E6;
   --color-bg-alt:     #EDE9E2;
   --color-bg-warm:    #E8E1D0;
-  /* A card lifted off the warm ground. Added in 17f for the project-start
-     pass; it is paper, not white, so it sits in the same family as
-     --color-bg rather than punching a hole in the page. */
-  --surface-elevated: #FBF9F4;
+  /* The ground the document itself stands on.
+     Most routes are dark now, and `body` was still cream, so cream
+     showed through wherever a section had not painted yet — a full
+     cream screen on Home between the service film and "Here's what
+     that looks like", and the macOS overscroll bounce on every route.
+     `--color-dark` is the warm near-black the cream pages use for
+     their dark bands; this is the navy the dark ROUTES are built on,
+     which until now was typed as #121C27 in each page's nav effect. */
+  --color-navy:       #121C27;
   --color-dark:       #141412;
   --color-dark-alt:   #1C1B18;
   --color-ink:        #141412;
@@ -304,10 +309,14 @@
 
 /* Reset */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+/* Both, not just body: the canvas behind the overscroll bounce takes
+   its colour from `html` when `html` sets one, and from `body` only
+   when it doesn't. Setting one and not the other is what left the
+   bounce cream. Each route still paints its own surface over this. */
+html { scroll-behavior: smooth; background: var(--color-navy); }
 body {
   font-family: var(--font-body);
-  background: var(--color-bg);
+  background: var(--color-navy);
   color: var(--color-ink);
   font-size: 17px;
   line-height: 1.6;
