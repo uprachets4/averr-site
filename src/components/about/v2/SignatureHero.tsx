@@ -250,8 +250,18 @@ export default function SignatureHero({
           </div>
         </div>
 
+        {/* The name is real text from the first paint at .28, and the
+            signature's "writes in" sweep runs on a COPY stacked over
+            it. The base is never clipped, so the largest text on the
+            page no longer waits 2.9s for the pen — see about.css. The
+            copy is aria-hidden; a reader gets the name once. */}
         <div className="signame">
-          <b>Prachets Upadhyay</b>
+          <b>
+            Prachets Upadhyay
+            <i className="sweep" aria-hidden="true">
+              Prachets Upadhyay
+            </i>
+          </b>
           <span className="mono">Founder · Averr Studios · Toronto</span>
         </div>
 

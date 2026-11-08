@@ -254,17 +254,28 @@ export default function Principles({
     const key = `${k}${st}${window.innerWidth}x${window.innerHeight}`;
     if (!fitCache.current[key]) {
       wd.style.setProperty("--fs", "100px");
-      /* Measure the LETTERS, not the furniture.
-         CRAFT's two `.guide` rules live inside `.wd` and overhang it
-         by 4% a side, so they land in `scrollWidth` — and they are
-         `scaleX(0)` until CRAFT settles, which made the measured
-         width, and therefore the cached size, depend on whether the
-         word happened to be settled when the cache first filled.
-         Same word, same viewport, two different sizes. Taking them
-         out of the measurement makes it depend only on the type. */
+      /* Measure the LETTERS AT REST, and nothing else.
+         Two things used to leak into `scrollWidth` and make the same
+         word at the same viewport cache two different sizes:
+           - CRAFT's two `.guide` rules live inside `.wd` and overhang
+             it by 4% a side, and are `scaleX(0)` until CRAFT settles;
+           - every word's letters carry a transform while they are
+             acting out their meaning, and a rotated or scaled letter
+             has a wider box than a resting one. DIRECTION's letters
+             spin continuously, so its measurement landed wherever the
+             spin happened to be at that instant.
+         Both are taken out for the measurement and put straight back,
+         so the size depends only on the type. */
       const guides = [...wd.querySelectorAll<HTMLElement>(".guide")];
+      const letters = [...wd.querySelectorAll<HTMLElement>(".kwl")];
+      const held = letters.map((l) => l.style.transform);
       for (const g of guides) g.style.display = "none";
+      for (const l of letters) l.style.transform = "none";
       const width = wd.scrollWidth;
+      letters.forEach((l, i) => {
+        if (held[i]) l.style.transform = held[i];
+        else l.style.removeProperty("transform");
+      });
       for (const g of guides) g.style.removeProperty("display");
       if (!width) return;
       const narrow = window.innerWidth <= 900;
