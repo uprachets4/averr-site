@@ -4,14 +4,20 @@ import { useSetNavDarkOverride } from "../lib/navTone";
 import { useDocumentMeta, META } from "../lib/documentMeta";
 import { prefersReducedMotion } from "../components/about/v2/useSectionProgress";
 import Opening from "../components/contact/v2/Opening";
+import Brief from "../components/contact/v2/Brief";
+import { useBrief } from "../components/contact/v2/briefState";
 import "../components/contact/v2/contact.css";
 
 /* ═══════════════════════════════════════════════════════════════
    /contact, spec 34.
 
-   Step 2 ships the opening and the two doors. Steps 3 and 4 add
-   Write (the brief, the letter and the send) and Talk, then Other
-   ways, under this same `.ct` root.
+   Steps 2 and 3 ship the opening with its two doors, and Write —
+   the brief, the letter that composes itself from it, and the send.
+   Step 4 adds Talk and Other ways under this same `.ct` root.
+
+   The brief's state lives here, in `useBrief`, because three things
+   read it: the letter, the Send button, and (in step 4) the Talk
+   section's carry-over note. One object, so they cannot disagree.
 
    The old page's six sections went in this step rather than at the
    end, for the reason spec 33 learned the hard way: every one of
@@ -48,6 +54,8 @@ export default function Contact() {
     [setNavDark]
   );
 
+  const brief = useBrief();
+
   /** A door jumps to its section; reduced motion jumps outright. */
   const go = useCallback(function go(id: string) {
     document.getElementById(id)?.scrollIntoView({
@@ -83,6 +91,23 @@ export default function Contact() {
       <div className="grain" aria-hidden="true" />
 
       <Opening onGo={go} />
+
+      <section className="write gut" id="write" aria-labelledby="ct-wh">
+        <div className="orb c" aria-hidden="true" />
+        <div className="wrap">
+          <div className="whead rv in">
+            <div>
+              <span className="eyebrow">Write</span>
+              <h2 id="ct-wh">Tell me what you're building.</h2>
+            </div>
+            <p>
+              Pick what you need and add a few details. Your letter writes
+              itself on the right.
+            </p>
+          </div>
+          <Brief brief={brief} onBook={() => go("talk")} />
+        </div>
+      </section>
     </div>
   );
 }
