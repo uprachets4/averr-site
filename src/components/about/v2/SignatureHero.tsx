@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { MARK_PATH_D } from "../../MonogramMark";
 import { embedRequested, openModal, warmEmbed } from "../../services/passBooking";
-import Portrait from "./Portrait";
+import Portrait, { PORTRAIT_SRC } from "./Portrait";
 import { clamp, easeInOut, isDesktop, prefersReducedMotion } from "./useSectionProgress";
 
 /**
@@ -60,6 +60,51 @@ export default function SignatureHero({
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const creditRefs = useRef<(HTMLDivElement | null)[]>([]);
   const ctaRef = useRef<HTMLDivElement | null>(null);
+  const photoRef = useRef<SVGImageElement | null>(null);
+
+  /* ── the photo inside the mark arrives on the first scroll ───── */
+  /**
+   * It is `opacity: var(--m, 0)` — invisible until the mark reveal
+   * begins at p = .06 — but Chrome still counted it as the largest
+   * contentful paint, because a transparent SVG `<image>` is not
+   * excluded from LCP the way a transparent `<img>` is. That made a
+   * picture nobody can see the page's reported LCP element, instead
+   * of the hero name, which is the first thing actually painted.
+   *
+   * So the href is withheld until the first scroll, keyboard or
+   * pointer input: LCP is finalised at the first interaction, so by
+   * the time this image exists it can no longer be a candidate. It
+   * costs nothing — the portrait figure fetches the same file
+   * eagerly, so this is a cache hit by the time the reveal needs it,
+   * and the reveal cannot start before a scroll in any case. A page
+   * restored mid-scroll gets it immediately.
+   */
+  useEffect(function showPhoto() {
+    const el = photoRef.current;
+    if (!el) return;
+
+    let armed = true;
+    function reveal() {
+      if (!armed) return;
+      armed = false;
+      el?.setAttribute("href", PORTRAIT_SRC);
+      off();
+    }
+    function off() {
+      window.removeEventListener("scroll", reveal);
+      window.removeEventListener("pointerdown", reveal);
+      window.removeEventListener("keydown", reveal);
+    }
+
+    if (window.scrollY > 0) {
+      reveal();
+      return;
+    }
+    window.addEventListener("scroll", reveal, { passive: true });
+    window.addEventListener("pointerdown", reveal, { passive: true });
+    window.addEventListener("keydown", reveal);
+    return off;
+  }, []);
 
   /* ── the pen writes the mark ─────────────────────────────────── */
   useEffect(function sign() {
@@ -185,9 +230,10 @@ export default function SignatureHero({
               </defs>
               <path className="mfill" d={MARK_PATH_D} fill="url(#mfillg)" fillRule="evenodd" />
               <g clipPath="url(#mclip)">
+                {/* `href` is set by `showPhoto` below, not here. */}
                 <image
                   className="mphoto"
-                  href="/about/portrait.webp"
+                  ref={photoRef}
                   x="-40"
                   y="-10"
                   width="407"

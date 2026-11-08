@@ -254,7 +254,18 @@ export default function Principles({
     const key = `${k}${st}${window.innerWidth}x${window.innerHeight}`;
     if (!fitCache.current[key]) {
       wd.style.setProperty("--fs", "100px");
+      /* Measure the LETTERS, not the furniture.
+         CRAFT's two `.guide` rules live inside `.wd` and overhang it
+         by 4% a side, so they land in `scrollWidth` — and they are
+         `scaleX(0)` until CRAFT settles, which made the measured
+         width, and therefore the cached size, depend on whether the
+         word happened to be settled when the cache first filled.
+         Same word, same viewport, two different sizes. Taking them
+         out of the measurement makes it depend only on the type. */
+      const guides = [...wd.querySelectorAll<HTMLElement>(".guide")];
+      for (const g of guides) g.style.display = "none";
       const width = wd.scrollWidth;
+      for (const g of guides) g.style.removeProperty("display");
       if (!width) return;
       const narrow = window.innerWidth <= 900;
       const byW = ((window.innerWidth * (narrow ? 0.9 : 0.84)) / width) * 100;
@@ -319,14 +330,29 @@ export default function Principles({
 
   useEffect(
     function fitAll() {
-      fit(active.current < 0 ? 0 : active.current);
-      function onResize() {
+      function refitAll() {
         fitCache.current = {};
         PRINCIPLES.forEach((_, k) => fit(k));
       }
-      window.addEventListener("resize", onResize, { passive: true });
+
+      fit(active.current < 0 ? 0 : active.current);
+
+      /* The first fit can land before Geist has loaded, and then the
+         cache holds a size measured in the fallback face — at 390 that
+         was 112.9px against the 119.4px the real type wants, cached
+         for the rest of the page's life. Re-measure once the fonts
+         are in. This is the other half of making the fit depend only
+         on the type: the guides are out of the measurement, and now
+         the measurement waits for the face it is measuring. */
+      let alive = true;
+      document.fonts?.ready.then(function refit() {
+        if (alive) refitAll();
+      });
+
+      window.addEventListener("resize", refitAll, { passive: true });
       return function stop() {
-        window.removeEventListener("resize", onResize);
+        alive = false;
+        window.removeEventListener("resize", refitAll);
       };
     },
     []

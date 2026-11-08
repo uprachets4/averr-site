@@ -29,12 +29,20 @@
  * figure scaling .86 → 1 and the image 1.12 → 1, all driven by `--r`
  * from the hero's scroll loop.
  */
+/**
+ * The 1000w original. Also what the hero's mark shows through its
+ * clip path, so it lives here rather than being typed in two places —
+ * and the two sharing one URL is what makes the mark's deferred
+ * fetch free: this `<img>` has already warmed it.
+ */
+export const PORTRAIT_SRC = "/about/portrait.webp";
+
 export default function Portrait() {
   return (
     <figure className="portrait">
       <img
-        src="/about/portrait.webp"
-        srcSet="/about/portrait-640.webp 640w, /about/portrait.webp 1000w"
+        src={PORTRAIT_SRC}
+        srcSet={`/about/portrait-640.webp 640w, ${PORTRAIT_SRC} 1000w`}
         sizes="(max-width: 414px) 82vw, (max-width: 900px) 340px, (max-height: 937px) 51.2vh, 480px"
         alt="Prachets Upadhyay, founder of Averr Studios"
         width={1000}

@@ -536,6 +536,17 @@
   .ab .who2 {display:none}
   .ab .lnhead h2 {font-size:24px}
 }
+/* The You/Prachets row already drops out on a short phone
+   (`max-height:760px`). It has to drop out on a NARROW one too: at
+   320px the two columns wrap enough extra lines that the tallest step
+   card, Design, ran about 7px past the pinned stage, and the stage
+   clips. 360 is the first width where it fits, so this stops just
+   below it. Both cards' text stays in the document either way; only
+   this row is hidden, as on a short screen. */
+@media (max-width:359px) {
+  .ab .who2 {display:none}
+}
+
 @media (prefers-reduced-motion:reduce) {
   .ab, .ab *,
   .ab *::before,
