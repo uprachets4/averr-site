@@ -296,19 +296,30 @@
 .sv .btns span {font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px}
 .sv .btns .p {background:var(--app);color:var(--ink)}
 .sv .btns .s {box-shadow:inset 0 0 0 1.5px currentColor}
-.sv .btns .g {opacity:.55}
+/* .55 put "Cancel" at 4.07:1 on --light. A ghost button still reads as
+   one at .62, which clears AA. */
+.sv .btns .g {opacity:.62}
 .sv .btns .x {background:#D9D9E0;color:#8B8B99}
 .sv .inputs {display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .sv .inputs span {height:44px;border-radius:12px;box-shadow:inset 0 0 0 1.5px var(--hair);display:flex;align-items:center;padding:0 14px;font-size:13px;color:var(--ink-2);transition:box-shadow .7s}
 .sv .inputs .f {box-shadow:inset 0 0 0 2px var(--app);color:inherit}
-.sv .inputs .e {box-shadow:inset 0 0 0 2px #D5818C;color:#B4535F}
+/* #B4535F measured 4.41:1 on --light — an error message nobody can
+   quite read is the worst one to lose. #A8454F is 5.26:1. */
+.sv .inputs .e {box-shadow:inset 0 0 0 2px #D5818C;color:#A8454F}
 .sv .tokens {display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .sv .tokens div {border-radius:12px;padding:12px;font:500 11px/1.4 var(--mono);box-shadow:inset 0 0 0 1px var(--hair);display:flex;flex-direction:column;gap:8px;transition:box-shadow .7s}
 .sv .tokens i {height:30px;border-radius:8px;background:var(--t)}
 .sv .toggle {display:flex;gap:10px;align-items:center;font-size:12px;font-weight:500}
 .sv .toggle b {width:38px;height:22px;border-radius:999px;background:#D9D9E0;position:relative;transition:background-color .5s}
 .sv .toggle b::after {content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .5s var(--out)}
-.sv .slot.s4 .ds {background:#0D131B;color:var(--light)}
+/* This panel flips the design-system mock to dark, and the muted and
+   error inks are both tuned for the light surface. --ink-2 landed at
+   3.31:1 on #0D131B and the error line at 3.85:1 — spec 34 step 6 made
+   --ink-2 DARKER (#6E6E80 -> #666678) to clear AA on --light, which
+   cost it here. Re-point both inside the dark panel rather than move
+   the token back and break the light one. */
+.sv .slot.s4 .ds {background:#0D131B;color:var(--light);--ink-2:#8F8FA3}
+.sv .slot.s4 .ds .inputs .e {color:var(--app)}
 .sv .slot.s4 .dsnav {border-color:var(--faint);color:var(--mute)}
 .sv .slot.s4 .inputs span,
 .sv .slot.s4 .tokens div {box-shadow:inset 0 0 0 1.5px var(--line)}
@@ -419,8 +430,11 @@
 .sv .slot.s3 .ri.o1 {transform:translateY(72px)}
 .sv .slot.s3 .ri.o2 {transform:translateY(144px)}
 .sv .slot.s3 .ri.o3 {transform:translateY(216px)}
-.sv .callbar {position:absolute;left:14px;right:14px;bottom:14px;height:52px;border-radius:16px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;transform:translateY(90px);transition:transform .8s var(--out) .2s}
-.sv .callbar i {width:10px;height:10px;border-radius:50%;background:#fff;animation:sv-blink 1s infinite}
+/* Ink, not white: #fff on --blue measured 2.83:1, a real AA failure on
+   14px bold text. --ink on the same blue clears it with room. The dot
+   follows the text so the bar still reads as one object. */
+.sv .callbar {position:absolute;left:14px;right:14px;bottom:14px;height:52px;border-radius:16px;background:var(--blue);color:var(--ink);display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;transform:translateY(90px);transition:transform .8s var(--out) .2s}
+.sv .callbar i {width:10px;height:10px;border-radius:50%;background:currentColor;animation:sv-blink 1s infinite}
 .sv .slot.s4 .callbar {transform:none}
 
 /* M2 campaigns + outreach */
@@ -443,7 +457,9 @@
 .sv .sq {display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:#fff;box-shadow:0 1px 2px rgba(18,28,39,.06);font-size:13px}
 .sv .sq i {width:22px;height:22px;border-radius:7px;background:rgba(86,154,250,.16);display:grid;place-items:center;font-style:normal;font-size:11px;color:#2D5FB8}
 .sv .sq em {font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;font-style:normal;color:var(--ink-2)}
-.sv .livebar {display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--blue);color:#fff;font-size:13px;font-weight:600}
+/* The same #fff-on---blue defect as `.callbar`, 2.83:1, in the other
+   mock. Found by running axe while scrolling, not at rest. */
+.sv .livebar {display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--blue);color:var(--ink);font-size:13px;font-weight:600}
 
 /* M3 report */
 .sv .rep {padding:26px 32px;display:grid;grid-template-columns:1.4fr 1fr;gap:22px}

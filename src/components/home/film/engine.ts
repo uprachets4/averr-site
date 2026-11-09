@@ -46,6 +46,9 @@ export type FilmOpts = {
   sigSvg: SVGSVGElement;
   sigWord: SVGTextElement;
   outs: HTMLElement[];
+  outsWrap: HTMLElement;
+  fTop: HTMLElement;
+  fBot: HTMLElement;
   ts: HTMLElement;
   /** The name the visitor typed, or "" for the placeholder. */
   getName: () => string;
@@ -93,6 +96,19 @@ const SIG_OUT_FROM = 0.82;
 const SIG_OUT_TO = 0.8255;
 const FIN_IN_TO = 0.831;
 /** Services leave .425 -> .4305, Work arrives .4305 -> .436. */
+/** Partners leaves .1 -> .1055, Services arrives .1055 -> .111.
+ *
+ *  PHONES ONLY. The other three handovers were sequenced already; this
+ *  one stayed a crossfade, with partners at 1 -> 0 over .1 -> .12 while
+ *  the services intro came in over .1 -> .118. On a wide screen the two
+ *  blocks sit in different places and the dissolve reads as intended,
+ *  which is why it stays. Under 820px the partner plates stack down the
+ *  middle, exactly where "Four services. One team." lands, so the two
+ *  print on top of each other — the logo row with the heading through
+ *  it. Desktop timings are untouched by design. */
+const PRT_OUT_TO = 0.1055;
+const SVC_IN_TO = 0.111;
+
 const SVC_OUT_FROM = 0.425;
 const SVC_OUT_TO = 0.4305;
 const WORK_IN_TO = 0.436;
@@ -185,7 +201,7 @@ function hasWebGL(): boolean {
 
 export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
   const { film, light, layers, marks, vIntro, beats, rail, wTop, credits, counter } = opts;
-  const { sigCanvas, sigSvg, sigWord, outs, ts } = opts;
+  const { sigCanvas, sigSvg, sigWord, outs, outsWrap, fTop, fBot, ts } = opts;
 
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const small0 = isSmall();
@@ -622,8 +638,11 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
   let finaleOn = false;
   function overlay(P: number) {
     // partners
+    const small = isSmall();
     const pp = clamp(P / T.pE, 0, 1);
-    layers.partners.style.opacity = (P < T.pE ? 1 : 1 - clamp((P - T.pE) / 0.02, 0, 1)).toFixed(3);
+    layers.partners.style.opacity = (
+      small ? fadeOut(P, T.pE, PRT_OUT_TO) : P < T.pE ? 1 : 1 - clamp((P - T.pE) / 0.02, 0, 1)
+    ).toFixed(3);
     marks.forEach((m, i) => {
       const k = sm(pp * 6 - 0.1 - i * 0.15);
       m.style.opacity = k.toFixed(3);
@@ -631,7 +650,7 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
     });
     // services
     layers.services.style.opacity = Math.min(
-      fadeIn(P, T.vS, T.vS + 0.018),
+      small ? fadeIn(P, PRT_OUT_TO, SVC_IN_TO) : fadeIn(P, T.vS, T.vS + 0.018),
       fadeOut(P, SVC_OUT_FROM, SVC_OUT_TO),
     ).toFixed(3);
     const iu = (P - T.vS) / (T.vI - T.vS);
@@ -675,6 +694,29 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
     layers.finale.style.pointerEvents = fo > 0.5 ? "auto" : "none";
     if (fo > 0.6 && !finaleOn) { finaleOn = true; placeOuts(); playFinale(); }
     if (fo < 0.2 && finaleOn) { finaleOn = false; outs.forEach((o) => o.classList.remove("in")); }
+    /* PHONES ONLY: the finale's two statements take turns.
+       The act holds three stacked groups — the "Yours next" prompt with
+       its field, the outcome chips, and "Taken seriously." with the
+       booking button. At 1440 they sit apart down a 900px stage; at
+       390x844 all three print at once and the prompt and the sign-off
+       argue with each other. So the prompt and the chips (one thought:
+       type your name, here is what you would get) hold the act, hand
+       over at .90 -> .915, and the sign-off has the stage from .915.
+       Wide screens keep showing the whole composition, untouched. */
+    if (small) {
+      const lead = fadeOut(P, 0.9, 0.915);
+      fTop.style.opacity = lead.toFixed(3);
+      outsWrap.style.opacity = lead.toFixed(3);
+      fTop.style.pointerEvents = lead > 0.5 ? "" : "none";
+      const sign = fadeIn(P, 0.915, 0.93);
+      fBot.style.opacity = sign.toFixed(3);
+      fBot.style.pointerEvents = sign > 0.5 ? "" : "none";
+    } else {
+      for (const el of [fTop, fBot, outsWrap]) {
+        el.style.opacity = "";
+        el.style.pointerEvents = "";
+      }
+    }
     // the stage light takes the colour of whatever is on screen
     if (P < T.vI) setLight("#9874E8", 0.16);
     else if (P < T.wS) setLight(SERVICES[Math.max(0, cur)].color, 0.26);

@@ -482,6 +482,28 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     take.style.clipPath = `circle(${(e * Math.hypot(W, H) * 0.75).toFixed(1)}px at 50% ${cy.toFixed(1)}px)`;
     takeIn.style.opacity = Math.max(0, (k - 0.55) / 0.45).toFixed(2);
 
+    /* ...and then the stage itself dissolves, uncovering the film.
+       The circle finishes covering this stage well before the story's
+       scroll ends, and it paints the same gradient the film's stage
+       does, so from that point on there was nothing on screen: one
+       empty navy frame at 390 and at 1440 both. The film now lies
+       directly under this stage (`.hf-film` is pulled up 100vh), so
+       fading the stage out across the end of the flood hands straight
+       over to "In good company" instead of to a blank. No act moves;
+       the flood itself is untouched.
+
+       The window matters. The circle's radius is `e * hypot(W,H) * .75`,
+       which covers this stage's farthest corner at e ~= .70, i.e. k ~=
+       .58 at 390x844 and ~= .57 at 1440x900. Start the dissolve there
+       and the copy is already behind the flood, so no two blocks of
+       text ever cross-fade; start it later and the blank frame comes
+       back in between. */
+    const stageOp = 1 - Math.max(0, Math.min(1, (k - 0.56) / 0.24));
+    stage.style.opacity = stageOp.toFixed(3);
+    /* Once it has dissolved it is still there, on top of the film, with
+       a chapter rail that would go on taking clicks. */
+    stage.style.pointerEvents = stageOp < 0.02 ? "none" : "";
+
     L.forEach((l) => l.r.render(l.s, camera));
   }
   function dispose() {

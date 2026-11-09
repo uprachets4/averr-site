@@ -70,7 +70,9 @@ export default function Footer() {
                 Start a project
               </MagneticCTA>
               <div className="nf-now">
-                <span>Currently answering: same-day.</span>
+                {/* "same-day" contradicted the promise Contact and About
+                    both make; the footer now says the same thing they do. */}
+                <span>Replies within 24 hours.</span>
                 <TorontoClock style={{ color: "rgba(255,255,255,0.82)" }} />
               </div>
             </div>

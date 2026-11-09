@@ -42,6 +42,8 @@ export default function HomeFilm() {
   const sigSvgRef = useRef<SVGSVGElement | null>(null);
   const sigWordRef = useRef<SVGTextElement | null>(null);
   const outsRef = useRef<HTMLDivElement | null>(null);
+  const fTopRef = useRef<HTMLDivElement | null>(null);
+  const fBotRef = useRef<HTMLDivElement | null>(null);
   const tsRef = useRef<HTMLParagraphElement | null>(null);
   const marksRef = useRef<HTMLDivElement | null>(null);
 
@@ -87,6 +89,9 @@ export default function HomeFilm() {
               sigSvg: sigSvgRef.current!,
               sigWord: sigWordRef.current!,
               outs: Array.from(outsRef.current!.children) as HTMLElement[],
+              outsWrap: outsRef.current!,
+              fTop: fTopRef.current!,
+              fBot: fBotRef.current!,
               ts: tsRef.current!,
               getName: () => nameRef.current,
             });
@@ -279,7 +284,7 @@ export default function HomeFilm() {
 
           {/* ── 5 · yours next ───────────────────────────────────── */}
           <section className="hf-layer" ref={finaleRef} aria-label="Yours next">
-            <div className="hf-ftop hf-glow">
+            <div className="hf-ftop hf-glow" ref={fTopRef}>
               <span className="hf-eyebrow">Yours next</span>
               <h2>What would it look like for you?</h2>
               <form className="hf-field" autoComplete="off" onSubmit={onSubmit}>
@@ -308,7 +313,7 @@ export default function HomeFilm() {
                 </div>
               ))}
             </div>
-            <div className="hf-fbot hf-glow">
+            <div className="hf-fbot hf-glow" ref={fBotRef}>
               <p className="hf-ts" ref={tsRef}>
                 Taken seriously.
               </p>

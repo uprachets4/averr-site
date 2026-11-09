@@ -6,7 +6,31 @@
  * `html,body` rules.
  */
 
-.hf-film { position: relative; height: 1500vh; }
+/**
+ * The film starts one viewport EARLY, underneath the planet.
+ *
+ * Both stages are `position: sticky` inside a tall container, and a
+ * sticky stage unpins one viewport before its container ends. The
+ * planet's container ran 0–780vh, so its stage unpinned at 680vh while
+ * the film's container only began at 780vh: a full viewport in which
+ * the planet had stopped and the film had not started. The planet's
+ * takeover has finished covering its own copy by then and paints the
+ * same gradient the film's stage does, so that viewport rendered as one
+ * empty navy frame — at 390 and at 1440 alike.
+ *
+ * The pull-up has to clear the point where the planet's copy dies, not
+ * just the unpin: the flood covers that copy at about 91% of the
+ * planet's pinned range, a further 500px before the stage unpins. At
+ * -100vh the film was still unpinned there and the blank frame simply
+ * moved earlier. -200vh pins it at 580vh, comfortably before, and
+ * `z-index` keeps the planet painting over it until the planet
+ * dissolves, so nothing is seen early.
+ *
+ * No act moves: `progress()` measures from this element's own top, so
+ * every act keeps the same scroll distance; the page is two viewports
+ * shorter and the acts all start two viewports sooner.
+ */
+.hf-film { position: relative; z-index: 0; height: 1500vh; margin-top: -200vh; }
 
 .hf-stage {
   position: sticky;

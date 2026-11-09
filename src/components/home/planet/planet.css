@@ -21,6 +21,9 @@
 
 .ph-story {
   position: relative;
+  /* Above the film, which now starts 100vh early and underneath this
+     story so the sticky handover leaves no empty frame. See `.hf-film`. */
+  z-index: 1;
   height: 780vh;
 }
 
