@@ -6,14 +6,30 @@ import { CAL_LINK, CAL_FULL_URL } from "./calConfig";
 
 /**
  * The Cal.com embed, in its own chunk so nothing it pulls in is on
- * /contact's critical path. Mounted by BookingSection only when the
- * section is near, or straight away when the URL carries ?date.
+ * /contact's critical path.
  *
- * The ?date / ?notes handoff from /services' start pass is preserved
- * exactly: `date` and `month` select the chosen day, `notes` prefills
- * the business name. A malformed or past value is simply ignored.
+ * Two callers now, so everything that used to be hard-coded is a
+ * prop with the old behaviour as its default:
+ *   - /services' start pass links here with `?date` / `?month` /
+ *     `?notes`, and still does: the URL prefill below is unchanged;
+ *   - /contact's Talk section passes the letter's name, email and a
+ *     notes line, and asks for the dark theme.
+ *
+ * A prop beats the URL where both say something, since the prop is
+ * what the visitor just typed.
  */
-export default function CalEmbed() {
+export default function CalEmbed({
+  theme = "light",
+  name,
+  email,
+  notes,
+}: {
+  theme?: "light" | "dark";
+  name?: string;
+  email?: string;
+  /** e.g. "Lakeshore Physio · Websites, AI Automation" */
+  notes?: string;
+} = {}) {
   const [params] = useSearchParams();
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -24,41 +40,49 @@ export default function CalEmbed() {
     const d = fromISO(raw);
     return d ? toISO(d) : null;
   })();
-  const notes = (params.get("notes") || "").slice(0, 60).trim();
+  const urlNotes = (params.get("notes") || "").slice(0, 60).trim();
+  const useNotes = (notes || urlNotes).slice(0, 200).trim();
 
   const config: React.ComponentProps<typeof Cal>["config"] = {
     layout: "month_view",
     ...(picked ? { date: picked, month: picked.slice(0, 7) } : {}),
-    ...(notes ? { notes } : {}),
+    ...(useNotes ? { notes: useNotes } : {}),
+    ...(name ? { name } : {}),
+    ...(email ? { email } : {}),
   };
 
   const href = (function hosted() {
     const q = new URLSearchParams();
     if (picked) q.set("date", picked);
-    if (notes) q.set("notes", notes);
+    if (useNotes) q.set("notes", useNotes);
+    if (name) q.set("name", name);
+    if (email) q.set("email", email);
     const s = q.toString();
     return s ? `${CAL_FULL_URL}?${s}` : CAL_FULL_URL;
   })();
 
-  useEffect(function initCal() {
-    let cancelled = false;
-    (async function boot() {
-      try {
-        const cal = await getCalApi({});
-        if (cancelled) return;
-        cal("ui", { hideEventTypeDetails: false, theme: "light" });
-        setReady(true);
-      } catch (err) {
-        if (typeof console !== "undefined") {
-          console.warn("Cal.com not embedded — using external link fallback", err);
+  useEffect(
+    function initCal() {
+      let cancelled = false;
+      (async function boot() {
+        try {
+          const cal = await getCalApi({});
+          if (cancelled) return;
+          cal("ui", { hideEventTypeDetails: false, theme });
+          setReady(true);
+        } catch (err) {
+          if (typeof console !== "undefined") {
+            console.warn("Cal.com not embedded — using external link fallback", err);
+          }
+          if (!cancelled) setFailed(true);
         }
-        if (!cancelled) setFailed(true);
-      }
-    })();
-    return function cleanup() {
-      cancelled = true;
-    };
-  }, []);
+      })();
+      return function cleanup() {
+        cancelled = true;
+      };
+    },
+    [theme]
+  );
 
   if (failed) {
     return (
@@ -86,8 +110,10 @@ export default function CalEmbed() {
         config={config}
       />
       {ready ? null : <span className="ce-wait">Loading times…</span>}
+      {/* Every selector is prefixed `ce`, so this block cannot reach
+          anything outside the embed — spec 34's collision sweep. */}
       <style>{`
-        .ce { position: relative; height: 100%; width: 100%; }
+        .ce { position: relative; height: 100%; width: 100%; min-height: 440px; }
         .ce iframe { height: 100% !important; width: 100% !important; }
         .ce-wait {
           position: absolute; inset: 0; display: grid; place-items: center;

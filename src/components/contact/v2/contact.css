@@ -252,7 +252,14 @@
 .ct .calbar {display:flex;align-items:center;gap:7px;padding:12px 16px;border-bottom:1px solid var(--faint)}
 .ct .calbar i {width:9px;height:9px;border-radius:50%;background:rgba(245,244,249,.2)}
 .ct .calbar span {margin-left:10px;font:500 11px/1 var(--mono);color:var(--mute)}
-.ct .calbody {display:grid;grid-template-columns:.85fr 1.7fr 1fr;min-height:440px}
+/* The reference's three columns were `.cmeta | .cgrid | .times`, and
+   the last two were the faked month grid and time list. The real
+   embed takes both their places as one `.calembed`, so the frame,
+   the side panel and the carry-over note survive exactly as drawn
+   and only the sample is gone. 1.7fr + 1fr = 2.7fr. */
+.ct .calbody {display:grid;grid-template-columns:.85fr 2.7fr;min-height:440px}
+.ct .calembed {min-width:0;position:relative}
+.ct .calwait {position:absolute;inset:0;display:grid;place-items:center;font:500 13px/1 var(--mono);color:var(--mute)}
 .ct .calbody>* {min-width:0}
 .ct .cmeta {padding:24px;border-right:1px solid var(--faint);display:flex;flex-direction:column;gap:12px}
 .ct .cmeta img {width:44px;height:44px;border-radius:50%;object-fit:cover}
@@ -313,6 +320,7 @@
   .ct .cmeta {border-right:0;border-bottom:1px solid var(--faint);flex-direction:row;flex-wrap:wrap;align-items:center}
   .ct .carry {margin-top:0;width:100%}
   .ct .cgrid {border-right:0;border-bottom:1px solid var(--faint)}
+  .ct .calembed {min-height:520px}
   .ct .times {display:grid;grid-template-columns:1fr 1fr}
   .ct .times .mh, .ct .times .none {grid-column:1/-1}
   .ct .waysrow {grid-template-columns:1fr 1fr}

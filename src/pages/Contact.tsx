@@ -6,14 +6,16 @@ import { prefersReducedMotion } from "../components/about/v2/useSectionProgress"
 import Opening from "../components/contact/v2/Opening";
 import Brief from "../components/contact/v2/Brief";
 import { useBrief } from "../components/contact/v2/briefState";
+import TalkSection from "../components/contact/v2/TalkSection";
+import OtherWays from "../components/contact/v2/OtherWays";
 import "../components/contact/v2/contact.css";
 
 /* ═══════════════════════════════════════════════════════════════
    /contact, spec 34.
 
-   Steps 2 and 3 ship the opening with its two doors, and Write —
-   the brief, the letter that composes itself from it, and the send.
-   Step 4 adds Talk and Other ways under this same `.ct` root.
+   Four sections under one `.ct` root: the opening with its two
+   doors, Write (the brief, the letter that composes itself from it,
+   and the send), Talk with the real Cal.com embed, and Other ways.
 
    The brief's state lives here, in `useBrief`, because three things
    read it: the letter, the Send button, and (in step 4) the Talk
@@ -108,6 +110,9 @@ export default function Contact() {
           <Brief brief={brief} onBook={() => go("talk")} />
         </div>
       </section>
+
+      <TalkSection brief={brief} />
+      <OtherWays />
     </div>
   );
 }

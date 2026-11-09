@@ -156,9 +156,21 @@ function needPhrase(state: BriefState): string {
   return `${LETTER.needPrefix}${joinList(parts)}.`;
 }
 
-/** The reference lowercases a sub-option that starts a sentence-case word. */
+/**
+ * A sub-option dropped into the middle of the letter's sentence, so
+ * it reads as prose: "help with Websites (a new website)".
+ *
+ * DEVIATION from the reference, at the owner's instruction. Its test
+ * is `/^[A-Z][a-z]/`, which needs a lowercase letter immediately
+ * after the capital — so it misses any first word of a single
+ * letter, and "A new website" stayed capitalised mid-sentence. The
+ * rule here is: lowercase the first letter unless the first word is
+ * an all-caps initialism of two letters or more. "AI agents" keeps
+ * its capitals, "A new website" and "Online booking" do not.
+ */
 export function lowerFirst(x: string): string {
-  return /^[A-Z][a-z]/.test(x) ? x.charAt(0).toLowerCase() + x.slice(1) : x;
+  if (/^[A-Z]{2,}(\b|$)/.test(x)) return x;
+  return x.charAt(0).toLowerCase() + x.slice(1);
 }
 
 /**
