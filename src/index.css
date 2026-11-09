@@ -306,8 +306,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Grain overlays */
-.grain-light,
-.grain-dark {
+.grain-light {
   position: absolute; inset: 0;
   pointer-events: none;
   z-index: 1;
@@ -317,10 +316,7 @@ a { color: inherit; text-decoration: none; }
   opacity: 0.06;
   mix-blend-mode: multiply;
 }
-@keyframes shift-gradient {
-  0%   { background-position: 0% 15%; }
-  100% { background-position: 0% 85%; }
-}
+
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -337,27 +333,6 @@ a { color: inherit; text-decoration: none; }
    ═══════════════════════════════════════════════════════════════ */
 
 @layer utilities {
-  .type-display-2xl {
-    font-family: var(--font-display);
-    font-size: var(--type-display-2xl-size);
-    font-weight: var(--type-display-2xl-weight);
-    letter-spacing: var(--type-display-2xl-tracking);
-    line-height: var(--type-display-2xl-leading);
-  }
-  .type-hero {
-    font-family: var(--font-display);
-    font-size: var(--type-hero-size);
-    font-weight: var(--type-hero-weight);
-    letter-spacing: var(--type-hero-tracking);
-    line-height: var(--type-hero-leading);
-  }
-  .type-display-xl {
-    font-family: var(--font-display);
-    font-size: var(--type-display-xl-size);
-    font-weight: var(--type-display-xl-weight);
-    letter-spacing: var(--type-display-xl-tracking);
-    line-height: var(--type-display-xl-leading);
-  }
   .type-display-l {
     font-family: var(--font-display);
     font-size: var(--type-display-l-size);
@@ -365,37 +340,11 @@ a { color: inherit; text-decoration: none; }
     letter-spacing: var(--type-display-l-tracking);
     line-height: var(--type-display-l-leading);
   }
-  .type-h1 {
-    font-family: var(--font-display);
-    font-size: var(--type-h1-size);
-    font-weight: var(--type-h1-weight);
-    letter-spacing: var(--type-h1-tracking);
-    line-height: var(--type-h1-leading);
-  }
-  .type-h2 {
-    font-family: var(--font-display);
-    font-size: var(--type-h2-size);
-    font-weight: var(--type-h2-weight);
-    letter-spacing: var(--type-h2-tracking);
-    line-height: var(--type-h2-leading);
-  }
   /* Last-line orphan guard for every display/heading tier. `pretty` only
      re-breaks the closing lines, so existing ragging and block heights are
      preserved; unsupported browsers just ignore it. */
-  .type-display-2xl,
-  .type-display-xl,
-  .type-display-l,
-  .type-h1,
-  .type-h2 {
+  .type-display-l {
     text-wrap: pretty;
-  }
-
-  .type-h3 {
-    font-family: var(--font-display);
-    font-size: var(--type-h3-size);
-    font-weight: var(--type-h3-weight);
-    letter-spacing: var(--type-h3-tracking);
-    line-height: var(--type-h3-leading);
   }
   .type-body-lg {
     font-family: var(--font-body);
@@ -427,110 +376,6 @@ a { color: inherit; text-decoration: none; }
     text-transform: uppercase;
   }
 
-  /* ── Accent voice ──
-     Cormorant Garamond italic, sized up to optically match Geist's
-     x-height at the same nominal size. Inline-only: never a block,
-     max one phrase per headline, never alongside PillHl, never in
-     body copy / eyebrows / CTAs / nav. Inherits line-height so it
-     can't disturb the leading of the headline it sits inside. */
-
-  /* ── Read-fill: words brighten as the paragraph crosses the reading line.
-     `--p` (0-1) is written once per paragraph per frame by useFillVar;
-     each word derives its own opacity from --i / --n. ── */
-  .read-fill { --p: 0; margin: 0; }
-  .read-fill__w {
-    --span: calc(1.8 / var(--n));
-    /* starts are compressed into [0, 1 - span] so the LAST word still
-       reaches 1 by the time --p does */
-    --start: calc((var(--i) / var(--n)) * (1 - var(--span)));
-    /* the unread floor is a token: 0.22 reads on cream, but on a
-       near-black ground it is invisible, so /about raises it */
-    --rf: var(--rf-floor, 0.22);
-    opacity: clamp(
-      var(--rf),
-      calc(var(--rf) + (1 - var(--rf)) * ((var(--p) - var(--start)) / var(--span))),
-      1
-    );
-  }
-  /* the one flourish per paragraph: a sweep in the study's tint, once the
-     paragraph has been read */
-  .read-fill__hl {
-    background-image: linear-gradient(
-      to right,
-      color-mix(in oklab, var(--tint) 22%, transparent),
-      color-mix(in oklab, var(--tint) 22%, transparent)
-    );
-    background-repeat: no-repeat;
-    background-position: left center;
-    background-size: 0% 82%;
-    transition: background-size var(--duration-slow) var(--ease-out-quart);
-    border-radius: 2px;
-  }
-  .read-fill--lit .read-fill__hl { background-size: 100% 82%; }
-  @media (prefers-reduced-motion: reduce) {
-    .read-fill__hl { background-size: 100% 82%; transition: none; }
-  }
-
-  .read-fill__num {
-    color: color-mix(
-      in oklab,
-      var(--tint) calc(clamp(0, var(--p), 1) * 100%),
-      var(--hair)
-    );
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .read-fill__w { opacity: 1; }
-    /* the one flourish per paragraph: a sweep in the study's tint, once the
-     paragraph has been read */
-  .read-fill__hl {
-    background-image: linear-gradient(
-      to right,
-      color-mix(in oklab, var(--tint) 22%, transparent),
-      color-mix(in oklab, var(--tint) 22%, transparent)
-    );
-    background-repeat: no-repeat;
-    background-position: left center;
-    background-size: 0% 82%;
-    transition: background-size var(--duration-slow) var(--ease-out-quart);
-    border-radius: 2px;
-  }
-  .read-fill--lit .read-fill__hl { background-size: 100% 82%; }
-  @media (prefers-reduced-motion: reduce) {
-    .read-fill__hl { background-size: 100% 82%; transition: none; }
-  }
-
-  .read-fill__num { color: var(--tint); }
-  }
-
-  /* ── Approach pillar names: an outline that fills left to right as the
-     block is read. One scroll-written variable per block (--fill). ── */
-  .pillar-name {
-    --fill: 0;
-    position: relative;
-    display: inline-block;
-    line-height: 1;
-  }
-  .pillar-name__outline {
-    -webkit-text-stroke: 1px currentColor;
-    color: transparent;
-    display: block;
-  }
-  .pillar-name__fill {
-    position: absolute;
-    inset: 0;
-    display: block;
-    clip-path: inset(0 calc((1 - clamp(0, var(--fill), 1)) * 100%) 0 0);
-  }
-  .pillar-name__rule {
-    display: block;
-    height: 2px;
-    transform-origin: left;
-    transform: scaleX(clamp(0, var(--fill), 1));
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .pillar-name { --fill: 1; }
-  }
-
   /* Visible to screen readers, not to the eye. */
   .sr-only {
     position: absolute;
@@ -544,26 +389,6 @@ a { color: inherit; text-decoration: none; }
     border: 0;
   }
 
-  .type-accent {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-style: italic;
-    font-weight: 600;
-    /* Cap-height match to Geist 500: Cormorant cap = 0.625em, Geist cap = 0.710em.
-       0.710 / 0.625 = 1.136 → 1.12 lands within 1.4% and keeps wrap headroom on
-       the Manifesto line, which loses its last word at 1.20em. */
-    font-size: 1.12em;
-    letter-spacing: -0.01em;
-    line-height: inherit;
-  }
-
-  /* ── Measure ── */
-  .measure-wide {
-    max-width: var(--container-wide);
-  }
-  .measure-body {
-    max-width: var(--measure-body);
-  }
-
   /* Tabular numerals — keeps count-ups from jittering horizontally
      as digits change width mid-animation. */
   .tnum {
@@ -572,10 +397,41 @@ a { color: inherit; text-decoration: none; }
   }
 
 }
-@keyframes ws-kb {
-  from { transform: scale(1.02) translate3d(0, 0, 0); }
-  to   { transform: scale(1.09) translate3d(-1.5%, -1.5%, 0); }
-}
+
+/* ═══════════════════════════════════════════════════════════════
+   FOUR v1 SECTION WRAPPERS THAT ARE NOT DEAD — read before deleting
+   ═══════════════════════════════════════════════════════════════
+
+   Everything else from the v1 home is gone. These four stayed because
+   their class names are two letters long and the v2 pages happen to
+   use the same two letters for something else. They are not dormant:
+   they match v2 elements today and win declarations on them.
+
+   Measured on the deployed branch with CDP getMatchedStylesForNode:
+
+     .sp  /services  <p class="sp">            gets position:sticky,
+                                               height:100vh and the
+                                               cream --color-bg-alt
+     .st  /services  <span class="st"> x4      gets background
+          /contact   <span class="mono st">    --color-dark (#141412)
+     .nh  /services  <div class="nh mono"> x4  gets min-height:100svh
+                                               (computed 900px),
+                                               display:flex,
+                                               flex-direction:column,
+                                               isolation:isolate,
+                                               overflow:hidden
+     .ds  /services  <div class="vp lt ds">    matches; its background
+                                               is overridden downstream
+
+   So deleting them changes what renders — a phone-width <p> would
+   stop being a sticky full-height cream panel, and four <div class="nh
+   mono"> would stop being 900px-tall flex columns. This pass was asked
+   to change nothing visible, so they stay.
+
+   They are almost certainly accidents rather than intent: nothing in
+   the v2 markup wants a 900px-tall flex column. Worth fixing on its
+   own, as a change with its own before/after, not buried in a cleanup.
+*/
 .sp {
   position: sticky; top: 0; height: 100vh; overflow: hidden;
   background: var(--color-bg-alt);
@@ -583,105 +439,22 @@ a { color: inherit; text-decoration: none; }
   padding: 104px 0 36px;
 }
 
-/* ── Chapter 5: start ──────────────────────────────────────────────── */
 .st { background: var(--color-bg); }
-@keyframes hf-breathe {
-  0%, 100% { rotate: y -1.5deg; }
-  50%      { rotate: y 1.5deg; }
-}
-@keyframes hf-drift {
-  from { translate: 0 0; }
-  to   { translate: 0 calc(var(--hf-drift) * -1); }
-}
 
-/* Ch6 is dark now: it closes the film on the hero's own ground. */
-/* The INHERITED colour has to flip with the ground, not only the
-   colours named below: every child here sets its own, but .st still
-   handed down --color-ink, so any text node added to this chapter
-   later would have rendered ink-on-dark — invisible. */
+/* The second .st wins on the elements that match, and sets `color` as
+   well: every child named its own colour, but .st still handed down
+   --color-ink, so a text node added later would have rendered
+   ink-on-dark. Kept verbatim; see the note above. */
 .st { background: var(--color-dark); color: var(--color-parch); }
-@keyframes ob-rotate { from { transform: rotateY(0deg) rotateX(12deg); } to { transform: rotateY(360deg) rotateX(12deg); } }
-@keyframes ob-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-@keyframes pc-idle {
-  0%, 100% { translate: 0 0; rotate: 0deg; }
-  50%      { translate: 0 -5px; rotate: 0.35deg; }
-}
-@keyframes pc-ripple {
-  0%   { transform: scale(0); opacity: 0.75; }
-  100% { transform: scale(16); opacity: 0; }
-}
-@keyframes pc-blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
-@keyframes pc-type { from { width: 0; } to { width: 5.1em; } }
-@keyframes pc-code-w { from { width: 0; } to { width: 100%; } }
-@keyframes pc-draw { from { stroke-dashoffset: 230; } to { stroke-dashoffset: 0; } }
-@keyframes pc-dot-in { 0%, 76% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes pc-dot { 0%, 100% { opacity: 0.32; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
-@keyframes pc-pulse { from { stroke-dashoffset: 65; } to { stroke-dashoffset: 0; } }
-@keyframes pc-bounce { 0%, 100% { transform: translateY(0); } 36% { transform: translateY(-17px); } 70% { transform: translateY(-4px); } }
-@keyframes pc-ring { 0% { transform: scale(0.5); opacity: 0.9; } 100% { transform: scale(2.6); opacity: 0; } }
-@keyframes pc-click { 0%, 100% { transform: scale(1); } 40% { transform: scale(0.82); } }
-@keyframes pf-breathe {
-  0%, 100% { rotate: y 0deg; }
-  50%      { rotate: y 1.5deg; }
-}
-@keyframes pf-drift {
-  0%, 100% { translate: 0 0; }
-  50%      { translate: 0 calc(var(--pf-drift, 4px) * -1); }
-}
-@keyframes hx-ink { to { opacity: 1; translate: 0 0; } }
-@keyframes hx-caret-run { to { left: 100%; } }
-@keyframes hx-caret-on { to { opacity: 1; } }
-@keyframes hx-caret-off { to { opacity: 0; } }
-@keyframes hx-slam {
-  0%   { transform: scale(1.12); opacity: 0; }
-  55%  { opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}
-@keyframes hx-slab-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(237,233,226,0.5); }
-  100% { box-shadow: 0 18px 44px -26px rgba(0,0,0,0.9); }
-}
 
-/* ── the hero ── */
 .nh {
   position: relative; isolation: isolate;
   min-height: 100svh; display: flex; flex-direction: column;
   background: linear-gradient(170deg, var(--navy-1) 0%, var(--navy-2) 52%, var(--navy-3) 100%);
   overflow: hidden;
 }
-@keyframes nh-marquee { to { transform: translateX(-50%); } }
 
-/* ══ 27b · the pinned device story ═════════════════════════════════ */
 .ds { background: var(--bg); }
-@keyframes dp-type { from { width: 0; } to { width: 15.6em; } }
-@keyframes dp-caret { 0%,50% { border-color: var(--glow-peach); } 51%,100% { border-color: transparent; } }
-@keyframes dp-climb { from { transform: translateY(68px); opacity: 0.4; } to { transform: none; opacity: 1; } }
-@keyframes dp-pulse { to { box-shadow: 0 0 0 22px rgba(249,175,151,0); } }
-@keyframes dp-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-@keyframes dp-fade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes dp-click {
-  0% { opacity: 0; transform: translate(26px, 22px) scale(1.5); }
-  45% { opacity: 1; transform: none; }
-  62% { transform: scale(0.7); }
-  100% { opacity: 0; transform: none; }
-}
-@keyframes dsub-drift { 0%,100% { translate: 0 0; } 50% { translate: 0 -7px; } }
-@keyframes dsub-in { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: none; } }
-@keyframes os-orbit { to { transform: rotateZ(calc(var(--i) * 90deg + 360deg)) translateX(clamp(170px, 27vw, 310px)); } }
-@keyframes os-counter {
-  from { transform: rotateZ(calc(var(--i) * -90deg)) rotateX(-62deg); }
-  to   { transform: rotateZ(calc(var(--i) * -90deg - 360deg)) rotateX(-62deg); }
-}
-
-@media (max-width: 860px) {
-  .os-stage { aspect-ratio: 1 / 1; }
-  .os-ring li { transform: rotateZ(calc(var(--i) * 90deg)) translateX(132px); }
-  @keyframes os-orbit { to { transform: rotateZ(calc(var(--i) * 90deg + 360deg)) translateX(132px); } }
-  .os-chip { font-size: 13px; padding: 10px 15px; }
-  .wb-card { grid-template-columns: 1fr; }
-  .wb-credits > div { grid-template-columns: 1fr; gap: 3px; }
-  .wb-credits dt { font-size: 13px; }
-}
 
 /* ══ 27c · the navy footer, site-wide ══════════════════════════════ */
 .nf {
@@ -720,19 +493,13 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 860px) {
-  .nh-clients__label { font-size: 13px; letter-spacing: 0.1em; }
   .nf-cols li a { min-height: 44px; }
-  /* the orbiting chips are real links and carry real targets */
-  .os-chip { min-height: 44px; display: inline-flex; align-items: center; padding: 10px 18px; }
-  .wb-more, .wc-vault { min-height: 44px; }
 }
 
 @media (max-width: 860px) {
-  /* every remaining inline link reaches a 44px target */
-  .wc-also a, .wc-vault, .wc-vault span { min-height: 44px; display: inline-flex; align-items: center; }
   .nf-cols li a { min-width: 44px; }
 }
-@keyframes atmos-drift { to { transform: translateX(-800px); } }
+
 
 /* Session 29, owner instruction: the nav CTA never wraps to two lines at
    narrow widths. Scoped to the nav's own pill rather than applied to
