@@ -17,7 +17,7 @@
 /* Services v2. The visitor names their business; one pinned stage then builds twelve real deliverables for it — three per service (Websites, Web Apps, AI Automation, Marketing) — then tiles them together. After the refusals, the Project Start Pass: their name, the services they want and a day to talk become a ticket with the call, proposal and kickoff dates, ready to book. Questions and answers close the page. */
 .sv {
   --navy:#121C27; --navy-2:#182633; --navy-3:#232837; --black:#080A0A;
-  --light:#F5F4F9; --light-2:#EFEEF5; --hair:#D4D4DA; --ink:#0F1117; --ink-2:#6E6E80;
+  --light:#F5F4F9; --light-2:#EFEEF5; --hair:#D4D4DA; --ink:#0F1117; --ink-2:#666678; /* was #6E6E80: 4.56 on --light, which clears AA by 0.06. The 10px mono labels it paints (.mt) are exactly what spec 31 said to raise. #666678 is 5.14 on --light and 4.88 on --light-2. */
   --mute:rgba(245,244,249,.66); --faint:rgba(245,244,249,.14); --line:rgba(245,244,249,.22);
   --web:#F9AF97; --app:#D5818C; --ai:#9874E8; --blue:#569AFA;
   --grad:linear-gradient(90deg,#F9AF97,#D5818C,#9874E8,#708DF8,#569AFA);

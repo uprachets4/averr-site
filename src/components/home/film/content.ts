@@ -98,7 +98,10 @@ export const PARTNERS: Array<{ name: string; logo: string }> = [
   { name: "Royal LePage", logo: "/logos/partners/royallepage.png" },
 ];
 
-export const CLIENTS = ["CG Walls & Floors", "SIFT", "CadenceStack", "CareerClarity AI"];
+/* CareerClarity AI is out until its case file is live — it is still a
+   hidden draft, and "In good company" should only name work a visitor
+   can actually go and read. Put it back when the case file ships. */
+export const CLIENTS = ["CG Walls & Floors", "SIFT", "CadenceStack"];
 
 export const OUTCOMES: Array<[string, string, string]> = [
   ["Websites", SERVICE_COLOR.websites, "Your new site is live"],

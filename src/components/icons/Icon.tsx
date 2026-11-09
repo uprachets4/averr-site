@@ -67,10 +67,16 @@ export default function Icon({
       role={decorative ? undefined : "img"}
       aria-label={decorative ? undefined : label}
     >
+      {/* Phosphor puts `size` straight on the svg's `width` and
+          `height` ATTRIBUTES, and an attribute is not a CSS value —
+          `width="var(--icon-lg)"` made every page log
+          `Expected length, "var(--icon-lg)"`. The span above already
+          has the right box from the token, so the glyph just fills
+          it. A numeric size still passes through untouched. */}
       <Glyph
         weight={weight}
         color="currentColor"
-        size={sizeValue}
+        size={typeof size === "number" ? size : "100%"}
         style={{ display: "block" }}
       />
     </span>
