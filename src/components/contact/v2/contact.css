@@ -296,6 +296,40 @@
 .ct .waysrow span {font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
 .ct .waysrow b {font-size:17px;font-weight:500;letter-spacing:-.02em;overflow-wrap:anywhere}
 
+/* ================= 404 =================
+   Part B has no reference file: it is built out of this page's own
+   parts, under the same `.ct` root, so there is nothing second to
+   keep in step. `nf404*` rather than `nf*` — the old cream page's
+   class names are gone, and these must not be mistaken for them. */
+.ct .nf404 {position:relative;min-height:100svh;display:flex;align-items:center;padding-block:120px 80px;overflow:hidden}
+.ct .nf404 .orb.a {width:44vw;height:44vw;right:-8vw;top:6vh;background:radial-gradient(closest-side,rgba(152,116,232,.45),transparent);animation:ct-drift 28s ease-in-out infinite}
+.ct .nf404::after {content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(245,244,249,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(245,244,249,.035) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(60% 60% at 50% 50%,#000,transparent);mask-image:radial-gradient(60% 60% at 50% 50%,#000,transparent)}
+.ct .nf404in {position:relative;z-index:1;max-width:760px;display:flex;flex-direction:column;align-items:flex-start;gap:0}
+.ct .nf404mark {width:64px;height:auto;margin-bottom:26px}
+.ct .nf404mark .mstroke {fill:none;stroke:url(#ctgrad);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.ct .nf404mark .mfill {fill:url(#ctfill);opacity:0;transition:opacity .8s var(--ease)}
+.ct .nf404mark.signed .mfill {opacity:1}
+.ct .nf404 h1 {font-size:clamp(40px,5.6vw,84px);margin-top:22px}
+.ct .nf404 .lede {margin-top:20px}
+.ct .nf404rows {display:flex;flex-direction:column;width:100%;margin-top:40px;border-top:1px solid var(--faint)}
+.ct .nf404rows a {display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px 4px;border-bottom:1px solid var(--faint);text-decoration:none;transition:background .3s,padding-left .3s var(--out)}
+.ct .nf404rows a:hover {background:rgba(245,244,249,.04);padding-left:12px}
+.ct .nf404rows span {display:flex;flex-direction:column;gap:5px;min-width:0}
+.ct .nf404rows b {font-size:20px;font-weight:500;letter-spacing:-.02em}
+/* `em` for the line, never italic: the old page's serif italic was
+   half of its 17 contrast failures. */
+.ct .nf404rows em {font-style:normal;font-size:14.5px;line-height:1.45;color:rgba(245,244,249,.72)}
+.ct .nf404rows i {font-style:normal;flex:none;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:15px;transition:background .3s,color .3s,transform .4s var(--out)}
+.ct .nf404rows a:hover i {background:var(--light);color:var(--navy);transform:translateX(3px)}
+.ct .nf404cta {margin-top:36px}
+
+@media (max-width:900px) {
+  .ct .nf404 {padding-block:100px 56px;min-height:auto}
+  .ct .nf404rows a {padding:17px 2px}
+  .ct .nf404rows b {font-size:18px}
+  .ct .nf404cta {width:100%}
+}
+
 @media (max-width:1100px) and (min-width:901px) {
   .ct .doors {grid-template-columns:1fr}
   .ct .door {min-height:0}

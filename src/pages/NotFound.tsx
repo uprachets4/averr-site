@@ -1,108 +1,157 @@
-import { motion, useReducedMotion } from "motion/react";
-import { duration, ease } from "../lib/motion";
-import MagneticCTA from "../components/MagneticCTA";
-import MonogramMark from "../components/MonogramMark";
-import { CharReveal } from "../components/CharReveal";
+import { useCallback, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { MARK_PATH_D } from "../components/MonogramMark";
 import { useDocumentMeta, META } from "../lib/documentMeta";
+import { useDeclarePageEndTone } from "../lib/pageTone";
+import { useSetNavDarkOverride } from "../lib/navTone";
+import { embedRequested, openModal, warmEmbed } from "../components/services/passBooking";
+import { prefersReducedMotion, easeInOut } from "../components/about/v2/useSectionProgress";
+import "../components/contact/v2/contact.css";
 
 /**
- * 404.
+ * 404, spec 34 part B.
  *
- * PillHl is HOME ONLY from Session 20 — the hero and FinalCTA, nowhere
- * else — so the slab that used to sit on "doesn't exist" is gone and
- * the Cormorant accent carries "Yet." instead.
+ * Rebuilt in the navy world out of the Contact page's own parts: it
+ * reuses `.ct`, its tokens, its `.ways`-style rows and its buttons,
+ * so there is no second sheet to keep in step. There is no reference
+ * file for this page; the pieces are.
  *
- * The mark draws, the headline paints at the first frame per the hero
- * LCP rule, and the four routes are offered as rows rather than a grid
- * of cards: this page's whole job is to be left quickly.
+ * What it replaces: the original cream design, whose serif italic
+ * "Yet." and light-on-cream palette carried 17 contrast failures.
+ * No italics anywhere now.
+ *
+ * `CaseStudy` renders this for an unknown slug too, so a wrong case
+ * file link lands in the same navy 404 rather than the old cream one.
  */
 
-const ROUTES = [
-  { to: "/work", label: "Work", line: "Four projects, start to finish." },
-  { to: "/services", label: "Services", line: "Design, Automate, Grow." },
-  { to: "/about", label: "About", line: "The studio, and who runs it." },
-  { to: "/contact", label: "Contact", line: "Book a call or send a brief." },
+const ROUTES: { to: string; label: string; line: string }[] = [
+  { to: "/work", label: "Work", line: "Five projects, start to finish." },
+  {
+    to: "/services",
+    label: "Services",
+    line: "Websites, Web Apps, AI Automation and Marketing.",
+  },
+  { to: "/about", label: "About", line: "The person who builds it." },
+  { to: "/contact", label: "Contact", line: "Write to me, or book a call." },
 ];
 
 export default function NotFound() {
-  const reduce = useReducedMotion();
-
   useDocumentMeta(META.notFound.title, META.notFound.description);
+  useDeclarePageEndTone("dark");
+
+  const markRef = useRef<SVGSVGElement | null>(null);
+  const strokeRef = useRef<SVGPathElement | null>(null);
+
+  const setNavDark = useSetNavDarkOverride();
+  useEffect(
+    function navAlwaysDark() {
+      setNavDark(true);
+      const root = document.documentElement;
+      root.style.setProperty("--nav-dark-bar", "#13161E");
+      return function reset() {
+        setNavDark(false);
+        root.style.removeProperty("--nav-dark-bar");
+      };
+    },
+    [setNavDark]
+  );
+
+  /* The mini mark signs once, on load. */
+  useEffect(function sign() {
+    const svg = markRef.current;
+    const path = strokeRef.current;
+    if (!svg || !path) return;
+
+    const L = path.getTotalLength();
+    path.style.strokeDasharray = String(L);
+    path.style.strokeDashoffset = String(L);
+
+    if (prefersReducedMotion()) {
+      path.style.strokeDashoffset = "0";
+      svg.classList.add("signed");
+      return;
+    }
+
+    let raf = 0;
+    const t0 = performance.now();
+    (function frame(now: number) {
+      const k = Math.min(1, (now - t0) / 1800);
+      path.style.strokeDashoffset = String(L * (1 - easeInOut(k)));
+      if (k < 1) raf = requestAnimationFrame(frame);
+      else svg.classList.add("signed");
+    })(t0);
+
+    return function stop() {
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const warm = useCallback(function intent() {
+    if (!embedRequested()) warmEmbed().catch(() => undefined);
+  }, []);
+  const book = useCallback(function book() {
+    /* No date, as ruled: this CTA has no picked day. */
+    openModal({ notes: "404 page" }).catch(() => undefined);
+  }, []);
 
   return (
-    <section className="nf">
-      <div className="grain-light" aria-hidden="true" style={{ opacity: 0.05 }} />
+    <div className="ct">
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+        <defs>
+          <linearGradient id="ctgrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#F9AF97" />
+            <stop offset=".33" stopColor="#D5818C" />
+            <stop offset=".66" stopColor="#9874E8" />
+            <stop offset="1" stopColor="#569AFA" />
+          </linearGradient>
+          <linearGradient id="ctfill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#FFFFFF" />
+            <stop offset="1" stopColor="#E6E3F2" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="grain" aria-hidden="true" />
 
-      <div className="nf-in">
-        <div className="nf-mark" aria-hidden="true">
-          <MonogramMark variant="hero" />
+      <section className="nf404 gut" aria-labelledby="nf-h1">
+        <div className="orb a" aria-hidden="true" />
+        <div className="wrap nf404in">
+          <svg className="nf404mark" viewBox="0 0 327 454" aria-hidden="true" ref={markRef}>
+            <path className="mfill" d={MARK_PATH_D} fillRule="evenodd" />
+            <path className="mstroke" d={MARK_PATH_D} fillRule="evenodd" ref={strokeRef} />
+          </svg>
+
+          <span className="eyebrow">404</span>
+          <h1 id="nf-h1">This page doesn't exist.</h1>
+          <p className="lede">
+            The link may be old, or mistyped. Here's where everything lives.
+          </p>
+
+          <nav className="nf404rows" aria-label="Where everything lives">
+            {ROUTES.map(function row(r) {
+              return (
+                <Link to={r.to} key={r.to}>
+                  <span>
+                    <b>{r.label}</b>
+                    <em>{r.line}</em>
+                  </span>
+                  <i aria-hidden="true">→</i>
+                </Link>
+              );
+            })}
+          </nav>
+
+          <button
+            className="btn nf404cta"
+            type="button"
+            onMouseEnter={warm}
+            onFocus={warm}
+            onPointerDown={warm}
+            onClick={book}
+          >
+            Book a call →
+          </button>
         </div>
-
-        {/* painted at the first frame; the entrance is transform-only */}
-        <h1 className="type-display-l nf-h">
-          <CharReveal
-            paint
-            delay={reduce ? 0 : 1.1}
-            segments={[{ text: "This page doesn't exist. " }, { text: "Yet.", accent: true }]}
-          />
-        </h1>
-
-        <motion.p
-          className="nf-sub"
-          initial={{ opacity: 1, y: reduce ? 0 : 10 }}
-          animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 1.4 }}
-        >
-          Here's where the good stuff is:
-        </motion.p>
-
-        <motion.ul
-          className="nf-list"
-          initial={{ opacity: 1, y: reduce ? 0 : 10 }}
-          animate={{ y: 0 }}
-          transition={{ duration: reduce ? 0 : duration.base, ease: ease.outQuart, delay: reduce ? 0 : 1.6 }}
-        >
-          {ROUTES.map((r) => (
-            <li key={r.to} className="nf-row">
-              <MagneticCTA to={r.to} variant="text" size="lg" ariaLabel={`${r.label} — ${r.line}`}>
-                {r.label}
-              </MagneticCTA>
-              <span className="nf-line">{r.line}</span>
-            </li>
-          ))}
-        </motion.ul>
-      </div>
-
-      <style>{`
-        .nf {
-          position: relative; overflow: hidden;
-          background: var(--color-bg);
-          min-height: 100vh;
-          padding: clamp(104px, 14vh, 168px) 0 clamp(72px, 10vh, 120px);
-          display: flex; align-items: center;
-        }
-        .nf-in {
-          position: relative; z-index: 2;
-          max-width: var(--container-wide); margin: 0 auto; width: 100%;
-        }
-        .nf-mark { width: clamp(90px, 13vh, 150px); margin-bottom: clamp(22px, 3vh, 38px); }
-        .nf-mark > div { width: 100% !important; }
-        .nf-h { color: var(--color-ink); margin: 0; max-width: 20ch; }
-        .nf-sub {
-          margin: clamp(18px, 2.4vh, 28px) 0 clamp(28px, 4vh, 44px);
-          font-size: 18px; line-height: 1.6; color: var(--color-muted);
-        }
-        .nf-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-        .nf-row {
-          display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap;
-          padding: 16px 0; border-top: 1px solid rgba(20,20,18,0.12);
-        }
-        .nf-row:last-child { border-bottom: 1px solid rgba(20,20,18,0.12); }
-        .nf-line { font-size: 15px; color: var(--color-muted); }
-        @media (max-width: 760px) {
-          .nf-row { gap: 4px; flex-direction: column; align-items: flex-start; }
-        }
-      `}</style>
-    </section>
+      </section>
+    </div>
   );
 }
