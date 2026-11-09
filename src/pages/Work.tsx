@@ -21,8 +21,9 @@ import { useDocumentMeta, META } from "../lib/documentMeta";
  *
  * What it replaced, each checked for importers outside /work first:
  * VaultDoors, ProjectFilm, WorkMobile, OpenTransition and the
- * workIndex data. `Chapter`, `MagneticCTA` and `CharReveal` are no
- * longer used here but stay — four other routes render them.
+ * workIndex data. `Chapter` and `MagneticCTA` are no longer used here
+ * but stay — four other routes render them. `CharReveal` turned out to
+ * be rendered by no route at all and went in the spec-34 cleanup.
  */
 
 const SCROLL_KEY = "averr:work-scroll";

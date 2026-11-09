@@ -18,8 +18,9 @@ import { useDocumentMeta, META } from "../lib/documentMeta";
  * PillHl (only FinalCTA used it — the 404 dropped it in Session 20) and
  * the homeScenes data. `Chapter` stays: /work, /services, /about,
  * /contact and the case studies all use it, and `lib/pageTone` imports
- * its `Tone` type. So do CharReveal, MagneticCTA, LineReveal, Screenshot
- * and AverrMark.
+ * its `Tone` type. So do MagneticCTA, LineReveal, Screenshot and
+ * AverrMark. (CharReveal went in the spec-34 cleanup: by then nothing
+ * imported it.)
  *
  * `src/data/serviceColors.ts` is deliberately left in place though
  * nothing imports it today: the film's service acts are built on it in
