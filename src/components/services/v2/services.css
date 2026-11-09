@@ -371,11 +371,19 @@
 .sv .abtn {position:relative;height:40px;border-radius:999px;font-size:13px;font-weight:600}
 .sv .abtn span {position:absolute;inset:0;display:grid;place-items:center;border-radius:inherit;transition:opacity .4s,transform .5s var(--out)}
 .sv .abtn .a1 {border:1px solid var(--line)}
-.sv .abtn .a2 {background:var(--ai);color:#fff;opacity:0;transform:scale(.9)}
+/* Ink, not white: #fff on --ai measured 3.50:1 on 13px semibold. The
+   button keeps its violet; --ink on it is 5.39:1. The check mark is
+   part of the label's own text, so it follows this colour. */
+.sv .abtn .a2 {background:var(--ai);color:var(--ink);opacity:0;transform:scale(.9)}
 .sv .slot.s3 .abtn .a1 {opacity:0}
 .sv .slot.s3 .abtn .a2 {opacity:1;transform:none}
 .sv .dcard {font-size:13px;line-height:1.4;padding:12px;border-radius:11px;background:#182633;border:1px solid var(--faint);display:flex;flex-direction:column;gap:5px}
-.sv .dcard b {color:var(--ai);font-weight:500}
+/* --ai on the #182633 card is 4.40:1 at 10px — just under AA. Lifted
+   to #A086EC (5.22:1) HERE ONLY, so the token keeps its ten other
+   uses; those are backgrounds, borders and dots except `.flowhead b`
+   and `.nh i`, both measured separately and both clearing AA on their
+   own grounds. */
+.sv .dcard b {color:#A086EC;font-weight:500}
 .sv .wire {position:relative;align-self:center;height:2px;margin:0 6px;background:var(--faint);border-radius:2px;overflow:hidden}
 .sv .wire i {position:absolute;inset:0;background:var(--ai);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--out)}
 .sv .wire.lit i {transform:none}
