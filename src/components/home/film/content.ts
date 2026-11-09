@@ -103,6 +103,28 @@ export const PARTNERS: Array<{ name: string; logo: string }> = [
    can actually go and read. Put it back when the case file ships. */
 export const CLIENTS = ["CG Walls & Floors", "SIFT", "CadenceStack"];
 
+/**
+ * The studio's figures, owner-supplied and used verbatim.
+ *
+ * Order is the house service order — Websites, Web Apps, AI Automation,
+ * Marketing — and each takes its own service colour by name, which is
+ * the one case `serviceColors` allows a single colour: a surface that
+ * names ONE service.
+ */
+export type Stat = { n: number; suffix: string; label: string; color: string };
+
+export const STATS: Stat[] = [
+  { n: 50, suffix: "+", label: "websites delivered", color: SERVICE_COLOR.websites },
+  { n: 65, suffix: "+", label: "web apps shipped", color: SERVICE_COLOR.webApps },
+  { n: 50, suffix: "+", label: "AI automations built", color: SERVICE_COLOR.aiAutomation },
+  {
+    n: 50,
+    suffix: "+",
+    label: "marketing accounts managed right now",
+    color: SERVICE_COLOR.marketing,
+  },
+];
+
 export const OUTCOMES: Array<[string, string, string]> = [
   ["Websites", SERVICE_COLOR.websites, "Your new site is live"],
   ["Web Apps", SERVICE_COLOR.webApps, "New booking · Thursday, 2:30 pm"],

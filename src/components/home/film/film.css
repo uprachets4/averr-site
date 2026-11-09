@@ -300,3 +300,89 @@ h2.hf-cap { margin: 0; font-weight: 400; }
 .hf-film a:focus-visible,
 .hf-film input:focus-visible,
 .hf-film button:focus-visible { outline: 2px solid #F5F4F9; outline-offset: 3px; }
+
+/* ── the figures, under the clients row ───────────────────────────── */
+/* `.hf-center` puts a 22px gap above every child, so 10px more makes
+   the 32px of air the divider wants. */
+.hf-stats {
+  list-style: none;
+  margin: calc(32px - 22px) 0 0;
+  padding: clamp(20px, 3vh, 30px) 0 0;
+  width: 100%;
+  max-width: 1040px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 30px);
+  text-align: center;
+}
+.hf-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  /* entrance: transform and opacity only, 80ms apart */
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  transition-delay: calc(var(--i) * 80ms);
+}
+.hf-stats.in .hf-stat { opacity: 1; transform: none; }
+.hf-statn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(36px, 4.2vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  color: var(--c);
+  display: inline-flex;
+  align-items: baseline;
+}
+.hf-statn i { font-style: normal; opacity: 0.6; }
+.hf-statl {
+  font: 500 12px/1.35 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(245, 244, 249, 0.66);
+  max-width: 22ch;
+  /* two lines at most */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hf-stat { opacity: 1; transform: none; transition: none; }
+}
+@media (max-width: 640px) {
+  .hf-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
+  .hf-statl { font-size: 11px; letter-spacing: 0.06em; }
+}
+
+/* The partners act is pinned, so everything in it has to fit one
+   screen. With the figures added it no longer did at 390x844: the
+   eyebrow and the heading sat behind the fixed nav and the last
+   label was cut off at the bottom. The plates are what cost the
+   room — at their 170px floor three of them stack vertically — so
+   they shrink here and the gaps close up. The figures stay. */
+@media (max-width: 640px) {
+  .hf-layer[aria-label="Partners and clients"] .hf-center {
+    /* 84px clears the fixed nav; the block still centres in what is
+       left, so it does not ride the top of the screen. */
+    padding: 84px 14px 20px;
+    gap: 14px;
+  }
+  .hf-layer[aria-label="Partners and clients"] .hf-marks { gap: 20px; }
+  .hf-layer[aria-label="Partners and clients"] .hf-row { gap: 12px 16px; }
+  .hf-layer[aria-label="Partners and clients"] .hf-mark { gap: 8px; }
+  .hf-layer[aria-label="Partners and clients"] .hf-plate {
+    width: 112px; height: 58px; padding: 8px 12px; border-radius: 13px;
+  }
+  .hf-layer[aria-label="Partners and clients"] .hf-mark small { font-size: 11px; letter-spacing: 0.12em; }
+  .hf-layer[aria-label="Partners and clients"] .hf-row--c b { font-size: 19px; }
+  .hf-stats { padding-top: 18px; margin-top: calc(26px - 14px); }
+  .hf-statn { font-size: clamp(32px, 9.5vw, 46px); }
+}

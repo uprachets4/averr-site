@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { CLIENTS, OUTCOMES, PARTNERS, PROJECTS, SERVICES } from "./content";
+import { CLIENTS, OUTCOMES, PARTNERS, PROJECTS, SERVICES, STATS } from "./content";
 import type { FilmHandle } from "./engine";
 import "./film.css";
 
@@ -46,6 +46,16 @@ export default function HomeFilm() {
   const fBotRef = useRef<HTMLDivElement | null>(null);
   const tsRef = useRef<HTMLParagraphElement | null>(null);
   const marksRef = useRef<HTMLDivElement | null>(null);
+
+  /* The stat row. `statsIn` is React state because the entrance is a
+     className and this component re-renders on every keystroke in the
+     finale's field — an imperatively added class would be reconciled
+     away. The COUNT itself never goes through state: it writes
+     textContent on these refs from a rAF loop, so ninety frames of
+     counting cost no renders. */
+  const statNumRefs = useRef<Array<HTMLElement | null>>([]);
+  const countedRef = useRef(false);
+  const [statsIn, setStatsIn] = useState(false);
 
   /* The typed name lives in React state and a ref, and nowhere else:
      no network call, no storage. It dies with the tab. */
@@ -94,12 +104,19 @@ export default function HomeFilm() {
               fBot: fBotRef.current!,
               ts: tsRef.current!,
               getName: () => nameRef.current,
+              /* The stats ride the partners act's own progress, the same
+                 value that fades the marks in — not a second observer
+                 that would fight the pin. */
+              onPartnersIn: () => setStatsIn(true),
             });
           })
           .catch((err) => {
             /* No WebGL, a blocked chunk, a throw: every line of copy
                still reads on the stage's own gradient, in order. */
             if (import.meta.env.DEV) console.warn("home film: engine unavailable", err);
+            /* No engine means no progress callback, so the figures would
+               sit at 0 forever. The act still reads on the gradient. */
+            setStatsIn(true);
           });
       },
       { rootMargin: "100% 0px" },
@@ -113,6 +130,44 @@ export default function HomeFilm() {
       handleRef.current = null;
     };
   }, []);
+
+  /* 0 -> n over 900ms, ease-out, 80ms apart, once. */
+  useEffect(
+    function countUp() {
+      if (!statsIn || countedRef.current) return;
+      countedRef.current = true;
+      const els = statNumRefs.current;
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce) {
+        STATS.forEach((s, i) => {
+          const el = els[i];
+          if (el) el.textContent = String(s.n);
+        });
+        return;
+      }
+      let raf = 0;
+      const t0 = performance.now();
+      const DUR = 900;
+      const STEP = 80;
+      (function frame(now: number) {
+        let running = false;
+        STATS.forEach((s, i) => {
+          const el = els[i];
+          if (!el) return;
+          const k = Math.max(0, Math.min(1, (now - t0 - i * STEP) / DUR));
+          /* easeOutCubic — fast off the mark, settles onto the figure */
+          const e = 1 - Math.pow(1 - k, 3);
+          el.textContent = String(Math.round(s.n * e));
+          if (k < 1) running = true;
+        });
+        if (running) raf = requestAnimationFrame(frame);
+      })(t0);
+      return function stop() {
+        if (raf) cancelAnimationFrame(raf);
+      };
+    },
+    [statsIn]
+  );
 
   /* The name rebuilds 420ms after typing stops, as in the reference. */
   useEffect(
@@ -142,7 +197,10 @@ export default function HomeFilm() {
           <section className="hf-layer" ref={partnersRef} aria-label="Partners and clients">
             <div className="hf-center">
               <span className="hf-eyebrow">Partners and clients</span>
-              <h2 className="hf-xl hf-glow" style={{ fontSize: "clamp(40px,6vw,108px)" }}>
+              {/* The min came down from 40px so the act clears the nav on a
+                  390px phone once the figures are under it; 6vw still
+                  governs from ~500px up, so nothing wider changes. */}
+              <h2 className="hf-xl hf-glow" style={{ fontSize: "clamp(30px,6vw,108px)" }}>
                 In good company.
               </h2>
               <div className="hf-marks" ref={marksRef}>
@@ -164,6 +222,33 @@ export default function HomeFilm() {
                   ))}
                 </div>
               </div>
+
+              {/* The figures. Deliberately NOT inside `.hf-marks`: the
+                  engine drives every `.hf-mark` in there by the act's
+                  own progress, and these have their own entrance. */}
+              <ul className={`hf-stats${statsIn ? " in" : ""}`}>
+                {STATS.map((s, i) => (
+                  <li
+                    className="hf-stat"
+                    key={s.label}
+                    style={{ "--c": s.color, "--i": i } as CSSProperties}
+                  >
+                    {/* The counting number is decorative: it is mid-count
+                        for most of its life and would read as noise. The
+                        real figure is the hf-sr line below. */}
+                    <span className="hf-statn" aria-hidden="true">
+                      <b ref={(el) => void (statNumRefs.current[i] = el)}>
+                        {countedRef.current ? s.n : 0}
+                      </b>
+                      <i>{s.suffix}</i>
+                    </span>
+                    <span className="hf-statl" aria-hidden="true">
+                      {s.label}
+                    </span>
+                    <span className="hf-sr">{`${s.n}${s.suffix} ${s.label}`}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </section>
 

@@ -50,6 +50,8 @@ export type FilmOpts = {
   fTop: HTMLElement;
   fBot: HTMLElement;
   ts: HTMLElement;
+  /** Fired once when the partners act has finished arriving. */
+  onPartnersIn?: () => void;
   /** The name the visitor typed, or "" for the placeholder. */
   getName: () => string;
 };
@@ -636,10 +638,14 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
   }
 
   let finaleOn = false;
+  let statsFired = false;
   function overlay(P: number) {
     // partners
     const small = isSmall();
     const pp = clamp(P / T.pE, 0, 1);
+    /* The figures start counting off the SAME progress that fades the
+       marks in, once the last of them is on its way. */
+    if (!statsFired && pp > 0.62) { statsFired = true; opts.onPartnersIn?.(); }
     layers.partners.style.opacity = (
       small ? fadeOut(P, T.pE, PRT_OUT_TO) : P < T.pE ? 1 : 1 - clamp((P - T.pE) / 0.02, 0, 1)
     ).toFixed(3);
