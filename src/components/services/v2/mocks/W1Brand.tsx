@@ -73,9 +73,13 @@ export default function W1Brand({ f }: { f: Fields }) {
           </div>
         </div>
 
+        {/* #C2604F measured 4.13:1 on the white plate — an AA failure on
+            11px text, and the border takes its colour from here too.
+            #BF5745 is the same hue (8.85deg vs 8.87) and saturation,
+            darkened just far enough to reach 4.50:1. */}
         <span
           className="stamp r4"
-          style={{ position: "absolute", right: 30, bottom: 26, color: "#C2604F" }}
+          style={{ position: "absolute", right: 30, bottom: 26, color: "#BF5745" }}
         >
           Approved
         </span>

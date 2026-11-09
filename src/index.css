@@ -398,63 +398,26 @@ a { color: inherit; text-decoration: none; }
 
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   FOUR v1 SECTION WRAPPERS THAT ARE NOT DEAD — read before deleting
-   ═══════════════════════════════════════════════════════════════
+/* The last four v1 section wrappers — `.sp`, `.st`, `.nh` and `.ds` —
+   are gone from here.
 
-   Everything else from the v1 home is gone. These four stayed because
-   their class names are two letters long and the v2 pages happen to
-   use the same two letters for something else. They are not dormant:
-   they match v2 elements today and win declarations on them.
+   They were the only rules the CSS cull could not take, because their
+   names are two letters long and four v2 service mocks use the same
+   two letters for something else. They were never dormant: they matched
+   those v2 elements and won declarations on them, so /services rendered
+   a 900px-tall workflow node, a sticky full-height cream <p>, and
+   status pills painted #141412.
 
-   Measured on the deployed branch with CDP getMatchedStylesForNode:
+   Nothing outside v2 renders any of them — the only elements carrying
+   these classes are `services/v2/mocks/I2Agent` (.nh x4),
+   `W2Site` (.sp), `A1Dashboard` (.st), `A3System` (.ds) and
+   `contact/v2/Letter` (.st) — and each already has its own scoped rule
+   in services.css or contact.css (`.sv .nh`, `.sv .sp`, `.sv .st`,
+   `.sv .ds`, `.ct .lhd .st`). So the rules are deleted outright rather
+   than re-scoped: the v2 elements now get only their own.
 
-     .sp  /services  <p class="sp">            gets position:sticky,
-                                               height:100vh and the
-                                               cream --color-bg-alt
-     .st  /services  <span class="st"> x4      gets background
-          /contact   <span class="mono st">    --color-dark (#141412)
-     .nh  /services  <div class="nh mono"> x4  gets min-height:100svh
-                                               (computed 900px),
-                                               display:flex,
-                                               flex-direction:column,
-                                               isolation:isolate,
-                                               overflow:hidden
-     .ds  /services  <div class="vp lt ds">    matches; its background
-                                               is overridden downstream
-
-   So deleting them changes what renders — a phone-width <p> would
-   stop being a sticky full-height cream panel, and four <div class="nh
-   mono"> would stop being 900px-tall flex columns. This pass was asked
-   to change nothing visible, so they stay.
-
-   They are almost certainly accidents rather than intent: nothing in
-   the v2 markup wants a 900px-tall flex column. Worth fixing on its
-   own, as a change with its own before/after, not buried in a cleanup.
-*/
-.sp {
-  position: sticky; top: 0; height: 100vh; overflow: hidden;
-  background: var(--color-bg-alt);
-  display: flex; flex-direction: column; justify-content: center; gap: 22px;
-  padding: 104px 0 36px;
-}
-
-.st { background: var(--color-bg); }
-
-/* The second .st wins on the elements that match, and sets `color` as
-   well: every child named its own colour, but .st still handed down
-   --color-ink, so a text node added later would have rendered
-   ink-on-dark. Kept verbatim; see the note above. */
-.st { background: var(--color-dark); color: var(--color-parch); }
-
-.nh {
-  position: relative; isolation: isolate;
-  min-height: 100svh; display: flex; flex-direction: column;
-  background: linear-gradient(170deg, var(--navy-1) 0%, var(--navy-2) 52%, var(--navy-3) 100%);
-  overflow: hidden;
-}
-
-.ds { background: var(--bg); }
+   Two letters is not a class name. If a wrapper ever needs one again,
+   give it a prefix nothing else can collide with. */
 
 /* ══ 27c · the navy footer, site-wide ══════════════════════════════ */
 .nf {
