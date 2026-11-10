@@ -64,6 +64,10 @@ export const META = {
     description:
       "Every screen is a real product we built: websites, web apps, AI automation and marketing for businesses across the GTA.",
   },
+  privacy: {
+    title: "Privacy — Averr Studios",
+    description: "How Averr Studios handles the information you send us.",
+  },
   /** The 404 takes the home description, as the table specifies. */
   notFound: {
     title: "Not found — Averr Studios",

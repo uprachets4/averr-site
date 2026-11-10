@@ -449,6 +449,12 @@ a { color: inherit; text-decoration: none; }
   border-top: 1px solid rgba(255,255,255,0.12);
   font-size: 13px; color: rgba(255,255,255,0.56);
 }
+/* the small links beside the locality line */
+.nf-small { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.nf-small a { color: rgba(255,255,255,0.82); border-bottom: 1px solid rgba(255,255,255,0.28); }
+.nf-small a:hover { color: #fff; border-bottom-color: #fff; }
+.nf-small > span[aria-hidden] { opacity: 0.5; }
+
 @media (max-width: 860px) {
   .nf-top { grid-template-columns: 1fr; }
   .nf-cols { grid-template-columns: 1fr 1fr; }

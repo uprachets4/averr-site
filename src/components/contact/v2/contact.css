@@ -235,6 +235,10 @@
 
 /* The send failure notice. Not in the reference, which only animates:
    the port posts for real, so it needs somewhere to say it didn't. */
+/* one line of microcopy under the send button, spec 35 part B */
+.ct .sendnote {flex-basis:100%;margin:2px 0 0;font-size:13px;line-height:1.5;color:var(--mute)}
+.ct .sendnote a {color:var(--light);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(245,244,249,.45)}
+.ct .sendnote a:hover {text-decoration-color:var(--light)}
 .ct .sendfail {flex-basis:100%;margin:0;font-size:14px;line-height:1.5;color:#F2B6BE}
 .ct .sendfail a {color:var(--light);text-decoration:underline;text-underline-offset:3px}
 

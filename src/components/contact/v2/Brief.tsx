@@ -297,6 +297,11 @@ export default function Brief({
               {status === "sending" ? "Sending…" : "Send to Prachets →"}
             </button>
 
+            <p className="sendnote">
+              We only use this to reply to you.{" "}
+              <a href="/privacy">Privacy</a>
+            </p>
+
             {status === "error" ? (
               <p className="sendfail" role="alert">
                 It didn't send. Email me directly at{" "}

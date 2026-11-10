@@ -81,7 +81,14 @@ export default function Footer() {
 
         <div className="nf-bottom">
           <span>© {YEAR} Averr Studios · Toronto</span>
-          <span>Toronto &amp; the GTA</span>
+          {/* a plain anchor, like every other internal link in this
+              footer — not a router <Link>, so the one odd one out does
+              not become the pattern someone copies next. */}
+          <span className="nf-small">
+            <a href="/privacy">Privacy</a>
+            <span aria-hidden="true">·</span>
+            <span>Toronto &amp; the GTA</span>
+          </span>
         </div>
       </div>
     </footer>

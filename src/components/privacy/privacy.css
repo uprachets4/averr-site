@@ -1,0 +1,215 @@
+/* ═══════════════════════════════════════════════════════════════
+   /privacy — spec 35 part B.
+
+   Its own prefix and its own tokens on `.pv`, for the reason spec 35
+   had to fix four of: a two-letter class is not a class name, and a
+   bare token block on `:root` leaks into every other route. Nothing
+   here is global.
+
+   `font-size` and `line-height` are restated on `.pv` because the
+   document hands down 17px / 1.6, and a sheet written against the
+   browser default comes out taller everywhere it sets padding but no
+   line-height.
+   ═══════════════════════════════════════════════════════════════ */
+
+.pv {
+  --navy: #121c27;
+  --navy-2: #182633;
+  --light: #f5f4f9;
+  --mute: rgba(245, 244, 249, 0.72);
+  --faint: rgba(245, 244, 249, 0.12);
+  --display: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: dark;
+
+  background: var(--navy);
+  color: var(--light);
+  font-family: var(--display);
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+  line-height: normal;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+}
+.pv,
+.pv * {
+  box-sizing: border-box;
+}
+
+/* a single, very quiet wash so the column is not floating on flat navy */
+.pv .pvsky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(70% 45% at 50% 0%, rgba(152, 116, 232, 0.14), transparent 70%);
+}
+
+.pv .pvwrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: clamp(104px, 14vh, 152px) 20px clamp(80px, 12vh, 128px);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+}
+
+/* ── the head ─────────────────────────────────────────────────── */
+.pv .pveyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 500 12px/1 var(--mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+  margin-bottom: 20px;
+}
+.pv .pveyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+.pv h1 {
+  margin: 0;
+  font-size: clamp(38px, 6vw, 72px);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+.pv .pvlede {
+  margin: 20px 0 0;
+  max-width: 54ch;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--mute);
+}
+.pv .pvstamp {
+  margin: 26px 0 0;
+  font: 500 12px/1 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+/* ── the column ───────────────────────────────────────────────── */
+.pv .pvbody {
+  max-width: 680px;
+}
+.pv .pvsec {
+  padding-top: 48px;
+}
+.pv .pvsec + .pvsec {
+  margin-top: 16px;
+}
+.pv .pvsec h2 {
+  margin: 0 0 16px;
+  font-size: clamp(24px, 2.2vw, 28px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+.pv .pvsec p {
+  margin: 0 0 16px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--mute);
+}
+.pv .pvsec p:last-child {
+  margin-bottom: 0;
+}
+.pv .pvsec ul {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pv .pvsec li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--mute);
+}
+.pv .pvsec li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(245, 244, 249, 0.42);
+}
+.pv .pvsec b {
+  color: var(--light);
+  font-weight: 600;
+}
+.pv a {
+  color: var(--light);
+  border-bottom: 1px solid rgba(245, 244, 249, 0.34);
+  transition: border-color 0.2s ease;
+}
+.pv a:hover {
+  border-bottom-color: var(--light);
+}
+.pv a:focus-visible {
+  outline: 2px solid var(--light);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ── the index, desktop only ──────────────────────────────────── */
+.pv .pvnav {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .pv .pvwrap {
+    grid-template-columns: 196px minmax(0, 1fr);
+    gap: 64px;
+  }
+  .pv .pvhead {
+    grid-column: 1 / -1;
+  }
+  .pv .pvnav {
+    display: block;
+    position: sticky;
+    top: 132px;
+    align-self: start;
+  }
+  .pv .pvnav ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    counter-reset: pv;
+  }
+  .pv .pvnav a {
+    font: 500 12px/1.4 var(--mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mute);
+    border-bottom: 0;
+    display: block;
+  }
+  .pv .pvnav a:hover,
+  .pv .pvnav a:focus-visible {
+    color: var(--light);
+  }
+}
+
+@media (max-width: 1023px) {
+  .pv .pvwrap {
+    gap: 0;
+  }
+}
