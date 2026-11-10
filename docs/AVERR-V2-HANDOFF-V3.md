@@ -1,0 +1,4014 @@
+# AVERR STUDIOS v2 — HANDOFF V3
+
+**Written:** 2026-09-29 · **Supersedes:** everything after Session 9 in `HANDOFF.md` / `REDESIGN-HANDOFF.md`
+**Audience:** a fresh Claude Code session with no memory of this project. This file is your only memory. Read it all before touching anything.
+
+> Note on naming: the sessions referred to a file called `AVERR-V2-MASTER-HANDOFF.md`. **No file by that name exists in the repo.** The pre-Session-9 documents are `HANDOFF.md` (root, dated July 2026), `REDESIGN-HANDOFF.md` (root), and `docs/00-master-reference.md` … `docs/03-build-status.md`. Those remain valid for project identity, brand, and pre-v2 history. **This file is authoritative for everything from Session 9-fix-c onward** and supersedes them on any conflict.
+
+---
+
+## 1. STATE
+
+| | |
+|---|---|
+| **Repo** | `github.com/uprachets4/averr-site` |
+| **Working branch** | `redesign-v2` (**~237 commits ahead of `main`** at the end of Session 18d — `git rev-list --count main..HEAD` for the exact number) |
+| **HEAD** | `83cc51a` — *25a-2 the last cream grounds on home go transparent*. Run `git log --oneline -1` for the exact hash. |
+| **Doc currency** | Written at the end of Session 25a. |
+| **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
+| **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
+| **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
+| **Dev server** | Test against the alias. **Never start dev servers with Bash** — and note that `preview_start` by name has started *another project's* dev server from inside this repo (§5.48), so the alias is the reliable path. |
+
+### Last verified bundle (build exit 0, unfiltered)
+
+```
+dist/index.html                    3.78 kB │ gzip:   1.51 kB  ← carries the route-chunk map
+dist/assets/index-*.css           42.33 kB │ gzip:   8.77 kB
+dist/assets/index-*.js           312.10 kB │ gzip:  97.73 kB  ← home + shell
+dist/assets/motion-*.js          162.61 kB │ gzip:  53.98 kB  ← the motion library, shared
+dist/assets/ServicesBuild-*.js   166.86 kB │ gzip:  40.73 kB  ← lazy, one viewport early (17i)
+dist/assets/CaseStudy-*.js        50.24 kB │ gzip:  12.40 kB
+dist/assets/Contact-*.js          34.81 kB │ gzip:   9.49 kB  ← the Cal embed is its own chunk now
+() => "dist/assets/About-*.js            78.71 kB │ gzip:  18.88 kB  ← hero, fly-in, desk, process scene, credits"
+dist/assets/KickoffPass-*.js      29.68 kB │ gzip:   9.26 kB  ← lazy (17i)
+dist/assets/Work-*.js             22.46 kB │ gzip:   6.83 kB
+dist/assets/Services-*.js         10.04 kB │ gzip:   3.17 kB  ← was 51.06 before 17i
+dist/assets/NotFound-*.js          4.33 kB │ gzip:   1.70 kB
+dist/assets/MonogramMark-*.js      3.95 kB │ gzip:   1.86 kB
+dist/assets/businessDays-*.js      2.01 kB │ gzip:   0.92 kB
+dist/assets/ReadFill-*.js          1.42 kB │ gzip:   0.74 kB  ← shared by /about and the studies
+dist/assets/Cal.es-*.js            1.39 kB │ gzip:   0.75 kB  ← the embed, fetched on intent only
+dist/assets/SectionBoundary-*.js   0.45 kB │ gzip:   0.30 kB
+```
+
+Home's initial JS moved **151.59 → 152.53 kB gzip (+0.94)** in 19-pre-2:
+the generated screenshot manifest plus `prefetchRoute`. Well inside the
++12 kB gate.
+
+**Fonts are now part of the budget too** — they are preloaded, so they
+share the critical pipe with the entry chunk. `public/fonts` is **248 kB
+total**, down from 816 kB:
+
+```
+InterVariable.woff2          77 kB   (was 344)  not preloaded
+InterVariable-Italic.woff2   85 kB   (was 379)  not preloaded
+geist-latin-wght-normal      29 kB              PRELOADED
+cormorant-garamond-600-ital  23 kB              PRELOADED
+geist-mono-latin-wght        23 kB              not preloaded
+```
+
+Gate: **flag anything over +12 KB gzip JS in a single session.** **17c-2 changed how this is measured**: routes are code-split, so the number that matters is now **home's initial JS = 151.65 kB gzip** (the motion chunk folded back into index in 17c-2-fix once /services/next began sharing components with /services; one fewer boundary, marginally smaller), down from a single 199.70 kB bundle — **−46 kB on the landing route**. Total across all chunks is higher than the old single bundle (splitting has overhead), but no visitor downloads all of it. Judge future sessions on the initial figure for the route they touch, and on that route's own chunk.
+
+### Stack
+
+Vite + React + TypeScript · `react-router-dom` · **`motion` 12.43.0** (imported as `motion/react`) · Tailwind v4 (tokens live in `src/index.css`, utilities are hand-rolled `type-*` classes) · Vercel auto-deploy on branch push · Playwright (in `node_modules`) used for all DOM verification.
+
+---
+
+## 2. SESSION LOG (9-fix-c → 16-fix-2 + 15d)
+
+Every hash below verified against `git log`.
+
+**9-fix-c** `1b6f0dc` — Home surgical fixes: real CG Walls featured image replacing a placeholder, gradient section seams removed (CaseStudies + Manifesto merged into one dark chapter), on-dark contrast raised to AA, Writing nav link resolved. `Hero.tsx` was under a no-touch guard.
+
+**10** `40f7c13` — Type & scale system. Editorial display scale (`display-2xl` to 208px, `h2` to 56px), self-hosted Geist + Geist Mono (**zero Google Fonts requests**), `tnum` on stats, self-hosted Cormorant italic as the accent voice, wide/body measure tokens, `/process` → `/about#process`. Prachets amended the spec mid-session: keep Cormorant 500+600, drop the `opsz` axis, self-host Geist, leave `og-image.svg` alone.
+
+**10-fix** `083205b` — Hero 1440 regression (headline `display-xl` → `display-l`, **class swap only** — Hero.tsx was otherwise locked), mobile full-screen nav overlay with focus trap, dropped the unused Cormorant 500.
+
+**11** `784a593` — `<Chapter>` transition system: scroll-linked `clip-path` inset+radius expansion on every cream↔dark boundary. `MagneticCTA` gained an additive `tone="dark"` (replacing a `.cta-on-dark` `!important` override), single tab stop per CTA, desktop nav active state.
+
+**11-fix** `de837cf` — StorySoFar stages fit the pinned frame, nav prominence + Work count, home→/work+/services wayfinding, `ImageFrame` additive `tone`. Prachets pre-approved a pre-check: *if the "234px Gallery sliver" turns out to be empty padding, STOP and report* — it was a measurement artifact (real slides were 820–845px), reported not "fixed".
+
+**11-fix-2** `2d17870` — Chapter easing `outQuart` → `inOut` so the expansion lands mid-viewport.
+
+**12** `6adc93e` — Hero cinematic rebuild (Prachets explicitly unlocked `Hero.tsx`): split h1 at `display-2xl`, slab pill entrance, pinned scroll takeover where the pill's clip-path expands to a full dark frame carrying a 4-case-study reel, Toronto clock, unpinned fallbacks. `HeroSignature` and the client row were deleted.
+
+**12-fix** `f2dd291` — Tone-aware nav site-wide, mobile load film ×0.5 for LCP, **root-caused the frozen reel opacity** (see §5), deleted orphaned `HeroSignature`.
+
+**12-fix-2** `85840e2` + `6d9aeec` — Swept every scroll-linked opacity in a sticky frame onto the new shared `useScrollStyle` hook (34 hits → 0).
+
+**12-fix-3** `83d0a37` + `f86df6d` — Hero pill inside the container with balanced padding, reel pan retimed, /services Grow cards contained, /about numerals cleared of body copy; `useScrollStyle` changed to a **callback ref that writes on attach**, fixing a stuck `"serious."` clone.
+
+**13** `7169c2e` — Home rebuild: StorySoFar → three unpinned scenes, Pillars → three service doors with live hover previews, Numbers + CaseStudies stats → one dark **ProofLedger**. Prachets's rules: *no image repeats anywhere on home*, *nothing invented*.
+
+**14** `2db13ca` — /work rebuild ("The Vault"): hero, dark index chapter with full-width rows, cursor-follow preview with velocity tilt, URL-synced pillar filters with FLIP, /work-specific closer.
+
+**14-fix** `ba6f3f0` — Removed the non-selective pillar filters entirely, single-sourced headline figures into case-study data (home + /work read one field), status fallback for rows with no measured figure.
+
+**14-fix-2** `8fded56` — Fragment captions (SIFT's trailing period dropped; Prachets accepted home changing by that one character), status shown once (meta = year number only).
+
+**14-fix-3** `d04b44b` + **14-fix-3b** `d984ba0` — **All pricing removed site-wide** (timelines instead), /services gutter restored, /services hero `PillHl` → Cormorant accent, ledger dedupe (CG row), ILLUSTRATIVE labels on sample metrics, door previews clamped + enlarged + Grow mini dashboard. Prachets answered three questions: derive the pillar count word from data; use each section's own eyebrow as the rail label source; fold ScrollProgress into the rail.
+
+**15a** `4368c6a` `b2de080` `cd6b81d` `9f46983` — Case studies part 1: zoom-into-the-work hero with client-tint glow (additive `tint`), reading rail, word-level read-fill Context, pinned Approach with image wipes. Prachets chose: pinned split on **all four** studies (retiring the `text-then-image-full` render but keeping it in data/union), derive the "Two/Three pillars" count from data, rail labels = the sections' own eyebrows.
+
+**15b** `5e57481` `755955e` `cfde955` `0a96a72` `121b756` — Rail ≥1600 only, self-ticking "what we built" with live count, detail-zoom Signatures on additive `focal` points, figure-led Outcome, quiet "what's next", next-project finale replacing the shared `FinalCTA`. Prachets approved two image corrections: CapitalCommand's "operational truth" signature → `08-system-health`, SIFT's "sync engine" signature → `07-sources`.
+
+**15c** `aa8236a` `ade4646` `07ccb7c` `48d3b37` `a366fca` `5d5cb2e` `1b37a3a` `b6ae77a` — Fixed the blank CapitalCommand page (see §5), per-section `SectionBoundary`, Approach images at natural aspect, finale scrim, rail ≥1700, Context as statement+support with verbatim tint highlighters, labelled "what we built", lit "what's next" timeline. **Item 4 (zero image repeats) was reported BLOCKED** — the pool was empty.
+
+**15c-fix** `49e2b93` — Unblocked it: the hero's two back screens became **blurred, tinted depth copies of the front image**, and the front switched to `heroImage` (= `heroImages[0]`, used nowhere else). Zero rendered content repeats.
+
+**16** `f166859` `11c3fa7` `64e8bcd` — /work rebuild: vault doors, pinned project film, side index, clone-expand transition into case studies, mobile snap sections; row index + CursorPreview deleted. `64e8bcd` fixed two type errors that had been **pushed broken** because build output was being piped through `grep`.
+
+**16-fix-2** `f8b5c1c` — Doors open inside the pin; nav tone made honest via an out-of-clip marker.
+
+**16-fix** `6a530c3` — Compact dot index with hover-expand names, film screen back to ~64%, and the **unfiltered-build standing rule** adopted.
+
+**16-fix-2 + 15d** `f3957b0` `01da18e` `46b8f1e` `40219c6` `b2ce349` `3fd88ed` — Film: every project gets a dwell (CapitalCommand fixed), sequenced text transitions, measured name fitting → name moved to its own full-width row, doors became an overlay with project one behind them. Case studies: Approach outline-fill pillar names + statement/support + verbatim emphasis, the blank Approach frame fixed at its real cause, finale CTA moved below the image, and the frame's base layer marked `[data-frame-base]` for audits.
+
+**17** `08965f2` `a70693b` `9ef61fe` `c3c65d6` `eece7b5` `b1994b9` `ed4e054` `cd59093` `ca06bee` `8eba163` — **/services rebuild.** Split out of the 2169-line page into `src/data/servicesProcess.ts` + `src/components/services/{AutomatePipeline,NoList,KickoffCalendar,ServicesCloser}.tsx`.
+
+- *Pillars:* the Automate ambient gained illustrative task chips (New lead → Enriched → Draft ready → Sent → Logged) travelling the existing node path on a 6s loop, 3 in flight, nodes lighting as a chip arrives; hand-written rAF (see §5.15). The unsourced caption **"System average: 12h/week returned" was cut** (§7.11). Mood-board cards re-cut to each image's natural aspect — they were ~1.8:1 screenshots in a fixed 1.40 box under `object-fit: cover`, cropping ~23% off every one — and the stack fans ±6° on hover. "What's included" became chips that assemble, latched once, on both paths. The pillar rail meets the container edge at ≥1680, measured off a probe.
+- *The "no" list:* each line's refusal is struck as you read — a 2px parch rule drawn across a **verbatim** substring held in data, with `splitRefusal()` throwing in dev if it ever stops being one. The rule is a background with `box-decoration-break: clone`, not a positioned bar, so it draws correctly across phrases that wrap (§5.16).
+- *The calendar:* the three-column steps became 14 cells filling one at a time, each step card arriving as its own first day fills. Day 01 = Monday (what makes "3 business days" land on day 04 without crossing a weekend); step 03 spans days 08–12; 06/07 and 13/14 are quiet weekend cells; stamp reads `WITHIN 14 DAYS · KICKOFF` at day 12. Prachets ruled the mapping, and ruled **out** labelling day 05 "your decision" — only the steps' own copy appears.
+- *Closer:* a /services-specific dark closer replaced the shared `FinalCTA`; page end tone now `dark`. With ComingSoon's slab swapped for the Cormorant accent, **`PillHl` is now exactly home hero + home `FinalCTA` + the 404** (verified live: home 2, /nope 1, all other routes 0).
+- *Hero:* headline moved onto one `CharReveal` stagger with "One studio" as an accent segment, plus the home scroll cue.
+
+Prachets's rulings: 20 minutes is the canonical call length (a sweep found /contact and ComingSoon already agreeing — nothing changed); "fixed price" and "up to 15 pages" stay as scope promises, not prices.
+
+**17-fix** `a9ef74a` `4642136` `ea20a63` — `StackedPillar` (< 900px, and **any** width under reduced motion) rendered no ambient at all, so reduced-motion readers lost all three visuals instead of getting a real final state, and `AutomatePipeline`'s reduce branch was unreachable. `AmbientVisual` gained `frozen`, and `StaticAmbient` feeds it progress pinned at 1 so every scroll-linked transform resolves to its end value. The stills are **scaled** to the column, not reflowed — the compositions are authored in fixed px and a 0–400 SVG space and do not survive squeezing — and the ILLUSTRATIVE label is printed at full size *outside* the scaled box, because at 375 the still runs ~0.45 and a label inside it landed near 5px.
+
+**17-fix-2** — Two rulings from Prachets. (a) **Standing rule 18 is absolute** — commit + push per verified item; a brief's `Commit:` line is the report summary, not a squash target. Recorded in §4.18, §7.12 closed. (b) The scaled Automate still's ~6px labels at 375 were **a defect, not an acceptable thumbnail**. Below 900px that still is now a purpose-built **vertical** composition — the five nodes on a straight vertical line, each with its label at real `type-eyebrow` size and its resting chip beside it, ILLUSTRATIVE above. Not the desktop diagram shrunk. Design and Grow continue to scale.
+
+**17b** `10cd235` `9cf8ec5` — **/services leads with what we do.** Owner feedback: the page opened on three enormous pillar words with the services people actually buy reduced to chips, so a visitor could not tell what the studio sells. The hierarchy is inverted — services are the page, pillars are the labels they group under.
+
+- **`servicePillars.ts` is now the single source for /services *and* home.** `PILLAR_SERVICES` holds 16 services, each with `name`, `outcome`, `proof: string[]`, and `from` — the original "what's included" string it renders in plain language, kept unrendered so every line on the page traces to the claim it came from. `SERVICE_COUNT` is derived, so the hero's "16 WAYS WE HELP" cannot drift from the list.
+- **Grow went from 4 services to 6.** The four offered services described work the portfolio does not show; the work it *does* show had no line. Prachets ruled: keep all four, add **Local search** and **Outreach campaigns**, both traced to CG Walls' own copy (*"Google Business Profile optimization"*, *"Google Business Profile seeded with an authentic Brampton homeowner review"*, *"Realtor lead-gen infrastructure: scrapers that watch posting activity, AI email generator that references the specific listing"*, *"door-to-door playbook … tier-ranked by home era and density"*). **Reporting** also regained "Attribution".
+- **Proof links only where a study's own copy shows the service was delivered — 9 of 16.** Prachets tightened two of my pairings in review: **Workflow audit** lost its CG link (a reduced-hours figure is an outcome, not evidence an audit was delivered) and **Human review built in** lost CapitalCommand (product philosophy, not a review layer built for a team). A row with no verified pair renders **no chip and reserves no space** — the absence is intended.
+- **`ServiceIndex.tsx`** — grouped rows at `--container-wide`, pillar label + timeline per group, name `type-h2` left, outcome `type-body-lg` right, proof chips beneath. Hover/focus shifts the name +8px, lifts the outcome to full ink, and fades a 240px proof thumbnail into a third grid track that the copy can never reach (measured: 24–60px clear at every width). A sticky pillar switcher tracks the active group by IntersectionObserver, jumps on click, and fades out after the index; on mobile it becomes a scroll-snap chip row and the thumbnails are dropped.
+- **Hero:** "Here's *exactly* what we do." (Cormorant on "exactly"), GTA subhead, scroll cue kept.
+- **The pillar sequence became "How each one works."** — pillar word down from `display-xl` to `display-l`, and stage 2 now names the same services the index sells instead of the old internal phrasing. Stacked path mirrors it.
+- **Home doors** print their pillar's first four service names in mono under the promise, read from the same record. The preview clamp is unaffected — its 24px clearance is measured against the promise column's left edge, which the added lines do not move.
+
+**17c-1** `2902d5b` `35383eb` — **/services rebuild, part 1 of 3, on a hidden route.** Prachets rated 17b **1–2/10**: a flat list, then the same services repeated in the pinned section, and not cinematic. New concept: ONE continuous pinned scene where a generic business's site is visibly built as you scroll, each of the 16 services being the caption of the step happening on the canvas. **The story is the list** — no service is named twice on the page.
+
+- **Built on `/services/next`**, noindex and linked from nowhere. `/services` is untouched until 17c-3 swaps them; nothing half-built is ever visible on the live route. Only `App.tsx` changed outside the three new files.
+- **Pin math.** Beat = 65vh. Wrapper = `beats × 65vh + 100vh` per the n+1 rule (§5.4). Design's five beats: travel **325vh**, wrapper **425vh** (measured 3825px at 900vh viewport = 4.25×, sticky child exactly 1.00×). The 16-beat target with two 80vh chapter transitions is **1200vh travel / 1300vh wrapper**.
+- **Per-beat phases:** caption in 0–0.15, canvas build 0.05–0.40, **dwell 0.40–0.85** (29.25vh of hold, ruled up from 45% of a 55vh beat), caption out 0.85–1.00. Dwell midpoints at progress 0.125 / 0.325 / 0.525 / 0.725 / 0.925 — those are the screenshot positions.
+- **One continuous float drives caption, canvas and rail.** Nothing on a timer, nothing keyed on an index that flips independently (§5.13). The caption remounts only at a beat boundary, by which point the previous one has faded to 0 — sequenced, never overlapping. Every canvas scene stays mounted and crossfades, so there is never a frame with nothing to draw (§5.6).
+- **The rail is the index:** three chapters, sixteen ticks, hover shows the service name, click lands in that beat's dwell. Automate and Grow read "soon" with disabled ticks until 17c-2 (verified: 16 ticks, 5 enabled).
+- **Canvas** is CSS and inline SVG only — no screenshots, no brand marks, a non-Averr palette so it reads as someone else's business, and ILLUSTRATIVE on the surface throughout. A browser frame on `yourbusiness.ca`: wireframe recoloured by a dropped-in palette with the mark drawing itself → sections assembling top-down → the site becoming a dashboard → **a labelled specimen grid** → a version tag ticking with pulsing "+" marks.
+- Mobile and reduced motion drop the pin: one section per service, each canvas playing its beat once on entry or resting at its finished state.
+
+*A fix inside the session:* beat 4 first pulled the dashboard apart with x-offsets and floated three labels over it. On screen that read as a broken layout — sidebar slid out leaving a dead gutter, table past the frame edge, each label beside something it did not name. Rebuilt as real labelled specimens (button, card, input, tokens, spacing). **The DOM sweep passed it both times; only looking at the screenshot caught it.**
+
+**17c-2** `076af86` `b0abe23` `dd0f8ab` `9a1f3c4` `5e390f5` — **/services/next rebuilt at product fidelity.** Prachets rated 17c-1 **3–4/10**: the concept was right but the canvas read as a small pastel wireframe and every beat was the same toy window.
+
+- **A1 · route code-splitting.** Every route but home behind `React.lazy`; home stays eager as the LCP surface. Home's initial JS **199.70 → 153.46 kB gzip**. The Suspense fallback paints the page ground at a full viewport — a zero-height `main` is what makes the footer jump and the scroll lurch on a route change.
+- **A2 · `WindowChrome`** — a real application window at 62% of the container and up to 82vh (measured 821×738 at 1440, 886×813 at 1920): traffic lights, title/URL bar, a four-layer tinted shadow, a diagonal reflection. Hairlines are inset shadows, not 1px borders, so they stay hairlines at 2dppx.
+- **A3 · `GhostCursor`** — a pointer choreographed from the same scroll value as everything else, eased hops, a slow wobble, a press ripple. **Each screen reads the same local progress the cursor is keyed against**, so a click and its response cannot drift.
+- **A4 · `camera`** — per-beat push-ins scaling the window CONTENT toward a focal point via `transform-origin`. The chrome is outside the transform; scaling the window edges is what makes a mockup look like a zoomed screenshot rather than a camera move.
+- **A5** — only the active beat ±1 is mounted. **Zero long tasks >50ms** across a full scroll of the chapter, measured with a PerformanceObserver on the alias.
+- **B1–B5 · five genuinely different pieces of software**: a brand board (SVG logo, palette with hex, type specimen, business card and van decal that recolour when the cursor picks an accent); a local-business homepage that scrolls inside its own window (booking widget the cursor fills and submits, success toast); a **dark** analytics dashboard (date range switched 7d→30d with KPIs and chart responding, status pills, notifications); a component library (4 variants × 4 states, input states, token tables, a dark-mode toggle that re-themes in place); a release dashboard (changelog, score ring 72→98, Core Web Vitals turning green). All content invented and plausible for the GTA; ILLUSTRATIVE throughout.
+
+*Three fixes inside the session, all caught by looking rather than by the sweep:* the window **collapsed to its 38px title bar** (an auto-height wrapper; the absolutely-positioned screens contributed no height and `overflow:hidden` clipped everything — the DOM sweep read all five screens' text correctly the whole time); the **next screen ghosted through the current beat** at ~12% (crossfade began 0.42 of a beat early, now the last tenth); and screens were **still assembling during their own dwell** (layout now completes by local 0.40, leaving the dwell for the cursor's interaction).
+
+**Outstanding, not done:** mobile type. 176 text nodes inside the screens render below 11px at 375 — the fine print (mono labels at 8px, card descriptions at 9px). The headline content is legible, but this misses the brief's ≥11px requirement. The fix is mobile-specific simplified variants of the dense panels, not a uniform font bump, which would break the desktop density the screens depend on. **Carry into 17c-3.**
+
+**17c-2-fix** `6818f1e` `…` — audit of Prachets's screen recording at ~1680. Six items, all fixed and measured on the alias.
+
+1. **Caption collided with the window.** Measured: "Post-launch" rendered **562px inside a 461px column at 1680** — 101px of silent overflow, its right edge 682 against a window starting at 671; at 1920 it was 11px *inside* the window. My 17c-2 report of "gap 90px, no collision" had measured the h2's block box, which reports the column width no matter how far an inline-block word spills past it (§5.5). The name is now `type-h1` in a 30% column, **fitted by measuring the widest word**. After: worst gap **51 / 57 / 96 / 96px** at 1280 / 1440 / 1680 / 1920, zero overflow.
+2. **Window 62% → 66% of `--container-wide`**, 82vh → 84vh. Measured **66.0% of the container at every width**; as a share of *viewport* that is 60.7 / 60.7 / 56.5 / 49.5% — it falls on wide screens because the container caps at 1440, which is why the recording read it as small. The Releases screen was also filled out: eight changelog entries with tags and per-deploy timings, plus a ten-week deploy-history chart.
+3. **Camera → focus move.** Scale capped at **1.22** (from 1.5–1.6), transform origin at the focus rect's centre so the focused element cannot leave frame, and a four-band spotlight veils the surroundings at 0.66. Four bands rather than one masked overlay because `backdrop-filter` applies to what is *behind* an element — a single rect would blur the thing meant to stay sharp. **Any scale above 1 crops the frame edges; the veil is what makes the cropping read as background rather than damage.** It is mitigation, not elimination.
+4. **Transitions went grey.** Two causes, both found by looking: the incoming window was ramping up *semi-transparent* so the outgoing one read straight through it, offset; and the ILLUSTRATIVE label was rendered per layer, so two overlapped on every switch. The incoming window now becomes opaque almost immediately and **occludes** the outgoing one; the label moved to the stage.
+5. **Pin released into an empty viewport.** Scroll progress hits 1 exactly where the sticky unsticks, so the final beat's fade ran the window to zero while the stage was still pinned. The last beat's window and caption now **hold** to the end. `/services/next` continues into `NoList` → `KickoffCalendar` → `ServicesCloser`, the same components in the same order `/services` uses. Verified: **0 blank samples** at four offsets across the release.
+6. **"Northgate" vs the specified "Your Business".** 17c-2 used Northgate for realism and **did not report the substitution** — a deviation that should have been flagged. Prachets accepted it; it is now consistent (the URL bar had still read `yourbusiness.ca` while every window title said Northgate). **Standing instruction from this session: report every deviation from a brief, however small.**
+
+*Probe errors, mine:* the gap check first measured the **leftmost** frame rather than the active one — during a dwell the outgoing layer sits translated −6%, so it reported 4–5px gaps that did not exist. And the automated "empty area" heuristic scored the dense website screen at 66% empty by counting hits on large containers; fill was judged visually instead.
+
+**17c-3** `64fe34a` … `d5b675e` + the chapter-card fix — **Automate chapter, plus two rulings.**
+
+- **R1 · the scale push-in is gone.** At 1.6, 1.35 and 1.22 it cropped the frame's edges — arithmetic, not tuning: scaling content inside a fixed window always pushes some out. Focus is now carried entirely by the spotlight veil. Verified: **0 scaled content layers** at every beat, spotlight bands present on all ten.
+- **R2 · the build stage may exceed the 1440 container on /services/next only**, capped at 1680 with the normal gutter; columns 29/67. Measured window: **61.7% / 61.9% / 58.6% of viewport** at 1440 / 1680 / 1920 — the 1920 target of ≥58% is met. Caption gaps 151 / 226 / 268px. Every other surface keeps `--container-wide`.
+- **Slot space.** Beats are no longer evenly spaced, so scroll maps onto SLOTS: five Design beats at 65vh, an 80vh transition, five Automate beats at 65vh. **Travel 730vh, wrapper 830vh** (measured 8.30× viewport).
+- **T1 · the back-office reveal.** The Releases window slides left and shrinks to 0.86, revealing the time-audit app already behind it, then exits while the back office settles to centre. The pulled-aside window holds z-index 20 so it reads as the front window moving away. The chapter card ("CHAPTER 2 / Automate / What runs *behind* the site.") lands in the **back half** of the transition — shown from the start it was half-covered by the sliding window, which crosses the caption column.
+- **Five Automate screens**, each a different application: a time-audit heatmap with an automatable toggle and a ticking hours total; a navy agent console with a resolving run timeline, a streaming reply and a fit gauge; a dotted-grid workflow canvas with packets and a run log; an email-client approval inbox with a tracked-change diff; a serif docs runbook. Rail: 10 ticks enabled, Automate segment active.
+- **Mobile.** Every Automate screen ships a restructured `compact` variant — **all five measure exactly 11px minimum, 0 nodes under**. The five Design screens remain **7–8px** and have no compact variant; that is the gate on the swap session, unchanged.
+
+*Three bugs, and one of them was mine from a session earlier:*
+- **React #185, maximum update depth**, crashing the whole route at the last Design beat — no windows, no caption, the noindex meta gone with the unmounted tree. The caption fitter added in **17c-2-fix** kept its scale in state, measured the rendered word and divided by the current scale to recover the base width, with `scale` in its own deps; width does not scale perfectly linearly with font-size, so it oscillated forever. **It only fires when a word actually overflows, so a 30% column never tripped it and 17c-3's 29% column did immediately — it shipped latent for a session.** Rewritten with no state and no dependency on its own output.
+- **`tsc` exhausted its heap** (2GB, FATAL) on nested ternaries inside `useTransform` — TypeScript reconciling a union of tuple types across three transforms. Keyframes are now built as plain typed arrays first. Builds pass on the default heap.
+- **A 4.3-million-line file.** A python edit sliced `s[s.index(A):s.index(B)]` where B occurred *before* A, producing an empty string; `str.replace("", new)` inserts between every character. **Guard: assert the slice is non-empty and the indices are ordered before replacing.**
+
+**17c-4** `c3154e9` … — **Grow chapter, carry-over fixes, and a new standing rule.**
+
+- **All three chapters now run on one pinned stage: 16 beats, two 80vh transitions. Travel 1200vh, wrapper 1300vh** — exactly the figure the pin plan projected in 17c-1. Measured 13.00× viewport (1300vh *is* 13 viewports; an earlier probe expecting 14 was wrong arithmetic, not a wrong wrapper).
+- **C1 · the workflow canvas connectors are measured, not guessed.** They were cubic curves between percentage points with both control points on the source's y, which swung wide and never met the boxes. Each node now reports its own rect, the path leaves a real port on the right edge and arrives at one on the left, routed orthogonally with rounded corners, and the packets travel that exact polyline.
+- **C2 · the run-log spotlight is aligned** — the log is positioned in percentages so the rect names the same box. Verified sharp inside its own veil.
+- **Six Grow screens:** a Durham map with a results panel where Northgate climbs #7 → #2 on a layout spring while its review count ticks 38 → 212; an outreach sequence with merge-filled previews and replies landing; an ads manager with impressions/clicks/CTR/leads and two ad previews; an A/B test where B wins and expands; a content calendar with a draft dragged onto Thursday; and a monthly report with an SVG attribution flow from five channels into leads and booked jobs.
+- **No currency anywhere**, illustrative data included — which also removed the agent console's "$15–25K" budget band that 17c-3 had introduced in breach of the same rule.
+- **Mobile:** all six Grow screens measure exactly **11px minimum, 0 nodes under**. The five Design screens remain 7–8px and are still the swap-session gate.
+- **New standing rule §4.23 — crash-scroll.** See below; added after 17c-3.
+
+*A bug class worth naming, because it bit three times in one session:* **an SVG with a small viewBox stretched across a large panel scales its `<text>` with everything else.** The map's 8px labels rendered near 26px in a 300×220 viewBox under `preserveAspectRatio="slice"`, and the report's flow labels did the same at 7px in a 200-wide box. **Draw type as HTML at a real font size, or size the viewBox to the panel.** The map was rebuilt in positioned CSS; the report's two labels became spans.
+
+*Also mine:* the C2 screenshot first captured the approval inbox rather than the workflow canvas — slot-vs-beat indexing in the probe, the third time that specific confusion has produced a wrong reading. It did surface a real defect by accident (A4's focus rect was framing empty space below the diff), but the carry-over it was meant to verify went unverified until a second pass.
+
+*Honest limit:* the map is the weakest of the six. It now reads as a map — white streets, tinted blocks, an amber arterial, legible labels — but it is a stylised one, sparser than the report or the workflow canvas, both of which genuinely look like software.
+
+**17c-5** `…` — **the finale: the build page is now `/services`.**
+
+- **Design mobile variants** — the last five screens at 7–8px now have restructured single-column variants. **All sixteen screens measure 11px minimum, 0 nodes under, at 375.** The gate is closed.
+- **The map is real streets.** `src/data/osmOshawa.ts` — a committed Overpass extract over central Oshawa/Whitby, projected flat and simplified, **880 ways at 9.4 kB gzip** against a 60 kB budget. No tiles, no runtime API, no map library. **OpenStreetMap data is ODbL; "© OpenStreetMap contributors" renders inside the map window at 11px and must not be removed.** Styled in our palette with road weights by class — not a look-alike of any provider.
+- **The swap.** `/services` renders the build page; `/services/next`, its route, its lazy import and the client-side noindex are gone. Deleted with zero importers: `ServicesNext.tsx`, `ServiceIndex.tsx`, `AutomatePipeline.tsx`, and the old `Services.tsx` in full. Title and meta description updated and restored on unmount.
+- **Verified on the alias:** all 16 captions correct · **all 16 rail jumps correct** · both chapter cards · 3-speed crash-scroll at 1440/1920/375 both directions with **0 console and 0 React errors** · 0 long tasks on a full scroll · 0 ViewTimeline on sticky descendants · no `$` strings · PillHl home 2 / 404 1 / services 0 · 375: 16 frames, **0 nodes under 11px**, zero overflow · all three chapter anchors on cold loads · a real door click from home.
+
+**Mobile lab numbers (390×844, 4× CPU throttle, ~1.6 Mbps) — one of these is bad:**
+
+| | |
+|---|---|
+| CLS | **0.001** |
+| TBT proxy | **174 ms** over 4 long tasks |
+| **LCP** | **4884 ms** — element `P.type-body-lg`, the hero subhead |
+
+**The LCP element is gated behind its own entrance delay.** The hero subhead animates in at `delay: 1.1`, so it cannot paint before 1.1s, and under throttle the whole chain stretches. The route also costs a lazy-load round trip. **This pattern is on every page hero, not just this one** — it is a ship-pass item, and the cheapest fix is to let the LCP text paint immediately and animate something else.
+
+*Four wrong guesses in a row on one bug, worth recording as method:* the chapter anchors appeared to fail on `#automate` and `#grow`. I changed the scroll to instant, then added retries, then fixed a guard that was cancelling those retries — all without evidence. **Instrumenting the scroll position took one run and showed the anchors had worked the whole time**: final y 4653, caption "Workflow audit". The probe was reusing one page across `#design → #automate → #grow`, and a hash-only change is a same-document navigation, so React never remounted. It did surface one real edge — clicking `/services#grow` while already on `/services` did nothing — now fixed by taking the hash from `useLocation`. **Instrument before the second guess.**
+
+**19-pre** `f47c12d` … `341a231` — **Site-wide LCP. Every hero's LCP element now paints at first render, and the font loading was rebuilt around it.** Nine commits.
+
+*The ruling (Prachets):* **the LCP element must PAINT at first render.** Its entrance becomes transform-only — y 8px → 0, `duration.base`, `ease.outQuart`, from 0ms. Every other hero element keeps its choreography. Target: **mobile lab LCP < 2.5 s on every route.**
+
+**The LCP element per route** (390×844, 4× CPU, ~1.6 Mbps), and what it was hiding behind:
+
+| Route | LCP element | Was | Now |
+|---|---|---|---|
+| `/` | `P.type-body-lg` hero kicker | delay 0.675 (mobile film) | painted |
+| `/work` | `IMG` first preview | `loading="lazy"`, faded `whileInView` | eager, `fetchPriority=high`, painted |
+| 4 case studies | `P.type-body-lg` subhead | delay 0.75 | painted |
+| careerclarity-ai | `P` body copy | delay 1.2 | painted |
+| `/services` | `P.type-body-lg` subhead | **delay 1.1** | painted |
+| `/about` | `SPAN.type-display-l` CharReveal | **delay 2.2** + per-char fade | painted (`paint` prop) |
+| `/contact` | `P.type-body-lg` subhead | **delay 1.6** | painted |
+| 404 | `H1.type-display-l` | delay 0.3 | painted (its pill keeps delay 0.9) |
+
+**`CharReveal` gained a `paint` prop.** It keeps every character at opacity 1 from the first frame, drops the per-char stagger, and animates y only. Reserved for an LCP element — do not sprinkle it; the stagger is the component's reason to exist.
+
+**Retiming alone did not reach the target, and the measurement said why.** After the choreography fixes every route still sat at 2.5–3.4 s, with first contentful paint pinned at ~2.2 s. The waterfall: **the 344 kB `InterVariable.woff2` preload was racing the 151 kB entry chunk for the pipe.** The JS took 1826 ms to arrive instead of the ~760 ms it needs alone. Three changes followed, each measured:
+
+1. **Subset the Inter variable fonts** — 344 → 77 kB and 379 → 85 kB, both axes kept, every codepoint the original covered from our source charset still covered. `tools/subset-inter.py` records the range and is idempotent.
+2. **Preload Geist only, not Inter.** A preload is a *high-priority* request; preloading 106 kB of fonts alongside the JS cost ~370 ms of FCP to save a swap on body copy. Geist carries every display headline and is 29 kB, so it keeps its preload.
+3. **A metric-matched fallback for Inter** (`'Inter Fallback'`, `size-adjust: 97.22%` measured from the site's own body copy, vertical overrides from Inter's hhea), so the swap cannot reflow.
+
+**`/work` was mounting the desktop film on phones.** `useMedia` started at `false` and only read `matchMedia` in an effect, so every phone visit rendered the whole `ProjectFilm` first — its four preview images have no `loading` attribute, so **431 kB was requested on the critical path and then thrown away**. `/work`'s own LCP image finished behind three images no one would ever see. Fixed by reading `matchMedia` in the `useState` initialiser, the way `Nav.tsx` already did.
+
+**Results — mobile lab, 390×844, 4× CPU, ~1.6 Mbps/150 ms:**
+
+| Route | LCP before | LCP after | CLS before → after |
+|---|---|---|---|
+| `/` | 4060 | **2264** | 0 → 0 |
+| `/work` | 4908 | **3384** ✗ | **0.054 → 0.016** |
+| cg-walls | 3804 | **2304** | 0.004 → 0 |
+| capitalcommand | 3876 | **2344** | 0 → 0 |
+| sift | 3824 | **2356** | 0.004 → 0 |
+| cadencestack | 3892 | **2368** | 0.005 → 0 |
+| careerclarity-ai | 4440 | **2244** | 0 → 0 |
+| `/services` | 5052 | **2792** ✗ | 0.001 → 0.001 |
+| `/about` | 2680 | **2252** | 0 → 0 |
+| `/contact` | 4940 | **2284** | 0 → 0 |
+| 404 | 3548 | **2184** | 0 → 0 |
+
+**9 of 11 routes under 2.5 s. Two are not, and neither can be fixed by choreography:**
+
+- **`/work` 3384.** The LCP element is an `<img>` that React has to render before the browser can even request it — it cannot paint at first render by construction. It is requested at ~2.3 s and is 86 kB. The fixes are a smaller preview (it renders ~358 px wide from a 1400 px source) or prerendering. **Both are owner calls — see §7.**
+- **`/services` 2792.** FCP is 1928; the gap is the lazy route chunk, a second round trip after the entry chunk plus the heaviest first render on the site. A build-time path→chunk map injecting `modulepreload` would recover most of it. **Not attempted — it is a build-pipeline change, not hero choreography.**
+
+**The real floor is first contentful paint at ~1.9 s**, and it is the SPA boot: HTML round trip (~330 ms) + 151 kB entry chunk (~1100 ms) + React mount at 4× CPU (~450 ms). Nothing in the hero can paint before that. **Prerendering the shell is the only lever left** — logged in §8.
+
+**Reduced motion:** unchanged, verified — character opacity 1 and no transform at every sampled instant on `/`, `/about`, `/services`.
+
+**Verified on the alias:** build exit **0** unfiltered · frames at 0/300/800/1500 ms on all eight hero types, visually reviewed · opacity census of every hero text node at each frame · CLS attributed to its source node, not just totalled · **zero horizontal overflow at 375 on all 11 routes** (`scrollWidth` 375 everywhere) · **3-speed crash-scroll at 1440/1920/375, both directions — 33 route-runs, 0 console errors, 0 React errors, every route alive.**
+
+*Two probe notes.* **A crash-scroll piped through `tail` shows nothing until it ends** — I lost 45 minutes watching an empty file before rewriting it to log per route. It is a ~25-minute run; log every route as it finishes. And **`1920 /work` recorded 946 s against 38 s at 1440** — not reproducible: a fresh pass is 5.8 s with one 59 ms long task, and the per-step cost is identical at both widths. Recorded as an unexplained outlier, not diagnosed.
+
+**19-pre-2** `e521774` … `895313d` — **Prachets's four rulings on 19-pre.** Three commits.
+
+**1 · Every hero text element paints at first render.** Not just the LCP one. Each starts at opacity 1 and animates the transform only — y 12 → 0, `duration.base`, `ease.outQuart` — and **keeps its original stagger offset**, so the offsets now describe the order the lines TRAVEL in rather than the order they appear in. A hero still reads top → bottom with nothing hidden.
+
+- `LineReveal` gains `paint`: the mask goes with the fade, because a line sitting 110% below its own clipping box is not on screen. The clip is dropped with it or it would crop the painted line.
+- `CharReveal`'s `paint` now **keeps the per-character stagger** (19-pre had zeroed it), so a painted headline still reads as a reveal.
+- Non-text keeps what it had: the home **slab** (still the signature), the Toronto clock — which got its own fade so the eyebrow beside it could paint — the scroll cues, the monogram, and the accent bounce on /nope and the coming-soon page, which was already a transform.
+- Home's kicker gets its `1.35 / 0.55` place in the ladder back. 19-pre had deleted it when the element became painted; with everything painted it is needed again.
+
+*Verified per-frame on the alias*, sampling every animation frame from mount: **every line at opacity 1.00 the whole time**, travelling strictly in order — "The studio for" 0.35 → "businesses that want to" 0.43 → "look" 0.65 → "serious." 0.80 → kicker 1.35 → CTAs 1.43/1.51 at 1440, the same order at half speed on 390. The only thing that *appears* on screen is the slab.
+
+**2 · WebP derivatives, site-wide.** `tools/derive-screenshots.mjs` emits 640/960/1280 and the natural width for every capture under `public/work/`, **never upscaling** (a 1400px source emits 640/960/1280/1400). **Outputs are committed** rather than generated by a Vite plugin, so the build stays a plain `vite build` with no image toolchain in it — re-run the script after adding a screenshot. It also writes `src/data/screenshots.ts` with each file's intrinsic size and available widths.
+
+`<Screenshot>` is now the one way a screenshot is rendered: a `<picture>` with the WebP `srcset`, the original JPEG as the fallback `<img>`, and the intrinsic `width`/`height` always set. Three places animate the `<img>` itself (the Signatures push-in, the open-transition clone) and take a `<WebpSource>` beside it instead. The duplicated `w`/`h` in `workIndex` is gone — **one generated source of truth**, because two hand-maintained copies of the same number is how they drift.
+
+| Route (390×844, full scroll) | image bytes before | after | |
+|---|---|---|---|
+| `/work` | 303 kB | **100 kB** | **−67%** |
+| `/work/cadencestack` | 256 kB | **101 kB** | **−61%** |
+| `/work/sift` | 189 kB | **82 kB** | **−56%** |
+
+**3 · The route chunk is preloaded for the path being loaded.** `tools/route-preload.ts` reads the bundle at build time, resolves each route to its chunk **plus that chunk's static imports**, and writes the map into `index.html`. A tiny inline script — no modules, no imports, so it can run before the entry script — matches `location.pathname` and appends `<link rel="modulepreload">`, so the two downloads overlap instead of queueing. The same map is left on `window` for `src/lib/prefetchRoute.ts`, which warms a route on nav-link hover, focus or touch (`rel="prefetch"` there, not `modulepreload`: the visitor has not committed to going yet).
+
+**4 · Prerendering is deferred to the Ship pass** — §8.
+
+### Mobile lab, 3-run median (390×844, 4× CPU, ~1.6 Mbps/150 ms)
+
+| Route | 19-pre | 19-pre-2 | CLS | |
+|---|---|---|---|---|
+| `/` | 2264 | **1904** | 0.000 | |
+| `/work` | 3384 | **2320** | 0.016 | was the worst route |
+| cg-walls | 2304 | **2048** | 0.008 | |
+| capitalcommand | 2344 | **2072** | 0.000 | |
+| sift | 2356 | **2084** | 0.009 | |
+| cadencestack | 2368 | **2080** | 0.000 | |
+| careerclarity-ai | 2244 | **2008** | 0.001 | |
+| `/services` | 2792 | **2228** | 0.001 | the chunk preload |
+| `/about` | 2252 | **2016** | 0.000 | |
+| `/contact` | 2284 | **2056** | 0.000 | |
+| 404 | 2184 | **1904** | 0.000 | |
+
+**All eleven routes under 2.5 s.** First contentful paint is now 1644–1856 ms.
+
+**Verified on the alias:** build exit **0** unfiltered · per-animation-frame ladder on home at 1440 and 390 · frame montages at 0.30–1.5 s, visually reviewed · image bytes counted per route over a full scroll · CLS attributed to its source node under a *gentle* scroll · **reduced motion clean on all 8 hero routes** (final state at 900 ms, no fades, no offsets) · **zero horizontal overflow at 375 on all 11 routes** · **3-speed crash-scroll at 1440/1920/375, both directions — 33 route-runs, 0 console errors, 0 React errors, every route alive.** The 946 s `1920 /work` outlier logged in 19-pre ran **53 s** here, confirming it was environmental.
+
+*A measurement correction that matters more than the numbers.* **Every single-pass figure in this project, 19-pre's "after" table included, was measuring a cold edge cache.** The first pass over a freshly deployed asset set is consistently 300–600 ms slower than the second and third; 19-pre-2's first pass read `/` at 2504 ms and the median is 1904 ms. **Measure three passes and take the median** — one pass straight after a deploy is a worst case, not a result.
+
+**17d** `608a0c6` … `d925553` — **Owner recording audit: /services quality plus two site-wide fixes.** Twelve commits.
+
+**1 · The captions were in beat space, not slot space.** `BuildCaption` read `position` — a SLOT float — against `beat.index`. The two agree only for Design: the first chapter transition displaces every later beat by one slot and the second by two. So on every Automate and Grow beat the fade window `[i+0.85, i+1]` was already behind the playhead, `useTransform` clamped to its end value, and **the caption sat at opacity 0 for the whole beat.** That is the empty caption column in the recording — **§5's own slot-vs-beat trap, in the one place nobody had checked.** The caption is now visible for the whole beat bar a 7% swap at each edge, the first beat does not fade in at all (its slot starts at position 0, while the stage is already on screen during the lead-in), and the two per-element entrances are gone: they were wall-clock delays inside a scroll-driven scene, so a quick scroll left the outcome and chips still fading in several beats later. **Verified: all 16 beats show name + outcome at 10 of 10 samples.**
+
+**2 · The spotlight had two faults.** `backdrop-filter: blur(2px)` ran inside a transformed ancestor, where Chromium composites the band as an **opaque fill** rather than failing quietly — that is the white box over the Approvals diff. The old comment called it free because it "costs nothing where it works"; **a filter documented as unreliable in the exact context it runs in is not free.** And one fixed near-black tint sat over every screen, which on a light screen is a grey wash over cream. The scrim is now the screen's **own** surface: light screens fade toward their paper at 0.55, dark ones deepen toward their ink at 0.5. **Verified: 18/18 veils screen-tinted, zero backdrop-filter anywhere, nothing covered.**
+
+**3 · Density and scale.** Measured before: **base type 7.5–10.5px, minimum 7px, blank regions up to 39%** of the window. Now: **base 13px and minimum 11px on every screen at both 1440 and 1680.** 174 font sizes were raised by a codemod that reads each style object — anything in a mono object floors at 11px, anything else lands at 13px unless it was already a heading — and five screens were rebuilt by hand:
+
+| Screen | Was | Now |
+|---|---|---|
+| Agent console | one reply line above ~500px of nothing | four streamed paragraphs + a "sources used" block |
+| Workflow canvas | small nodes, a floating log card | 148px node cards with icon/name/status, graph spans the canvas, full-width log strip |
+| Approvals | 4 stubs, short draft | 6 threads with previews, 268px list, draft fills the pane |
+| A/B test | five grey bars per variant | two real landing pages — nav, hero, proof row, postal-code form, services strip |
+| Content calendar | 8 entries, 7.5px day numbers | 20 entries across most weekdays at 11px, composer with body copy, hashtags, channels |
+
+Plus the time audit (heatmap rows were a fixed 22px, so it sat in the top third — now stretches), the runbook (gained the right rail a docs site has, a costs section and a change log) and outreach (10 prospects, and the rest of the sequence under the email preview).
+
+**Six screens are still over the 15% blank target** and are listed in §7. **The van decal's phone number** was SVG `<text>` at 7 units in a stretched viewBox — the §5 SVG-text gotcha again — and was removed rather than enlarged; the same number already sits at 11px on the business card above it.
+
+**4 · The nav CTA.** Not a tone bug — a **cross-fade collision**. Background and colour ran the same duration from opposite ends, so they met in the middle: 175ms into a tone flip the pill was `rgb(133,131,127)` and the label `rgb(127,125,119)` — **1.09:1**. Two opposite ramps over one duration always cross; arithmetic, not tuning. The colour now **steps once at the halfway point**, and the ramp uses `ease.inOut` because it is the only token that is point-symmetric (`[0.65,0,0.35,1]`), so it is exactly half way at exactly half time **in both directions**. Worst contrast through a flip is now **3.56:1**, and the settled states were never the problem. **Verified: 50 settled samples and 174 continuous-scroll samples across 5 routes, zero blank frames.**
+
+**5 · The home ledger** lost the CareerClarity row — an unverified "student throughput" figure for an unreleased product — and was deliberately **not** repadded. Four rows remain (SIFT 42%, and the three studio figures), count-up resolves, hairline gaps even.
+
+**6 · The home CTAs** have their `spring.snappy` back, on the transform only: they stay painted at opacity 1 from the first frame per the hero LCP rule, so the bounce is motion on something already on screen.
+
+**Verified on the alias:** build exit **0** unfiltered · caption sampling 10 points × 16 beats · spotlight veil and backdrop-filter audited per beat with screenshots · density and type measured at **1440 and 1680** with dwell screenshots reviewed one by one · nav CTA pixel-tested at 50 settled and 174 continuous points with dark-state screenshots · ledger rows, figures and spacing · **zero horizontal overflow at 375 on all 11 routes, scrolled** · **3-speed crash scroll at 1440/1920/375 on /, /work, a case study, /services, /about — 15 route-runs, 0 console errors, 0 React errors** · **mobile LCP median of 3: home 1964 ms, /services 2240 ms, both under 2.5 s**, CLS 0.000/0.001.
+
+*Three probe errors of mine, all caught before they reached a number in this log.* A caption baseline of "0/160" was measured against a **Vercel Security Checkpoint 403** page — §5.22, tripped by my own polling. Twice, a density sample for the **last beat** landed on the kickoff calendar **below** the stage, because the final caption keeps its text after the pin releases and the sticky frame still reports a positive top; the probe now requires the frame to sit near the top of the viewport. And the first font-size census read the **modal size including mono labels** as "base", which is not what the brief means by base UI text — it now reads the modal of non-mono text and judges mono by the 11px floor.
+
+**17e** `aae26c8` … `ccd4c1f` — **/services: the 14-day calendar becomes "Pick the day you call us."** Seven commits.
+
+*Owner feedback:* the calendar was accurate and inert — fourteen cells filling as you scrolled past, which the reader had to decode before it said anything. It is replaced by one question and the reader's own dates.
+
+**Pre-flight, as asked.** The booking tool is **Cal.com**, link `prachets/discoverycall`, embedded on /contact via `@calcom/embed-react`. **It does support a date parameter** — both the embed `config` and the hosted page take `date` and `month`. /services' CTA previously pointed at `/contact` with no parameter. The calendar sat in the `cream-warm` chapter between `NoList` and `ServicesCloser`, under `//_05 · how to start` and the h2 "Three steps. Two weeks to kickoff, max." **Only `Services.tsx` imported it.**
+
+**What it is now.** A strip of the next 21 days from today in **America/Toronto**; weekend chips are quieter and disabled; the default is the next business day (today, when today is one). A lens glides between chips on `spring.soft`. Pointer drag, click/tap, and the keyboard all drive it — arrows skip weekends, Home/End jump to the first and last selectable day — with `role="radiogroup"` and an `aria-live` sentence. Three nodes on a line show **Discovery call** (the pick, "20 minutes"), **Proposal** (+3 business days) and **Kickoff** (+14 calendar days, the bound, in the Cormorant accent). Digits roll on an odometer, the nodes shift as the segment lengths change, and the line redraws. The old h2 survives verbatim as the closing line, so **no copy was lost and no new promise was made** — the only facts used are the 20-minute call, 3 business days, 14 days, preview URLs from day one.
+
+**The CTA carries the date.** "Book {Weekday}'s call" → `/contact?date=YYYY-MM-DD`, and Contact passes it to both the Cal embed config and the hosted-page fallback link. **Verified end to end:** `?date=2026-10-09` produces `…/embed?layout=month_view&date=2026-10-09&month=2026-10`; a malformed value is ignored; no page errors.
+
+**The date maths is its own tested module.** `src/lib/businessDays.ts` carries civil dates **pinned to midday UTC** and read only through UTC getters, so a DST boundary cannot move "add 14 days" onto the day before. `tools/business-days.test.ts` runs on node's own test runner with no new dependency — **`npm run test:dates`, 8 passing**: a Friday pick, a +3 that crosses a weekend, a month boundary, a year boundary, a leap day, the weekend rules and ISO round-tripping.
+
+**⚠ There is no holiday calendar.** Only Saturday and Sunday are skipped, so a proposal due three business days after a pick that straddles a statutory holiday will read one working day early. The page only ever promises "3 business days", which is the same promise the old calendar made — but it is a real limitation and a holiday list is the fix if it ever matters.
+
+**Five sampled picks, all correct:**
+
+| Call | Proposal (+3 business) | Kickoff (+14 calendar) |
+|---|---|---|
+| Tue Oct 6 | Fri Oct 9 | Tue Oct 20 |
+| Wed Oct 7 | Mon Oct 12 | Wed Oct 21 |
+| Thu Oct 8 | Tue Oct 13 | Thu Oct 22 |
+| **Fri Oct 9** | **Wed Oct 14** | **Fri Oct 23** |
+| Mon Oct 12 | Thu Oct 15 | Mon Oct 26 |
+
+**Deleted:** `KickoffCalendar.tsx` (zero importers verified) plus `CALENDAR_DAYS`, `WEEKDAY_HEADERS`, `WEEKEND_DAYS`, `KICKOFF_STAMP`, `KICKOFF_STAMP_DAY` and the `dayStart`/`dayEnd` fields on `ProcessStep`, none of which anything else read. `STEPS` stays — `ProcessTimeline` and `AutomateScreens` use it.
+
+**Verified on the alias:** build exit **0** unfiltered · default selection = next business day · 21 chips, 6 weekend chips disabled and a weekend click ignored · keyboard, pointer drag and tap all select · `aria-live` announces the full sentence, and each node carries its own date as `sr-only` text because the odometer renders all ten glyphs · CTA date param correct after arrow, Home/End and tap · **reduced motion: both the digit column and the line segment compute `transform: none`** · mobile 375: strip scrolls with `scroll-snap-type: x`, minimum font **13px**, document width 375 · **zero horizontal overflow at 375 on all 11 routes** · **3-speed crash scroll on /services at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2388 ms, home 1876 ms**, CLS 0.001/0.000.
+
+*Four faults found by looking at the screenshots rather than the numbers.* The kickoff node sat flush against the container edge and its date read as clipped. All 21 chips did not fit at 1680 — the strip ran ~400px past the container and cut the last one. **`type-accent` was on the same element as `type-h2`**, and its `font-size: 1.12em` resolves against the PARENT's size, so the kickoff date rendered at about a third of the other two — it must nest INSIDE. And the odometer's clipped columns were as wide as the widest glyph, so a two-digit date read "Wed 1 4"; each column is now sized by an invisible copy of its own digit, because Cormorant has no tabular figures and a fixed `1ch` advance did not fix the accented date.
+
+**One deviation from the brief:** the eyebrow reads **`//_05 · TRY IT`**, not bare "TRY IT" — the site's section eyebrows all carry the `//_NN ·` prefix and this section was `//_05 · how to start`. Say the word and it drops to "TRY IT".
+
+**One cosmetic nit left:** the accented kickoff date still shows a hair more space between its two digits than the sans dates do. It is Cormorant italic's own side bearings, not a layout bug, and it is far better than it was.
+
+**17f** `b6ea58f` … `231f1f2` — **"Your project start pass".** Five commits.
+
+*Owner verdict on 17e: concept right, presentation 4/10, and the kickoff date was clipped.* This is the centrepiece version: two questions that build one artefact.
+
+### Pre-flight, as asked
+
+| | |
+|---|---|
+| Cal.com `?notes=` prefill | **Supported** — survives the redirect and reaches the embed |
+| Cal.com `?date=` | **Works** — applied, then stripped from the visible URL by Cal's router |
+| Weekend availability | **Saturday and Sunday both showed slots** when checked |
+| **Event duration** | **"Discovery Call 30m"** — the site says **20 minutes** everywhere. See §7. |
+
+### The date rules changed
+
+**Weekends are bookable.** The call may be any day. Only the proposal count skips non-working days, and it now skips **Ontario's nine statutory holidays** as well as weekends — a static 2026–2027 table in `businessDays.ts`, which closes the no-holiday-calendar limitation 17e logged.
+
+**It needed two anchors, and a test caught it.** A call ON a business day counts from the day after (Monday → Thursday). A call on a weekend or a holiday counts the following business day as day one (Saturday → Wednesday). Without the second anchor a Saturday call would have landed *later* than the Monday after it, which is not a promise anyone would make out loud. **12 tests passing, up from 8.**
+
+**Eight picks on the alias, all correct** (Thanksgiving is Mon Oct 12 2026):
+
+| Call | Proposal | Kickoff |
+|---|---|---|
+| Wed Oct 7 | Tue Oct 13 | Wed Oct 21 |
+| Thu Oct 8 | Wed Oct 14 | Thu Oct 22 |
+| Fri Oct 9 | Thu Oct 15 | Fri Oct 23 |
+| **Sat Oct 10** | **Thu Oct 15** | Sat Oct 24 |
+| **Sun Oct 11** | **Thu Oct 15** | Sun Oct 25 |
+| **Mon Oct 12 (Thanksgiving)** | **Thu Oct 15** | Mon Oct 26 |
+| Tue Oct 13 | Fri Oct 16 | Tue Oct 27 |
+| Wed Oct 14 | Mon Oct 19 | Wed Oct 28 |
+
+### What it is
+
+A **28-day wheel** that centres its selection, scales and fades neighbours by distance (transform and opacity only), marks today, labels weekends "Weekend call" and **names the holiday on the day itself** — "THANKSGIVING" appears under Oct 12. Drag with momentum, click, arrows, Home/End; `role="listbox"` with `aria-activedescendant` and an `aria-live` sentence.
+
+The **pass** is a 560px card on the new `--surface-elevated` token with a three-layer tinted shadow: Averr mark, "PROJECT START PASS", the business name at `type-h1`, three rows, a radial-gradient perforation, a barcode drawn deterministically from the name and the day, a pass number (`AV-1006-NR`), and a **READY TO BOOK** stamp that lands once per completion. On change the dates roll, a sheen sweeps and the card settles through ≤3°; on desktop it tilts ≤4° toward the cursor.
+
+**The kickoff date is MEASURED**, not hoped for — the line is measured against the card's inner width and the font scaled to fit, one pass, reset-measure-write. **Verified unclipped at 1280 / 1440 / 1680 / 1920 / 375** with a 32-character business name: right edge 932 vs 1195, 1114 vs 1348, 1300 vs 1526, 1420 vs 1646, 144 vs 333.
+
+**Privacy.** The business name is component state only — **no storage, no analytics, no fetch**. It rides to /contact as `notes`, which is the field Cal.com prefills from, and **never as `name`**, which belongs to a person. **Verified end to end:** `/contact?date=2026-10-10&notes=Northgate%20Renovations` produces `…/embed?layout=month_view&date=2026-10-10&month=2026-10&notes=Northgate+Renovations`.
+
+**Verified on the alias:** build exit **0** unfiltered · 8 picks correct incl. Sat, Sun, a holiday and a holiday straddle · weekends selectable · **kickoff unclipped at all five widths** · name typing updates pass, pass number and CTA · the stamp fires on completion and resets when the name is cleared · keyboard, drag and touch all select · `aria-live` announces · **zero horizontal overflow at 375**, minimum font **13px** · **reduced motion: the sheen is absent and the stamp simply appears** · **3-speed crash scroll on /services at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2236 ms (was 2388), home 1872 ms**, CLS 0.001/0.000. The section's code was NOT lazy-loaded — the Services chunk grew 44.15 → 45.75 kB gzip and LCP did not regress, so the extra boundary would have bought nothing.
+
+*Four faults the screenshots caught, not the numbers.* The wheel read as a stub — the opacity falloff hit zero four days out and the track was anchored left, so the selection sat against the edge; it now centres and keeps six days legible. **Cormorant's italic figures draw outside a 1em line box**, so the odometer window clipped them and leaked the tail of the digit above as a stray stroke over "Sat 24"; window and cells are 1.35em with the strip lifted by half the extra leading. At 375 the pass rows' fixed 132px label column squeezed the date onto two lines and pushed it under the "20 MIN" meta; below 1024 the row is a grid with the label on its own line. And the mobile wheel showed two days at a 104px cell, now 82px and five.
+
+**Deviations.** `--surface-elevated` **did not exist** — I added it to `index.css` as `#FBF9F4`, paper rather than white, so the card sits in the same family as `--color-bg`. The "mid-typing" screenshot is the **completed** state rather than a true mid-keystroke frame; the stamp moment and mid-typing are therefore one capture, not two.
+
+**17g** `267c248` … `b51fa7d` — **A guided conversation, an obvious date control, and a pass that confirms.** Five commits.
+
+*Owner audit of 17f:* the name question was missed — a faint mono label over a pale underline reads as a caption, not an action; the date wheel could not be changed by clicking; the call is 30 minutes; and a booked pass should show the booked time.
+
+### Pre-flight
+
+| | |
+|---|---|
+| Booking event | **`bookingSuccessfulV2`**. Only **`startTime`** is read. The deprecated `bookingSuccessful` carries `organizer.name` and `.email`; V2 carries **no attendee identity at all**, which is why it is used. |
+| Modal | `cal("modal", { calLink, config })`, taking the same `date` / `month` / `notes` prefill. |
+| Loader | The embed is **dynamic-imported on first intent**. It is now its own **1.39 kB** chunk and `app.cal.com` is not contacted until hover, focus or click — **measured: 0 cal.com requests before the CTA, 87 after.** |
+| "20" mentions | **Six**, all corrected (below). |
+
+### 1 · Thirty minutes, site-wide
+
+| File | Before → after |
+|---|---|
+| `ServicesCloser.tsx:97` | "Twenty minutes, no deck" → **"Thirty minutes, no deck"** |
+| `servicesProcess.ts:39` | "20 minutes. No slide deck." → **"30 minutes."** |
+| `KickoffPass.tsx` | `meta="20 min"` → **`"30 min"`** |
+| `ComingSoon.tsx:110` | "a 20-minute call" → **"a 30-minute call"** |
+| `Contact.tsx:1096` | "Book a 20-minute intro call." → **"30-minute"** |
+| `businessDays.ts:178` | the doc comment naming the facts |
+
+**Zero remaining.** This closes the owner item 17f opened.
+
+### 2 · The conversation
+
+Each step carries a mono "STEP n OF 2" over the question at **`type-h3` in ink**, never the muted token — measured at **14.15:1**. The name input is a real field: elevated fill, 12px radius, `type-h2` text at **17.53:1**, a 2px focus ring, **93px tall**. An animated placeholder types and deletes three example names with a blinking caret once the section is in view, **stops the moment the field is focused**, and is replaced by a static placeholder under reduced motion. Nothing is autofocused. At ≥2 characters Step 1 takes a tick and dims to 0.62 while Step 2 goes to full emphasis — **Step 2 is never locked.** The pass's empty name slot carries a **pulsing dashed outline** until a name is typed, so both columns point at the same first action.
+
+### 3 · The date control
+
+Centre day at `type-display-l` with **52px arrows**, clickable dimmed neighbours, swipe, arrow keys, Home/End, and a **month popover** (this month and next, past days disabled, Escape and outside-click close with focus returned to the trigger). Range **today → +60 days**. Weekends and holidays are named on the day itself.
+
+| | |
+|---|---|
+| initial | Tuesday, Oct 6 · **Today** |
+| next arrow | Wednesday, Oct 7 |
+| neighbour click | Thursday, Oct 8 |
+| ArrowRight | Friday, Oct 9 |
+| End | Saturday, Dec 5 · **Weekend call** |
+| Home | Tuesday, Oct 6 |
+| popover | 31 days, 5 disabled, October 2026; Escape returns focus to "Pick another date" |
+
+### 4 · In-page booking
+
+The CTA opens the Cal modal. **Measured end to end:** `/embed?layout=month_view&date=2026-10-07&month=2026-10&notes=Northgate+Renovations&embedType=modal` — the chosen day preselected and the business name in notes. Embed failure falls back to `/contact?date=…&notes=…`; /contact is unchanged.
+
+### 5 · Booked → CONFIRMED
+
+A 180° `rotateY` flip (instant under reduced motion — `transform: none` measured) to a back face carrying **"Wed, Oct 7 · 2:30 PM ET · 30 MIN"**, the proposal and kickoff **recomputed from the booked day** (Oct 7 → proposal Tue Oct 13, past Thanksgiving; kickoff Wed Oct 21), the inbox line, a green CONFIRMED stamp, and aria-live **"Booked: Wednesday, October 7 at 2:30 PM Eastern."** The CTA becomes a quiet "Book another call" and the date control is disabled showing "Booked: Wed, Oct 7".
+
+**Verified with a simulated event, not a real booking.** `?simulateBooking=<ISO>` sets component state and nothing else — no request, no storage. **It is reachable on a deployment when typed by hand**, which is a deliberate trade so the flip could be verified on the alias; the dev-only `CustomEvent` path exists too. See §7.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · Q1 **14.15:1**, input text **17.53:1**, field outline composited **4.02:1** against the fill and **3.25:1** against the warm ground · animated placeholder runs, stops on focus, absent under reduced motion · pulsing slot before typing · step progression with tick · date control by arrow, neighbour, keyboard, Home/End and popover · range limits · weekend and holiday labels · **0 cal.com requests before intent** · modal on the selected date with notes · the flip in both motion modes · mobile 375: **no control under 44px**, minimum font **13px**, field full-width, **zero overflow** · **crash scroll 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2336 ms, home 1876 ms**, CLS 0.001/0.000 · **12 date tests passing**.
+
+*Three faults the screenshots caught, not the numbers.* **The booking CTA was 700px below the fold** in the empty state: `.kp2-pass` sets `position: relative` later in the same stylesheet at the same specificity, so it beat `.kp2-face--back`, the back face sat in normal flow and the card measured 1267px instead of 613. Then **the CONFIRMED stamp and barcode were clipped** — the back face is taller than the front, and `inset: 0` clipped it to the front's height; the face that is NOT showing is now the one taken out of flow. And **a confirmed pass was still pulsing the dashed "fill this in" slot** when no name had been typed.
+
+*One measurement error of mine, reported:* I first read the field outline as 17.53:1 by substituting alpha 1 into the `rgba` — that measures the ink, not the border. Composited properly, `--hair-hi` is **1.47:1** and fails WCAG 1.4.11; the border is now `rgba(20,20,18,0.55)`.
+
+**Deviations.** There is **no `--border` token** — §5.23 records that `--color-border` does not exist — and `--hair-hi` fails 3:1, so the field, the arrows and the "pick another date" control use a literal `rgba(20,20,18,0.55)`. The eyebrow remains **`//_05 · TRY IT`** rather than bare "TRY IT", keeping the site's `//_NN ·` section convention. And the simulated-booking harness is reachable in production via an explicit query param, as above.
+
+**17g-fix** — **five display fixes from the 17g recording.** One commit.
+
+**1 · The odometer is gone.** Per-digit rolling columns leaked their neighbours AT REST: "Oct 12" showed the leading 1 as a bar with stray strokes, and a pass row read "Monday, Oct 1g". **A column of ten glyphs clipped to a line box is always one mis-measured pixel away from showing the next one** — no amount of padding fixes the class of bug. `DateToken` replaces it everywhere (main date, both pass rows, the kickoff line): the whole string slides out at y −40% while the new one slides in from +40%, opacity and transform only, `duration.base` / `ease.outQuart`, instant under reduced motion. **The clip box is measured from the font's real ink**, via canvas `actualBoundingBoxAscent`/`Descent` on the string plus every digit in the element's own computed font, re-measured after `document.fonts.ready`; the padding that gives Cormorant's italic room is cancelled by an equal negative margin so nothing moves.
+
+*Verified:* 10 consecutive dates covering **digits 0–9**, in both faces — **every token holds exactly one layer at rest and no ink falls outside its measured box.** Zoomed crops at 1440 and 1680 show complete glyphs.
+
+**2 · The animated example reads as a placeholder.** It was dark and full-size and looked like a typed value while the pass still said "Your business". It is now prefixed **"e.g. "**, in `--color-muted-2` — **3.49:1 on the field, against ink's 17.53:1 for typed text** — with the blinking caret at the **start** of the field where a cursor would actually be, rather than trailing the example.
+
+**3 · One contextual tag.** The date repeated under the main date is gone. Above: the weekday. Below: a single outlined pill, shown only when it says something — **Today / Tomorrow / Weekend call / the holiday name** — in a row whose height is reserved. *Verified across six consecutive days: the tag row stays 28px and the date's y never moves.*
+
+**4 · Arrows and neighbours.** The reel is a grid, so the three numerals share one baseline row instead of being centred by box, with the weekday and tag in their own rows. **Measured clear space between each arrow and its neighbouring numeral: 28px at 1280, 1440, 1680 and 1920** — above the 24px asked for.
+
+**5 · `?simulateBooking` is dev and preview only.** Active on localhost and `*.vercel.app`; inert anywhere else, so nothing on averrstudios.com can make the pass claim a booking that does not exist. **Closes §7.12.**
+
+**Verified on the alias:** build exit **0** unfiltered · the digit sweep above · placeholder vs typed captured side by side · tag and baseline measurements above · mobile 375: minimum font **13px**, **no control under 44px**, zero overflow · reduced motion: the animated example is absent, the static placeholder serves, and every token computes `transform: none` · **crash scroll 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2408 ms, home 1880 ms**, CLS 0.001/0.000 · 12 date tests passing.
+
+*One probe error of mine, reported:* the first artefact audit selected three hosts that contain no `DateToken` and scored their zero layers as failures — "10 frames with artefacts" when the real tokens were all clean. The selector now requires a host to contain a sizer span.
+
+**17h** — **the /services screens that were still over the blank target.** Seven commits. Carry-forward from 17d (§7.14), not a new brief.
+
+**All sixteen screens now meet every density gate at BOTH widths: base 13px, minimum 11px, no flat region over 15% of the window — 17/17 at 1440 and 17/17 at 1680.**
+
+| Screen | before → after (1680) | what it needed |
+|---|---|---|
+| Brand & design direction | 24.2 → **7.0** | a Lockups row, taller photography, and a yard sign in Applications |
+| Human review built in | 21.9 → **10** | a sign-off and attachments on the draft, a status row under the thread list |
+| Paid ads | 20 → **6.6** | sitelinks, a second ad variant and the keywords buying the clicks |
+| Product & SaaS interfaces | 18.8 → **10.9** | eight job rows instead of five |
+| Design systems | 18.3 → **6.1** | filled/disabled input states, a select, a textarea, a checkbox, twelve tokens |
+| Landing pages | 16.4 → **13.1** | a review line where `margin-top: auto` had left 200px of dead page |
+
+**⚠ A number in 17d's entry was wrong.** It listed **Reporting at 28.8 / 30** as one of the six failing screens. Measured correctly it is **8.4 / 7.8 and was never failing** — the sample had landed on the kickoff section *below* the released pin, the same leak flagged in 17d's own probe notes. The guard now requires the **stage grid itself** to be on screen, not just a stale frame rect. Only five of the six were real, plus Landing pages.
+
+*Two faults of mine in this session.* I added the design-system checkbox tick at **10px**, in the very session enforcing the 11px floor — caught by a probe that scans every scroll position rather than one sample per beat, because the tick only renders once a step completes. And on the brand board I **raised the wrong heights first**: the flat region was the right column below the van decal, not the bottom strip; raising the lockups and photography changed the measurement by nothing. Looking at the screenshot found it in one pass.
+
+**Verified on the alias:** build exit **0** unfiltered · density and type at 1440 and 1680 with dwell screenshots reviewed one by one · **no sub-11px text anywhere on the stage, scanned at every scroll position** · mobile 375 across a full scroll: screen minimum **11px**, max `scrollWidth` **375** · **3-speed crash scroll at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2464 ms, home 1940 ms**, CLS 0.001/0.000 · 12 date tests passing. The Services chunk grew 49.92 → **51.06 kB** gzip (+1.14).
+
+**17i** — **the pass sheen, and /services off the critical path.** Two commits, plus a doc commit that unblocked §7.2 and §7.3.
+
+**1 · The sheen sweeps behind the type.** It was a full-bleed gradient over the whole card, so it washed across the glyphs. The sweep now renders first at `z-index: 0` and everything readable is wrapped in `.kp2-above` at `z-index: 1`. *Verified: `sheenZ "0"`, `typeZ "1"`, and a screenshot taken mid-sweep shows the type solid.*
+
+**2 · The build stage and the start pass load off the critical path.** `/services` is a lazy route, so its LCP element — the hero subhead — could not paint until the whole route chunk had downloaded and executed, and every session had been adding to that chunk. New `components/LazyBelowFold.tsx` defers a section's code behind an `IntersectionObserver` with **`rootMargin: "100% 0px"`**, so the import resolves one full viewport early and the swap is never seen; the placeholder holds the section's real height in the section's own ground colour, so a mistimed swap still cannot shift anything on screen. Without `IntersectionObserver` the section loads immediately rather than never, and a failed chunk still renders.
+
+| | before | after |
+|---|---|---|
+| `Services` route chunk | 51.06 kB gzip | **3.17 kB gzip** |
+| `ServicesBuild` (own chunk) | — | 40.73 kB gzip |
+| `KickoffPass` (own chunk) | — | 9.26 kB gzip |
+| **/services mobile LCP** | **2464 ms** | **1932 ms** (target was ≤2300) |
+
+*Verified:* build exit **0** unfiltered · home unchanged at **1856 ms** · **no pop-in** — the stage is mounted at scroll 0 and the pass mounts at y=12150 with its top still 1884px below the fold · 3-speed crash scroll at 1440/1920/375 clean.
+
+*The recurring trap, hit again and reported.* The first LCP pass after the deploy read **2772 ms** with runs spread 1928–3008 — a cold edge cache on a fresh deployment. Five warm passes gave **1932 ms**. **Never take the first timing after a deploy.**
+
+*One CLS finding, investigated rather than assumed.* A full-page scroll of /services accumulates **~0.09** cumulative CLS. It is identical at two scroll speeds and no single shift exceeds 0.023, so it is the pinned stage's own scroll-linked animation, not the lazy swap. **Load-window CLS stays 0.001.**
+
+---
+
+**SESSION 18 — /about, "proof of a person".** Seven commits (`5b5ab00` … `6f256aa`). The page was a monogram hero, four stacked full-height principle bands, a process timeline, and a founder card in a box. It is now a hero that leads with a line, **a principles playground**, a process line that draws as you reach it, and a founder section built like a person rather than a business card.
+
+### 18a-1 · The mark draws on its own timing, the hero leads with a line
+
+`MonogramMark` already stroke-drew a real SVG path — this was a retiming, not a new mechanism. It now runs on motion tokens (`duration.slow × 2`, `ease.inOut`), which the **hero LCP rule** permits because the mark is not text.
+
+The headline is new: **"Small on *purpose*."** at `type-display-2xl`, painted from the first frame (`CharReveal paint`), with the accent nested *inside* the size class per §5.33. **The old headline is kept verbatim as the subhead** — "The studio for founders who care how they show up." — so no copy was lost. The ladder keeps its original top→bottom order; the only timed waits are on the non-text mark.
+
+### 18a-2 · The principles playground (the page signature)
+
+Four panels on **one horizontal track driven by a single scroll value**. `components/about/PrinciplesTrack.tsx`; the copy moved to `data/principles.ts` **byte-identical**, extracted by script rather than retyped.
+
+- The wrapper is **500vh** — four panels of travel plus the extra viewport the **n+1 rule** wants — so panel 04 gets real pinned time instead of sliding past as the sticky lets go. *Measured: wrapper 4500px, travel 3600px = exactly 400vh, sticky pinned (`top: 0`) at all four marks.*
+- `x` is **stepped, not linear**: each panel holds for most of its slot and the move between is eased through `easing.inOut`. A linear map would put every panel on its mark for one instant. *Measured dwell plateaus across the track:* `0.00–0.10 → 0vw`, `0.25–0.40 → −1vw`, `0.60–0.75 → −2vw`, `0.95–1.00 → −3vw`, snapping to exactly 0 / −1440 / −2880 / −4320 px.
+- **Each panel carries its own ground**, so the cream / alt / cream / dark rhythm the four principles always had survives the rebuild — and the stage still hands the next chapter a dark edge, which is what `Chapter from="dark"` downstream expects. *Measured: `#F4F0E6` / `#EDE9E2` / `#F4F0E6` / `#141412`, panel 04 with `grain-dark`, ink `--color-parch`, muted `--color-muted-l`.*
+- The only scroll-linked style inside the sticky frame is the track's transform. **Zero ViewTimeline on any stage descendant**, measured.
+- A progress row of four marks sits under the stage; clicking one scrolls to that panel. *Measured: clicking 03 landed at y=4033 against an expected 4033, x=−2vw, active mark 2.*
+- **Below 900px and under reduced motion the track becomes a stack**: `position: static`, no track, all four headings present, every demo still interactive.
+
+**The four demos are live things built from CSS, SVG and state — there are no images in any of them.**
+
+| | demo | works by |
+|---|---|---|
+| 01 | a grey template card **rebuilding into a crafted one** — mono eyebrow, display headline with the accent voice, gold rule, set body, ink CTA. The crafted content is always in flow and the slabs are absolute over it, so the card is exactly as tall in both states | hover, focus **and** click-to-pin |
+| 02 | a **direction sheet assembling** — five real tokens with their names, a Geist and a Cormorant italic specimen, a 4→128 spacing ruler; pieces arrive staggered and snap on a spring | plays on arrival, **Replay** by mouse or keyboard |
+| 03 | the site's own **MagneticCTA** labelled "Try me", beside a dot crossing a track under **linear vs the site's outQuart** | both halves are buttons |
+| 04 | two mini sites and a **2026 → 2029 slider**: the trend-led one desaturates, grows a "2026 TREND" tag and its type drifts off-era; the one built on fundamentals is wired to nothing | drag **and** arrow keys |
+
+*Verified by mouse and by keyboard, each one:* 01 Template → hover → Crafted → away → Template, keyboard focus → Crafted with a 2px focus ring, Enter pins it · 02 settles on arrival, and 120ms into a replay the swatch opacities read `0.42, 0.12, 0, 0, 0` — the stagger — from both a click and a keypress · 03 **the dot at ~330ms sits at 185px on linear and 471px on eased**, segments toggle by click and by Enter · 04 three `ArrowRight` presses reach 2029, the trend-led half changes and **the "built to last" half is byte-identical** across a full snapshot of every descendant's box, colour, filter, size, tracking and shadow.
+
+**Two defects the probe caught, not the eye.** The direction sheet **overflowed its frame by 2px** at 1440×900 — harmless to look at, but it would have clipped the spacing scale outright on a short laptop. And the panel-04 mockups carried **9px and 10px labels**, under the site's 11px floor. Both fixed in their own commit.
+
+**A density pass after reading the screenshots.** Every frame was a fixed 538px tall for demos whose natural heights run 200–420, so each one floated in 100–140px of dead space; frames now size to their content under a cap that only bites on a short viewport. The direction sheet became a **two-by-two composition** — palette beside type, ruler beside Replay — because the ruler alone still left the sheet's right half empty. *Measured after: frame heights 360 / 433 / 383 / 449, **clip 0 on every panel at both 1440×900 and 1440×700**, minimum font 11px.*
+
+**⚠ A deviation of mine, fixed in `6f256aa`.** The brief said the principle bodies read-fill; I shipped them as static paragraphs. They now fill — but **a pinned panel cannot read off its own position**, because it is not moving through its own scrollport, so each body fills off **the same scroll value that drives the track**, over the slice where its panel is arriving and sitting still: `[0, 0.07]`, `[0.25, 0.39]`, `[0.58, 0.72]`, `[0.91, 0.99]`. *Measured: each body runs 0 → 0.50 → 1.00 across its own window and finishes before the next begins; words reach opacity 1.* Stacked, the paragraph does move through the scrollport and reads off its own position.
+
+*The reading I took, stated:* **read-fill is applied to bodies, not headings.** It is a paragraph mechanism — index.css describes it as words brightening as *the paragraph* crosses the reading line — and a display headline sitting at 0.22 opacity is not what it is for. The founder statement is the exception, because the brief named it.
+
+### 18b-1 · The five stages become one line
+
+`ProcessTimeline` was five cards with an SVG rule behind them, each card arriving on its own `whileInView` timer — so the rule and the cards told slightly different stories about where you were. **One scroll value now drives the line's `scaleX`, which node is lit, and which step has spoken.** The line reaching a node *is* the node lighting.
+
+*Verified:* `position: relative`, **never sticky** · width **1325px at 1440 = exactly `--container-wide`** (the band's horizontal padding went so the gutter comes from the token) · nodes light in strict order `00000 → 11000 → 11100 → 11110 → 11111` with each step's text fading up behind its own node · week labels **verbatim** — Week 1, Week 1-2, Week 2-3, Week 3, Week 3-4 — in **Geist Mono 12px** · 375: the same line runs **vertical**, rail 2×994px, no overflow · reduced motion: `scaleX(1)`, all five lit, all text at opacity 1.
+
+### 18b-2 · The founder
+
+The card inside a centred 900px column became a full-width row. *Verified:* the mark holds the photograph's slot at **300px on the left** (grid `300px / 944.8px`), the name is **`type-display-l` at 100.8px**, the role line sits under it, and **the band contains zero `<img>` elements — there is still no placeholder photo.** Links are **MagneticCTA text variants** carrying `target="_blank"` and `rel="noopener noreferrer"`.
+
+The bio splits into **the statement it makes** (an `h3`) and **the support behind it** (body), each filling on its own scroll range so the statement finishes before the support starts. *Both verbatim against the brief, string-compared:*
+
+> **Statement:** "Toronto-based design engineer with a background spanning B2B SaaS sales within Google's extended workforce program, frontend development, and AI workflow automation."
+> **Support:** "Previously co-founded KlaasX Edutech (15-person team, 150+ institutions). Started Averr Studios to build the kind of client websites that actually earn their portfolio slot."
+
+*Measured:* `--p` runs 0 → 0.99 → 1 as the section crosses the reading line, word opacity 0.22 → 1; under reduced motion `--p` is 1 and every word is at opacity 1 on arrival.
+
+### 18b-3 · The closer
+
+Unchanged, and confirmed: **`ClosingCTA` exists only in `About.tsx`** — it is /about's own, not a shared component — and `useDeclarePageEndTone("dark")` is in place, so the footer still reveals over dark on this route.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **/about mobile LCP median of 3 = 2044 ms** (baseline 2004 ms), FCP 1716 ms, **load-window CLS 0.0000**, LCP element the hero name block · **3-speed crash scroll at 1440 / 1920 / 375, both directions — CLS 0 (0.0001 at 375), worst single shift 0.0001, zero console errors, zero React errors** · **zero ViewTimeline on sticky descendants** · reduced motion has real final states everywhere · minimum font **11px** across the stage at every scroll position.
+
+**Site-wide sweep, all ten routes at 375:** zero horizontal overflow anywhere · **PillHl inventory unchanged — home 2, /nope 1, zero elsewhere** · **zero `# AVERR STUDIOS v2 — HANDOFF V3
+
+**Written:** 2026-09-29 · **Supersedes:** everything after Session 9 in `HANDOFF.md` / `REDESIGN-HANDOFF.md`
+**Audience:** a fresh Claude Code session with no memory of this project. This file is your only memory. Read it all before touching anything.
+
+> Note on naming: the sessions referred to a file called `AVERR-V2-MASTER-HANDOFF.md`. **No file by that name exists in the repo.** The pre-Session-9 documents are `HANDOFF.md` (root, dated July 2026), `REDESIGN-HANDOFF.md` (root), and `docs/00-master-reference.md` … `docs/03-build-status.md`. Those remain valid for project identity, brand, and pre-v2 history. **This file is authoritative for everything from Session 9-fix-c onward** and supersedes them on any conflict.
+
+---
+
+## 1. STATE
+
+| | |
+|---|---|
+| **Repo** | `github.com/uprachets4/averr-site` |
+| **Working branch** | `redesign-v2` (**~110 commits ahead of `main`** at the end of Session 17-fix — `git rev-list --count main..HEAD` for the exact number) |
+| **HEAD** | `f9452c0` — *"17h: a third application fills the brand board's right column"*. **This is the last commit that changed code.** The commits after it touch only this file, so the tip is a doc commit — run `git log --oneline -1` for the exact hash rather than trusting one written here. |
+| **Doc currency** | Written at the end of Session 17h. A hash written into this table goes stale the moment the table is committed, which is why the row above names the last *code* commit instead. |
+| **Preview alias** | `https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app` |
+| **Production** | `averrstudios.com` responds **200**, and is served from **`main`** — i.e. **production is still the OLD site.** None of the v2 redesign has shipped to production. Promoting means merging `redesign-v2` → `main`. **Do not merge without Prachets saying so.** |
+| **Local path** | `/Users/prachetsupadhyay/Developer/averr-site` |
+| **Dev server** | already running on `http://localhost:5173` in most sessions. Never start dev servers with Bash — use the preview tooling, or just test against the alias. |
+
+### Last verified bundle (build exit 0, unfiltered)
+
+```
+dist/index.html                    3.18 kB │ gzip:   1.40 kB  ← carries the route-chunk map
+dist/assets/index-*.css           42.09 kB │ gzip:   8.75 kB
+dist/assets/index-*.js           473.71 kB │ gzip: 150.18 kB  ← home + shell + motion
+dist/assets/Services-*.js        204.42 kB │ gzip:  51.06 kB  ← the build page + the start pass
+dist/assets/Cal.es-*.js            1.39 kB │ gzip:   0.75 kB  ← the embed, fetched on intent only
+dist/assets/CaseStudy-*.js        51.34 kB │ gzip:  12.71 kB
+dist/assets/Contact-*.js          44.67 kB │ gzip:  11.14 kB
+dist/assets/Work-*.js             22.49 kB │ gzip:   6.80 kB
+dist/assets/About-*.js            22.30 kB │ gzip:   5.93 kB
+dist/assets/NotFound-*.js          4.28 kB │ gzip:   1.69 kB
+dist/assets/MonogramMark-*.js      3.85 kB │ gzip:   1.81 kB
+dist/assets/SectionBoundary-*.js   0.44 kB │ gzip:   0.29 kB
+```
+
+Home's initial JS moved **151.59 → 152.53 kB gzip (+0.94)** in 19-pre-2:
+the generated screenshot manifest plus `prefetchRoute`. Well inside the
++12 kB gate.
+
+**Fonts are now part of the budget too** — they are preloaded, so they
+share the critical pipe with the entry chunk. `public/fonts` is **248 kB
+total**, down from 816 kB:
+
+```
+InterVariable.woff2          77 kB   (was 344)  not preloaded
+InterVariable-Italic.woff2   85 kB   (was 379)  not preloaded
+geist-latin-wght-normal      29 kB              PRELOADED
+cormorant-garamond-600-ital  23 kB              PRELOADED
+geist-mono-latin-wght        23 kB              not preloaded
+```
+
+Gate: **flag anything over +12 KB gzip JS in a single session.** **17c-2 changed how this is measured**: routes are code-split, so the number that matters is now **home's initial JS = 151.65 kB gzip** (the motion chunk folded back into index in 17c-2-fix once /services/next began sharing components with /services; one fewer boundary, marginally smaller), down from a single 199.70 kB bundle — **−46 kB on the landing route**. Total across all chunks is higher than the old single bundle (splitting has overhead), but no visitor downloads all of it. Judge future sessions on the initial figure for the route they touch, and on that route's own chunk.
+
+### Stack
+
+Vite + React + TypeScript · `react-router-dom` · **`motion` 12.43.0** (imported as `motion/react`) · Tailwind v4 (tokens live in `src/index.css`, utilities are hand-rolled `type-*` classes) · Vercel auto-deploy on branch push · Playwright (in `node_modules`) used for all DOM verification.
+
+---
+
+## 2. SESSION LOG (9-fix-c → 16-fix-2 + 15d)
+
+Every hash below verified against `git log`.
+
+**9-fix-c** `1b6f0dc` — Home surgical fixes: real CG Walls featured image replacing a placeholder, gradient section seams removed (CaseStudies + Manifesto merged into one dark chapter), on-dark contrast raised to AA, Writing nav link resolved. `Hero.tsx` was under a no-touch guard.
+
+**10** `40f7c13` — Type & scale system. Editorial display scale (`display-2xl` to 208px, `h2` to 56px), self-hosted Geist + Geist Mono (**zero Google Fonts requests**), `tnum` on stats, self-hosted Cormorant italic as the accent voice, wide/body measure tokens, `/process` → `/about#process`. Prachets amended the spec mid-session: keep Cormorant 500+600, drop the `opsz` axis, self-host Geist, leave `og-image.svg` alone.
+
+**10-fix** `083205b` — Hero 1440 regression (headline `display-xl` → `display-l`, **class swap only** — Hero.tsx was otherwise locked), mobile full-screen nav overlay with focus trap, dropped the unused Cormorant 500.
+
+**11** `784a593` — `<Chapter>` transition system: scroll-linked `clip-path` inset+radius expansion on every cream↔dark boundary. `MagneticCTA` gained an additive `tone="dark"` (replacing a `.cta-on-dark` `!important` override), single tab stop per CTA, desktop nav active state.
+
+**11-fix** `de837cf` — StorySoFar stages fit the pinned frame, nav prominence + Work count, home→/work+/services wayfinding, `ImageFrame` additive `tone`. Prachets pre-approved a pre-check: *if the "234px Gallery sliver" turns out to be empty padding, STOP and report* — it was a measurement artifact (real slides were 820–845px), reported not "fixed".
+
+**11-fix-2** `2d17870` — Chapter easing `outQuart` → `inOut` so the expansion lands mid-viewport.
+
+**12** `6adc93e` — Hero cinematic rebuild (Prachets explicitly unlocked `Hero.tsx`): split h1 at `display-2xl`, slab pill entrance, pinned scroll takeover where the pill's clip-path expands to a full dark frame carrying a 4-case-study reel, Toronto clock, unpinned fallbacks. `HeroSignature` and the client row were deleted.
+
+**12-fix** `f2dd291` — Tone-aware nav site-wide, mobile load film ×0.5 for LCP, **root-caused the frozen reel opacity** (see §5), deleted orphaned `HeroSignature`.
+
+**12-fix-2** `85840e2` + `6d9aeec` — Swept every scroll-linked opacity in a sticky frame onto the new shared `useScrollStyle` hook (34 hits → 0).
+
+**12-fix-3** `83d0a37` + `f86df6d` — Hero pill inside the container with balanced padding, reel pan retimed, /services Grow cards contained, /about numerals cleared of body copy; `useScrollStyle` changed to a **callback ref that writes on attach**, fixing a stuck `"serious."` clone.
+
+**13** `7169c2e` — Home rebuild: StorySoFar → three unpinned scenes, Pillars → three service doors with live hover previews, Numbers + CaseStudies stats → one dark **ProofLedger**. Prachets's rules: *no image repeats anywhere on home*, *nothing invented*.
+
+**14** `2db13ca` — /work rebuild ("The Vault"): hero, dark index chapter with full-width rows, cursor-follow preview with velocity tilt, URL-synced pillar filters with FLIP, /work-specific closer.
+
+**14-fix** `ba6f3f0` — Removed the non-selective pillar filters entirely, single-sourced headline figures into case-study data (home + /work read one field), status fallback for rows with no measured figure.
+
+**14-fix-2** `8fded56` — Fragment captions (SIFT's trailing period dropped; Prachets accepted home changing by that one character), status shown once (meta = year number only).
+
+**14-fix-3** `d04b44b` + **14-fix-3b** `d984ba0` — **All pricing removed site-wide** (timelines instead), /services gutter restored, /services hero `PillHl` → Cormorant accent, ledger dedupe (CG row), ILLUSTRATIVE labels on sample metrics, door previews clamped + enlarged + Grow mini dashboard. Prachets answered three questions: derive the pillar count word from data; use each section's own eyebrow as the rail label source; fold ScrollProgress into the rail.
+
+**15a** `4368c6a` `b2de080` `cd6b81d` `9f46983` — Case studies part 1: zoom-into-the-work hero with client-tint glow (additive `tint`), reading rail, word-level read-fill Context, pinned Approach with image wipes. Prachets chose: pinned split on **all four** studies (retiring the `text-then-image-full` render but keeping it in data/union), derive the "Two/Three pillars" count from data, rail labels = the sections' own eyebrows.
+
+**15b** `5e57481` `755955e` `cfde955` `0a96a72` `121b756` — Rail ≥1600 only, self-ticking "what we built" with live count, detail-zoom Signatures on additive `focal` points, figure-led Outcome, quiet "what's next", next-project finale replacing the shared `FinalCTA`. Prachets approved two image corrections: CapitalCommand's "operational truth" signature → `08-system-health`, SIFT's "sync engine" signature → `07-sources`.
+
+**15c** `aa8236a` `ade4646` `07ccb7c` `48d3b37` `a366fca` `5d5cb2e` `1b37a3a` `b6ae77a` — Fixed the blank CapitalCommand page (see §5), per-section `SectionBoundary`, Approach images at natural aspect, finale scrim, rail ≥1700, Context as statement+support with verbatim tint highlighters, labelled "what we built", lit "what's next" timeline. **Item 4 (zero image repeats) was reported BLOCKED** — the pool was empty.
+
+**15c-fix** `49e2b93` — Unblocked it: the hero's two back screens became **blurred, tinted depth copies of the front image**, and the front switched to `heroImage` (= `heroImages[0]`, used nowhere else). Zero rendered content repeats.
+
+**16** `f166859` `11c3fa7` `64e8bcd` — /work rebuild: vault doors, pinned project film, side index, clone-expand transition into case studies, mobile snap sections; row index + CursorPreview deleted. `64e8bcd` fixed two type errors that had been **pushed broken** because build output was being piped through `grep`.
+
+**16-fix-2** `f8b5c1c` — Doors open inside the pin; nav tone made honest via an out-of-clip marker.
+
+**16-fix** `6a530c3` — Compact dot index with hover-expand names, film screen back to ~64%, and the **unfiltered-build standing rule** adopted.
+
+**16-fix-2 + 15d** `f3957b0` `01da18e` `46b8f1e` `40219c6` `b2ce349` `3fd88ed` — Film: every project gets a dwell (CapitalCommand fixed), sequenced text transitions, measured name fitting → name moved to its own full-width row, doors became an overlay with project one behind them. Case studies: Approach outline-fill pillar names + statement/support + verbatim emphasis, the blank Approach frame fixed at its real cause, finale CTA moved below the image, and the frame's base layer marked `[data-frame-base]` for audits.
+
+**17** `08965f2` `a70693b` `9ef61fe` `c3c65d6` `eece7b5` `b1994b9` `ed4e054` `cd59093` `ca06bee` `8eba163` — **/services rebuild.** Split out of the 2169-line page into `src/data/servicesProcess.ts` + `src/components/services/{AutomatePipeline,NoList,KickoffCalendar,ServicesCloser}.tsx`.
+
+- *Pillars:* the Automate ambient gained illustrative task chips (New lead → Enriched → Draft ready → Sent → Logged) travelling the existing node path on a 6s loop, 3 in flight, nodes lighting as a chip arrives; hand-written rAF (see §5.15). The unsourced caption **"System average: 12h/week returned" was cut** (§7.11). Mood-board cards re-cut to each image's natural aspect — they were ~1.8:1 screenshots in a fixed 1.40 box under `object-fit: cover`, cropping ~23% off every one — and the stack fans ±6° on hover. "What's included" became chips that assemble, latched once, on both paths. The pillar rail meets the container edge at ≥1680, measured off a probe.
+- *The "no" list:* each line's refusal is struck as you read — a 2px parch rule drawn across a **verbatim** substring held in data, with `splitRefusal()` throwing in dev if it ever stops being one. The rule is a background with `box-decoration-break: clone`, not a positioned bar, so it draws correctly across phrases that wrap (§5.16).
+- *The calendar:* the three-column steps became 14 cells filling one at a time, each step card arriving as its own first day fills. Day 01 = Monday (what makes "3 business days" land on day 04 without crossing a weekend); step 03 spans days 08–12; 06/07 and 13/14 are quiet weekend cells; stamp reads `WITHIN 14 DAYS · KICKOFF` at day 12. Prachets ruled the mapping, and ruled **out** labelling day 05 "your decision" — only the steps' own copy appears.
+- *Closer:* a /services-specific dark closer replaced the shared `FinalCTA`; page end tone now `dark`. With ComingSoon's slab swapped for the Cormorant accent, **`PillHl` is now exactly home hero + home `FinalCTA` + the 404** (verified live: home 2, /nope 1, all other routes 0).
+- *Hero:* headline moved onto one `CharReveal` stagger with "One studio" as an accent segment, plus the home scroll cue.
+
+Prachets's rulings: 20 minutes is the canonical call length (a sweep found /contact and ComingSoon already agreeing — nothing changed); "fixed price" and "up to 15 pages" stay as scope promises, not prices.
+
+**17-fix** `a9ef74a` `4642136` `ea20a63` — `StackedPillar` (< 900px, and **any** width under reduced motion) rendered no ambient at all, so reduced-motion readers lost all three visuals instead of getting a real final state, and `AutomatePipeline`'s reduce branch was unreachable. `AmbientVisual` gained `frozen`, and `StaticAmbient` feeds it progress pinned at 1 so every scroll-linked transform resolves to its end value. The stills are **scaled** to the column, not reflowed — the compositions are authored in fixed px and a 0–400 SVG space and do not survive squeezing — and the ILLUSTRATIVE label is printed at full size *outside* the scaled box, because at 375 the still runs ~0.45 and a label inside it landed near 5px.
+
+**17-fix-2** — Two rulings from Prachets. (a) **Standing rule 18 is absolute** — commit + push per verified item; a brief's `Commit:` line is the report summary, not a squash target. Recorded in §4.18, §7.12 closed. (b) The scaled Automate still's ~6px labels at 375 were **a defect, not an acceptable thumbnail**. Below 900px that still is now a purpose-built **vertical** composition — the five nodes on a straight vertical line, each with its label at real `type-eyebrow` size and its resting chip beside it, ILLUSTRATIVE above. Not the desktop diagram shrunk. Design and Grow continue to scale.
+
+**17b** `10cd235` `9cf8ec5` — **/services leads with what we do.** Owner feedback: the page opened on three enormous pillar words with the services people actually buy reduced to chips, so a visitor could not tell what the studio sells. The hierarchy is inverted — services are the page, pillars are the labels they group under.
+
+- **`servicePillars.ts` is now the single source for /services *and* home.** `PILLAR_SERVICES` holds 16 services, each with `name`, `outcome`, `proof: string[]`, and `from` — the original "what's included" string it renders in plain language, kept unrendered so every line on the page traces to the claim it came from. `SERVICE_COUNT` is derived, so the hero's "16 WAYS WE HELP" cannot drift from the list.
+- **Grow went from 4 services to 6.** The four offered services described work the portfolio does not show; the work it *does* show had no line. Prachets ruled: keep all four, add **Local search** and **Outreach campaigns**, both traced to CG Walls' own copy (*"Google Business Profile optimization"*, *"Google Business Profile seeded with an authentic Brampton homeowner review"*, *"Realtor lead-gen infrastructure: scrapers that watch posting activity, AI email generator that references the specific listing"*, *"door-to-door playbook … tier-ranked by home era and density"*). **Reporting** also regained "Attribution".
+- **Proof links only where a study's own copy shows the service was delivered — 9 of 16.** Prachets tightened two of my pairings in review: **Workflow audit** lost its CG link (a reduced-hours figure is an outcome, not evidence an audit was delivered) and **Human review built in** lost CapitalCommand (product philosophy, not a review layer built for a team). A row with no verified pair renders **no chip and reserves no space** — the absence is intended.
+- **`ServiceIndex.tsx`** — grouped rows at `--container-wide`, pillar label + timeline per group, name `type-h2` left, outcome `type-body-lg` right, proof chips beneath. Hover/focus shifts the name +8px, lifts the outcome to full ink, and fades a 240px proof thumbnail into a third grid track that the copy can never reach (measured: 24–60px clear at every width). A sticky pillar switcher tracks the active group by IntersectionObserver, jumps on click, and fades out after the index; on mobile it becomes a scroll-snap chip row and the thumbnails are dropped.
+- **Hero:** "Here's *exactly* what we do." (Cormorant on "exactly"), GTA subhead, scroll cue kept.
+- **The pillar sequence became "How each one works."** — pillar word down from `display-xl` to `display-l`, and stage 2 now names the same services the index sells instead of the old internal phrasing. Stacked path mirrors it.
+- **Home doors** print their pillar's first four service names in mono under the promise, read from the same record. The preview clamp is unaffected — its 24px clearance is measured against the promise column's left edge, which the added lines do not move.
+
+**17c-1** `2902d5b` `35383eb` — **/services rebuild, part 1 of 3, on a hidden route.** Prachets rated 17b **1–2/10**: a flat list, then the same services repeated in the pinned section, and not cinematic. New concept: ONE continuous pinned scene where a generic business's site is visibly built as you scroll, each of the 16 services being the caption of the step happening on the canvas. **The story is the list** — no service is named twice on the page.
+
+- **Built on `/services/next`**, noindex and linked from nowhere. `/services` is untouched until 17c-3 swaps them; nothing half-built is ever visible on the live route. Only `App.tsx` changed outside the three new files.
+- **Pin math.** Beat = 65vh. Wrapper = `beats × 65vh + 100vh` per the n+1 rule (§5.4). Design's five beats: travel **325vh**, wrapper **425vh** (measured 3825px at 900vh viewport = 4.25×, sticky child exactly 1.00×). The 16-beat target with two 80vh chapter transitions is **1200vh travel / 1300vh wrapper**.
+- **Per-beat phases:** caption in 0–0.15, canvas build 0.05–0.40, **dwell 0.40–0.85** (29.25vh of hold, ruled up from 45% of a 55vh beat), caption out 0.85–1.00. Dwell midpoints at progress 0.125 / 0.325 / 0.525 / 0.725 / 0.925 — those are the screenshot positions.
+- **One continuous float drives caption, canvas and rail.** Nothing on a timer, nothing keyed on an index that flips independently (§5.13). The caption remounts only at a beat boundary, by which point the previous one has faded to 0 — sequenced, never overlapping. Every canvas scene stays mounted and crossfades, so there is never a frame with nothing to draw (§5.6).
+- **The rail is the index:** three chapters, sixteen ticks, hover shows the service name, click lands in that beat's dwell. Automate and Grow read "soon" with disabled ticks until 17c-2 (verified: 16 ticks, 5 enabled).
+- **Canvas** is CSS and inline SVG only — no screenshots, no brand marks, a non-Averr palette so it reads as someone else's business, and ILLUSTRATIVE on the surface throughout. A browser frame on `yourbusiness.ca`: wireframe recoloured by a dropped-in palette with the mark drawing itself → sections assembling top-down → the site becoming a dashboard → **a labelled specimen grid** → a version tag ticking with pulsing "+" marks.
+- Mobile and reduced motion drop the pin: one section per service, each canvas playing its beat once on entry or resting at its finished state.
+
+*A fix inside the session:* beat 4 first pulled the dashboard apart with x-offsets and floated three labels over it. On screen that read as a broken layout — sidebar slid out leaving a dead gutter, table past the frame edge, each label beside something it did not name. Rebuilt as real labelled specimens (button, card, input, tokens, spacing). **The DOM sweep passed it both times; only looking at the screenshot caught it.**
+
+**17c-2** `076af86` `b0abe23` `dd0f8ab` `9a1f3c4` `5e390f5` — **/services/next rebuilt at product fidelity.** Prachets rated 17c-1 **3–4/10**: the concept was right but the canvas read as a small pastel wireframe and every beat was the same toy window.
+
+- **A1 · route code-splitting.** Every route but home behind `React.lazy`; home stays eager as the LCP surface. Home's initial JS **199.70 → 153.46 kB gzip**. The Suspense fallback paints the page ground at a full viewport — a zero-height `main` is what makes the footer jump and the scroll lurch on a route change.
+- **A2 · `WindowChrome`** — a real application window at 62% of the container and up to 82vh (measured 821×738 at 1440, 886×813 at 1920): traffic lights, title/URL bar, a four-layer tinted shadow, a diagonal reflection. Hairlines are inset shadows, not 1px borders, so they stay hairlines at 2dppx.
+- **A3 · `GhostCursor`** — a pointer choreographed from the same scroll value as everything else, eased hops, a slow wobble, a press ripple. **Each screen reads the same local progress the cursor is keyed against**, so a click and its response cannot drift.
+- **A4 · `camera`** — per-beat push-ins scaling the window CONTENT toward a focal point via `transform-origin`. The chrome is outside the transform; scaling the window edges is what makes a mockup look like a zoomed screenshot rather than a camera move.
+- **A5** — only the active beat ±1 is mounted. **Zero long tasks >50ms** across a full scroll of the chapter, measured with a PerformanceObserver on the alias.
+- **B1–B5 · five genuinely different pieces of software**: a brand board (SVG logo, palette with hex, type specimen, business card and van decal that recolour when the cursor picks an accent); a local-business homepage that scrolls inside its own window (booking widget the cursor fills and submits, success toast); a **dark** analytics dashboard (date range switched 7d→30d with KPIs and chart responding, status pills, notifications); a component library (4 variants × 4 states, input states, token tables, a dark-mode toggle that re-themes in place); a release dashboard (changelog, score ring 72→98, Core Web Vitals turning green). All content invented and plausible for the GTA; ILLUSTRATIVE throughout.
+
+*Three fixes inside the session, all caught by looking rather than by the sweep:* the window **collapsed to its 38px title bar** (an auto-height wrapper; the absolutely-positioned screens contributed no height and `overflow:hidden` clipped everything — the DOM sweep read all five screens' text correctly the whole time); the **next screen ghosted through the current beat** at ~12% (crossfade began 0.42 of a beat early, now the last tenth); and screens were **still assembling during their own dwell** (layout now completes by local 0.40, leaving the dwell for the cursor's interaction).
+
+**Outstanding, not done:** mobile type. 176 text nodes inside the screens render below 11px at 375 — the fine print (mono labels at 8px, card descriptions at 9px). The headline content is legible, but this misses the brief's ≥11px requirement. The fix is mobile-specific simplified variants of the dense panels, not a uniform font bump, which would break the desktop density the screens depend on. **Carry into 17c-3.**
+
+**17c-2-fix** `6818f1e` `…` — audit of Prachets's screen recording at ~1680. Six items, all fixed and measured on the alias.
+
+1. **Caption collided with the window.** Measured: "Post-launch" rendered **562px inside a 461px column at 1680** — 101px of silent overflow, its right edge 682 against a window starting at 671; at 1920 it was 11px *inside* the window. My 17c-2 report of "gap 90px, no collision" had measured the h2's block box, which reports the column width no matter how far an inline-block word spills past it (§5.5). The name is now `type-h1` in a 30% column, **fitted by measuring the widest word**. After: worst gap **51 / 57 / 96 / 96px** at 1280 / 1440 / 1680 / 1920, zero overflow.
+2. **Window 62% → 66% of `--container-wide`**, 82vh → 84vh. Measured **66.0% of the container at every width**; as a share of *viewport* that is 60.7 / 60.7 / 56.5 / 49.5% — it falls on wide screens because the container caps at 1440, which is why the recording read it as small. The Releases screen was also filled out: eight changelog entries with tags and per-deploy timings, plus a ten-week deploy-history chart.
+3. **Camera → focus move.** Scale capped at **1.22** (from 1.5–1.6), transform origin at the focus rect's centre so the focused element cannot leave frame, and a four-band spotlight veils the surroundings at 0.66. Four bands rather than one masked overlay because `backdrop-filter` applies to what is *behind* an element — a single rect would blur the thing meant to stay sharp. **Any scale above 1 crops the frame edges; the veil is what makes the cropping read as background rather than damage.** It is mitigation, not elimination.
+4. **Transitions went grey.** Two causes, both found by looking: the incoming window was ramping up *semi-transparent* so the outgoing one read straight through it, offset; and the ILLUSTRATIVE label was rendered per layer, so two overlapped on every switch. The incoming window now becomes opaque almost immediately and **occludes** the outgoing one; the label moved to the stage.
+5. **Pin released into an empty viewport.** Scroll progress hits 1 exactly where the sticky unsticks, so the final beat's fade ran the window to zero while the stage was still pinned. The last beat's window and caption now **hold** to the end. `/services/next` continues into `NoList` → `KickoffCalendar` → `ServicesCloser`, the same components in the same order `/services` uses. Verified: **0 blank samples** at four offsets across the release.
+6. **"Northgate" vs the specified "Your Business".** 17c-2 used Northgate for realism and **did not report the substitution** — a deviation that should have been flagged. Prachets accepted it; it is now consistent (the URL bar had still read `yourbusiness.ca` while every window title said Northgate). **Standing instruction from this session: report every deviation from a brief, however small.**
+
+*Probe errors, mine:* the gap check first measured the **leftmost** frame rather than the active one — during a dwell the outgoing layer sits translated −6%, so it reported 4–5px gaps that did not exist. And the automated "empty area" heuristic scored the dense website screen at 66% empty by counting hits on large containers; fill was judged visually instead.
+
+**17c-3** `64fe34a` … `d5b675e` + the chapter-card fix — **Automate chapter, plus two rulings.**
+
+- **R1 · the scale push-in is gone.** At 1.6, 1.35 and 1.22 it cropped the frame's edges — arithmetic, not tuning: scaling content inside a fixed window always pushes some out. Focus is now carried entirely by the spotlight veil. Verified: **0 scaled content layers** at every beat, spotlight bands present on all ten.
+- **R2 · the build stage may exceed the 1440 container on /services/next only**, capped at 1680 with the normal gutter; columns 29/67. Measured window: **61.7% / 61.9% / 58.6% of viewport** at 1440 / 1680 / 1920 — the 1920 target of ≥58% is met. Caption gaps 151 / 226 / 268px. Every other surface keeps `--container-wide`.
+- **Slot space.** Beats are no longer evenly spaced, so scroll maps onto SLOTS: five Design beats at 65vh, an 80vh transition, five Automate beats at 65vh. **Travel 730vh, wrapper 830vh** (measured 8.30× viewport).
+- **T1 · the back-office reveal.** The Releases window slides left and shrinks to 0.86, revealing the time-audit app already behind it, then exits while the back office settles to centre. The pulled-aside window holds z-index 20 so it reads as the front window moving away. The chapter card ("CHAPTER 2 / Automate / What runs *behind* the site.") lands in the **back half** of the transition — shown from the start it was half-covered by the sliding window, which crosses the caption column.
+- **Five Automate screens**, each a different application: a time-audit heatmap with an automatable toggle and a ticking hours total; a navy agent console with a resolving run timeline, a streaming reply and a fit gauge; a dotted-grid workflow canvas with packets and a run log; an email-client approval inbox with a tracked-change diff; a serif docs runbook. Rail: 10 ticks enabled, Automate segment active.
+- **Mobile.** Every Automate screen ships a restructured `compact` variant — **all five measure exactly 11px minimum, 0 nodes under**. The five Design screens remain **7–8px** and have no compact variant; that is the gate on the swap session, unchanged.
+
+*Three bugs, and one of them was mine from a session earlier:*
+- **React #185, maximum update depth**, crashing the whole route at the last Design beat — no windows, no caption, the noindex meta gone with the unmounted tree. The caption fitter added in **17c-2-fix** kept its scale in state, measured the rendered word and divided by the current scale to recover the base width, with `scale` in its own deps; width does not scale perfectly linearly with font-size, so it oscillated forever. **It only fires when a word actually overflows, so a 30% column never tripped it and 17c-3's 29% column did immediately — it shipped latent for a session.** Rewritten with no state and no dependency on its own output.
+- **`tsc` exhausted its heap** (2GB, FATAL) on nested ternaries inside `useTransform` — TypeScript reconciling a union of tuple types across three transforms. Keyframes are now built as plain typed arrays first. Builds pass on the default heap.
+- **A 4.3-million-line file.** A python edit sliced `s[s.index(A):s.index(B)]` where B occurred *before* A, producing an empty string; `str.replace("", new)` inserts between every character. **Guard: assert the slice is non-empty and the indices are ordered before replacing.**
+
+**17c-4** `c3154e9` … — **Grow chapter, carry-over fixes, and a new standing rule.**
+
+- **All three chapters now run on one pinned stage: 16 beats, two 80vh transitions. Travel 1200vh, wrapper 1300vh** — exactly the figure the pin plan projected in 17c-1. Measured 13.00× viewport (1300vh *is* 13 viewports; an earlier probe expecting 14 was wrong arithmetic, not a wrong wrapper).
+- **C1 · the workflow canvas connectors are measured, not guessed.** They were cubic curves between percentage points with both control points on the source's y, which swung wide and never met the boxes. Each node now reports its own rect, the path leaves a real port on the right edge and arrives at one on the left, routed orthogonally with rounded corners, and the packets travel that exact polyline.
+- **C2 · the run-log spotlight is aligned** — the log is positioned in percentages so the rect names the same box. Verified sharp inside its own veil.
+- **Six Grow screens:** a Durham map with a results panel where Northgate climbs #7 → #2 on a layout spring while its review count ticks 38 → 212; an outreach sequence with merge-filled previews and replies landing; an ads manager with impressions/clicks/CTR/leads and two ad previews; an A/B test where B wins and expands; a content calendar with a draft dragged onto Thursday; and a monthly report with an SVG attribution flow from five channels into leads and booked jobs.
+- **No currency anywhere**, illustrative data included — which also removed the agent console's "$15–25K" budget band that 17c-3 had introduced in breach of the same rule.
+- **Mobile:** all six Grow screens measure exactly **11px minimum, 0 nodes under**. The five Design screens remain 7–8px and are still the swap-session gate.
+- **New standing rule §4.23 — crash-scroll.** See below; added after 17c-3.
+
+*A bug class worth naming, because it bit three times in one session:* **an SVG with a small viewBox stretched across a large panel scales its `<text>` with everything else.** The map's 8px labels rendered near 26px in a 300×220 viewBox under `preserveAspectRatio="slice"`, and the report's flow labels did the same at 7px in a 200-wide box. **Draw type as HTML at a real font size, or size the viewBox to the panel.** The map was rebuilt in positioned CSS; the report's two labels became spans.
+
+*Also mine:* the C2 screenshot first captured the approval inbox rather than the workflow canvas — slot-vs-beat indexing in the probe, the third time that specific confusion has produced a wrong reading. It did surface a real defect by accident (A4's focus rect was framing empty space below the diff), but the carry-over it was meant to verify went unverified until a second pass.
+
+*Honest limit:* the map is the weakest of the six. It now reads as a map — white streets, tinted blocks, an amber arterial, legible labels — but it is a stylised one, sparser than the report or the workflow canvas, both of which genuinely look like software.
+
+**17c-5** `…` — **the finale: the build page is now `/services`.**
+
+- **Design mobile variants** — the last five screens at 7–8px now have restructured single-column variants. **All sixteen screens measure 11px minimum, 0 nodes under, at 375.** The gate is closed.
+- **The map is real streets.** `src/data/osmOshawa.ts` — a committed Overpass extract over central Oshawa/Whitby, projected flat and simplified, **880 ways at 9.4 kB gzip** against a 60 kB budget. No tiles, no runtime API, no map library. **OpenStreetMap data is ODbL; "© OpenStreetMap contributors" renders inside the map window at 11px and must not be removed.** Styled in our palette with road weights by class — not a look-alike of any provider.
+- **The swap.** `/services` renders the build page; `/services/next`, its route, its lazy import and the client-side noindex are gone. Deleted with zero importers: `ServicesNext.tsx`, `ServiceIndex.tsx`, `AutomatePipeline.tsx`, and the old `Services.tsx` in full. Title and meta description updated and restored on unmount.
+- **Verified on the alias:** all 16 captions correct · **all 16 rail jumps correct** · both chapter cards · 3-speed crash-scroll at 1440/1920/375 both directions with **0 console and 0 React errors** · 0 long tasks on a full scroll · 0 ViewTimeline on sticky descendants · no `$` strings · PillHl home 2 / 404 1 / services 0 · 375: 16 frames, **0 nodes under 11px**, zero overflow · all three chapter anchors on cold loads · a real door click from home.
+
+**Mobile lab numbers (390×844, 4× CPU throttle, ~1.6 Mbps) — one of these is bad:**
+
+| | |
+|---|---|
+| CLS | **0.001** |
+| TBT proxy | **174 ms** over 4 long tasks |
+| **LCP** | **4884 ms** — element `P.type-body-lg`, the hero subhead |
+
+**The LCP element is gated behind its own entrance delay.** The hero subhead animates in at `delay: 1.1`, so it cannot paint before 1.1s, and under throttle the whole chain stretches. The route also costs a lazy-load round trip. **This pattern is on every page hero, not just this one** — it is a ship-pass item, and the cheapest fix is to let the LCP text paint immediately and animate something else.
+
+*Four wrong guesses in a row on one bug, worth recording as method:* the chapter anchors appeared to fail on `#automate` and `#grow`. I changed the scroll to instant, then added retries, then fixed a guard that was cancelling those retries — all without evidence. **Instrumenting the scroll position took one run and showed the anchors had worked the whole time**: final y 4653, caption "Workflow audit". The probe was reusing one page across `#design → #automate → #grow`, and a hash-only change is a same-document navigation, so React never remounted. It did surface one real edge — clicking `/services#grow` while already on `/services` did nothing — now fixed by taking the hash from `useLocation`. **Instrument before the second guess.**
+
+**19-pre** `f47c12d` … `341a231` — **Site-wide LCP. Every hero's LCP element now paints at first render, and the font loading was rebuilt around it.** Nine commits.
+
+*The ruling (Prachets):* **the LCP element must PAINT at first render.** Its entrance becomes transform-only — y 8px → 0, `duration.base`, `ease.outQuart`, from 0ms. Every other hero element keeps its choreography. Target: **mobile lab LCP < 2.5 s on every route.**
+
+**The LCP element per route** (390×844, 4× CPU, ~1.6 Mbps), and what it was hiding behind:
+
+| Route | LCP element | Was | Now |
+|---|---|---|---|
+| `/` | `P.type-body-lg` hero kicker | delay 0.675 (mobile film) | painted |
+| `/work` | `IMG` first preview | `loading="lazy"`, faded `whileInView` | eager, `fetchPriority=high`, painted |
+| 4 case studies | `P.type-body-lg` subhead | delay 0.75 | painted |
+| careerclarity-ai | `P` body copy | delay 1.2 | painted |
+| `/services` | `P.type-body-lg` subhead | **delay 1.1** | painted |
+| `/about` | `SPAN.type-display-l` CharReveal | **delay 2.2** + per-char fade | painted (`paint` prop) |
+| `/contact` | `P.type-body-lg` subhead | **delay 1.6** | painted |
+| 404 | `H1.type-display-l` | delay 0.3 | painted (its pill keeps delay 0.9) |
+
+**`CharReveal` gained a `paint` prop.** It keeps every character at opacity 1 from the first frame, drops the per-char stagger, and animates y only. Reserved for an LCP element — do not sprinkle it; the stagger is the component's reason to exist.
+
+**Retiming alone did not reach the target, and the measurement said why.** After the choreography fixes every route still sat at 2.5–3.4 s, with first contentful paint pinned at ~2.2 s. The waterfall: **the 344 kB `InterVariable.woff2` preload was racing the 151 kB entry chunk for the pipe.** The JS took 1826 ms to arrive instead of the ~760 ms it needs alone. Three changes followed, each measured:
+
+1. **Subset the Inter variable fonts** — 344 → 77 kB and 379 → 85 kB, both axes kept, every codepoint the original covered from our source charset still covered. `tools/subset-inter.py` records the range and is idempotent.
+2. **Preload Geist only, not Inter.** A preload is a *high-priority* request; preloading 106 kB of fonts alongside the JS cost ~370 ms of FCP to save a swap on body copy. Geist carries every display headline and is 29 kB, so it keeps its preload.
+3. **A metric-matched fallback for Inter** (`'Inter Fallback'`, `size-adjust: 97.22%` measured from the site's own body copy, vertical overrides from Inter's hhea), so the swap cannot reflow.
+
+**`/work` was mounting the desktop film on phones.** `useMedia` started at `false` and only read `matchMedia` in an effect, so every phone visit rendered the whole `ProjectFilm` first — its four preview images have no `loading` attribute, so **431 kB was requested on the critical path and then thrown away**. `/work`'s own LCP image finished behind three images no one would ever see. Fixed by reading `matchMedia` in the `useState` initialiser, the way `Nav.tsx` already did.
+
+**Results — mobile lab, 390×844, 4× CPU, ~1.6 Mbps/150 ms:**
+
+| Route | LCP before | LCP after | CLS before → after |
+|---|---|---|---|
+| `/` | 4060 | **2264** | 0 → 0 |
+| `/work` | 4908 | **3384** ✗ | **0.054 → 0.016** |
+| cg-walls | 3804 | **2304** | 0.004 → 0 |
+| capitalcommand | 3876 | **2344** | 0 → 0 |
+| sift | 3824 | **2356** | 0.004 → 0 |
+| cadencestack | 3892 | **2368** | 0.005 → 0 |
+| careerclarity-ai | 4440 | **2244** | 0 → 0 |
+| `/services` | 5052 | **2792** ✗ | 0.001 → 0.001 |
+| `/about` | 2680 | **2252** | 0 → 0 |
+| `/contact` | 4940 | **2284** | 0 → 0 |
+| 404 | 3548 | **2184** | 0 → 0 |
+
+**9 of 11 routes under 2.5 s. Two are not, and neither can be fixed by choreography:**
+
+- **`/work` 3384.** The LCP element is an `<img>` that React has to render before the browser can even request it — it cannot paint at first render by construction. It is requested at ~2.3 s and is 86 kB. The fixes are a smaller preview (it renders ~358 px wide from a 1400 px source) or prerendering. **Both are owner calls — see §7.**
+- **`/services` 2792.** FCP is 1928; the gap is the lazy route chunk, a second round trip after the entry chunk plus the heaviest first render on the site. A build-time path→chunk map injecting `modulepreload` would recover most of it. **Not attempted — it is a build-pipeline change, not hero choreography.**
+
+**The real floor is first contentful paint at ~1.9 s**, and it is the SPA boot: HTML round trip (~330 ms) + 151 kB entry chunk (~1100 ms) + React mount at 4× CPU (~450 ms). Nothing in the hero can paint before that. **Prerendering the shell is the only lever left** — logged in §8.
+
+**Reduced motion:** unchanged, verified — character opacity 1 and no transform at every sampled instant on `/`, `/about`, `/services`.
+
+**Verified on the alias:** build exit **0** unfiltered · frames at 0/300/800/1500 ms on all eight hero types, visually reviewed · opacity census of every hero text node at each frame · CLS attributed to its source node, not just totalled · **zero horizontal overflow at 375 on all 11 routes** (`scrollWidth` 375 everywhere) · **3-speed crash-scroll at 1440/1920/375, both directions — 33 route-runs, 0 console errors, 0 React errors, every route alive.**
+
+*Two probe notes.* **A crash-scroll piped through `tail` shows nothing until it ends** — I lost 45 minutes watching an empty file before rewriting it to log per route. It is a ~25-minute run; log every route as it finishes. And **`1920 /work` recorded 946 s against 38 s at 1440** — not reproducible: a fresh pass is 5.8 s with one 59 ms long task, and the per-step cost is identical at both widths. Recorded as an unexplained outlier, not diagnosed.
+
+**19-pre-2** `e521774` … `895313d` — **Prachets's four rulings on 19-pre.** Three commits.
+
+**1 · Every hero text element paints at first render.** Not just the LCP one. Each starts at opacity 1 and animates the transform only — y 12 → 0, `duration.base`, `ease.outQuart` — and **keeps its original stagger offset**, so the offsets now describe the order the lines TRAVEL in rather than the order they appear in. A hero still reads top → bottom with nothing hidden.
+
+- `LineReveal` gains `paint`: the mask goes with the fade, because a line sitting 110% below its own clipping box is not on screen. The clip is dropped with it or it would crop the painted line.
+- `CharReveal`'s `paint` now **keeps the per-character stagger** (19-pre had zeroed it), so a painted headline still reads as a reveal.
+- Non-text keeps what it had: the home **slab** (still the signature), the Toronto clock — which got its own fade so the eyebrow beside it could paint — the scroll cues, the monogram, and the accent bounce on /nope and the coming-soon page, which was already a transform.
+- Home's kicker gets its `1.35 / 0.55` place in the ladder back. 19-pre had deleted it when the element became painted; with everything painted it is needed again.
+
+*Verified per-frame on the alias*, sampling every animation frame from mount: **every line at opacity 1.00 the whole time**, travelling strictly in order — "The studio for" 0.35 → "businesses that want to" 0.43 → "look" 0.65 → "serious." 0.80 → kicker 1.35 → CTAs 1.43/1.51 at 1440, the same order at half speed on 390. The only thing that *appears* on screen is the slab.
+
+**2 · WebP derivatives, site-wide.** `tools/derive-screenshots.mjs` emits 640/960/1280 and the natural width for every capture under `public/work/`, **never upscaling** (a 1400px source emits 640/960/1280/1400). **Outputs are committed** rather than generated by a Vite plugin, so the build stays a plain `vite build` with no image toolchain in it — re-run the script after adding a screenshot. It also writes `src/data/screenshots.ts` with each file's intrinsic size and available widths.
+
+`<Screenshot>` is now the one way a screenshot is rendered: a `<picture>` with the WebP `srcset`, the original JPEG as the fallback `<img>`, and the intrinsic `width`/`height` always set. Three places animate the `<img>` itself (the Signatures push-in, the open-transition clone) and take a `<WebpSource>` beside it instead. The duplicated `w`/`h` in `workIndex` is gone — **one generated source of truth**, because two hand-maintained copies of the same number is how they drift.
+
+| Route (390×844, full scroll) | image bytes before | after | |
+|---|---|---|---|
+| `/work` | 303 kB | **100 kB** | **−67%** |
+| `/work/cadencestack` | 256 kB | **101 kB** | **−61%** |
+| `/work/sift` | 189 kB | **82 kB** | **−56%** |
+
+**3 · The route chunk is preloaded for the path being loaded.** `tools/route-preload.ts` reads the bundle at build time, resolves each route to its chunk **plus that chunk's static imports**, and writes the map into `index.html`. A tiny inline script — no modules, no imports, so it can run before the entry script — matches `location.pathname` and appends `<link rel="modulepreload">`, so the two downloads overlap instead of queueing. The same map is left on `window` for `src/lib/prefetchRoute.ts`, which warms a route on nav-link hover, focus or touch (`rel="prefetch"` there, not `modulepreload`: the visitor has not committed to going yet).
+
+**4 · Prerendering is deferred to the Ship pass** — §8.
+
+### Mobile lab, 3-run median (390×844, 4× CPU, ~1.6 Mbps/150 ms)
+
+| Route | 19-pre | 19-pre-2 | CLS | |
+|---|---|---|---|---|
+| `/` | 2264 | **1904** | 0.000 | |
+| `/work` | 3384 | **2320** | 0.016 | was the worst route |
+| cg-walls | 2304 | **2048** | 0.008 | |
+| capitalcommand | 2344 | **2072** | 0.000 | |
+| sift | 2356 | **2084** | 0.009 | |
+| cadencestack | 2368 | **2080** | 0.000 | |
+| careerclarity-ai | 2244 | **2008** | 0.001 | |
+| `/services` | 2792 | **2228** | 0.001 | the chunk preload |
+| `/about` | 2252 | **2016** | 0.000 | |
+| `/contact` | 2284 | **2056** | 0.000 | |
+| 404 | 2184 | **1904** | 0.000 | |
+
+**All eleven routes under 2.5 s.** First contentful paint is now 1644–1856 ms.
+
+**Verified on the alias:** build exit **0** unfiltered · per-animation-frame ladder on home at 1440 and 390 · frame montages at 0.30–1.5 s, visually reviewed · image bytes counted per route over a full scroll · CLS attributed to its source node under a *gentle* scroll · **reduced motion clean on all 8 hero routes** (final state at 900 ms, no fades, no offsets) · **zero horizontal overflow at 375 on all 11 routes** · **3-speed crash-scroll at 1440/1920/375, both directions — 33 route-runs, 0 console errors, 0 React errors, every route alive.** The 946 s `1920 /work` outlier logged in 19-pre ran **53 s** here, confirming it was environmental.
+
+*A measurement correction that matters more than the numbers.* **Every single-pass figure in this project, 19-pre's "after" table included, was measuring a cold edge cache.** The first pass over a freshly deployed asset set is consistently 300–600 ms slower than the second and third; 19-pre-2's first pass read `/` at 2504 ms and the median is 1904 ms. **Measure three passes and take the median** — one pass straight after a deploy is a worst case, not a result.
+
+**17d** `608a0c6` … `d925553` — **Owner recording audit: /services quality plus two site-wide fixes.** Twelve commits.
+
+**1 · The captions were in beat space, not slot space.** `BuildCaption` read `position` — a SLOT float — against `beat.index`. The two agree only for Design: the first chapter transition displaces every later beat by one slot and the second by two. So on every Automate and Grow beat the fade window `[i+0.85, i+1]` was already behind the playhead, `useTransform` clamped to its end value, and **the caption sat at opacity 0 for the whole beat.** That is the empty caption column in the recording — **§5's own slot-vs-beat trap, in the one place nobody had checked.** The caption is now visible for the whole beat bar a 7% swap at each edge, the first beat does not fade in at all (its slot starts at position 0, while the stage is already on screen during the lead-in), and the two per-element entrances are gone: they were wall-clock delays inside a scroll-driven scene, so a quick scroll left the outcome and chips still fading in several beats later. **Verified: all 16 beats show name + outcome at 10 of 10 samples.**
+
+**2 · The spotlight had two faults.** `backdrop-filter: blur(2px)` ran inside a transformed ancestor, where Chromium composites the band as an **opaque fill** rather than failing quietly — that is the white box over the Approvals diff. The old comment called it free because it "costs nothing where it works"; **a filter documented as unreliable in the exact context it runs in is not free.** And one fixed near-black tint sat over every screen, which on a light screen is a grey wash over cream. The scrim is now the screen's **own** surface: light screens fade toward their paper at 0.55, dark ones deepen toward their ink at 0.5. **Verified: 18/18 veils screen-tinted, zero backdrop-filter anywhere, nothing covered.**
+
+**3 · Density and scale.** Measured before: **base type 7.5–10.5px, minimum 7px, blank regions up to 39%** of the window. Now: **base 13px and minimum 11px on every screen at both 1440 and 1680.** 174 font sizes were raised by a codemod that reads each style object — anything in a mono object floors at 11px, anything else lands at 13px unless it was already a heading — and five screens were rebuilt by hand:
+
+| Screen | Was | Now |
+|---|---|---|
+| Agent console | one reply line above ~500px of nothing | four streamed paragraphs + a "sources used" block |
+| Workflow canvas | small nodes, a floating log card | 148px node cards with icon/name/status, graph spans the canvas, full-width log strip |
+| Approvals | 4 stubs, short draft | 6 threads with previews, 268px list, draft fills the pane |
+| A/B test | five grey bars per variant | two real landing pages — nav, hero, proof row, postal-code form, services strip |
+| Content calendar | 8 entries, 7.5px day numbers | 20 entries across most weekdays at 11px, composer with body copy, hashtags, channels |
+
+Plus the time audit (heatmap rows were a fixed 22px, so it sat in the top third — now stretches), the runbook (gained the right rail a docs site has, a costs section and a change log) and outreach (10 prospects, and the rest of the sequence under the email preview).
+
+**Six screens are still over the 15% blank target** and are listed in §7. **The van decal's phone number** was SVG `<text>` at 7 units in a stretched viewBox — the §5 SVG-text gotcha again — and was removed rather than enlarged; the same number already sits at 11px on the business card above it.
+
+**4 · The nav CTA.** Not a tone bug — a **cross-fade collision**. Background and colour ran the same duration from opposite ends, so they met in the middle: 175ms into a tone flip the pill was `rgb(133,131,127)` and the label `rgb(127,125,119)` — **1.09:1**. Two opposite ramps over one duration always cross; arithmetic, not tuning. The colour now **steps once at the halfway point**, and the ramp uses `ease.inOut` because it is the only token that is point-symmetric (`[0.65,0,0.35,1]`), so it is exactly half way at exactly half time **in both directions**. Worst contrast through a flip is now **3.56:1**, and the settled states were never the problem. **Verified: 50 settled samples and 174 continuous-scroll samples across 5 routes, zero blank frames.**
+
+**5 · The home ledger** lost the CareerClarity row — an unverified "student throughput" figure for an unreleased product — and was deliberately **not** repadded. Four rows remain (SIFT 42%, and the three studio figures), count-up resolves, hairline gaps even.
+
+**6 · The home CTAs** have their `spring.snappy` back, on the transform only: they stay painted at opacity 1 from the first frame per the hero LCP rule, so the bounce is motion on something already on screen.
+
+**Verified on the alias:** build exit **0** unfiltered · caption sampling 10 points × 16 beats · spotlight veil and backdrop-filter audited per beat with screenshots · density and type measured at **1440 and 1680** with dwell screenshots reviewed one by one · nav CTA pixel-tested at 50 settled and 174 continuous points with dark-state screenshots · ledger rows, figures and spacing · **zero horizontal overflow at 375 on all 11 routes, scrolled** · **3-speed crash scroll at 1440/1920/375 on /, /work, a case study, /services, /about — 15 route-runs, 0 console errors, 0 React errors** · **mobile LCP median of 3: home 1964 ms, /services 2240 ms, both under 2.5 s**, CLS 0.000/0.001.
+
+*Three probe errors of mine, all caught before they reached a number in this log.* A caption baseline of "0/160" was measured against a **Vercel Security Checkpoint 403** page — §5.22, tripped by my own polling. Twice, a density sample for the **last beat** landed on the kickoff calendar **below** the stage, because the final caption keeps its text after the pin releases and the sticky frame still reports a positive top; the probe now requires the frame to sit near the top of the viewport. And the first font-size census read the **modal size including mono labels** as "base", which is not what the brief means by base UI text — it now reads the modal of non-mono text and judges mono by the 11px floor.
+
+**17e** `aae26c8` … `ccd4c1f` — **/services: the 14-day calendar becomes "Pick the day you call us."** Seven commits.
+
+*Owner feedback:* the calendar was accurate and inert — fourteen cells filling as you scrolled past, which the reader had to decode before it said anything. It is replaced by one question and the reader's own dates.
+
+**Pre-flight, as asked.** The booking tool is **Cal.com**, link `prachets/discoverycall`, embedded on /contact via `@calcom/embed-react`. **It does support a date parameter** — both the embed `config` and the hosted page take `date` and `month`. /services' CTA previously pointed at `/contact` with no parameter. The calendar sat in the `cream-warm` chapter between `NoList` and `ServicesCloser`, under `//_05 · how to start` and the h2 "Three steps. Two weeks to kickoff, max." **Only `Services.tsx` imported it.**
+
+**What it is now.** A strip of the next 21 days from today in **America/Toronto**; weekend chips are quieter and disabled; the default is the next business day (today, when today is one). A lens glides between chips on `spring.soft`. Pointer drag, click/tap, and the keyboard all drive it — arrows skip weekends, Home/End jump to the first and last selectable day — with `role="radiogroup"` and an `aria-live` sentence. Three nodes on a line show **Discovery call** (the pick, "20 minutes"), **Proposal** (+3 business days) and **Kickoff** (+14 calendar days, the bound, in the Cormorant accent). Digits roll on an odometer, the nodes shift as the segment lengths change, and the line redraws. The old h2 survives verbatim as the closing line, so **no copy was lost and no new promise was made** — the only facts used are the 20-minute call, 3 business days, 14 days, preview URLs from day one.
+
+**The CTA carries the date.** "Book {Weekday}'s call" → `/contact?date=YYYY-MM-DD`, and Contact passes it to both the Cal embed config and the hosted-page fallback link. **Verified end to end:** `?date=2026-10-09` produces `…/embed?layout=month_view&date=2026-10-09&month=2026-10`; a malformed value is ignored; no page errors.
+
+**The date maths is its own tested module.** `src/lib/businessDays.ts` carries civil dates **pinned to midday UTC** and read only through UTC getters, so a DST boundary cannot move "add 14 days" onto the day before. `tools/business-days.test.ts` runs on node's own test runner with no new dependency — **`npm run test:dates`, 8 passing**: a Friday pick, a +3 that crosses a weekend, a month boundary, a year boundary, a leap day, the weekend rules and ISO round-tripping.
+
+**⚠ There is no holiday calendar.** Only Saturday and Sunday are skipped, so a proposal due three business days after a pick that straddles a statutory holiday will read one working day early. The page only ever promises "3 business days", which is the same promise the old calendar made — but it is a real limitation and a holiday list is the fix if it ever matters.
+
+**Five sampled picks, all correct:**
+
+| Call | Proposal (+3 business) | Kickoff (+14 calendar) |
+|---|---|---|
+| Tue Oct 6 | Fri Oct 9 | Tue Oct 20 |
+| Wed Oct 7 | Mon Oct 12 | Wed Oct 21 |
+| Thu Oct 8 | Tue Oct 13 | Thu Oct 22 |
+| **Fri Oct 9** | **Wed Oct 14** | **Fri Oct 23** |
+| Mon Oct 12 | Thu Oct 15 | Mon Oct 26 |
+
+**Deleted:** `KickoffCalendar.tsx` (zero importers verified) plus `CALENDAR_DAYS`, `WEEKDAY_HEADERS`, `WEEKEND_DAYS`, `KICKOFF_STAMP`, `KICKOFF_STAMP_DAY` and the `dayStart`/`dayEnd` fields on `ProcessStep`, none of which anything else read. `STEPS` stays — `ProcessTimeline` and `AutomateScreens` use it.
+
+**Verified on the alias:** build exit **0** unfiltered · default selection = next business day · 21 chips, 6 weekend chips disabled and a weekend click ignored · keyboard, pointer drag and tap all select · `aria-live` announces the full sentence, and each node carries its own date as `sr-only` text because the odometer renders all ten glyphs · CTA date param correct after arrow, Home/End and tap · **reduced motion: both the digit column and the line segment compute `transform: none`** · mobile 375: strip scrolls with `scroll-snap-type: x`, minimum font **13px**, document width 375 · **zero horizontal overflow at 375 on all 11 routes** · **3-speed crash scroll on /services at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2388 ms, home 1876 ms**, CLS 0.001/0.000.
+
+*Four faults found by looking at the screenshots rather than the numbers.* The kickoff node sat flush against the container edge and its date read as clipped. All 21 chips did not fit at 1680 — the strip ran ~400px past the container and cut the last one. **`type-accent` was on the same element as `type-h2`**, and its `font-size: 1.12em` resolves against the PARENT's size, so the kickoff date rendered at about a third of the other two — it must nest INSIDE. And the odometer's clipped columns were as wide as the widest glyph, so a two-digit date read "Wed 1 4"; each column is now sized by an invisible copy of its own digit, because Cormorant has no tabular figures and a fixed `1ch` advance did not fix the accented date.
+
+**One deviation from the brief:** the eyebrow reads **`//_05 · TRY IT`**, not bare "TRY IT" — the site's section eyebrows all carry the `//_NN ·` prefix and this section was `//_05 · how to start`. Say the word and it drops to "TRY IT".
+
+**One cosmetic nit left:** the accented kickoff date still shows a hair more space between its two digits than the sans dates do. It is Cormorant italic's own side bearings, not a layout bug, and it is far better than it was.
+
+**17f** `b6ea58f` … `231f1f2` — **"Your project start pass".** Five commits.
+
+*Owner verdict on 17e: concept right, presentation 4/10, and the kickoff date was clipped.* This is the centrepiece version: two questions that build one artefact.
+
+### Pre-flight, as asked
+
+| | |
+|---|---|
+| Cal.com `?notes=` prefill | **Supported** — survives the redirect and reaches the embed |
+| Cal.com `?date=` | **Works** — applied, then stripped from the visible URL by Cal's router |
+| Weekend availability | **Saturday and Sunday both showed slots** when checked |
+| **Event duration** | **"Discovery Call 30m"** — the site says **20 minutes** everywhere. See §7. |
+
+### The date rules changed
+
+**Weekends are bookable.** The call may be any day. Only the proposal count skips non-working days, and it now skips **Ontario's nine statutory holidays** as well as weekends — a static 2026–2027 table in `businessDays.ts`, which closes the no-holiday-calendar limitation 17e logged.
+
+**It needed two anchors, and a test caught it.** A call ON a business day counts from the day after (Monday → Thursday). A call on a weekend or a holiday counts the following business day as day one (Saturday → Wednesday). Without the second anchor a Saturday call would have landed *later* than the Monday after it, which is not a promise anyone would make out loud. **12 tests passing, up from 8.**
+
+**Eight picks on the alias, all correct** (Thanksgiving is Mon Oct 12 2026):
+
+| Call | Proposal | Kickoff |
+|---|---|---|
+| Wed Oct 7 | Tue Oct 13 | Wed Oct 21 |
+| Thu Oct 8 | Wed Oct 14 | Thu Oct 22 |
+| Fri Oct 9 | Thu Oct 15 | Fri Oct 23 |
+| **Sat Oct 10** | **Thu Oct 15** | Sat Oct 24 |
+| **Sun Oct 11** | **Thu Oct 15** | Sun Oct 25 |
+| **Mon Oct 12 (Thanksgiving)** | **Thu Oct 15** | Mon Oct 26 |
+| Tue Oct 13 | Fri Oct 16 | Tue Oct 27 |
+| Wed Oct 14 | Mon Oct 19 | Wed Oct 28 |
+
+### What it is
+
+A **28-day wheel** that centres its selection, scales and fades neighbours by distance (transform and opacity only), marks today, labels weekends "Weekend call" and **names the holiday on the day itself** — "THANKSGIVING" appears under Oct 12. Drag with momentum, click, arrows, Home/End; `role="listbox"` with `aria-activedescendant` and an `aria-live` sentence.
+
+The **pass** is a 560px card on the new `--surface-elevated` token with a three-layer tinted shadow: Averr mark, "PROJECT START PASS", the business name at `type-h1`, three rows, a radial-gradient perforation, a barcode drawn deterministically from the name and the day, a pass number (`AV-1006-NR`), and a **READY TO BOOK** stamp that lands once per completion. On change the dates roll, a sheen sweeps and the card settles through ≤3°; on desktop it tilts ≤4° toward the cursor.
+
+**The kickoff date is MEASURED**, not hoped for — the line is measured against the card's inner width and the font scaled to fit, one pass, reset-measure-write. **Verified unclipped at 1280 / 1440 / 1680 / 1920 / 375** with a 32-character business name: right edge 932 vs 1195, 1114 vs 1348, 1300 vs 1526, 1420 vs 1646, 144 vs 333.
+
+**Privacy.** The business name is component state only — **no storage, no analytics, no fetch**. It rides to /contact as `notes`, which is the field Cal.com prefills from, and **never as `name`**, which belongs to a person. **Verified end to end:** `/contact?date=2026-10-10&notes=Northgate%20Renovations` produces `…/embed?layout=month_view&date=2026-10-10&month=2026-10&notes=Northgate+Renovations`.
+
+**Verified on the alias:** build exit **0** unfiltered · 8 picks correct incl. Sat, Sun, a holiday and a holiday straddle · weekends selectable · **kickoff unclipped at all five widths** · name typing updates pass, pass number and CTA · the stamp fires on completion and resets when the name is cleared · keyboard, drag and touch all select · `aria-live` announces · **zero horizontal overflow at 375**, minimum font **13px** · **reduced motion: the sheen is absent and the stamp simply appears** · **3-speed crash scroll on /services at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2236 ms (was 2388), home 1872 ms**, CLS 0.001/0.000. The section's code was NOT lazy-loaded — the Services chunk grew 44.15 → 45.75 kB gzip and LCP did not regress, so the extra boundary would have bought nothing.
+
+*Four faults the screenshots caught, not the numbers.* The wheel read as a stub — the opacity falloff hit zero four days out and the track was anchored left, so the selection sat against the edge; it now centres and keeps six days legible. **Cormorant's italic figures draw outside a 1em line box**, so the odometer window clipped them and leaked the tail of the digit above as a stray stroke over "Sat 24"; window and cells are 1.35em with the strip lifted by half the extra leading. At 375 the pass rows' fixed 132px label column squeezed the date onto two lines and pushed it under the "20 MIN" meta; below 1024 the row is a grid with the label on its own line. And the mobile wheel showed two days at a 104px cell, now 82px and five.
+
+**Deviations.** `--surface-elevated` **did not exist** — I added it to `index.css` as `#FBF9F4`, paper rather than white, so the card sits in the same family as `--color-bg`. The "mid-typing" screenshot is the **completed** state rather than a true mid-keystroke frame; the stamp moment and mid-typing are therefore one capture, not two.
+
+**17g** `267c248` … `b51fa7d` — **A guided conversation, an obvious date control, and a pass that confirms.** Five commits.
+
+*Owner audit of 17f:* the name question was missed — a faint mono label over a pale underline reads as a caption, not an action; the date wheel could not be changed by clicking; the call is 30 minutes; and a booked pass should show the booked time.
+
+### Pre-flight
+
+| | |
+|---|---|
+| Booking event | **`bookingSuccessfulV2`**. Only **`startTime`** is read. The deprecated `bookingSuccessful` carries `organizer.name` and `.email`; V2 carries **no attendee identity at all**, which is why it is used. |
+| Modal | `cal("modal", { calLink, config })`, taking the same `date` / `month` / `notes` prefill. |
+| Loader | The embed is **dynamic-imported on first intent**. It is now its own **1.39 kB** chunk and `app.cal.com` is not contacted until hover, focus or click — **measured: 0 cal.com requests before the CTA, 87 after.** |
+| "20" mentions | **Six**, all corrected (below). |
+
+### 1 · Thirty minutes, site-wide
+
+| File | Before → after |
+|---|---|
+| `ServicesCloser.tsx:97` | "Twenty minutes, no deck" → **"Thirty minutes, no deck"** |
+| `servicesProcess.ts:39` | "20 minutes. No slide deck." → **"30 minutes."** |
+| `KickoffPass.tsx` | `meta="20 min"` → **`"30 min"`** |
+| `ComingSoon.tsx:110` | "a 20-minute call" → **"a 30-minute call"** |
+| `Contact.tsx:1096` | "Book a 20-minute intro call." → **"30-minute"** |
+| `businessDays.ts:178` | the doc comment naming the facts |
+
+**Zero remaining.** This closes the owner item 17f opened.
+
+### 2 · The conversation
+
+Each step carries a mono "STEP n OF 2" over the question at **`type-h3` in ink**, never the muted token — measured at **14.15:1**. The name input is a real field: elevated fill, 12px radius, `type-h2` text at **17.53:1**, a 2px focus ring, **93px tall**. An animated placeholder types and deletes three example names with a blinking caret once the section is in view, **stops the moment the field is focused**, and is replaced by a static placeholder under reduced motion. Nothing is autofocused. At ≥2 characters Step 1 takes a tick and dims to 0.62 while Step 2 goes to full emphasis — **Step 2 is never locked.** The pass's empty name slot carries a **pulsing dashed outline** until a name is typed, so both columns point at the same first action.
+
+### 3 · The date control
+
+Centre day at `type-display-l` with **52px arrows**, clickable dimmed neighbours, swipe, arrow keys, Home/End, and a **month popover** (this month and next, past days disabled, Escape and outside-click close with focus returned to the trigger). Range **today → +60 days**. Weekends and holidays are named on the day itself.
+
+| | |
+|---|---|
+| initial | Tuesday, Oct 6 · **Today** |
+| next arrow | Wednesday, Oct 7 |
+| neighbour click | Thursday, Oct 8 |
+| ArrowRight | Friday, Oct 9 |
+| End | Saturday, Dec 5 · **Weekend call** |
+| Home | Tuesday, Oct 6 |
+| popover | 31 days, 5 disabled, October 2026; Escape returns focus to "Pick another date" |
+
+### 4 · In-page booking
+
+The CTA opens the Cal modal. **Measured end to end:** `/embed?layout=month_view&date=2026-10-07&month=2026-10&notes=Northgate+Renovations&embedType=modal` — the chosen day preselected and the business name in notes. Embed failure falls back to `/contact?date=…&notes=…`; /contact is unchanged.
+
+### 5 · Booked → CONFIRMED
+
+A 180° `rotateY` flip (instant under reduced motion — `transform: none` measured) to a back face carrying **"Wed, Oct 7 · 2:30 PM ET · 30 MIN"**, the proposal and kickoff **recomputed from the booked day** (Oct 7 → proposal Tue Oct 13, past Thanksgiving; kickoff Wed Oct 21), the inbox line, a green CONFIRMED stamp, and aria-live **"Booked: Wednesday, October 7 at 2:30 PM Eastern."** The CTA becomes a quiet "Book another call" and the date control is disabled showing "Booked: Wed, Oct 7".
+
+**Verified with a simulated event, not a real booking.** `?simulateBooking=<ISO>` sets component state and nothing else — no request, no storage. **It is reachable on a deployment when typed by hand**, which is a deliberate trade so the flip could be verified on the alias; the dev-only `CustomEvent` path exists too. See §7.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · Q1 **14.15:1**, input text **17.53:1**, field outline composited **4.02:1** against the fill and **3.25:1** against the warm ground · animated placeholder runs, stops on focus, absent under reduced motion · pulsing slot before typing · step progression with tick · date control by arrow, neighbour, keyboard, Home/End and popover · range limits · weekend and holiday labels · **0 cal.com requests before intent** · modal on the selected date with notes · the flip in both motion modes · mobile 375: **no control under 44px**, minimum font **13px**, field full-width, **zero overflow** · **crash scroll 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2336 ms, home 1876 ms**, CLS 0.001/0.000 · **12 date tests passing**.
+
+*Three faults the screenshots caught, not the numbers.* **The booking CTA was 700px below the fold** in the empty state: `.kp2-pass` sets `position: relative` later in the same stylesheet at the same specificity, so it beat `.kp2-face--back`, the back face sat in normal flow and the card measured 1267px instead of 613. Then **the CONFIRMED stamp and barcode were clipped** — the back face is taller than the front, and `inset: 0` clipped it to the front's height; the face that is NOT showing is now the one taken out of flow. And **a confirmed pass was still pulsing the dashed "fill this in" slot** when no name had been typed.
+
+*One measurement error of mine, reported:* I first read the field outline as 17.53:1 by substituting alpha 1 into the `rgba` — that measures the ink, not the border. Composited properly, `--hair-hi` is **1.47:1** and fails WCAG 1.4.11; the border is now `rgba(20,20,18,0.55)`.
+
+**Deviations.** There is **no `--border` token** — §5.23 records that `--color-border` does not exist — and `--hair-hi` fails 3:1, so the field, the arrows and the "pick another date" control use a literal `rgba(20,20,18,0.55)`. The eyebrow remains **`//_05 · TRY IT`** rather than bare "TRY IT", keeping the site's `//_NN ·` section convention. And the simulated-booking harness is reachable in production via an explicit query param, as above.
+
+**17g-fix** — **five display fixes from the 17g recording.** One commit.
+
+**1 · The odometer is gone.** Per-digit rolling columns leaked their neighbours AT REST: "Oct 12" showed the leading 1 as a bar with stray strokes, and a pass row read "Monday, Oct 1g". **A column of ten glyphs clipped to a line box is always one mis-measured pixel away from showing the next one** — no amount of padding fixes the class of bug. `DateToken` replaces it everywhere (main date, both pass rows, the kickoff line): the whole string slides out at y −40% while the new one slides in from +40%, opacity and transform only, `duration.base` / `ease.outQuart`, instant under reduced motion. **The clip box is measured from the font's real ink**, via canvas `actualBoundingBoxAscent`/`Descent` on the string plus every digit in the element's own computed font, re-measured after `document.fonts.ready`; the padding that gives Cormorant's italic room is cancelled by an equal negative margin so nothing moves.
+
+*Verified:* 10 consecutive dates covering **digits 0–9**, in both faces — **every token holds exactly one layer at rest and no ink falls outside its measured box.** Zoomed crops at 1440 and 1680 show complete glyphs.
+
+**2 · The animated example reads as a placeholder.** It was dark and full-size and looked like a typed value while the pass still said "Your business". It is now prefixed **"e.g. "**, in `--color-muted-2` — **3.49:1 on the field, against ink's 17.53:1 for typed text** — with the blinking caret at the **start** of the field where a cursor would actually be, rather than trailing the example.
+
+**3 · One contextual tag.** The date repeated under the main date is gone. Above: the weekday. Below: a single outlined pill, shown only when it says something — **Today / Tomorrow / Weekend call / the holiday name** — in a row whose height is reserved. *Verified across six consecutive days: the tag row stays 28px and the date's y never moves.*
+
+**4 · Arrows and neighbours.** The reel is a grid, so the three numerals share one baseline row instead of being centred by box, with the weekday and tag in their own rows. **Measured clear space between each arrow and its neighbouring numeral: 28px at 1280, 1440, 1680 and 1920** — above the 24px asked for.
+
+**5 · `?simulateBooking` is dev and preview only.** Active on localhost and `*.vercel.app`; inert anywhere else, so nothing on averrstudios.com can make the pass claim a booking that does not exist. **Closes §7.12.**
+
+**Verified on the alias:** build exit **0** unfiltered · the digit sweep above · placeholder vs typed captured side by side · tag and baseline measurements above · mobile 375: minimum font **13px**, **no control under 44px**, zero overflow · reduced motion: the animated example is absent, the static placeholder serves, and every token computes `transform: none` · **crash scroll 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2408 ms, home 1880 ms**, CLS 0.001/0.000 · 12 date tests passing.
+
+*One probe error of mine, reported:* the first artefact audit selected three hosts that contain no `DateToken` and scored their zero layers as failures — "10 frames with artefacts" when the real tokens were all clean. The selector now requires a host to contain a sizer span.
+
+**17h** — **the /services screens that were still over the blank target.** Seven commits. Carry-forward from 17d (§7.14), not a new brief.
+
+**All sixteen screens now meet every density gate at BOTH widths: base 13px, minimum 11px, no flat region over 15% of the window — 17/17 at 1440 and 17/17 at 1680.**
+
+| Screen | before → after (1680) | what it needed |
+|---|---|---|
+| Brand & design direction | 24.2 → **7.0** | a Lockups row, taller photography, and a yard sign in Applications |
+| Human review built in | 21.9 → **10** | a sign-off and attachments on the draft, a status row under the thread list |
+| Paid ads | 20 → **6.6** | sitelinks, a second ad variant and the keywords buying the clicks |
+| Product & SaaS interfaces | 18.8 → **10.9** | eight job rows instead of five |
+| Design systems | 18.3 → **6.1** | filled/disabled input states, a select, a textarea, a checkbox, twelve tokens |
+| Landing pages | 16.4 → **13.1** | a review line where `margin-top: auto` had left 200px of dead page |
+
+**⚠ A number in 17d's entry was wrong.** It listed **Reporting at 28.8 / 30** as one of the six failing screens. Measured correctly it is **8.4 / 7.8 and was never failing** — the sample had landed on the kickoff section *below* the released pin, the same leak flagged in 17d's own probe notes. The guard now requires the **stage grid itself** to be on screen, not just a stale frame rect. Only five of the six were real, plus Landing pages.
+
+*Two faults of mine in this session.* I added the design-system checkbox tick at **10px**, in the very session enforcing the 11px floor — caught by a probe that scans every scroll position rather than one sample per beat, because the tick only renders once a step completes. And on the brand board I **raised the wrong heights first**: the flat region was the right column below the van decal, not the bottom strip; raising the lockups and photography changed the measurement by nothing. Looking at the screenshot found it in one pass.
+
+**Verified on the alias:** build exit **0** unfiltered · density and type at 1440 and 1680 with dwell screenshots reviewed one by one · **no sub-11px text anywhere on the stage, scanned at every scroll position** · mobile 375 across a full scroll: screen minimum **11px**, max `scrollWidth` **375** · **3-speed crash scroll at 1440/1920/375 — 0 console errors, 0 React errors** · **mobile LCP median of 3: /services 2464 ms, home 1940 ms**, CLS 0.001/0.000 · 12 date tests passing. The Services chunk grew 49.92 → **51.06 kB** gzip (+1.14).
+
+ on any route** · zero page errors.
+
+Bundle: `About` **40.21 kB / 10.58 kB gzip**; a shared `ReadFill` chunk (1.42 / 0.74 kB) is now pulled by /about as well as the case studies.
+
+**Deviations, all small, all reported.**
+1. **Read-fill on bodies, not headings** — the reading above. The founder statement is the stated exception.
+2. **"Grid absorbs future collaborators without a rewrite." is kept verbatim** under the founder links. It reads oddly beside the new layout, but the copy rule says only the listed sentence changes — **flagging it rather than cutting it.**
+3. The How-we-work band's padding went from `160px 40px` to `160px 0` so the process line can actually be `--container-wide`; the gutter now comes from the token.
+4. The founder card's box, border and shadow are gone in favour of a full-width row, reading "larger section" as the brief's intent.
+5. Each principle panel keeps its own ground rather than the stage sharing one — not asked for, but it preserves the locked cream/alt/cream/dark rhythm and the dark edge the next chapter needs.
+
+**Five probe errors of mine, reported.**
+1. `preview_start {name: "averr-dev"}` started **another project's dev server** (`job-command-center` on :3000) twice; fell back to the alias, which is this project's standard path anyway.
+2. I piped a capture script through `head -3`. **SIGPIPE killed it mid-run**, I then read a screenshot left over from the previous run and concluded a deploy had not landed. Reading the DOM showed the change was live all along.
+3. I piped a build through `tail`, which breaks the unfiltered-build rule; re-ran it unfiltered for a true exit code.
+4. One founder read-fill sample read `--p: 0` because it sampled immediately after `scrollIntoView`, before the scroll handler had run. A proper trace showed the mechanism working.
+5. A probe run immediately after a push reported stale frame heights, and another returned zero `.read-fill` nodes — both an edge still serving the previous build. **An asset returning 200 does not mean the page is serving it:** intercept the request and check which chunk the page actually asks for.
+
+**SESSION 18c-1 — /about, "inside the studio".** Ten commits (`5f0b0bc` … `5cea0e6`). Owner verdict on Session 18 was **4–5/10**: "Small on purpose." was not understood, the principle demos were small and pale on empty cream, and there was no atmosphere. The owner liked the dark ground and blue/violet screen of the ages-well panel, so /about's world is built from it.
+
+### The world (18c-1a)
+
+Derived from the panel, not invented. The panel's violet is `--about-glow-2` **verbatim**; `--about-glow` sits at **hue 226°**, between that violet (252°) and the panel's cyan (182°), at full saturation; the ground and surfaces are the same hue family at the panel ground's lightness.
+
+| token | value | measured on the live page |
+|---|---|---|
+| `--about-ground` | `#0A0D14` | hue 222°, the room |
+| `--about-surface` | `#111624` | the monitor's glass |
+| `--about-surface-2` | `#171D2E` | the bezel's lit face |
+| `--about-glow` | `#3D6BFF` | **4.39:1** — fills and rules only |
+| `--about-glow-2` | `#7C5CFF` | **4.47:1** — fills and rules only |
+| `--about-glow-text` | `#6E90FF` | **6.57:1** — the blue when it is type |
+| `--about-ink` | `#EDE9E2` | **16.06:1** |
+| `--about-body` | `#9AA6C6` | **8.00:1** (6.91:1 on surface-2) |
+
+**Both glows miss AA for body text by a hair.** That is why `--about-glow-text` exists and why nothing readable is ever `--about-glow`. Measured off the live page: hero h1 16.06:1 · hero subhead 8.00:1 · principle title 16.06:1 · principle eyebrow 6.57:1 · principle body 8.00:1 · process week label 6.57:1 · screen-04 mono 8.00:1. **Every one passes.**
+
+The tokens are scoped to `html[data-route="about"]`, not to the route's subtree, because the nav and footer live outside it. Overriding `--color-dark` there makes every dark surface on the route the studio's ground for free, and the footer's `endTone` still resolves dark. `--mark-ink` and `--nav-dark-bar` are new tokens with their old values as fallbacks. `Chapter`'s clip-path slabs are gone from this route — there is no surface change left to reveal — replaced by **`GlowHorizon`**, a soft blue horizon between sections. Grain is at 4%.
+
+**read-fill's unread floor is a token now** (`--rf-floor`), raised from 0.22 to **0.46** here because 0.22 is invisible on this ground.
+
+### The hero (18c-1b) — COPY CHANGE
+
+**"Small on purpose." is deleted.** The headline is **"You work directly with *the person who builds it*."**, the Cormorant accent on the half that is the promise. Subhead, name/role line and both CTAs are untouched. *Verified: h1 computes `opacity: 1` with only a transform — painted at the first frame, transform-only, top to bottom.*
+
+**ASSET RULE — there is no founder photograph in the repo.** `public/about/` does not exist and nothing matching `founder`/`prachet` is anywhere under `public/`. The PU mark holds the slot and **no placeholder image is used**: it draws in parch, then at 1.8s the studio's light comes up behind and on it — a radial blue/violet glow plus a two-layer drop-shadow on the SVG. **No filter touches any text.** Behind it, `AmbientDrift` runs two lamps on **86s and 68s** loops so they never settle into a visible cycle; CSS keyframes, so leaving the hero genuinely *pauses* them, and reduced motion holds both still.
+
+### The desk (18c-1c) — the signature
+
+One monitor, four things shown on it, at full scale.
+
+*Measured at 1440:* wrapper **4500px = 500vh**, travel **3600px = 400vh** (the n+1 rule) · sticky pinned (`top: 0`) at all four dwells · dolly **0.88 → 1** across the approach, with the tilt settling to flat · exactly **one screen opaque, the other three `inert`** at every dwell · spill **blue / blue-violet / cyan / violet** per screen · active mark correct · **minimum font inside every live screen 13px** · zero page errors. At 1920: wrapper 5400 = 500vh, travel 4320 = 400vh.
+
+| | screen | verified by mouse AND keyboard |
+|---|---|---|
+| 01 | a whole landing page rebuilding from grey slabs — bar, hero, three cards, footer | Template → hover → Crafted → away → Template; keyboard focus → Crafted with a 2px ring; Enter pins |
+| 02 | the direction sheet, built from the studio's own tokens, plus the signature moves | settled on arrival; 130ms into a replay the swatches read `0.5, 0.26, 0.04, 0, 0, 0` — the stagger — from **both** a click and Enter |
+| 03 | the real MagneticCTA, and linear vs eased on two tracks at once | at ~360ms the dots sit at **203px linear / 525px eased**; identical from a keypress |
+| 04 | the owner's favourite, at full size, its look kept as the reference | three `ArrowRight`s reach 2029; the trend half changes and **the built-to-last half is byte-identical** across a full snapshot of every descendant |
+
+**The hand-off never shows a blank screen.** Sampled mid-change: the slot opacities are `[0,0,1,0]` with a **maximum of 1**, the scanline is present and sweeping, and the screen's own background is opaque `rgb(17,22,36)`. The caption's out-then-in is `AnimatePresence mode="wait"` — **no timers anywhere**. Clicking mark 04 landed at **y=4424 against an expected 4424**.
+
+**Mobile (375) and reduced motion:** the stage is `static`, all four principles stack as caption + a monitor-framed screen, every screen still interactive (tap toggles the page; arrow keys drive the slider and still touch only the trend half). **Nothing in the desk is under 13px and no control I added is under 44px.** Reduced motion: no scanlines, lamp `animation-name: none`, dolly `transform: none`, read-fill `--p: 1`, swatches at opacity 1.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **/about mobile LCP median of 3, warm = 2096 ms** `[2076, 2096, 2248]`, FCP 1728 ms, load-window CLS **0.0000**, LCP element the hero subhead · **3-speed crash scroll at 1440 / 1920 / 375, both directions — CLS 0 (0.0001 at 375 and 1440-gentle), zero overflow, zero console errors, zero React errors** · **zero ViewTimeline on sticky descendants** · zero horizontal overflow at 375, 1440 and 1920.
+
+Bundle: `About` **59.88 kB / 13.92 kB gzip** (was 44.93 / 11.53 before the desk).
+
+**Three CLS faults found and fixed, each by attributing the shift rather than guessing.**
+1. **The scanline animated `top`** — a layout property — so every frame of the sweep was a layout shift. Attribution put **0.1295 of 0.142 on `SPAN.mon-scan` alone**. It is a transform now (`y: 775%`, which is its own height × the screen).
+2. **The stacked desk leaked sideways.** The spill is 168% wide on purpose; the pinned stage clips it for free, but the stacked layout did not, so the page scrolled horizontally — **469px wide at 375, and 1833px at 1440 under reduced motion**, which uses the same stacked build. `overflow-x: clip`, so the spill still bleeds vertically.
+3. **The caption moved the page.** One 450px box changing height by up to 123px between principles. Its height is reserved now and the captions are top-aligned, which also stops the eyebrow jumping.
+
+**Three faults the first screenshots showed, which no probe would have caught.** The mark is 560px and the hero column was centred, so the new headline sat below the fold — the hero is two columns now. The mark was drawing in `--color-ink` on a near-black ground: a hole with a glow around it. And nothing declared itself dark, so the Averr logo was dark on dark.
+
+**Deviations, all reported.**
+1. **The hero is two columns** and the mark takes the slot the brief gives the photograph. Centred under a 560px mark the headline was below the fold.
+2. **The h1 is `type-display-l`, not `display-2xl`.** 2xl was chosen for a three-word line; the nine-word sentence ran **903px tall** at that size.
+3. **Screen 03 shows linear and eased at the same time** on two tracks rather than behind a toggle. At monitor size there is room to show the comparison instead of asking the reader to remember it.
+4. **Screen 04's frames fill the glass** rather than holding 4:3 — at full size the fixed ratio left ~200px of dead screen under the slider. Its gradient, type, tag and behaviour are untouched, which is what "keep its look" is about.
+5. **The monitor has no stand.** The foot read as a stray clipped shape under the bezel rather than as an object.
+6. The process line's mono labels went **12 → 13px** to meet this brief's floor.
+7. **The monitor is ~76vh**, not exactly 78vh, once the bezel is included.
+8. `PrinciplesTrack.tsx` and its five demo files are **deleted** — superseded by the desk.
+9. **read-fill's unread words composite to 2.54:1**, under AA. It is the transient state before a paragraph is read and it settles at 8.00:1; the floor was already raised from 0.22 to 0.46 for this ground. Reaching 4.5:1 at the floor needs ~0.78 alpha, which erases the effect. **Flagging rather than deciding it.**
+10. The **global footer** still carries 11–12px text (`Studio` / `Resources` / `Contact` headings, the copyright line, `Terms`). Pre-existing and site-wide, meets the site's own 11px floor, outside this brief — **flagged, not changed**.
+
+**Four probe errors of mine, reported.**
+1. I read the monitor's size **before scrolling to a dwell**, while the dolly was still at 0.88, and briefly concluded the column was too narrow. A scroll-linked transform has to be measured at the scroll position you mean.
+2. **CLS 0.2854 at 1440 was a stale-edge read** — §5.50 again. The crash and normal passes run first and hit the pre-fix chunk while the later passes got the new one, which is exactly why they improved and those two did not. Reproducing with the same timing after confirming the served chunk gave 0.0258.
+3. My spill probe's regex matched `rgba()` only, so when the gradient became `oklab()` it reported the old values and I briefly thought the deploy had not landed.
+4. I piped a probe through `grep`, which stripped the contents of two arrays and made two failing checks look empty.
+
+**SESSION 18d — /about reworked: the site palette restored, and made cinematic.** Nine commits (`72fb655` … `f7c2fed`). Owner verdict on 18c-1 was **0/10, for breaking the colour system.**
+
+### What went wrong, and the rule that comes out of it
+
+The owner liked the dark ground and blue/violet screen of **one panel** — "A site that ages well". 18c-1 took that and made it the whole of /about's palette: a blue-black document ground, blue tokens overriding `--color-dark`, the chapter rhythm replaced with glow horizons. Nothing asked for that.
+
+> **LOCKED RULE (18d).** An element the owner likes is **kept and applied LOCALLY**. It is **never extrapolated into a page or site palette** without an explicit instruction. Every page follows the site's cream/ink chapter rhythm and tokens.
+
+This is recorded in §4 and at the top of the token block in `index.css`.
+
+### 1 · Palette restore
+
+The ground tokens are gone from the document and scoped to **`.studio-screen`, which is the monitor and nothing else**. The screens and the ages-well demo keep exactly the look the owner liked; the page around them is the site's.
+
+*Measured per section, on the live page, at 1440 and 375 — identical at both:*
+
+| section | ground | token |
+|---|---|---|
+| hero | `rgb(244, 240, 230)` | `--color-bg` |
+| the desk | `rgb(20, 20, 18)` | `--color-dark` |
+| process | `rgb(237, 233, 226)` | `--color-bg-alt` |
+| founder | `rgb(244, 240, 230)` | `--color-bg` |
+| closer | `rgb(20, 20, 18)` | `--color-dark` |
+
+`Chapter`'s clip-path slabs are back at the boundaries; `GlowHorizon` and `AmbientDrift` are deleted. Grain is site-standard. The nav takes its tone from `Chapter`'s own `data-tone="dark"` again instead of a route-wide override, and `--rf-floor` is back to the site default on cream.
+
+**A scripted audit for any blue outside the monitor** found exactly two, both mine from 18c-1, and both removed: the radial glow behind the hero mark, and the closer's accent wash (back to warm parch). The remaining hits were false positives — the grain's SVG data-URI contains `http://www`, whose digits my colour regex read as an rgb triple.
+
+### 2 · The hero
+
+The original composition, restored: one centred column on cream, the mark drawing itself, then the name and role, the headline, the subhead and both CTAs. Copy is 18c-1's — **"You work directly with *the person who builds it*."** — and still paints at the first frame.
+
+**New: the mark tilts toward the cursor.** `rotateY` follows the pointer's x and `rotateX` its y inverted so the near edge comes forward, both capped at **6°**, both on `spring.soft`. *Measured: ±0.0796 in the rotateY slot at 0.88 across (≈4.6°), identity at centre.* The stroke highlights along the nearest side by moving a gradient stop **along the outline** rather than laying a shape over it — *measured 0.9 at either edge, 0 at centre.* None of it under reduced motion.
+
+**ASSET RULE — there is still no founder photograph.** `public/about/` does not exist. The mark holds the hero and **no placeholder is used**.
+
+### 3 · Fly into the mark
+
+Scrolling out of the hero, the monogram scales up until its counter is larger than the viewport and the principle stage is seen **through the mark's own shape**; once the shape clears the screen the mask comes off.
+
+A real **SVG `clipPath` with the real path** — not a raster mask — so the edge stays crisp where a bitmap would turn to mush. The transform is written onto the path with `setAttribute` from a scroll subscription: React state would re-render the stage every frame, and motion's `style` cannot interpolate a transform *string*. One attribute write per frame.
+
+*Six-frame sequence measured across the approach:* scale **2.25 → 4.44 → 8.76 → 17.29 → 26**, clip `url(#…)` for frames 1–5 and `none` at frame 6, the screen opaque at every frame, **zero long tasks**, zero page errors. Reduced motion: `clip-path: none`.
+
+### 4 · The monitor, more interactive
+
+Kept from 18c-1: the large monitor, the dolly-in, full-scale screens, scanline hand-offs, sequenced captions — now on a **dark ink chapter like home's takeover**, with the colour carried by the screen content and the spill local to the monitor.
+
+- **01 is drag-to-compare.** The same landing page built twice, cut at the handle. *Verified: the arrival sweep settles at 46; a pointer drag → 78; two ArrowLefts → 70; Home/End jump to the ends; the clip tracks exactly (`inset(0 29.94% 0 0)` at 70). By touch at 375: 40 → 65.* Only `clip-path` changes, so the drag cannot reflow. **The template half is real grey type (`#5A5A55`) on a light page (`#F4F0E6`) at AA with a 13px floor** — at monitor size the old pale skeleton read as broken rather than as a template.
+- **02 recolours live.** The swatches are buttons and the specimens a Geist/Cormorant toggle; both drive a mini crafted page beside them. *Verified: clicking swatch 5 moved the accent and rule to `rgb(124,92,255)`; Enter on Cormorant switched the face to Cormorant Garamond italic.*
+- **03** unchanged. **04** keeps exactly the look the owner liked; *2029 via arrow keys still changes only the trend half (`saturate(0.22)` vs `none`).*
+
+### 5 · The process line
+
+Each stage is a real button with `aria-expanded` and `aria-controls`, opening its own copy and week label, **one at a time**. *Verified: all five closed initially; clicking 02 opens only 02 with the right panel id; Enter on 04 closes 02 and opens 04.* The stage the line has just reached pulses softly, and not at all under reduced motion.
+
+### 6 · Founder and closer
+
+Both back on the site palette. The corrected Google bio sentence stays verbatim; **"Grid absorbs future collaborators without a rewrite." is deleted**, as asked. The founder keeps its full-width row.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **/about mobile LCP median of 3, warm = 2080 ms** (FCP 1748, load-window CLS 0.0000, LCP element the h1) · **3-speed crash scroll at 1440 / 1920 / 375, both directions — CLS 0 everywhere (0.0001 at 375), zero overflow, zero errors** · **site-wide sweep, all ten routes at 375: zero overflow, PillHl unchanged (home 2, /nope 1), zero `$`** · 375: stage minimum font **13px**, **zero desk controls under 44px** · reduced motion: stage static, no scanlines, no fly-in mask, no node pulse.
+
+**On the LCP number, honestly:** three attempts gave medians of 2080, **6200** and 2080. The middle one is discarded as environmental, not a regression — its FCP was **5968 ms**, so the page had not begun painting on time, and `curl` against the alias during that window showed TTFB swinging from 0.09 s to 2.4 s. The 2080 ms figure reproduced on two independent attempts with FCP ~1745 both times.
+
+Bundle: `About` **61.05 kB / 14.80 kB gzip**.
+
+**Deviations, all reported.**
+1. **The hero headline sits below the fold at 1440×900.** The mark is `clamp(320px, 45vw, 560px)` — 564×784 — which is the size it has always been, so the restored composition inherently runs past the fold. I restored it faithfully rather than quietly shrinking it; say the word and I will trim the mark.
+2. **Both halves of the drag comparison carry the same copy.** Different copy made the seam read as corruption ("We provide quality solu|where it is."). Identical content, differing only in face, weight, tracking, accent and radius, is legible and is the sharper argument.
+3. **"Signature moves" is gone from screen 02.** It was my own addition in 18c-1, not part of the brief's sheet, and five cells no longer fit the glass once the live page was added.
+4. **03 still shows linear and eased simultaneously** rather than behind a toggle (carried from 18c-1, which the brief said to keep as built).
+5. The **global footer** still carries 11–12px text and the nav/footer links are under 44px — pre-existing, site-wide, outside this brief. Flagged, not changed.
+6. No founder photograph exists, so the photo paths in items 2 and 6 (tall frame, parallax) are **not built**. They are the only parts of the brief not implemented, and they are blocked on the asset.
+
+**Probe errors of mine, reported.**
+1. I measured the mark's tilt through `.about-hero svg`, which matched an **ambient fragment**, not the monogram — it reported "no transform" and I briefly thought the tilt was dead. Targeting by `aria-label` showed it working.
+2. My spill probe's regex still only matches `rgba()`, so `oklab()` gradients read as `rgba(0,0,0,0)`. Cosmetic, but it has now misled me twice; the attribution probes are the ones to trust.
+3. I piped a probe through `grep` again and hid the contents of two arrays.
+
+
+### 18d ruling · the h1 must clear the fold
+
+Two commits (`7c3b4ed`, `f155a0f`). The mark was
+`clamp(320px, 45vw, 560px)`: **width**-driven, so it grew with the window and
+pushed the headline off screen on every short viewport. It is **height**-driven
+now — `clamp(180px, 34vh, 420px)`, width following the mark's own 327:454
+aspect — and the hero's top padding and column gap moved onto vh clamps
+(`clamp(88px, 11vh, 120px)`, `clamp(14px, 2.4vh, 30px)`) so the rhythm tightens
+with the viewport instead of holding at 120px and 30px.
+
+*Measured on the live page — the h1's bottom edge against the viewport:*
+
+| viewport | mark | h1 top → bottom | verdict |
+|---|---|---|---|
+| 1440 × 900 | 222 × 308 | 546 → **749** | **PASS**, 151px clear |
+| 1366 × 768 | 190 × 263 | 480 → **673** | **PASS**, 95px clear |
+| 1280 × 720 | 178 × 247 | 458 → **639** | **PASS**, 81px clear |
+| 390 × 844 | 208 × 289 | 528 → **651** | **PASS** — the ruling asked only for the first line (bottom 573); the whole h1 fits |
+
+The subhead is also above the fold at all three desktop sizes (831 / 749 / 710).
+**The CTAs are not** (909 / 823 / 784) — the ruling did not ask for them, so they
+are left below the fold rather than compressing the ladder further.
+
+**A second fault the resize exposed.** The fly-in's start scale was pinned to the
+old 560px mark, so the shape you flew into was no longer the shape you had been
+looking at — it began mid-air at roughly 2.5× the mark. It derives from the same
+clamp now, off the viewport height, so the two cannot drift apart again.
+*Re-verified: the start scale is **0.674 = 308/454**, exactly the rendered mark
+height at 1440×900.*
+
+*Six-frame fly sequence re-run at the new size:* scale **0.674 → 0.97 → 2.42 →
+6.03 → 15.03 → 26**, clip `url(#…)` for frames 1–5 and `none` at frame 6, the
+screen opaque at every frame, **zero long tasks**, zero page errors, reduced
+motion unmasked. **Crispness:** a crop of the mask edge at **scale 11.96 with
+deviceScaleFactor 2** shows a clean vector curve — no raster softening, no
+stair-stepping. The draw and the cursor tilt key off the rendered box and needed
+no change.
+
+**/about mobile LCP unchanged: median of 3, warm = 2080 ms**, runs
+`[2080, 2080, 2084]`, FCP 1744, load-window CLS 0.0000. The tightness of these
+three also settles the open question from 18d's entry: the 6200 ms median there
+was environmental, not a regression.
+
+*One probe artifact, reported:* the fold probe counts "49 lines" for the h1
+because `range.getClientRects()` returns one rect per character — `CharReveal`
+wraps every glyph in its own span. The top and bottom edges it reports are
+correct; the line count is not, and is ignored above.
+
+**SESSION 18e — /about's second half.** Seven commits (`822eeca` … `915d9ec`). The post-pin sections were still basic: a line with labels, a bio block, a plain closer.
+
+### 1 · The process becomes "one site, idea to live"
+
+A pinned 100vh stage on the process chapter's existing cream-alt ground, holding **ONE browser window** in which a fictional local bakery's homepage rises in fidelity. It is the same page and the same chrome throughout, so every hand-off is a change of treatment, never a cut to a different site. All React/CSS/SVG; no images; an ILLUSTRATIVE label in the window.
+
+| stage | what the window does |
+|---|---|
+| Direction | hand-drawn SVG strokes draw themselves over a greyed page, beside a palette/type panel |
+| Design | the sketch clears and the page resolves — display face, gold eyebrow, the Cormorant accent, real art |
+| Build | a code panel slides in and types, and the page's two buttons become **genuinely pressable** |
+| Refine | four review pins land with notes, resolve one by one into green ticks, speed score counts 72 → 98 |
+| Ship | the URL bar turns green, the host becomes the real domain, a Live badge and a launch pulse |
+
+**ONE scroll value drives all of it** — which stage is active, the playhead, and every sub-animation that would otherwise want a timer: the stroke draw, the typing, the pins, the score. *Measured at 1440: wrapper 6.0vh, travel 5.0vh (five stages plus the n+1 viewport), sticky pinned at all five dwells, playhead at exactly 0 / 265 / 530 / 795 / 1060px. At 1920: 0 / 288 / 576 / 864 / 1152.* Each stage label is a button that scrolls to its own window — *clicking 05 landed at exactly 10061 against an expected 10061* — and the stage's verbatim body swaps out-then-in beneath.
+
+*Morph frames between Design and Build:* the page's opacity stays 1 and its logo text is unchanged throughout while the code panel slides in — **no cut, no blank frame.**
+
+*Build's buttons:* hovering the CTA moves it `rgb(20,20,18)` → `rgb(177,133,68)` and it takes focus. **Names, bodies and week labels are byte-identical**, extracted by script into `process/steps.ts`. Below 900px and under reduced motion: five stacked blocks, each showing the window at that stage's completed state, each playing its change once on entry.
+
+### 2 · The founder becomes credits
+
+A sticky split on cream. Left: **no photograph exists in the repo** (`public/about/` does not exist), so the mark holds the slot at plate size with the slow push-in a photo would have had — *measured scale 1.023 → 1.06 across the section* — and **no placeholder is used**. Right: the name at display-l, then five credit lines, each masking up out of its own box as the scroll reaches it, one at a time, with a rule drawing under it. *Measured: lines 1–3 revealed with 4–5 still masked mid-rise at the same scroll position.* Then the chips and the MagneticCTA links.
+
+**Every line → its source sentence:**
+
+| line | source |
+|---|---|
+| FOUNDER · Averr Studios | "Started Averr Studios to build the kind of client websites that actually earn their portfolio slot." + the role line "Founder + Design Engineer" |
+| CO-FOUNDED · KlaasX Edutech · 15-person team · 150+ institutions | "Previously co-founded KlaasX Edutech (15-person team, 150+ institutions)." |
+| SALES · B2B SaaS within Google's extended workforce program | "…B2B SaaS sales within Google's extended workforce program…" |
+| CRAFT · Design engineering, frontend, AI workflow automation | "Toronto-based design engineer with a background spanning … frontend development, and AI workflow automation." |
+| BASED · Toronto | "Toronto-based design engineer…" |
+
+**No new claims.** The sources are written into `FounderCredits.tsx` as well, so they stay checkable.
+
+### 3 · The closer signs off on the mark
+
+Above the existing eyebrow, the mark draws once more: **stroke only, parch, 2px, 1.6s on ease.inOut**, triggered once on entry, with a warm glow carried by a drop-shadow on the SVG and **no filter on any text**. The page now opens and closes on the same mark. Copy and CTAs unchanged.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **/about mobile LCP median of 3, warm = 2220 ms** `[2200, 2220, 2240]`, FCP 1872, load-window CLS 0.0008 · **3-speed crash scroll at 1440 / 1920 / 375, both directions — max CLS 0.0042, zero overflow, zero errors** · **palette audit: nothing off-palette anywhere outside the window and the monitor** · site-wide sweep, ten routes at 375: zero overflow, PillHl unchanged, zero `$` · 375: the new sections' minimum font **13px**, no control under 44px, five stacked windows, not pinned · reduced motion: stacked, no scanlines, no fly-in mask.
+
+Bundle: `About` **78.71 kB / 18.88 kB gzip**.
+
+**⚠ The biggest deviation — a copy removal worth a ruling.** The credits layout the brief specifies (mark, name, credit lines, chips, links) leaves no place for the bio paragraphs, so **the two bio sentences and the role line are no longer rendered**. The Google wording ruled on in 18b survives inside the SALES line and KlaasX inside CO-FOUNDED, but "Toronto-based design engineer with a background spanning…" and "Started Averr Studios to build the kind of client websites that actually earn their portfolio slot." are gone **as sentences**. `FounderStatement.tsx` is deliberately kept though unrendered, as the canonical provenance record, so the copy can be restored verbatim in one move. **Say the word and the bio goes back under the credits.**
+
+**Other deviations.**
+1. **The Direction wireframe is indicative, not a trace.** Its SVG is stretched over the window with `preserveAspectRatio="none"`, so the strokes sit near, not exactly on, the elements beneath.
+2. **Design's "snap" is a transform/opacity resolve, not a true FLIP.** The sketch clears while the page comes up to full fidelity; nothing measures a first/last box.
+3. **`ProcessTimeline.tsx` is deleted.** The clickable expanding stage line built in 18d item 5 is superseded wholesale by this scene — its accordion no longer exists.
+4. The stage body copy sits under the window rather than under the rail, which reads better at this size.
+5. The bakery's two buttons take a 44px touch target on mobile — they are genuinely pressable from Build onward, so they are treated as real controls rather than excused as illustration.
+
+**Probe errors of mine, reported.**
+1. **The Direction sketch never drew, and I nearly shipped it.** `motion.path` takes ownership of `stroke-dasharray`/`stroke-dashoffset` the moment `pathLength` is set on it, so it overwrote the style prop every frame and the offset sat at 1 forever. The same `within` value was driving the typing and the pins correctly, which is what proved the value was fine and the element was not. A plain `<path>` fixed it. **See §5.59.**
+2. **The sketch overlay ate the pointer.** It spans the page at opacity 0 from Design onward but still took pointer events, so Build's "live" buttons could not be hovered or clicked at all — the whole point of that stage. Playwright surfaced it as a hover timeout naming the SVG as interceptor. **See §5.60.**
+3. I reported the founder credits as "never revealing" off a probe that used `scrollIntoView` and measured 400ms later — the page sets `scroll-behavior: smooth`, so the scroll had not settled. A proper trace showed the reveal and the push-in working. **See §5.61.**
+4. The stale-edge trap bit twice more before I wrote `.await.mjs`, which polls until the PAGE requests the expected chunk rather than until the asset returns 200.
+
+
+### 18e rulings · the SALES wording and the statement line
+
+Two commits (`63d177e`, `22f520c`).
+
+**1 · "B2B SaaS for Google".** The SALES credit line was "B2B SaaS within Google's
+extended workforce program"; the owner's ruling is to name Google directly, and
+"for", not "at".
+
+*A full-site search for the old wording found exactly two occurrences and no others:*
+
+| where | before | after |
+|---|---|---|
+| `FounderCredits.tsx` — the rendered SALES line | "B2B SaaS within Google's extended workforce program" | **"B2B SaaS for Google"** |
+| `FounderStatement.tsx` — `FOUNDER_STATEMENT`, **not rendered** since 18e | "…B2B SaaS sales within Google's extended workforce program…" | **unchanged**, now annotated as superseded |
+
+Checked and clean: the meta description, `og:description` and `twitter:description`
+in `index.html` mention no such thing, and **there is no JSON-LD on the site at
+all** (`ld+json` appears nowhere in `index.html` or `src/`). Every other "Google"
+in the codebase is a Google *product* in the services and case-study copy — Google
+Business Profile, Google Ads, Google Jobs, Google reviews — plus two font-loading
+comments in `index.css`. None of them touch the founder's role, so none were
+changed. *Verified on the alias: "extended workforce" appears nowhere in the
+rendered page at 1440 or 375.*
+
+The unrendered bio constant is deliberately left verbatim — recording what the bio
+said is that file's entire job — and now carries a note that the Google clause is
+superseded and must be brought in line if the sentence is ever restored. **This is
+the one credit line whose wording is the owner's rather than the bio's**, and the
+component says so next to the source quote.
+
+**2 · One statement line returns.** Under the name, above the credit lines:
+
+> "Started Averr Studios to build the kind of client websites that actually earn
+> their portfolio slot."
+
+*Source:* `FOUNDER_SUPPORT`'s second sentence. **Extracted from the source by
+script rather than retyped**, and it matches the ruling's text character for
+character. At `type-h3` with read-fill — *measured 28px at 1440, 22px at 375,
+`--p` reaching 1*. The other bio sentences stay retired; their facts are carried
+by the credit lines, and `FounderStatement.tsx` remains the provenance record.
+
+*Deviation:* it renders as a **paragraph carrying the type-h3 size, not a real
+`<h3>`** — it is a sentence, not a heading for the list beneath it.
+
+**3 · Deviations accepted** by the owner and now closed: the indicative Direction
+wireframe, the transform/opacity Design resolve, and `ProcessTimeline.tsx` being
+deleted.
+
+*Verified on the alias:* build exit **0** unfiltered · screenshots at 1440 and 375 ·
+**3-speed crash scroll on /about at 1440 / 1920 / 375, both directions — max CLS
+0.0042, zero overflow, zero errors** · all five credit lines read
+`Averr Studios` / `KlaasX Edutech · 15-person team · 150+ institutions` /
+`B2B SaaS for Google` / `Design engineering, frontend, AI workflow automation` /
+`Toronto`.
+
+**SESSION 19 — /contact rebuilt: "see your reply before you send".** Five commits (`7143d8d` … `ff01a34`).
+
+### The locked-rule violation the pre-flight found
+
+The Budget shape dropdown carried **"Under $5K", "$5K–$10K", "$10K–$25K", "$25K+"** — five `$` live on /contact, against the locked no-prices rule, for however long it had been there. It never surfaced because `CustomSelect` only mounts its options while the listbox is open and `.sweep.mjs` read `innerText`.
+
+**Owner ruling: no pricing or budget talk at all.** The field is deleted outright rather than reworded. It could not be its own commit — the file holding it, `ContactForm.tsx`, is deleted wholesale by the rebuild.
+
+**The blind spot is closed.** `.money.mjs` opens every combobox, `aria-haspopup`, `details`, `summary` and `select` on every route before scanning. *Site-wide result, with collapsed controls opened: **0** literal currency strings across all ten routes.* A broader pass (also matching `budget`, `pricing`, `\d+K`) returns 11 lines, every one of them a client's situation in case-study narrative ("zero ad budget", "transparent pricing", SIFT's own `/pricing` route) or the home page's `48.2K` impressions metric — no Averr price claim anywhere.
+
+### Copy truth-check — every promise to its source
+
+| rendered | source |
+|---|---|
+| h1 "Let's build something that earns its place." | unchanged from the old hero |
+| lede "Every good client project has started here…" | unchanged |
+| path 01 "Book a 30-minute call" / "Pick a time now — no sales script." | the booking band's "Book a 30-minute intro call." and "No sales script." |
+| path 02 "Send a brief" / "Write it here and we reply within 24 hours." | the dark band's "24 hours. Every message." |
+| "24 hours. Every message." + its two support lines | **kept verbatim**, now the statement between the paths and the booking |
+| booking eyebrow/h2/sub | unchanged from the old booking band |
+| "Tell us what you're building." / "Two minutes. No captcha. We read every one." | unchanged from the old form band |
+| timeline helper "Soft launch. Hard deadline. 'Figuring it out.'…" | the "Rough timeline." tip, verbatim |
+| message helpers (two lines) | the "What you're building." and "Links to anything." tips, verbatim |
+| preview next step "I read every message myself and reply within 24 hours — usually with a follow-up question or two, sometimes with a rough proposal." | the dark band's own support line |
+| preview per-pillar lines | each pillar's first service `outcome` in `servicePillars.ts` |
+| "The other three ways." | unchanged |
+| Service area "Toronto & the GTA" | the meta description ("across the GTA"), surfaced by ruling 3 |
+| Response time "Within 24 hours" | the dark band |
+| receipt "A reply from Prachets within 24 hours." | the dark band |
+| "Talk soon." closer | unchanged |
+
+**Dropped:** the "Budget shape." tip has no home, because there is no budget field and no budget talk. **No phone** exists anywhere on the site, so none is shown. Instagram was in the old direct band and is dropped in favour of the service area and response time, which the ruling asked for.
+
+### The chip → payload mapping
+
+`projectType` still goes to the inbox in its old vocabulary so the email format does not change, and the full selection rides along as `services`:
+
+| chips | `projectType` sent |
+|---|---|
+| Design (alone or with others) | `new-site` |
+| Automate only | `automation` |
+| Grow only | `other` |
+| Not sure yet / nothing | `other` |
+
+### What it does now
+
+**Two paths** under the h1, typographic, each scrolling to its section. **The booking** is framed in the site's window chrome and mounts one viewport early — *measured: **0** cal.com requests on load, 86 once the section is reached* — or immediately when the URL carries `?date`. **The old empty-cream-box render is fixed**: the iframe paints at 570px on desktop and 1433px at 375.
+
+**The `/services` handoff is intact:** `/contact?date=2026-11-12&notes=Harbourview%20Bakehouse` loads Cal immediately, the date reaches the embed, and the business field is prefilled "Harbourview Bakehouse".
+
+**The brief** is the signature. The form is conversational — name, email, business, "What do you need?" chips (the three pillars, each expandable to its real services, plus Not sure yet), a rough timeline, and the message — and beside it **the reply composes live**. *Verified across four input combinations:* empty shows a quiet "e.g."; a name alone gives "Hi Sam,"; adding email and business fills To and "Re: Harbourview Bakehouse"; two pillars produce "Thanks for reaching out about design and automation for Harbourview Bakehouse." followed by a line per pillar.
+
+**Submit** folds the draft away into an Outbox tab and raises a Received receipt in its place — *measured: draft opacity 1 → 0.00 with a 3D fold transform, outbox 0 → 1, receipt 0.91, carrying "Oct 10, 2026, 11:23 p.m. · Toronto", the business, the needs and the next step.* **Reduced motion: the draft keeps an identity transform and the receipt simply appears.**
+
+**Failures never render the server's words.** *Verified: the mocked failure shows only "Something went wrong on our side. Email us directly and we'll reply within 24 hours." plus a mailto prefilled with everything typed; `serverWordsLeaked: false`.* The raw error is console-logged on localhost and `*.vercel.app` only. **The missing-`RESEND_API_KEY` 500 takes this same path** — the visitor no longer sees "Please set RESEND_API_KEY in Vercel", which is what the old form rendered verbatim. Setting the key remains an owner item.
+
+**NO REAL SENDS this session.** `?mockSend=1` (and `?mockFail=1`) route the submit at a local mock with no network; the harness is inert off localhost and `*.vercel.app`, the same guard `?simulateBooking` uses. The live endpoint was never called.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **/contact mobile LCP median of 3, warm = 2076 ms** `[2056, 2076, 2148]`, FCP 1732, load-window CLS 0.0000 — *better than the 2104 ms baseline* · **3-speed crash scroll at 1440 / 1920 / 375, both directions — worst CLS 0.079 at 375 crash, zero overflow, zero errors** · site-wide sweep: zero overflow on all ten routes, PillHl unchanged, zero `$` · **palette audit: nothing off-palette on /contact** · 375: the preview sits below the form and is not sticky, minimum font **13px**, no control I added under 44px · **keyboard-only completion works** — tab reaches every chip and its expander, Enter toggles, and submit returns the receipt.
+
+Bundle: `Contact` **43.92 → 34.81 kB** (10.86 → 9.49 gzip), with `CalEmbed` split to its own 2.21 kB chunk.
+
+**Three CLS faults, each found by attribution.**
+1. **0.91 at 375.** The Cal iframe settles at **1433px** on mobile against a 560px reserve — it grew 680px after mounting and shoved the brief section up 439px. The reserve is the measured height now.
+2. **Still 0.157.** Cal grows its iframe in *steps* as it hydrates, and in normal flow every step shifted everything after it. The reserve defines the layout and the embed is absolutely positioned inside it, so the iframe can resize freely.
+3. The hero's scroll cue landed on the path cards' bottom edge — the hero used to end in a paragraph.
+
+**Deviations.**
+1. **A timeline field was added.** It did not exist before. The brief listed timeline as a field and ruling 4 asked the "Rough timeline." tip to sit under a matching field — there was none, so one was made. Free text, optional.
+2. **Instagram is dropped** from the direct row to make space for the service area and response time the ruling asked for. It still exists in the footer.
+3. **The budget removal is not its own commit**, because its file is deleted by the rebuild.
+4. `ContactForm.tsx` and the four helper-card components are deleted.
+
+**Probe errors of mine, reported.**
+1. `.sweep.mjs`'s blind spot — the `$` finding above. It reported /contact clean every session.
+2. `.await.mjs` was hard-coded to watch `/about`'s chunk; pointed at /contact it polled the wrong page for ten minutes. It takes a route now.
+3. My first commit attempt staged both items at once and had to be unwound.
+
+**SESSION 20 — site-wide finish.** Six commits (`342ce75` … `54c6285`).
+
+### 0 · /contact's timeline was already optional
+
+No validation entry, labelled "· optional". *Verified: submitting with the timeline empty returns the Received receipt with zero validation errors.*
+
+### 1 · Page transitions
+
+An ink panel sweeps up, names the destination in parch, and sweeps off the top — **490ms nominal** (cover 220, hold 50, reveal 220). It listens for clicks **at the document in the capture phase** rather than wrapping every `Link`, so the nav, the cards, MagneticCTA and the footer all get it without any call site knowing it exists. The route chunk is prefetched the moment the click is intercepted.
+
+*Measured, warm, hover-prefetched — click to a **painted** destination hero:*
+
+| | ms | |
+|---|---|---|
+| / → /services | 284 | PASS |
+| / → /work | 260 | PASS |
+| /services → /about | 264 | PASS |
+| /about → /contact | 613 | PASS |
+| /contact → /work | 279 | PASS |
+| /work → /about | 265 | PASS |
+
+*Six-frame sequences captured for three route pairs.* After each navigation: **title updated, focus on the new page's `h1`, the live region announcing the page name, scroll at 0** — all measured.
+
+**Exclusions, all verified false (no wipe):** `/work` → a case study, which keeps `OpenTransition`'s clone-expand (a capture listener would preempt its `onClick`); browser back; hash links; and reduced motion, which navigates instantly.
+
+### 2 · The footer
+
+A "Start a project" CTA and the existing "Currently answering: same-day, Toronto time." beside a **live Toronto clock**, then a **giant "Averr" rising out of a mask** on the footer's own scroll with the mark beside it, then three link columns and the © line. *Measured at 1440 / 1920 / 375: the wordmark's width equals its container's exactly at all three, the clock ticks, and the smallest footer text is **12px**.*
+
+**The Privacy / Cookies / Terms links are REMOVED.** `/privacy`, `/cookies` and `/terms` are **not routes in App.tsx and never have been** — all three have been 404ing for as long as the footer has existed. Omitted per the brief, and flagged rather than invented.
+
+### 3 · Home polish
+
+**The doors show the real work.** Each door's preview was a hand-made still; it now renders the **actual /services screens** for that pillar, cycling every 2.2s with the app-switch crossfade, in the `compact` layout those components already have. *Measured: home's initial JS is **160.0 kB** encoded and the previews contribute **nothing** to it — hovering a door pulls **+20.3 kB** on demand and mounts the live preview.* Everything inside is `aria-hidden`; the door's own copy stays the accessible content; touch keeps the still.
+
+**The reel attends to one card.** Lift and tilt already existed (capped at 3°). Added: keyboard focus gets the same lift, and the siblings recede. *Measured on hover: opacities `[1, 0.7, 0.7, 0.7]` with the hovered card lifted.* The dimming is CSS `:has()` on the row, so no hover state lives in React.
+
+### 4 · The 404
+
+*Verified:* h1 **"This page doesn't exist. Yet."** with the Cormorant accent on "Yet.", `opacity: 1` at first render, the subhead "Here's where the good stuff is:", and four rows — Work / Services / About / Contact — each with its one-line description. **`.pill-hl` count: 0.**
+
+**PillHl inventory, all ten routes: home 2, everywhere else 0.** It is home-only now.
+
+### Verification on the alias
+
+Build exit **0** unfiltered · **mobile LCP, median of 3, warm — every route passes:**
+
+| route | LCP | | route | LCP |
+|---|---|---|---|---|
+| / | 1916 | | /work/cg-walls-and-floors | 2092 |
+| /work | 2364 | | /work/capitalcommand | 2108 |
+| /services | 2012 | | /work/sift | 2116 |
+| /about | 2128 | | /work/cadencestack | 2124 |
+| /contact | 2060 | | /nope | 2016 |
+
+**Zero horizontal overflow at 375 on all ten routes.** Crash scroll, 3 speeds, both directions: **home** 0.037 worst at 1440 crash, 0.0017 at 375; **/nope** 0 everywhere. Both zero errors.
+
+**Two pre-existing defects found and fixed.**
+1. **/contact had no `<h1>` at all.** Its headline was a bare `CharReveal` span, so the page had no main heading — nothing for the transition to move focus to (it was landing on an `h2`) and nothing for a screen reader to land on.
+2. **The footer's three column titles were 11px**, under the brief's 12px floor.
+
+**Two of my own, found by measuring.**
+3. **The wipe missed the 800ms gate** at 700ms nominal (876–971ms measured), because `AnimatePresence` cost ~60ms mounting before the cover could start. The panel is **always mounted** now, inert at `inset(100%)` with `visibility: hidden`, and the timings are trimmed.
+4. **The wordmark filled under half the footer.** Its viewBox was 420 units around **237 units of ink**, so `preserveAspectRatio` fit it by height. The viewBox is measured from the glyphs' own bbox now and re-measured once the webfont loads, because the fallback's metrics are not Geist's.
+
+**Deviations.**
+1. **The reel's caption is not hidden-then-revealed.** The card's name and headline figure are already visible under every card; hiding them to reveal on hover would be worse for touch and for anyone scanning. The hover state is the lift, the tilt and the siblings receding.
+2. **Legal links removed** rather than pointed somewhere, because the routes do not exist.
+3. `ServicesBuild` split from 166.85 kB into a 17.04 kB shell plus three screen chunks (Build 45.41, Automate 38.01, Grow 67.29) now shared between /services and home's door previews.
+4. Crash scroll was run on **home and /nope** — the two most-changed routes — rather than all ten; /about, /contact and /services were crash-scrolled in their own sessions, but **not since the footer changed**.
+
+**Probe errors of mine, reported.**
+1. After making the panel always-mounted, my own probe still tested `querySelector(".rw")` for existence, so every exclusion read as a failure and every timing as a 30s timeout. It tests whether the panel is *active* now.
+2. My click-to-hero probe also waited for the panel to go fully inert, which is stricter than the gate. /contact read 945ms that way; the hero is **painted and inked at 612ms**.
+3. The first timing run clicked without hovering, so nothing was prefetched — the brief specifies prefetch on hover.
+4. A nav link named "Contact" does not exist (it is "Book a call"), which timed out one probe.
+5. Home's JS was first measured from `content-length`, which compressed responses omit — it read 0.0 kB. `encodedBodySize` from the Resource Timing API is the right source.
+
+---
+
+**SESSION 21 — the flagship home hero.** Four commits (`edd31d8` … `60b2bab`).
+
+Owner verdict going in: the home hero is **4–5/10** — one static line, not interactive, and the message talks about businesses instead of to them.
+
+### 1 · The headline
+
+`src/components/home/heroPhrases.ts` owns it:
+
+| Line | Copy | Type |
+|---|---|---|
+| 1 | We're here to help | `type-h1`, ink at 0.72 |
+| 2 | your business | `type-hero`, ink |
+| 3 | *the slab* | `type-hero`, parch on `--color-dark` |
+
+| Slab phrase | Selector | Pillar | Scene |
+|---|---|---|---|
+| look serious. | DESIGN | design | `ScreenLocalSite` — northgate.ca |
+| get found. | GROW | grow | `ScreenMap` — Local search — Northgate |
+| run itself. | AUTOMATE | automate | `ScreenAgent` — Northgate Ops — Agent |
+
+`EYEBROW` and `KICKER` are unchanged. `WORD_BIG`/`WORD_PILL`/the old `LEAD_1`/`LEAD_2` are gone.
+
+**A new type step, `--type-hero` (`clamp(44px, 7vw, 112px)`).** The headline now shares the fold with the scene in a 60/40 split, so it is sized to the TEXT COLUMN rather than to the viewport. At `display-2xl` (11vw → 158px at 1440) "look serious." measures **~1050px**, which no 60% column can hold at any width. `.hero-pill-line`'s 38% indent went with the old two-word headline — the staircase is now lead → "your business" → slab, and an indent on a line holding "look serious." would overflow.
+
+### 2 · The slab is measured, and it is PillHl
+
+`PhraseSlab` renders `.pill-hl .pill-hl--bare` with `.pill-hl__slab` and `.pill-hl__word` — the same box, surface and gradient PillHl owns, so the signature pill still has one owner in the CSS. The `.pill-hl` DOM inventory on `/` is still **2** (hero + FinalCTA) and **0** elsewhere; the hero's is now PhraseSlab's.
+
+All three phrases are laid out once in a hidden ruler, re-measured after `document.fonts.ready` and on resize. The box is fixed at the widest and the surface animates on **scaleX**, never on layout width, so nothing above or below it reflows. The horizontal padding is read off the live element, so it is inside the ratio rather than fighting it.
+
+*Measured at 1440 — `box = widest word + padding`, `scaleX = padded ÷ widest`:*
+
+| Phrase | Word | +pad (56.4) | scaleX | Box |
+|---|---|---|---|---|
+| look serious. | 574.2 | 630.6 | 1.000 | 630.6 |
+| get found. | 461.7 | 518.1 | 0.822 | 630.6 |
+| run itself. | 421.0 | 477.4 | 0.757 | 630.6 |
+
+The box never changes. Measured `scaleX` matches the computed ratio to three places.
+
+**The entrance finally does what PillHl always said it did.** The words paint at the first frame in **ink**, legible on cream; a parch copy sits exactly on top and is revealed by a clip that tracks the surface, so the words turn parch as the slab passes under them. Traced at 150ms intervals: clip 100% hidden through 1200ms (the slab's delay), then 18.5% / 3.0% / 0.2% / 0% against slab scaleX 0.817 / 0.970 / 0.998 / 1 — in lockstep.
+
+### 3 · Who is driving
+
+`useHeroPhrase` auto-cycles at **3200ms**, and only while the hero is in view (IntersectionObserver, 0.25), the tab is visible, and motion is welcome. It stops **permanently** the first time the reader touches it — someone who has taken the wheel does not get it moved under them 3 seconds later. It also freezes while the pinned takeover runs, because the dark layer carries its own copy of the active phrase.
+
+Controls: the three selectors, a click on the slab itself, and ←/→/↑/↓ while the selector row has focus (bound to the row, not the window, so the page keeps its arrow keys).
+
+*Sampled every 800ms:* phrase changes at 3.2s, 6.4s, 9.6s, each with the scene title in step. After a click: four samples over 8s, no further change.
+
+### 4 · The live scene
+
+`HeroScene` reuses /services' real screens — reused, not rebuilt. Hydration waits for `requestIdleCallback` (2500ms timeout) **or** the first pointermove/scroll, so nothing is on the hero's critical path. `.hs-body` is a DEFINITE height (`min(46vh, 420px)`, 300px below 1024) with a reserve behind it, so the screens cannot shift the fold. The window leans ±6° toward the cursor on `spring.soft` and rests at `rotateX 4 / rotateY -8`; two ghost frames behind it carry the other two scenes' chrome.
+
+### 5 · Accessibility
+
+The `h1`'s accessible name is the **whole sentence** — "We're here to help your business look serious, get found, and run itself." — in an `.sr-only` span, with the visible lines `aria-hidden` so it is not read twice in pieces. A polite live region carries **only** user-driven changes, so the auto-cycle never talks over anyone. The selectors are `aria-pressed` toggle buttons, **not** a tablist: a tablist promises tab panels, and the scene is decorative and `aria-hidden`. *Deviation from the brief's "selectors", recorded.*
+
+### 6 · Numbers
+
+| | Before | After |
+|---|---|---|
+| Home initial JS | 101.83 kB gzip | **104.75 kB gzip** (+2.92, target ≤ +3) |
+| CSS | 8.94 kB gzip | 9.12 kB gzip |
+| Screen chunks in the initial payload | 0 | **0** (37.1 kB gzip, fetched after LCP) |
+
+*On the alias, 375×812, 1.6 Mbps / 150ms / 4× CPU, median of 3 warm:* **LCP 600ms** on `P.type-body-lg` (568 / 600 / 600).
+
+*First frame, measured as cumulative opacity:* lead 0.72 (its designed value), "your business" 1, slab words 1 in `rgb(20,20,18)`, kicker 1 — at 1920, 1440 and 375.
+
+*CLS through hydration:* **0.0001** at 1440, **0.0096** at 375 (attributed to `DIV.hs-win`).
+
+*h1 bottom vs viewport, and horizontal overflow:*
+
+| Viewport | h1 bottom | Slab box | Overflow |
+|---|---|---|---|
+| 1920×1080 | 654.5 | 700.7 in an 835.2 column | none |
+| 1440×900 | 552.7 | 630.6 in a 766.1 column | none |
+| 1280×720 | 450.0 | 560.5 in a 677.8 column | none |
+| 1024×768 | 435.3 | 448.4 in a 536.4 column | none |
+| 768×1024 | 357.6 | 336.3, single column | none |
+| 375×812 | 336.7 | 275.3, single column | none |
+
+*Crash scroll:* no console errors at 1440 or 375. Long tasks over 50ms: 51 and **147** at 1440, 79 at 375. The 147ms one is the hero's screen chunks evaluating after LCP; an idle yield between chunks did not split it, so it is one chunk's own work (GrowScreens is the largest at 67 kB raw). It is after LCP and off the interaction path — loading on demand instead would move it onto a click, which is worse.
+
+*Reduced motion:* no auto-cycle (same phrase after 8.5s), slab at its final scaleX, clip fully revealed, swaps instant. The window keeps its static `rotateX 4 / rotateY -8` rest pose — a transform, not an animation.
+
+### 7 · Honest reading
+
+The fold now carries a sentence addressed to the reader, a slab that moves, three ways to drive it, and the studio's actual work running beside it. It reads as the flagship. Two reservations, both for the owner:
+
+1. **The Automate screen is navy.** `ScreenAgent` is dark blue on /services and it comes across unchanged, so for a third of the cycle there is blue inside the hero window. The brief asked for these screens reused, and it is confined to the inside of the frame — the page palette is untouched — but it is the one place another page's colour lands on home. Swapping that screen is a one-line change if it is not wanted.
+2. **The headline is half its old size** (112px cap, was 208px). That is the price of the scene sharing the fold. Nothing else fits.
+
+### 8 · Copy that now reads wrong next to the new hero — candidates only, not changed
+
+1. **The kicker, directly under the h1:** "Averr Studios designs premium websites, builds AI automations, and runs the marketing engines for **small and mid-market businesses** across the GTA." The headline has just said "your business"; the next line goes back to talking about businesses in the third person.
+2. **The reel heading: "This is what serious looks like."** It was a callback to a hero that ended on "serious." The hero now ends on three things, so the line echoes one of them.
+3. **`PHRASES` vs `/services` pillar names.** The selectors say DESIGN / GROW / AUTOMATE, matching `servicePillars`; worth a check that the pillar blurbs still open the same way now that the hero makes the same three promises first.
+
+### 9 · My own errors this session, all found by probe
+
+1. The ruler measured the phrases **8% short** at every width, because `.pill-hl__word` re-tracks the text to `-0.015em` and the ruler was inheriting the headline's `-0.05em`. The slab was narrower than the word it held. Fix: the ruler carries the class it is measuring for.
+2. The ink copy and the parch copy had **different widths** for the same reason, so they did not overlay. Fix: `.ps-ink` is `.pill-hl__word` with the fill put back.
+3. The ink copy painted **on top of** the parch copy, because `.pill-hl__word` carries `z-index: 1` and the reveal wrapper had none. The words stayed ink over a dark slab.
+4. The reveal never ran at all until it was moved out of the `AnimatePresence` — see gotcha 68.
+5. The scene was **blank on a phone**: correct chrome, correct title, nothing inside — see gotcha 69.
+6. `mode="wait"` left the slab **standing empty for 300ms** between tokens. `popLayout` crosses them.
+7. I read a downsampled full-page screenshot and reported the active selector's label as invisible. It was there; 12px mono does not survive that scale. Zoom before calling something broken.
+
+---
+
+**SESSION 21 RULINGS.** Two commits (`d6da1c7`, `8f02bb1`).
+
+### 1 · The headline takes the column — 147.9px at 1440
+
+`--type-hero-size` is now driven by **`--container-wide`**, not by `vw`. The thing that has to fit is the widest phrase inside the headline's own column, and the container caps at 1440px while `vw` keeps going — so every `vw` clamp is either too small below the cap or too big above it.
+
+```
+--type-hero-size: clamp(44px, calc(var(--container-wide) * 0.92 / 6.36), 200px);
+@media (min-width: 1024px) {
+  --type-hero-size: clamp(44px,
+    calc(min(var(--container-wide) * 0.74 - 40px, var(--container-wide) - 320px) / 6.36),
+    200px);
+}
+.hero-main { grid-template-columns: minmax(0, 1fr) max(280px, 26%); gap: 40px; }
+```
+
+**6.256 is a measured constant.** "look serious." occupies 6.256 × the font size including the slab's own padding: 6.2560 at 1440, 6.2563 at 1920, 6.2568 at 375. 6.36 is the same number with ~1.7% of headroom.
+
+The scene takes 26% but **never less than 280px** — a flat 26% leaves 245px at 1024, which is not a window you can read a screen in. The size is a `min()` of the 74% share and "container less the gap and the scene's floor"; the branches meet exactly where the floor takes over, so the type scales smoothly through it instead of stepping.
+
+*Measured, with "look serious." on one line inside the slab at every width:*
+
+| Viewport | Font | Slab | Column | Slack | h1 top…bottom | Scene | Overflow |
+|---|---|---|---|---|---|---|---|
+| 1920×1080 | **161.3** | 1008.8 | 1025.6 | 16.8 | 284…706 | 374.4 | none |
+| 1680×1050 | **161.3** | 1008.8 | 1025.6 | 16.8 | — …691 | 374.4 | none |
+| 1512×982 | 155.6 | 973.2 | 989.4 | 16.2 | — …651 | 361.7 | none |
+| 1440×900 | **147.9** | 925.0 | 940.4 | 15.4 | 208…602 | 344.4 | none |
+| 1366×768 | 139.9 | 875.4 | 890.0 | 14.6 | 153…527 | 326.7 | none |
+| 1280×720 | **130.7** | 817.8 | 831.4 | 13.6 | 143…493 | 306.2 | none |
+| 1240×800 | 126.4 | 791.0 | 804.2 | 13.2 | 188…528 | 296.6 | none |
+| 1024×768 | 97.8 | 611.9 | 622.1 | 10.2 | 208…476 | 280.0 | none |
+| 768×1024 | 102.2 | 639.4 | 706.5 | 67.1 | 154…419 | stacked | none |
+| 390×844 | 50.6 | 316.7 | 350.0 | 33.3 | 196…351 | stacked | none |
+| 375×812 | 48.5 | 303.1 | 335.0 | 31.9 | 196…346 | stacked | none |
+
+The h1 clears the 88px nav at every size (minimum top **143** at 1280×720) and the primary CTA is above the fold at all of them.
+
+**Two things the bigger type broke, both found by probe and fixed in the same commit:**
+
+1. **At 1024–1239 the h1's first line sat ABOVE the viewport** — top **−53** at 1024×768, −48 at 1152×864, −80 at 1239×800. A pinned frame is 100vh and clips, and a stacked composition at this type size does not fit in one. The hero now stops pinning exactly where it stops being two columns: `FLAT_QUERY` (`max-width: 1023px`) replaces the old 767px mobile threshold for the *pinning* decision. The film still switches at 767. **A stacked hero always scrolls.**
+2. **The SCROLL cue landed on the primary CTA at 1280×720.** It now yields on **measurement** — the copy block's bottom against the frame's bottom less 88px — not on a guessed height breakpoint, because what collides is the copy's real height at that width, not the viewport. It shows at 1920 (81px clear) and stands down at 1440, 1366 and 1280. *That is a real loss of the scroll affordance on a 900px-tall laptop, and it is the price of the larger headline.*
+
+### 2 · The navy agent screen stays
+
+Owner ruling: screen interiors carry their own colours, as on /services. No change. Recorded against the 18d locked palette rule — a screen's interior is not the page's palette.
+
+### 3 · Copy
+
+| Where | Now |
+|---|---|
+| Hero kicker | "We design premium websites, build AI automations, and run the marketing engines that grow businesses like yours across the GTA." |
+| Reel heading (`HeroReel.tsx`) | "Here's what that looks like." |
+| `index.html` `<meta name="description">` | "Averr Studios: we design premium websites, build AI automations, and run the marketing engines that grow businesses like yours across the GTA." |
+
+`og:description` and `twitter:description` did **not** quote the old kicker ("…for businesses that expect craft") and are untouched. All three verified in the DOM on the alias.
+
+### 4 · LCP, re-measured — and why the first number was wrong
+
+**The 600 ms was my harness, not the site.** Every run shared one `BrowserContext` and I navigated via `about:blank` between them, so runs 2 and 3 served the whole page out of the browser's memory cache and never touched the throttled network. "Warm" means a warm **edge**, not a warm browser.
+
+*Corrected: a fresh context per run, `Network.setCacheDisabled: true`, the edge warmed by a throwaway load that is not measured.*
+
+```
+viewport                          390 × 844, dpr 3, isMobile true, hasTouch true
+Emulation.setCPUThrottlingRate    rate: 4
+Network.emulateNetworkConditions  latency 150 ms · down 209,715 B/s (1.6 Mbps) · up 98,304 B/s
+Network.setCacheDisabled          true, fresh context per run
+edge                              warmed before the measured runs
+```
+
+| | Home `/` | /about (calibration) |
+|---|---|---|
+| **LCP median of 3** | **2000 ms** `[1976, 2000, 2016]` | 2168 ms `[2156, 2168, 2224]` |
+| LCP element | `P.type-body-lg` (the kicker) | `H1.type-display-l` |
+| **FCP median** | **2000 ms** | 1840 ms |
+| TTFB median | 87 ms | 109 ms |
+| CLS | 0.0001 | 0.0008 |
+
+**Throttle proof:** the 106,820-byte entry chunk took 1265 ms, ≈676 kbit/s effective against a 1.6 Mbps cap (the gap is the 150 ms RTT and queueing inside `duration`). Unthrottled on the same link it lands in ~50 ms.
+
+**Calibration:** /about reads 2168 ms here against the **2044–2096 ms** this document records for /about in Session 18 — the same regime, so the harness is now comparable with every previous figure. Home's 2000 ms sits against the **1872–1964 ms** recorded across Sessions 10–17.
+
+**On home, FCP == LCP in all three runs.** There is no earlier contentful paint: the app is client-rendered and the hero's text all paints in the same frame, which is what the hero LCP rule produces by design.
+
+### 5 · Re-verified after the resize
+
+Auto-cycle at 3.2/6.4/9.6s with the scene in step · stops on interaction (4 samples over 8s) · selectors, slab click and ←/→ all drive it · live region carries only user changes · console clean · **crash scroll at 1440, 390 and 375: zero console errors, zero React errors, max horizontal overflow 0 at every scroll position** · longest task 137 ms at 1440, 120 at 390, 74 at 375 (the hero's screen chunks, after LCP).
+
+---
+
+**SESSION 21b — the home flagship, reconceived.** Six commits (`021d6c8` … `ec38108`).
+
+Owner verdict on Session 21: **4/10, "nothing changed"** — still text and a small dashboard. This replaced the concept: the visitor types their business name into the slab and a premium website for it builds itself live.
+
+### 1 · Copy
+
+| Where | Now |
+|---|---|
+| h1 | "Let's make" / **[the slab field]** / "the one they choose." |
+| h1 accessible name | "Let's make your business the one they choose." |
+| Field label | "Your business name" (`.sr-only`) |
+| Hint | "Type your business name ↑", Geist Mono, pulsing until first focus |
+| Primary CTA | **Build the real one →** · `/contact?notes={name}` when a name is typed, `/contact` otherwise |
+| Secondary CTA | See our work → (unchanged) |
+| Reel heading | "That was a sketch. Here's the real thing." |
+| Kicker, eyebrow, Toronto clock | unchanged |
+
+### 2 · The slab is a text field
+
+`NameField` keeps PillHl's `.pill-hl--bare` box and puts an `<input>` in it: `maxlength=32`, `autocomplete="organization"`, spellcheck off, a blinking caret before focus, the native one after.
+
+- **Measured, never reflowing.** A hidden ruler pinned to the UNSCALED size lays out whatever is shown; the surface behind scales to it on `transform`; the input stays the full width of the column.
+- **Steps down, never wraps.** "Northgate Renovations & Custom Millwork" caps at 32 characters and the type steps **72.7px → 40.7px**: `scrollWidth 657 = clientWidth 657`, one line, nothing clipped.
+- **Painted at the first frame.** The placeholder "your business" is in the markup at first render in **ink** (`rgb(20,20,18)`) on cream — legible before anything animates — and crosses to parch as the surface fades in under it. An input's glyphs cannot be clipped, so Session 21's reveal becomes a colour crossfade.
+- **The placeholder tries six names on**, typed in and backspaced, 2.6s each, with "your business" between: Harbour Dental · Maple & Pine Café · Northgate Renovations · Bloor St. Barbers · Lakeview Physio · Summit Law. Focus stops it and clears to the caret; empty + blur resumes it.
+
+### 3 · The live sketch
+
+`SketchWindow` holds a browser window across the lower right of the hero, bleeding off the right edge and the bottom, leaning ±5° toward the cursor on `spring.soft` from a rest of `rotateX 6 / rotateY -10`. Its page scrolls itself on a 26s out-and-back loop, paused on hover, and a ghost cursor reaches the booking button once per lap. Corner label: "A 10-SECOND SKETCH · THE REAL ONE TAKES TWO WEEKS".
+
+`SketchSite` generates the page. **Seven presets, each a whole design rather than a recolour** — verified by typing one name per preset at 1440:
+
+| Name typed | Preset | Palette ground / accent | Display | Nav | Hero layout | Mark |
+|---|---|---|---|---|---|---|
+| Maple & Pine Café | food | `#FBF5EC` / `#C2552C` | Cormorant **italic** | lowercase | stacked | filled disc |
+| Harbour Dental | health | `#F3F8F8` / `#17746F` | Inter 600 | normal | split | rounded square |
+| Northgate Renovations | trades | `#F1F2F3` / `#D0711A` | Geist 600 | UPPER 0.1em | split-reverse | shield |
+| Bloor St. Barbers | beauty | `#FAF4F5` / `#8B4663` | Cormorant 500 | UPPER 0.22em | centered | thin ring |
+| Summit Yoga | fitness | `#101214` / `#C4F04A` | Geist 600 | UPPER 0.14em | editorial | cut block |
+| Summit Law | professional | `#F7F6F1` / `#1E3A72` | Cormorant 600 | UPPER 0.16em | split | ruled square |
+| Rowan & Field | local | `#F6F5F1` / `#3C6A48` | Geist 600 | normal | stacked | pin |
+
+Each carries its own hero art (SVG: a cup and warm arcs; soft overlaps and a pulse line; roof pitches; a blush blob and arcs; diagonals and a ring; ruled columns; a street grid and a pin), its own 3–4 service cards, its own headline template, and a review strip of invented first names behind a **"sample"** label. The URL in the chrome is derived from the name with accents folded — "Maple & Pine Café" → `maplepinecafe.ca`, not `maplepinecaf.ca`.
+
+**Honest look at the seven:** they read as seven different studios' work, not one template. The café is warm and italic with a terracotta cup; the fitness studio is near-black with acid lime, uppercase and tight; the law practice is ivory, navy and ruled. The clearest tell that they share a skeleton is the service-card row, which is the same shape in all seven.
+
+**ASSET RULE honoured:** no photographs, no real brands. Every mark and every image is SVG drawn from the typed name.
+
+**PALETTE:** these are screen interiors and carry their own identity, per the 21 ruling. Nothing reaches the page around the window, which stays on the site's cream/ink tokens.
+
+### 4 · Scroll
+
+One value. The copy clears (p 0.02→0.18), the window un-tilts and scales until it fills the viewport (p 0.05→0.42), it holds, then dissolves (p 0.56→0.68) into the reel (p 0.56→0.70). The pin is **4 × 100vh** for three stages, per the n+1 rule. Measured at 1440×900:
+
+| p | window rect | copy | sketch | reel |
+|---|---|---|---|---|
+| 0 | 822..1700 / 249..1040 | 1.00 | 1.00 | 0 (inert) |
+| 0.2 | 608..1630 / 133..1053 | 0.00 | 1.00 | 0 (inert) |
+| 0.35 | 17..1462 / −166..1081 | 0.00 | 1.00 | 0 (inert) |
+| 0.5 | −14..1454 / −181..1082 | 0.00 | 1.00 | 0 (inert) |
+| 0.62 | −14..1454 / −181..1082 | 0.00 | 0.50 | 0.43 |
+| 0.75 | −14..1454 / −181..1082 | 0.00 | 0.00 | 1.00 |
+
+### 5 · The through-line
+
+`lib/businessName.tsx` — React state at the app root, **no storage, no analytics, no network**, dead with the tab. Verified end to end: typing "Harbour Dental" in the hero then clicking through in-app prefills **/services' start pass** ("Harbour Dental", found at y=12000) and **/contact's business field**. The CTA carries `?notes=Harbour%20Dental`; `?notes` still wins over the context where both exist.
+
+### 6 · Numbers
+
+| | Session 21 | 21b |
+|---|---|---|
+| Home initial JS | 104.83 kB gzip | **106.80 kB gzip** (+1.97, target ≤ +4) |
+| CSS | 9.15 | 10.44 kB gzip |
+| Generator chunk | — | **SketchSite 21.75 kB / 5.19 kB gzip**, outside the initial payload |
+
+*Alias, 390×844, 4× CPU, 1.6 Mbps / 150 ms, cache disabled, fresh context per run, edge warmed, median of 3:* **LCP 2024 ms** `[2024, 2064, 2000]` on `P.type-body-lg`, FCP 2024 ms, TTFB 102 ms, CLS 0.0006. Throttle proof: 108,589 B in 1290 ms ≈ 673 kbit/s.
+
+*First frame:* every hero text element at opacity 1 at 1440 and 390, placeholder "your business" in ink, window and static frame present.
+
+*CLS and crash scroll (3 speeds, both directions):*
+
+| | load CLS | total CLS | overflow | longest task | errors |
+|---|---|---|---|---|---|
+| 1440×900 | 0.0002 | 0.0563 | **0** | 95 ms | none |
+| 390×844 | 0.0005 | 0.0029 | **0** | 118 ms | none |
+| 375×812 | 0.0004 | 0.0029 | **0** | 79 ms | none |
+
+*Reduced motion:* no placeholder typing (static "your business"), not pinned, `sw-page` transform `none` (no self-scroll), no ghost cursor, hint and caret animations `none`.
+
+*Mobile (<1024):* the h1 is three lines with the field full-width, then hint, kicker, CTAs, then the sketch in a phone-proportioned window of definite height. Minimum font inside the sketch **13px**. Zero overflow at 375 and 390.
+
+### 7 · Does it read as a flagship?
+
+Yes. The fold is a sentence the reader completes themselves, a slab that accepts typing, and a premium website for *their* business assembling beside it — and the scroll turns that sketch into the whole screen before handing over to real work. The two reservations are below.
+
+### 8 · Deviations and judgement calls — every one
+
+1. **The headline is ~73px at 1440, not the ≥140px the 21 ruling set.** That ruling was written when the headline *was* the hero. Here the sketch is, and the two cannot both be large in one 100vh frame: the copy is bounded to 56% of the container so the window can have the rest. **If the size ruling still stands, the window has to shrink — that is a ruling, not something I should decide.**
+2. **The sketch follows the placeholder before anyone types.** Not in the brief. The six examples map to six different presets, which reads as deliberate, and without it the hero cannot demonstrate itself to someone who never touches the keyboard. The example is taken only once a word has finished typing, never per keystroke.
+3. **The window occupies the lower ~72%, not ~55%**, and is positioned from `--container-wide` rather than `vw`: a `vw` width cropped 30% at 1440 and 57% at 1920, where the container stops growing and the viewport does not.
+4. **An `<input>` lives inside the `<h1>`.** Valid HTML, and the reading order matches the visual order. The alternative — `aria-hidden` over the visible block as in Session 21 — would have hidden a focusable control, which is a trap. The h1's accessible name is the full sentence in an `.sr-only` span and only the decorative words either side are hidden.
+5. **Desktop total CLS is 0.0563** across a full crash scroll (load CLS is 0.0002). Under budget, not zero; the shift happens during the scroll sequence, not at load.
+6. **The hero stops pinning below 1024** (`FLAT_QUERY`), carried over from the 21 rulings.
+7. The compact sketch's smallest type is 13px per this brief, above the site's usual 11px floor.
+
+### 9 · Copy that now reads wrong next to the new hero — candidates only, not changed
+
+1. **`ThreeScenes` / `ThreeDoors` headings** on home immediately after the reel — worth re-reading now that the hero promises a sketch in ten seconds and the reel answers it; the next section starts a third argument.
+2. **`FinalCTA`** still invites a conversation in the abstract; the hero now ends on "Build the real one", so the closer could pick that thread up.
+3. **The `og:description` / `twitter:description`** ("A boutique studio building websites, AI systems, and marketing engines for businesses that expect craft") no longer echo any on-page line.
+
+### 10 · My own errors this session, all found by probe
+
+1. **The reel stage covered the whole hero at opacity 0 from the first frame** — it ate every pointer event (the name field could not be clicked at all) and its four card links sat in the tab order the whole time. Inert until on screen now.
+2. **Scroll-linked opacity went to motion inside the pinned frame**, which is exactly what `lib/useScrollStyle.ts` exists to prevent: the copy faded back IN as you scrolled past it (0.02 at p=0.2, **0.39** at p=0.5, **0.70** at p=0.75). I had read that file's warning in a previous session and still reached for `style={{ opacity }}`.
+3. **The fill target was measured with `getBoundingClientRect` on a window rotated in 3D** — a rect is the axis-aligned box *around* a rotated element, so the scale came out short and the window stopped 62px from the right edge.
+4. **The field's line used `LineReveal`, whose inner span is `inline-block`**, so `width: 100%` resolved against its own content: a 446px input in a 698px column, and a long name clipped instead of stepping down.
+5. **The step-down divided by the padded width**, counting the slab's padding as space the text could use — still 18px over.
+6. **The primary CTA could not be clicked**: the copy layer is `pointer-events: none` with the interactive parts switched back on, but an `a` element selector lost to MagneticCTA's own rule and the anchor computed `none`.
+7. **The field's line box followed its own font size**, so every step-down and every placeholder of a different length moved the page: load CLS 0.0364 at 390.
+8. **The stacked sketch had no definite height**, so the window grew when the generator replaced the static frame.
+9. **The mobile `:root` override was declared before the base `:root`** — same specificity, so source order decided and it lost. `--hero-copy-w` resolved to 152px on a phone and the headline wrapped to six lines.
+10. The editorial preset gave its copy the 0.6fr column and the headline overflowed; the café's URL dropped the accent and read `maplepinecaf.ca`.
+
+---
+
+**SESSION 22 — home as a five-chapter journey, plus the 21b rulings.** Six commits (`49501a1` … `73dce33`).
+
+### PART A — the 21b rulings
+
+**A1 · The headline is back up.** `--hero-copy-w` and `--type-hero-size` are the same number twice — "the one they choose." is 9.6 × the font size, so a copy column of 0.786 of the container sets both. Measured: **103.9px at 1440**, 113.3 at 1920, 109.3 at 1512, 92.2 at 1366, 86.4 at 1280, 72.5 at 1024. The hint, kicker and CTAs took their own narrower bound (`--hero-tail-w`) because they sit level with the window where the h1 sits above it.
+
+The window now starts **below the headline's last line, measured**, not at a percentage — 55% cleared the h1 at 900 and ran into it at 720. It is wider (0.9 of the container) and bleeds further off the right and the bottom to stay large as it moves down. It is also pushed down by the tilt's **measured overshoot**: a 3D-rotated element's rect reaches above the layer that positions it, by 20px at 1920, which was enough to put the tilted corner over the headline. **Clear of every glyph at ten widths.**
+
+*h1 and primary CTA above the fold:* 1920×1080 h1 184…530, CTA 746 · 1440×900 h1 184…502, CTA 717 · 1280×720 h1 184…449, CTA 655.
+
+**A2 · The placeholder-driven sketch stays.** Unchanged.
+
+**A3 · Seven industries, seven section SHAPES.** No two alike, and zero currency characters on any of them:
+
+| Preset | Shape | What it looks like |
+|---|---|---|
+| food | menu | Dish names with dotted leaders to a short note. **No prices.** |
+| health | bookable list | Rows on cards, each with a Book chip |
+| trades | numbered process | 01–04 on a vertical rule |
+| beauty | lookbook | A grid of drawn tiles with captions |
+| fitness | schedule | Day · time, the class, its length, a Join chip |
+| professional | practice areas | A ruled two-column list |
+| local | cards | The plain card row |
+
+Trades and professional needed new **content** as well as a new shape: a numbered process listing services reads as a mislabelled menu, and "practice areas" listing appointment lengths is not practice areas.
+
+### PART B — the five chapters
+
+| | Chapter | Sends you to | Mechanic |
+|---|---|---|---|
+| 1 | Your business | — | The 21b hero through its scroll-fill, now closing on the dark its successor opens on |
+| 2 | The work | /work | A film strip panned horizontally by one vertical scroll value |
+| 3 | What we do | /services | Three panels driven by scroll AND tabs, each with a playable live screen |
+| 4 | Who builds it | /about | The monogram drawn by the scroll |
+| 5 | Start | /contact | The hero's slab again, with the reader's own name |
+
+**Ch2.** Each card plays its own screenshots on hover or focus — a crossfade under a slow Ken-Burns drift, a ≤4° lean, siblings to 0.7 — and opens the study on click through the site's ink wipe. End card "Open the vault →".
+
+**Ch3.** Every one of the sixteen services is a chip that deep-links to `/services#{service-slug}`. The slug and the beat both come from the service's name, so a rename cannot leave a stale anchor. **16/16 chips land on their own beat**, verified one at a time. Beside each pillar is the REAL /services screen with one thing you can play:
+
+| Pillar | Screen | Control | Verified change |
+|---|---|---|---|
+| Design | `ScreenBrandBoard` | Pick the accent | Accent re-tints `rgb(200,118,60)` → `rgb(62,124,166)` |
+| Automate | `ScreenAgent` | Run agent | The lead ("Priya Raghunathan, Oshawa") appears and is scored |
+| Grow | `ScreenMap` | Publish update | The results list and the pin's position change |
+
+**Ch4.** `pathLength` is the chapter's own scroll progress, so the mark is drawn by the reader's hand. /about keeps its timed draw — home previews the idea rather than copying the mechanic. Once drawn it leans toward the cursor.
+
+**Ch5.** `PillHl` bookend with the typed name: default "Ready to make **your business** the one they choose?", typed "Ready to make **Harbour Dental** the one they choose?". Two path cards to `/contact#booking` and `/contact#brief`, and the existing "24 hours. Every message."
+
+**REMOVED**, zero importers verified first: `ThreeScenes` (the result grid), `ThreeDoors`, `Manifesto` (the Philosophy section), `ProofLedger` (the "Recent projects" feature **and** the three unverified Averr Studio figures — 40+, 15×, 1.4s), and `DoorPreviewLive`, which only ThreeDoors used.
+
+> **The three studio figures may return if the owner confirms them.** They were 40+ ("custom-built marketing sites and SaaS product surfaces across the GTA"), 15× ("AI agents and workflows removing manual work") and 1.4s. They are in git at `b8dd1bc^`.
+
+### PART C — the journey layer
+
+A fixed rail on the left edge from 1024 up: a progress fill, five dots, the active chapter's name on hover. It is hidden over the hero's first frame and arrives once the fill begins. **Tone flips from the chapter's own `data-tone`**, not from a scroll position, so a chapter that moves takes the rail's contrast with it — parch on `#141412` is 14.6:1.
+
+*Rail tracking, sampled down the page:* 0 hidden · 0.08 shown, "Your business" · 0.34 dark, "The work" · 0.66 light, "What we do" · 0.93 "Start".
+
+### Numbers
+
+| | 21b | 22 |
+|---|---|---|
+| Home initial JS | 106.80 kB gzip | **94.31 kB gzip** (−12.49) |
+| Chapter chunks | — | StartChapter 1.08 · FounderChapter 1.17 · WorkStrip 2.01 · ServicePanels 2.02 kB gzip, all below the fold |
+| Mobile LCP (alias, standard harness) | 2024 ms | **1788 ms** on `P.type-body-lg`, FCP 1788, TTFB 100, CLS 0.0006 |
+
+*Crash scroll, three speeds, both directions:*
+
+| | CLS load | CLS total | longest task | errors |
+|---|---|---|---|---|
+| 1440×900 | 0.0002 | 0.0003 | 66 ms | none |
+| 1920×1080 | 0.0001 | 0.0002 | 55 ms | none |
+| 375×812 | 0.0003 | 0.0012 | 82 ms | none |
+
+*Mobile 375:* zero horizontal overflow at every scroll position; every chapter stacks and stays usable; tabs, chips and path cards all ≥44px.
+
+*Reduced motion:* the hero does not pin, Ch2 and Ch3 both render stacked, the rail is present and jumps instantly.
+
+*PillHl inventory:* **home 2** (the hero's field + the closer), /work 0, /services 0, /about 0, /contact 0.
+
+### Does home read as one cinematic journey?
+
+Yes, and more than the sum of the chapters. You arrive at a sentence you finish yourself and a site for your own business building beside it; the scroll turns that into the whole screen, dissolves it to black, and pans the real work past you; the work hands to three panels you can press; the mark draws itself under your scroll; and the last thing on the page is your own business name on the same slab the page opened with. The rail makes the shape legible without narrating it.
+
+Two honest reservations: **chapter 3 is the least cinematic of the five** — it is a good interactive panel set, but the transition between its panels is a crossfade rather than a move, and next to the film strip either side of it that reads as a step down. And the hero's window shows **less of the generated site at rest** than it did in 21b, because A1 pushed it down and further off the edge; you only see the whole sketch once the scroll fills it.
+
+### Deviations and judgement calls — every one
+
+1. **ASSET: CareerClarity has no screenshot.** `public/work/` holds only the four live studies, and `careerclarity-ai` is a `draft()` record with every copy field empty. Its card is **text-only, flagged "In progress"**, and is not a link because there is no case study to open. It cannot have the screenshot the others have until the asset exists. *This is the STOP the asset rule asks for — reported rather than papered over.*
+2. **DATA: only two of four live studies have a `headlineFigure`** — CG Walls & Floors (85%) and SIFT (42%). CapitalCommand and CadenceStack have none, so their cards print the sector and the pillars. **Nothing invents a number.**
+3. **ASSET: `public/about/` is empty**, so there is no founder photograph to reveal as the mark completes. The chapter is built so that adding `public/about/founder.webp` is the only change needed.
+4. **Design's playable screen is the BRAND BOARD, not the Northgate site.** The brief asked for palette chips recolouring the site; `ScreenLocalSite` has no colour hook, while `ScreenBrandBoard` re-tints everything downstream of its accent. The real component that recolours is the one used.
+5. **Three new copy lines**: the pillar promises in Ch3. Nothing else is new copy.
+6. **Ch3's heading** is "Sixteen services. Three things they add up to." — new, and the count comes from the data.
+7. **Rail labels are an overlay, not in flow.** In flow the rail was 150px wide and sat on chapter 2's cards.
+8. **`ProofLedger` was deleted, not just its studio row.** It had zero importers once home stopped using it, so leaving it would have left dead code carrying the figures the owner wants gone.
+9. **11px type remains inside the reused /services screens** on mobile (their own `MIN`) and in the global footer. Home's own small type is 13px. Changing `MIN` would change /services, which is out of scope here.
+10. The hero's wrapper is 320vh, not 400: three stages, not four, now the reel has its own chapter.
+
+### My own errors this session, found by probe
+
+1. **The rail shipped 150px wide and sat on top of chapter 2's cards** — I had styled the labels in flow without checking what the rail overlapped.
+2. **The Design panel opened on an empty sheet.** `ScreenBrandBoard` draws itself across `local` 0.08–0.40 and I rested it at 0. Each screen now rests at its own "before" value.
+3. **The window's tilt overshoot** — I set its top from the h1's bottom and measured the collision anyway, because a rotated element's rect is bigger than the element.
+4. **Chapters 4 and 5 both padded a full chapter against the same edge**, leaving 290px of dead cream between the founder's CTA and the closer's eyebrow.
+
+---
+
+**SESSION 23 — the hero rebuilt from real work.** One commit (`1f96a2e`).
+
+Owner verdict on Session 22: **−1/10.** Root cause accepted: the 21b generated-site concept produced template-looking output, and the scroll-fill blew one of those templates up to full screen — greyed, with "SAMPLE" reviews — as the flagship's first impression, into a dead black frame.
+
+### 1 · Removed, zero importers verified
+
+The site generator and its seven presets (`home/sketch/`), the slab text field (`NameField`), the placeholder cycle, the "TYPE YOUR BUSINESS NAME" hint, `SketchWindow`, the scroll-fill/dissolve, and the app-root name context (`lib/businessName.tsx`).
+
+**The `?notes` handoff is untouched and still works** — it is a URL parameter, independent of the context. `/contact`'s brief and `/services`' start pass went back to seeding from `?notes` alone. Nothing else needed the context, so it is gone rather than left as a provider nothing writes to.
+
+### 2 · The field
+
+Sixteen planes in one `preserve-3d` scene at `perspective: 1400px`. **Every one is real:** twelve existing case-study captures through the WebP pipeline, four live /services screen components. No WebGL, no canvas, no generated sites, no stock, no placeholders.
+
+| Plane | Source | Screen x / y / w | z |
+|---|---|---|---|
+| CG Walls & Floors | `cgwalls/hero.jpg` | 82 / 48 / 38 | **+80** |
+| SIFT | `sift/01-command-overview.jpg` | 76 / 90 / 25 | −59 |
+| CapitalCommand | `capitalcommand/01-overview.jpg` | 90 / 13 / 24 | −198 |
+| Marketing websites | `ScreenLocalSite` (live) | 64 / 7 / 15 | −337 |
+| SIFT | `sift/04-pipeline.jpg` | 14 / 95 / 18 | −476 |
+| AI agents | `ScreenAgent` (live) | 89 / 78 / 16 | −615 |
+| CadenceStack | `cadencestack/01-command-center.jpg` | 94 / 34 / 20 | −754 |
+| CG Walls & Floors | `cgwalls/gallery.jpg` | 31 / 96 / 12 | −893 |
+| CapitalCommand | `capitalcommand/03-markets.jpg` | 74 / −3 / 12 | −1032 |
+| CadenceStack | `cadencestack/04-performance-analytics.jpg` | 98 / 49 / 12 | −1171 |
+| Local search | `ScreenMap` (live) | 70 / 95 / 11 | −1310 |
+| SIFT | `sift/08-command-insights.jpg` | 47 / 7 / 10 | −1449 |
+| Brand & design direction | `ScreenBrandBoard` (live) | 4 / 86 / 12 | −1588 |
+| CG Walls & Floors | `cgwalls/gallery2.jpg` | 84 / 97 / 10 | −1727 |
+| CapitalCommand | `capitalcommand/05-signal-desk.jpg` | 80 / 58 / 9 | −1866 |
+| CadenceStack | `cadencestack/08-post-database.jpg` | 63 / 33 / 9 | −2000 |
+
+**THE PLAN IS SCREEN-SPACE.** `translateZ` moves a plane toward the perspective origin and shrinks it, so authoring layout coordinates put far planes in the middle of the frame — six to eight sat on the headline at every width. `HeroField` divides each plane's x/y/w by its own foreshortening `k = 1400 / (1400 − z)`, so `fieldPlan.ts` reads as the composition you actually see.
+
+**The z ladder is EVEN**, +80 down to −2000 at about 139px a rung. Clustered depths left a stretch of the fly-through with nothing at a visible distance and the frame emptied out at 45% of the pin — the exact fault from Session 22.
+
+Motion: each plane drifts 2–5px on its own 18–31s loop; the whole scene breathes ±1.5° over 40s; the cursor steers yaw ±10° and pitch ±7° on `spring.soft`. All of it stops when the hero is out of view or under reduced motion.
+
+Hover or focus pulls a plane forward (`translateZ +120`, `scale 1.04`), dims the siblings to 0.55 and shows its label. **Verified by focus:** SIFT reads "SIFT · 42% ATS-score improvement average after AI resume rewrite", siblings at 0.55/0.51, click lands on `/work/sift`.
+
+### 3 · The slab
+
+`PillHl` gained an `invert` variant — a parch surface with ink text. The dark-on-dark default disappeared entirely on this ground, and the slab is the page's signature. PillHl inventory on home is still 2 (this and Ch5's closer).
+
+### 4 · The headline, measured
+
+The size is bound by the longer line, "Your next customer is", at ~9.8 × the font size inside a safe zone of 55% of the container:
+
+| Viewport | Font | Lead lines | Planes over the copy | CTA bottom |
+|---|---|---|---|---|
+| 1280×720 | 53.3 | 1 | **CLEAR** | 542 |
+| 1366×768 | 56.8 | 1 | **CLEAR** | 571 |
+| 1440×900 | 66.6 | 1 | **CLEAR** | 649 |
+| 1680×1050 | 77.7 | 1 | **CLEAR** | 735 |
+| 1920×1080 | 79.9 | 1 | **CLEAR** | 752 |
+
+### 5 · The fly-through, every 5%
+
+One scroll value pushes the scene +2400px. The copy lifts and goes by 20%; the vignette goes with it; the landing — CG Walls' real hero capture, full bleed — comes up from 40% and is solid by 66%, while the field only starts leaving at 58%. **They overlap by 18 points of the pin, so there is never an empty frame between them.** Traced at every 5% at 1440 and 1920: planes visible 16 → 11 → 3 → 2, landing 0 → 0.19 → 0.58 → 1. **No blank frame and no black frame at any sample.**
+
+**Long tasks over 50ms during a fly-through: 0 at 1440, one 54ms at 1920.**
+
+### 6 · Numbers
+
+| | S22 | S23 |
+|---|---|---|
+| Home initial JS | 94.31 kB gzip | **91.52 kB gzip** (−2.79) |
+| Mobile LCP (alias, standard harness) | 1788 ms | **1772 ms** `[1764, 1772, 1776]` |
+| FCP | 1788 | 1704 ms |
+| CLS (load) | 0.0006 | 0.0026 |
+
+*First frame:* every hero text element at opacity 1 at 1440 and 375, 16 planes present (6 on mobile).
+
+*Crash scroll, three speeds, both directions:*
+
+| | CLS load | CLS total | overflow | longtasks>50 | errors |
+|---|---|---|---|---|---|
+| 1440×900 | 0.0001 | 0.0002 | **0** | none | none |
+| 1920×1080 | 0 | 0.0001 | **0** | 54 ms | none |
+| 375×812 | 0.003 | 0.0032 | **0** | none | none |
+
+*Mobile 375:* six planes, not pinned, zero overflow. *Reduced motion:* not pinned, scene animation `none`, plane animation `none`.
+
+### 7 · Quality gate — honest critique
+
+**At rest, 1440 and 1920.** This clears the bar the previous two attempts did not. The parch slab on near-black is the strongest typographic moment the site has had — ink on warm parch at 67–80px, and it reads as a deliberate inversion rather than a highlighter. The room genuinely reads as a room: CG Walls' site is the lit focal plane with real renovation photography inside it, SIFT's console and the navy agent panel sit at believable distances, and the hairline on every plane means the far ones are screens at depth rather than smudges. The composition is asymmetric with a clear focal hierarchy and the headline column is completely clear. Against Linear it holds on contrast confidence and dark-surface craft; against Vercel it holds on ambient motion.
+
+**Mid-hover.** The pull-forward and the sibling dim work, and the label with the verified figure is the right amount of information. Weaker than the rest: the label is small type below a plane that may be near the frame edge, so it can sit half out of frame on the right-hand planes.
+
+**Fly-through, six frames.** The opening third is the best part — the room rushes and the near planes sweep convincingly. **The middle is too dim.** Between roughly 40% and 60% the frame is legible but sits at perhaps half the brightness it should, so a stretch that ought to be the most cinematic reads as murky. The landing itself is clean and the hand-off to the work chapter has no gap.
+
+**I am calling the mid fly-through short of the bar.** It is not the dead black frame of Session 22 — it is populated and legible at every 5% sample — but "not broken" is not the standard here. It needs a key light on the passing planes and a brightness floor through the middle of the dolly. I ran out of session to fix it properly and would rather report it than claim it.
+
+### 8 · Deviations
+
+1. **The LCP element is `P.hx-kicker`, not the h1.** The brief asked for the h1. All hero text paints in the first frame; the kicker is simply the largest text block by area. LCP 1772 ms, well inside budget.
+2. **The mid fly-through is too dim** — see above. Open.
+3. **Hover labels on right-edge planes can clip.** Open.
+4. **The flat/mobile hero drops the fly-through entirely** rather than shortening it to a scale-through: on a phone the field sits at 0.5 opacity behind centred copy and the page simply scrolls. Reported as a simplification, not a completed sub-feature.
+5. The breathing rotation uses the CSS `rotate` property rather than a transform, so it composes with motion's transform writes instead of fighting them.
+
+### 9 · My own errors this session, found by probe
+
+1. **I authored the field in layout coordinates.** Perspective pulls far planes toward the origin, so six to eight of them rendered on top of the headline at every width. The plan is screen-space now.
+2. **I guessed the type divisor** (4.9) instead of measuring the line, and "is" orphaned onto its own line at 1920.
+3. **I measured the safe zone from element boxes** — the CTA row is a full-width block even with its buttons at the left, so the zone came out as 1341px of a 1440 frame and every overlap test was meaningless.
+4. **The first z distribution was clustered**, which emptied the frame at 45% of the pin — the same class of fault the owner rejected in Session 22, reproduced by me and caught by the 5% trace.
+5. **The slab shipped dark-on-dark** in the first build because I used PillHl's default on a dark ground.
+6. **The far planes had no edge** and read as lens dirt until they got a hairline.
+
+---
+
+**SESSION 23b — the hero's open items closed.** Three commits (`fb0eb76`, `d31936c`, `2fd9aec`).
+
+### 1 · The fly-through is lit
+
+**Measured, not judged.** A 160×100 downsample of every 5% of the pin, mean luminance by the Rec.709 coefficients. That immediately contradicted the Session 23 report of a "murky 40–60% stretch": it was a **single crater at 40%**, luma **23.5** against **51.8** at rest, with the neighbours fine.
+
+And the cause was not darkness. At 40% the planes have scaled toward the eye and swept **outside the frame** — SIFT 6,828px past the right edge, CG Walls 6,666px past the left, CapitalCommand 4,108px above. Nothing was in shot. A brightness fix alone would have done nothing, and the first attempt at one changed the number by zero.
+
+Three changes:
+
+- **A key light per plane.** Each brightens as it comes toward the camera — a parch rim on its chrome, a sheen across the glass, opacity toward 1 — computed from its own z plus the dolly's push, so the room is lit by whatever is passing. The 0.62 floor applies **only while the camera is moving**, so the at-rest composition keeps its depth falloff.
+- **A cull at the eye.** A plane that reaches the camera magnifies one pixel across the whole frame. Each now fades over its last 320px instead of smearing.
+- **The landing rises early** (28% rather than 40%) and the field leaves later (46% rather than 58%), so the destination comes up to meet the camera through exactly the window the room cannot carry. The vignette is fully released by 20%.
+
+| % of pin | 1440 before | 1440 after | 1920 after |
+|---|---|---|---|
+| at rest | 51.8 | 51.8 | 52.3 |
+| 25 | 54.8 | 55.9 | 59.1 |
+| 35 | 47.3 | 90.3 | 90.1 |
+| **40** | **23.5** | **111.3** | **110.0** |
+| 45 | 58.5 | 148.7 | 147.0 |
+| 50 | 92.6 | 186.2 | 184.2 |
+| 55 | 125.5 | 201.0 | 201.2 |
+| 60 | 158.6 | 199.1 | 203.6 |
+
+**Darkest frame at 1440 is now 0% — the at-rest frame itself. At 1920, likewise 0%. No frame at either width falls below the at-rest mean.**
+
+**Honest critique of the five frames.** *40%* is the one that was broken and is now the best argument for the whole idea: the CG Walls site arrives readable — headline, body, both buttons, the trust row — with CadenceStack passing over it and CapitalCommand entering from the right. It reads as a camera landing on a project. *45% and 50%* are the strongest: the destination is nearly resolved while a plane still crosses the top, which is the Awwwards-grade beat the sequence needed. *55% and 60%* are clean but quiet — the room has gone and it is simply the capture settling, which is correct but is the least interesting part of the pin. The one weakness across 40–50% is that crossfading two full-frame layers leaves the CG site's blacks grey rather than black; it resolves by 55%. Against Linear and Vercel this now holds: lit, legible, and never a dead frame.
+
+### 2 · One hover label, clamped
+
+Flipping the label's side by measurement was not enough: `right: 0` inside a plane whose own right edge is past the viewport is still past the viewport, and a pixel nudge inside a 3D-transformed parent is itself transformed. **Six of sixteen still clipped at 1280 and two at 1920.**
+
+The field renders **one** label instead, outside the 3D scene, positioned from the hovered plane's measured rect and clamped to the frame.
+
+**Verified on every plane:** 1280×720 — 16 planes, 16 labels shown, **none clipped**. 1920×1080 — same.
+
+*(A probe error of mine along the way: I measured the label in the same `evaluate` as the `focus()` that triggered it, so I was reading the rect before React had re-rendered and six labels looked broken that were not.)*
+
+### 3 · The phone gets its scale-through
+
+The mobile hero pinned nothing and scrolled away. It now runs the shorter sequence as specced: six planes, a **1250px** push rather than 2400, no cursor camera, landing on the same CG Walls capture and handing into the work strip. A 240vh wrapper rather than 360.
+
+*Sampled every 10% at 375×812:*
+
+| % | 0 | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| planes in frame | 6 | 6 | 6 | 6 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| landing | 0 | 0 | 0 | .08 | .50 | .92 | 1 | 1 | 1 | 1 | 1 |
+| luma | 34.0 | 33.1 | 35.5 | 44.5 | 53.6 | 48.7 | 53.6 | 58.2 | 59.4 | 61.0 | 60.9 |
+
+**No blank frame.** The darkest is 10% at 33.1 against 34.0 at rest — 0.9 below, the copy leaving. The 20% crater the first mobile build had is gone now the landing starts at 14%.
+
+**Zero horizontal overflow at 375.** The plane chrome labels were **9px** on a phone; they are decorative and cannot carry 13px on a plane that size, so they are hidden rather than shipped under the floor. What remains at 11–12px is inside the live /services screen components the planes render — their own `MIN`, shared with /services — exactly as recorded in Session 22.
+
+### 4 · The 54ms long task
+
+**Identified, and it is not the fly-through.** It is a single 55ms task at **startTime 191ms** — the app's initial render. My Session 23 probe used a `buffered: true` observer and attributed a load-time task to the scroll sequence it happened to be watching. **A fly-through at 1920, sampled at every 5%, produces no long task at all.**
+
+It is ours, but reducing it means splitting the hero out of the entry chunk, which would cost the thing it is paying for — the hero is the LCP surface. Left alone, and recorded.
+
+### 5 · Numbers
+
+| | S23 | S23b |
+|---|---|---|
+| Home initial JS | 91.52 kB gzip | **91.89 kB gzip** (+0.37) |
+| Mobile LCP (alias, standard harness) | 1772 ms | **1724 ms** `[1736, 1724, 1724]` |
+| FCP | 1704 | 1724 ms |
+| CLS (load) | 0.0026 | 0.0069 |
+| Long tasks during a fly-through | 54 ms (misattributed) | **none** |
+
+### 6 · Deviations
+
+1. **The 40–50% frames are slightly washed** — two full-frame layers crossfading means the CG site's blacks are grey until ~55%. Inherent to the crossfade; not worth a compositing rewrite.
+2. **CLS rose from 0.0026 to 0.0069** when the phone started pinning. Still a twentieth of the budget.
+3. **11–12px text remains inside the reused /services screens** on mobile. Home's own text is ≥13px.
+4. The LCP element is still `P.hx-kicker` rather than the h1 — carried over from Session 23, all hero text paints in frame one.
+
+### 7 · My own errors this session
+
+1. **I reported "the 40–60% stretch is murky" in Session 23 from looking at it.** It was one frame at 40%, and the three either side were fine. A luminance sample at every 5% found that in one run.
+2. **I built the key light before diagnosing**, and it moved the number by exactly zero, because the frame was empty rather than dark.
+3. **I misattributed the 54ms long task** to the fly-through in Session 23; a buffered PerformanceObserver reports tasks from before you started watching.
+4. **I measured hover labels in the same `evaluate` as the focus that triggered them**, before React had re-rendered.
+
+---
+
+**SESSION 24a — chapters 1–3 of the complete film.** Four commits (`592dab6` … `547cfca`).
+
+Owner verdict on 23b: hero **5–6/10**, right direction. **Split reported and taken:** the brief's three new builds (the template wall, three image-in-type acts, the closer rework) are well past 2000 lines together, so this session is **24a = Ch1–3** and **24b = Ch4–6 + the rail's remaining work**.
+
+### Ch1 · The fly-through lands on CapitalCommand
+
+`LANDING` is now `/work/capitalcommand/01-overview.jpg`. It **occludes** rather than crossfades: a `clip-path` wipe opens from the CapitalCommand plane's own corner of the frame over a layer that is opaque throughout. Two full-frame layers blending was what left the blacks grey.
+
+**The wipe did not work at first, and the failure was invisible.** Handed to motion as a scroll-linked `clipPath` it read `inset(8% 2% 78% 74%)` at the **end** of the pin — clip-path is accelerated onto a ViewTimeline exactly as opacity is, and inside a sticky frame that timeline never advances. `lib/useScrollStyle.ts` has a sibling now, **`useScrollProp`**, and the wipe is written straight to the node.
+
+**On the luminance rule.** Session 23b's "no frame below the at-rest mean" **cannot hold against a dark landing** and should not be applied literally here:
+
+| | mean luminance |
+|---|---|
+| The room at rest | 52.9 |
+| CG Walls' capture (the old landing) | 224.4 |
+| **CapitalCommand's capture (the new one)** | **38.6** |
+| The landed frame as rendered | **35.3** |
+
+The landed frame matches the capture's own luminance, so it is at full brightness and nothing is dimming it. The test that means something is that, plus no empty frame. Traced at every 5%, the sweep into the landing is **monotonic** — 53.3 → 38.4 → 36.3 → 37.4 — with no dip below the destination's own level. The 40% crater that 23b fixed has not returned.
+
+### Ch2 · "You've seen this website before."
+
+A wall of **fourteen identical template sites** fills the frame. One scroll value pulls a single card out of the grid, pushes the rest back to a ghost at 0.12, and **wipes a real CG Walls & Floors capture over the skeleton it was**.
+
+**THE COPY IS RESTORED, NOT REWRITTEN.** The three beats are verbatim from **`src/data/homeScenes.ts`**, which survived the Session 22 removal of `ThreeScenes.tsx` (deleted in **`b8dd1bc`**) — the component went, the copy did not, so no git archaeology was needed:
+
+| Beat | Line | Accent |
+|---|---|---|
+| The Studio | "We started because most agency work **looks the same.**" | Cormorant |
+| The Approach | "So we built one that starts from the **client's world.**" | Cormorant |
+| The Result | "Sites that earn their portfolio slot. **Yours and ours.**" | Cormorant |
+
+All three bodies intact. Only the chapter's own h2 is new.
+
+*Traced at every 5%:* grid 1 → 0.72 → 0.12, chosen card 0 → 0.58 → 1, wipe `inset(0 100% 0 0)` → `inset(0 22% 0 0)` → `inset(0)`, beats 1/0/0 → 0/1/0 → 0/0/1 — **never two at once**.
+
+**Three faults the frames caught.** In a three-row grid the wall was squeezed to half the frame with its second row cut off and the body copy clipped — the head and the copy overlay the wall now, with a scrim. The skeletons were hollow through the middle, which reads as an unfinished wireframe rather than a generic site — they have a content band now. And `Screenshot` sets `height: auto` **inline**, which beat the stylesheet and letterboxed the capture inside its card; verified filling at 1440 (812×508) and 1920 (1083×677).
+
+### Ch3 · The vault teaser
+
+The strip's end card gained two cream panels that part on hover or focus with a hairline of parch opening between them — **a hint of /work's doors, not the mechanic**, which stays on /work. Measured −19.4px / +19.4px with the gap scaling 0 → 1. Links to `/work`.
+
+### The rail
+
+Six chapters: Your customer · Seen it before · The work · How we do it · Who you'll work with · Your move. It fell back to the **first** chapter at the bottom of the page — past the last section's midpoint nothing contains it and the default was index 0, so it jumped to "Your customer" at 97%. It falls back to the last chapter passed. *Verified:* 10% Your customer · 30% Seen it before · 50% The work · 70% How we do it · 88% Who you'll work with · 97% Your move.
+
+### Numbers
+
+| | 23b | 24a |
+|---|---|---|
+| Home initial JS | 91.89 kB gzip | **92.16 kB gzip** (+0.27) |
+| Mobile LCP (alias) | 1724 ms | **1948 ms** `[1760, 2044, 1948]` |
+| CLS (load) | 0.0069 | 0.0069 |
+
+*Crash scroll, three speeds, both directions:*
+
+| | CLS load/total | overflow | longest task | errors |
+|---|---|---|---|---|
+| 1440×900 | 0.0001 / 0.0002 | **0** | 55 ms | none |
+| 1920×1080 | 0 / 0.0001 | **0** | 55 ms | none |
+| 375×812 | 0.0078 / 0.008 | **0** | 53 ms | none |
+
+The 53–55ms task is the initial render at ~191ms, identified in 23b — not any scroll sequence.
+
+*Reduced motion:* the hero does not pin and the wall renders its still state — the real capture plus all three beats stated plainly.
+
+### Quality gate — honest critique
+
+**Ch1's landing** is the right call. CapitalCommand is the strongest capture in the set and it keeps the hero on its own dark ground instead of handing a cream page to a cream chapter. The wipe opening from the plane's own corner reads as the camera arriving rather than as a dissolve. It is darker than what came before, and that is the subject, not a fault.
+
+**Ch2 is the best new thing on the site.** The opening frame — fourteen identical templates under "You've seen this website before.", with "most agency work *looks the same*" in Cormorant below — makes the argument before a word of body copy is read. The payoff frame, where the real CG Walls site stands large and sharp with the ghost wall still legible behind it, is the clearest statement of the studio's position home has ever made. Against Linear and Awwwards SOTD this holds: it is an idea staged, not a layout filled.
+
+**Ch3** is unchanged from 23 apart from the teaser, and the teaser is restrained in the right way — two panels and a hairline, not a door mechanic competing with /work's.
+
+**Where it is still short.** The transition *between* Ch1's dark landing and Ch2's cream wall is a `Chapter` clip wipe doing ordinary work; it is clean but it is the least composed moment in the three. And Ch2's chosen card is upscaled during its growth, so there is a stretch where the real capture is soft before it settles sharp.
+
+### Deviations
+
+1. **Split into 24a/24b**, as the brief allows and instructs. Ch4 (the three image-in-type acts), Ch5 and Ch6 are not in this session; `ServicePanels` is still mounted and still copies the /services screens — **the owner's second complaint is not yet addressed** and is the first thing 24b does.
+2. **The luminance rule is reinterpreted** for a dark landing — see Ch1.
+3. The chapter line over the landed frame is **none**, as instructed.
+4. 11–12px text remains inside the reused /services screens in the hero field on mobile; home's own text is ≥13px.
+
+### My own errors this session
+
+1. **I shipped the landing wipe without checking it had opened.** It read its start value at the end of the pin for a whole build, and the only reason I caught it was measuring the computed `clipPath` rather than trusting the screenshot's darkness.
+2. **I applied 23b's luminance rule mechanically** to a landing that is deliberately dark, and flagged twelve frames as faults before working out the rule's own premise had changed.
+3. **I built Ch2 as a three-row grid**, which left the wall at half height with its second row cut off and the copy clipped — visible in the first frame I captured.
+
+---
+
+**SESSION 24b — chapters 4–6, the journey layer, and 24a's carry-overs.** Four commits (`0c50d81` … `f918e18`).
+
+### The carry-overs
+
+**(a) The Ch1→Ch2 hand-over is composed.** The landed CapitalCommand frame pulls back through the pin's tail — **1445×800 full bleed → 1037×574 inset**, dark closing to 0.38 over it — so the cream slab rises over a frame that is already leaving rather than cutting from a static one. The wall then **assembles card by card**: each of the fourteen owns a slice of the chapter's own scroll value offset by its index, so the stagger is the reader's scroll and not a timer.
+
+*Traced every 5% across the seam at 1440 and 1920:* luma 35.7 → 21.1 (the recede) → 43.6 → 228 (cream); cards 0 → 5 → 14. **No blank frame.**
+
+**(b) Ch2's breakout card is sharp.** A `sizes` matching the card's **layout** width made the browser pick a 640w rung and then blow it up 2.35×. Pinned near the viewport it picks **`hero-1400.webp`** and renders at **0.58× of natural** at both the 50% and 80% frames — downscaled throughout the scale, never up.
+
+### Ch4 · "Here's how we do it."
+
+**`ServicePanels` is deleted.** It mounted the build stage's own screens on the home page, which is the one thing the page rules forbid. Its chunk (2.02 kB gzip) is replaced by **`ServiceActs` at 1.79 kB**.
+
+Three acts, each a giant word with the studio's real captures showing **through** the letterforms, panned by the same scroll value that slides the acts. Under each, that pillar's services as a ruled list; hover or focus shifts the line, draws an arrow and shows a real proof thumbnail where the data has proof.
+
+*Fills, per the brief:*
+
+| Act | Captures in the type |
+|---|---|
+| DESIGN | `cgwalls/hero-1400.webp` + `sift/01-command-overview-1680.webp` |
+| AUTOMATE | `capitalcommand/01-overview-1680.webp` + `cadencestack/01-command-center-1680.webp` |
+| GROW | `cgwalls/gallery2-1400.webp` + `cadencestack/04-performance-analytics-1680.webp` |
+
+*All sixteen lines, verified:*
+
+| Act | Services | Beat links | Proof thumbs |
+|---|---|---|---|
+| Design | 5 | 5/5 correct | 4 |
+| Automate | 5 | 5/5 correct | 2 |
+| Grow | 6 | 6/6 correct | 3 |
+
+**16/16 land on their own `/services#{service-slug}` beat**, and a proof thumbnail appears on exactly the **9** services whose `proof` array is non-empty — never invented.
+
+**The first build FAILED the gate.** Three of the six captures are dark dashboards, and a dark image inside dark letterforms on a dark ground is a smudge — you could not tell there was a picture in AUTOMATE at all. A parch wash at 0.56 lifts every fill into legibility with the image's own texture still reading, and a 1px parch stroke keeps the letterform's edge where the capture behind it goes dark.
+
+**Chunk savings, honestly:** `ServicePanels` is gone, but `BuildScreens` (9.87), `GrowScreens` (18.19) and `AutomateScreens` (9.06 kB gzip) are **still built** — because **Ch1's field mounts four of them as live planes**, which is the hero the owner accepted at 5–6/10 in 23b. So "home no longer imports the /services screen components" is **half true**: chapter 4 no longer does, chapter 1 still does. Taking them out of the hero as well would remove **37.1 kB gzip** of lazy chunks from home's path, and is a design call rather than a cleanup.
+
+### Ch5 · "Here's who you'll work with."
+
+The chapter line added and the rhythm tightened — padding, the gap under the h2, the credit spacing — so the mark, the claim and the credits read as one scene rather than three stacked blocks.
+
+### Ch6 · "Your move."
+
+The chapter line added, the slab headline split into its two halves, and the closer moved onto **the hero's own dark ground** rather than cream, so the film ends where it began. PillHl inventory on home is still **2**.
+
+### The journey layer
+
+Six chapters, all reached. *Rail tracking, sampled every 5% down the whole page:* Your customer (0–15%) · Seen it before (20–40%) · The work (45–60%) · How we do it (65–85%) · Who you'll work with (90%) · Your move (95–100%).
+
+**Frames with almost nothing painted, across the entire page at every 5%: NONE.**
+
+`Chapter` clip transitions now sit at every cream↔dark boundary: dark→cream into Ch2, dark→cream into Ch5, cream→dark into Ch6.
+
+### Numbers
+
+| | 24a | 24b |
+|---|---|---|
+| Home initial JS | 92.16 kB gzip | **92.15 kB gzip** (−0.01) |
+| Mobile LCP (alias) | 1948 ms | **1732 ms** `[1732, 1764, 1716]` |
+| CLS (load) | 0.0069 | 0.0069 |
+
+*Crash scroll, three speeds, both directions:*
+
+| | CLS load/total | overflow | longest task | errors |
+|---|---|---|---|---|
+| 1440×900 | 0.0001 / 0.0002 | **0** | none > 50ms | none |
+| 1920×1080 | 0 / 0.0001 | **0** | 55, 93 ms | none |
+| 375×812 | 0.0078 / 0.008 | **0** | 57 ms | none |
+
+*Reduced motion:* the hero does not pin, the wall renders its still state, the acts render stacked with static fills.
+
+### Does home read as one cinematic film that reaches every page?
+
+**Yes.** You arrive in a dark room of the studio's actual work, fly through it and land on a client's dashboard; the cream rises and a wall of identical templates assembles, one breaks out and becomes real work while the studio's oldest argument plays across it; the strip pans the vault past you and its end card teases /work's doors; three giant words carry the work inside their letterforms and every one of the sixteen services is a door into /services; the founder's mark draws under your own scroll into /about; and it closes on the hero's ground with two ways into /contact. Every destination is reached, and no chapter borrows another page's mechanic.
+
+**Where it is still short.** The image-in-type fills are desaturated — the parch wash buys legibility on a dark ground and costs the captures' colour. Ch5 remains the quietest chapter; tightening the spacing helped but it is still the one moment that is a layout rather than a scene. And the Ch2→Ch3 and Ch3→Ch4 boundaries are hard cuts between two dark chapters, which is correct but unremarkable next to the Ch1→Ch2 move.
+
+### Deviations
+
+1. **The /services screen chunks remain on home** via Ch1's field — see above. Ch4 imports none.
+2. **Sub-44px tap targets remain on mobile**, and they are the **global nav** ("Averr" 27px, "Work" 22px) and **MagneticCTA's text variant** (27px) — shared with every page, so a site-wide decision rather than a home one. Home's own chapter controls all meet 44px.
+3. **11–12px text remains inside the reused /services screens** in the hero field on mobile.
+4. Ch6 moved from cream to dark, which the spec implies ("dark") and the 24a build had not done.
+5. The LCP element is still `P.hx-kicker` rather than the h1.
+
+### My own errors this session
+
+1. **I shipped the image-in-type acts without checking the fill was visible.** Three of six captures are dark dashboards; AUTOMATE read as an empty grey word until I looked at the frame.
+2. **I wrote a CSS rule for the mobile tap targets that matched nothing** and only found out by re-measuring — the links were `MagneticCTA`'s, not home's own.
+3. **The first Ch1→Ch2 recede finished before the cream arrived**, so the composed move the brief asked for was two separate moves; the dark band above the slab was empty in the frame I captured.
+
+---
+
+**SESSION 24b RULING — the hero field is all real client work.** One commit (`b0af4ee`).
+
+Owner ruling on 24b: replace the four live /services screen planes with real case-study captures; home must no longer import any /services screen component.
+
+### The swap
+
+| Was | Is now |
+|---|---|
+| `ScreenLocalSite` | `cgwalls/testimonials.jpg` |
+| `ScreenAgent` | `capitalcommand/04-ipo-intelligence.jpg` |
+| `ScreenMap` | `sift/02-tailor-resume.jpg` |
+| `ScreenBrandBoard` | `cadencestack/02-content-pillars.jpg` |
+
+One more from each project, none of them already in the field, all through the existing WebP pipeline. `Plane` no longer has a `screen` branch at all, and `HeroField`'s lazy imports, `Suspense`, live-mount gate and micro-motion loop went with it.
+
+### The chunks
+
+**No home module imports from `services/build`** — verified by grep and by watching the network: loading home and moving the pointer requests **no screen chunk at all**.
+
+With only /services left as a consumer, Vite folds the three into the already-lazy `ServicesBuild` chunk:
+
+| | before | after |
+|---|---|---|
+| BuildScreens | 9.87 kB gzip | — |
+| GrowScreens | 18.19 | — |
+| AutomateScreens | 9.06 | — |
+| ServicesBuild | 5.90 | **40.83** |
+| **Home entry** | 92.15 | **91.39 kB gzip** |
+
+The **37.12 kB gzip** is off home's graph. /services carries exactly what it did, inside a chunk it already loaded lazily.
+
+### Re-verified
+
+- **Safe zone CLEAR** at 1280×720, 1440×900, 1680×1050, 1920×1080 — 16 planes, none over the copy.
+- **Hover labels: 16/16 shown at 1280 and 1920, none clipped**, and only the two verified figures appear (CG Walls 85%, SIFT 42%).
+- **Fly-through, every 5%:** unchanged in shape — monotonic into the CapitalCommand landing (53.1 → 38.6 → 36.3 → ~36), then 28.8 → 24.1 across the deliberate recede into Ch2. No empty frame, no crater.
+- **Crash scroll:** CLS 0.0002 / 0.0001 / 0.008 at 1440 / 1920 / 375, **zero overflow**, no errors.
+- **Mobile LCP (standard harness): 1824 ms** `[1824, 1984, 1760]`, CLS 0.0069.
+
+### A latent bug the swap exposed
+
+Taking the `live` state out of `HeroField` changed its render cadence and broke the hover label: **only the first plane in the field showed one.** The cause was older than this session — `setTip(null)` was called from **inside a `setHover` updater**, so the leaving plane's blur raced the arriving plane's focus and wiped the label that had just been set. The owning plane is a ref now and the clear happens outside the updater.
+
+### Quality gate — the at-rest frame
+
+Substantively better. Where the live screens sat — a quote form, an agent console, a brand board — there are now actual client captures, so the room reads as a **portfolio** rather than a demo rig, and nothing on home is borrowed from another page. The parch slab remains the strongest typographic moment on the site.
+
+The cost is chromatic. Those three screens carried the only green, navy and copper accents in the field; with all-real captures, most of which are dark dashboards, the room is more uniformly grey and the CG Walls plane carries nearly all the warmth. The top-left quadrant and the lower-left are darker than before. **That is the right trade — integrity over variety for a portfolio — but it is a real loss and worth knowing before the next pass.**
+
+### Deviations
+
+1. The field is **more monotone** than with the live screens — see above.
+2. 11–12px text inside the /services screens is **gone from home**, since the screens are gone. Home's own small type is ≥13px.
+
+---
+
+**SESSION 25a — one colour flow, and the first three service chapters.** Two commits (`0bee86f`, `83cc51a`).
+
+**Split reported and taken**, as the brief allows: **25a = the colour flow + Ch1–4**, **25b = Ch5–8 + the rail's remaining work**.
+
+### 0 · THE SITE STANDARD (owner instruction)
+
+**The LOCKED palette rule is UPDATED.** Cream grounds are retired site-wide. The palette is now:
+
+> **the dark ink ground + chapter LIGHT + parch type.**
+
+Home is the pilot; the other pages migrate in later sessions. There are no cream chapter grounds and no clip-path slab switching between two grounds anywhere on home.
+
+**The light tokens**, all over `#141412`, all at or under the 0.35 cap:
+
+| Chapter | Colour | Peak α | Position | Parch (#EDE9E2) on the lit ground |
+|---|---|---|---|---|
+| What we build | `255,255,255` | 0.10 | 62% / 46% | 14.1:1 |
+| Websites | `200,118,60` copper | 0.30 | 72% / 42% | 12.4:1 |
+| Products | `61,107,255` blue | 0.26 | 30% / 52% | 13.1:1 |
+| Automation | `123,92,255` violet | 0.28 | 68% / 50% | 12.9:1 |
+| Marketing | `212,168,75` gold | 0.30 | 34% / 46% | 12.2:1 |
+| The work | `255,255,255` | 0.12 | 50% / 44% | 13.9:1 |
+| Who builds it | `237,233,226` parch-warm | 0.16 | 36% / 50% | 13.5:1 |
+| Your move | `226,160,96` dawn | 0.26 | 50% / 76% | 12.6:1 |
+
+Every lit ground keeps parch type above 12:1 — far past AA. The contrast figures are computed against the lit ground at peak alpha, which is the worst case.
+
+**It interpolates rather than cutting.** One fixed layer, rAF-throttled, writing its gradient straight to the node. Measured flowing down the page:
+
+| Scroll | Light | Chapter |
+|---|---|---|
+| 2% | `rgb(255,255,255)` α 0.10 | What we build |
+| 16% | `rgb(207,135,84)` α 0.275 | What we build |
+| 26% | `rgb(161,115,114)` α 0.29 | Websites |
+| 36% | `rgb(61,107,255)` α 0.26 | Products |
+| 46% | `rgb(100,98,255)` α 0.27 | Products |
+| 58% | `rgb(123,92,255)` α 0.28 | Automation |
+| 72% | `rgb(255,255,255)` α 0.12 | The work |
+
+The blends at 26% and 46% are the point: a chapter's colour arrives a third of the way through its predecessor and leaves after it.
+
+### Ch1 · the hero
+
+New copy — **"We build the websites, software and AI / your business / [runs on.]"** — with the subline and a second CTA that scrolls to chapter 2 rather than navigating. The accessible name is the plain sentence. The fly-through no longer parks on the CapitalCommand capture: the camera passes **through** it as the copper light blooms.
+
+### Ch2–Ch4 · the service chapters
+
+One template, three instances. Each: a 3D object that leans toward the cursor and assembles with scroll, the giant word with real captures moving inside its letterforms, a line to the reader, the chapter's services as a ruled list into `/services#{slug}`, and a proof link.
+
+| | Word | Object | Services |
+|---|---|---|---|
+| Ch2 Websites | WEBSITES | a fan of four real CG Walls website captures | Brand & design direction · Marketing websites · Landing pages · Post-launch refinement |
+| Ch3 Products | PRODUCTS | one real CapitalCommand capture exploded into five masked z-layers | Product & SaaS interfaces · Design systems |
+| Ch4 Automation | AUTOMATE | a 40-node Fibonacci sphere in CSS 3D, pulsing | the five Automate services |
+
+### Numbers
+
+Measured on a real home load, **total JS transferred**:
+
+| | before | after |
+|---|---|---|
+| Home | 144.42 kB | **146.53 kB** (+2.11, budget +4) |
+
+**A bundle finding worth keeping.** Restructuring home made Rollup re-partition and move React **into** the entry chunk, which read as a 14 kB regression and was not one — total transferred barely moved. The entry-chunk figure previous sessions tracked is not comparable across a re-partition. The split is explicit in `vite.config.ts` now so it stops moving when a page is rearranged, and **total transferred on a real load is the metric from here**.
+
+*Alias, standard harness:* **LCP 1752 ms** `[1732, 1848, 1752]`, FCP 1752, TTFB 96, CLS 0.0189.
+
+*Crash scroll:* 1440 CLS 0/0, overflow 0, no errors. 375 CLS 0.0101, overflow 0, no errors. **No blank frames at either width.** Longest task 57–65 ms (the initial render identified in 23b).
+
+*No visible cream ground on home*, swept every 400px. The only light-backgrounded element left is `RouteWipe`'s always-mounted transition panel — parch by design, clipped to `inset(100%)`, invisible, and shared by every route.
+
+### Quality gate
+
+**Ch3 failed the gate on its first build and was rebuilt.** The final S of PRODUCTS was cut off by the frame — the per-character estimate behind the word's size was low — and the objects were small enough to leave the bottom third of every chapter empty. The word is measured at 5.3em with headroom and fits at 1440 (right edge 1325 of 1440) and 1920 (1616 of 1920); the objects are half again as large.
+
+The three chapters read as one family without reading as one template: the fan, the exploded view and the orb are genuinely different objects, and the colour carries the difference further. Against Linear and Vercel the dark-plus-parch typographic confidence holds. **The weakest part is that the chapter light is subtle at 1440** — at 0.26–0.30 over near-black it reads more as a mood than as colour, and a reader may not consciously register the flow the measurements show.
+
+### Deviations
+
+1. **Service mapping contradiction in the brief, resolved.** Ch2 explicitly lists "Landing pages" (a Grow service) while Ch5 says "the 6 Grow services" — both cannot hold with each service appearing exactly once. I followed the explicit Ch2 list; **Ch5 gets the remaining five Grow services** (Local search, Outreach campaigns, Paid ads, Content, Reporting). Total across Ch2–Ch5: 4 + 2 + 5 + 5 = 16, each once.
+2. **ASSET RULE stop, reported.** Ch2's object asks for "CG Walls + SIFT's marketing pages". **SIFT has no marketing-page captures** — all eight are product dashboards. The stack is the four real CG Walls website captures, which are the only marketing-site captures in the repository.
+3. `TemplateWall` and `ServiceActs` are **deleted**, superseded by this structure. `WorkStrip` survives until Ch6 replaces it in 25b.
+4. **Ch7 and Ch8 are transparent but not yet restyled** — they lost their cream grounds so the flow is unbroken, but their Session 25 treatment is 25b's.
+5. CLS rose to 0.0189 on the alias (from 0.0069) with the new chapters; a fifth of the budget.
+
+### My own errors this session
+
+1. **I read a 14 kB bundle jump as a regression in my own code.** It was Rollup re-partitioning; the real delta was +2.11 kB, and I only found that by measuring a stashed build the same way.
+2. **I sized the giant word from a guessed per-character width** and shipped a frame with the last letter cut off.
+3. **I created `chapterLight.ts` next to `ChapterLight.tsx`**, which collides on a case-insensitive filesystem — the same mistake as `heroField`/`HeroField` in Session 23.
+4. **My "no cream" sweep reported a false positive** I had to trace by hand: an invisible, clipped, site-wide transition panel.
+
+---
+
+---
+
+**SESSION 25b — Ch5–Ch8, the rail, and the light that was never on.** Five commits (`87c70b7`, `81eb118`, `11339a8`, `7c87f35`, `0f672cd`).
+
+### The ruling: the colour had to become visible — and it was not visible at all
+
+The brief raised the glow cap to ~0.5, added a ≤0.3 horizon wash, and tinted the word's edge and the active rail label. Those landed. Then the frames still read as near-black, so I sampled the pixel at the glow's own centre instead of trusting the screenshot:
+
+| | at the glow centre, before | after |
+|---|---|---|
+| ch-ai | rgb(20,20,18) | **rgb(78,62,113)** |
+| ch-marketing | rgb(20,20,18) | **rgb(85,74,49)** |
+| ch-founder | rgb(20,20,18) | **rgb(57,54,49)** |
+
+Every chapter sampled the bare ground. **`.home-dark` painted an opaque background over the fixed light layer**, so the chapter light has been invisible since it was built in 25a — what warmth showed in 25a's frames was each 3D object's own `box-shadow`. The ground moved to the wrapper, `.clight` sits on it at `z-index: 0`, content goes to `z-index: 1`.
+
+The lesson generalises: *a scroll-linked value can be correct and still never reach the screen.* 24a had the same shape (a `clipPath` that read its start value at the end of a pin). **Sample the pixel, not the stylesheet.**
+
+### Three colours that never flipped when their chapters stopped being cream
+
+A sweep of every text-owning element in all eight chapters, each against the ground actually behind it, found:
+
+1. **Ch7's CTA — "Meet the person who builds it" — at 1.00:1.** Ink on the dark ground: present in the DOM, invisible on screen, for a whole session. `MagneticCTA` takes `tone="dark"`; Hero passed it, `FounderChapter` did not.
+2. **`.st` and `.fc-wrap` still handed down `--color-ink`.** 25a overrode each *named* element to parch and missed everything that inherits.
+3. **The hero clock at 3.23:1, 13px.** `TorontoClock` paints `--color-muted` — a cream-ground token — **inline**, so no stylesheet rule could reach it. Only its own `style` prop can.
+
+The sweep now passes with **every visible text element on home ≥ 4.5:1**, nothing excluded but `sr-only`.
+
+### Contrast on the brightest lit pixel behind text
+
+Sampled with the text hidden, so the reading is ground and not an anti-aliased glyph edge:
+
+| chapter | brightest lit pixel behind text | parch contrast |
+|---|---|---|
+| ch-websites | rgb(35,30,27) | 13.63:1 |
+| ch-products | rgb(25,28,39) | 14.03:1 |
+| ch-ai | rgb(32,29,38) | 13.72:1 |
+| ch-marketing | rgb(43,40,29) | 12.19:1 |
+| ch-work | rgb(57,57,55) | 9.57:1 |
+| ch-start | rgb(98,74,47) | 6.83:1 |
+
+All clear the 4.5:1 minimum. **ch-start is 6.83:1, just under the 7:1 body target** — the dawn horizon is the brightest ground on the page and the figure is honest; it is a kicker and a note that sit there, not running body copy.
+
+### The giant words
+
+Measured on the rendered frames, not judged:
+
+- **PRODUCTS and AUTOMATE overran the ruled column by 45–61px** at 1440 and 1920 — the last letter sat outside the chapter's own measure and read as a broken effect. The per-character advance had been tuned on WEBSITES. 0.72em is the measured figure for the widest words, and the vh cap came down to 14vh because at 1920 the *cap*, not the formula, was what let the word overrun. Every word now sits inside the column at 1280, 1440 and 1920.
+- **One parch wash for four captures left PRODUCTS dull**: 13% of its glyph pixels under the legibility floor, median 145 against 226–240 for its siblings. The wash is per chapter now (`lift` on the spec); Products takes 0.80 → 6% and median 178. Its capture was illegible texture at any wash, so nothing was lost.
+- GROW is 403px of glyphs against AUTOMATE's 690px because it is a four-letter word at the same size. **That is left alone** — tracking it out to match would read as a spaced label, not a slab.
+
+### Ch5–Ch8 and the rail
+
+- **Ch5 Marketing** — gold: concentric rings on a tilted plane with five pins rising out of it, GROW, the five remaining Grow services.
+- **Ch6 The work wall** — every `/work/` capture in `SCREENSHOTS`, a 3D-tilted drifting wall, hover pulls a tile forward and dims its siblings. "This is the work." / "Open the vault →" to `/work`. `TemplateWall` and `WorkStrip` are **deleted**.
+- **Ch7 Who builds it** — the parch monogram with its warm glow on the dark ground, the claim, three credits, the CTA (now visible).
+- **Ch8 Your move** — the dawn horizon, the path cards, and the "runs on." slab. It had been built with `PillHl invert`, a dark pill on a dark ground that read as a stray rounded box; it matches the hero's parch slab now, so the bookend reads as the same object returning.
+- **The rail** tracks all eight chapters and the active label carries the chapter's light: terracotta → blue → violet → gold → white → warm parch → dawn.
+
+### The flow had a cream slab at the end of it
+
+The 5% trace found home's last frame at **mean luminance 204.6** against the page's own 29–71: the global footer is a full-viewport cream ground, and it was the one cream ground left on home. The footer now takes the tone of the page it closes, through the `usePageEndTone` mechanism that already existed for its reveal, and `Home` declares `"dark"`. Home's last frame measures **68**, and all 19 footer text elements pass ≥ 4.5:1.
+
+**Named side effect:** `/services` and `/about` already declared a dark end tone, so **their footers turn dark too**. Both close on a dark band, so the footer continues their own ground rather than cutting to cream — but it is a visible change to two pages outside home, and the owner should rule on it. `/work` and the other cream routes are untouched.
+
+### No dead frames
+
+Traced at every 5% of a 19,682px page: mean luminance 29.1–204.6, and **5–14 visible text elements in every single sample**. No empty frame anywhere.
+
+### The CLS regression, and how it was found
+
+Crash scroll put mobile CLS at **0.4363** against a 0.1 budget. Home's chapters pin for 320vh on a desktop and stand at about 100vh on a phone, and the reserve held the desktop figure at every width — each chunk mounting **collapsed the page by ~1,843px under the reader**.
+
+There are **two** reserves per chapter — `LazyBelowFold`'s placeholder and the `Suspense` fallback behind it — and fixing only the placeholder moved it to 0.3205, which is how the second one was found. They are one component now carrying a per-breakpoint height.
+
+| | before | after |
+|---|---|---|
+| 375×812 | 0.4363 | **0.0102** |
+| 1920×1080 | 0.0518 | **0.0086** |
+| 1440×900 | 0.0001 | 0.0001 |
+
+### Numbers
+
+| | 25a | 25b |
+|---|---|---|
+| Home initial JS (transferred, real load) | 146.53 kB | **146.92 kB** (+0.39) |
+| Mobile LCP (alias, standard harness) | ~1948 ms | **1788 ms** `[1780, 1788, 1796]` |
+| LCP element | — | `P.hx-sub` |
+| Mobile crash-scroll CLS | 0.4363 | **0.0102** |
+
+*Verified on the alias:* 1440 CLS 0.0001 / 375 CLS 0.0102, **zero horizontal overflow**, no console or page errors.
+*Mobile 375:* zero overflow, **no text under 13px**, **no control under 44px** inside `main`.
+*Reduced motion:* every chapter renders its content with no pin.
+Longest task after 2.5s during a three-speed crash scroll: 96ms at 1440, 71ms at 1920, none on mobile — above the 50ms line and worth a Ship-pass look.
+
+### Quality gate — honest critique
+
+**The colour reads as colour now, and it does not cheapen the page.** It is a soft directional wash with a low horizon, occluded by the object in front of it, and it falls off into black well before the text column. It does not read as neon and it does not read as a gradient blob — mostly because it is never the brightest thing in frame and never sits behind body copy. At 1920 it is better than at 1440: there is more black for it to fall into.
+
+**The strongest chapters are Ch1 and Ch6.** The hero's field of real captures and Ch6's wall of real screens make the breadth argument with no copy at all. **Ch5's rings and Ch3's orb are the best of the abstract objects.** 
+
+**Where it is still short.** Ch3 (Products) is the weakest: two services on the list leaves a visibly empty lower third, the exploded capture reads as muddy overlapping panels, and its word is the dullest of the four even after the lift. Ch6's head copy sits over the wall with no scrim — it measured 9.57:1 at this scroll position, but that is a property of which tiles happen to be behind it, not a guarantee.
+
+### Does home tell one engaging story about what we build?
+
+**Yes, and it is the first time I would say so plainly.** The spine is real: *we build the things your business runs on* → the four things, each with its own colour, its own object and its own real proof → *here is all of it* → *here is who makes it* → *your move*, closing on the hero's own slab. Every claim lands on a real capture. The colour flow is what makes it one film rather than eight sections.
+
+The honest qualifier: **the story is carried by the words and the real work, and the 3D objects are the weakest link** — they are competent CSS abstractions, and Products' is genuinely muddy. If a session is spent here, spend it there.
+
+### Deviations
+
+1. **The Session 21 headline ruling is no longer met and cannot be.** It required the h1 at **≥140px (target ~150px) at 1440×900**. The hero headline measures **67px at 1440 and 80px at 1920**, because 25a made it a 120-character sentence in a half-width column beside the real-work field. At 140px the first line alone would be ~1520px — wider than the viewport. **This needs an owner ruling:** shorter headline, full-width headline (losing the field beside it), or accept the current size.
+2. **The footer tone change reaches `/services` and `/about`** — see above.
+3. ch-start is 6.83:1, under the 7:1 body target, over the 4.5:1 minimum.
+4. The 12px "Studio"/"Resources"/"Contact" footer headings measure **3.10:1 on the cream footer** of the other routes — a pre-existing site-wide failure, not introduced here. It joins the global nav's 44px item in the Ship pass.
+
+### My own errors this session
+
+1. **I shipped a chapter light that never reached the screen and wrote critiques of frames that were lit only by box-shadows.** Two sessions of "the colour is too subtle" were one opaque background. I only found it by sampling the glow's own centre pixel.
+2. **I "fixed" the word sizing and reported two measurements of the same block box** — 645px for both GROW and WEBSITES — without noticing that a block-level span tells you nothing about glyphs.
+3. **I added a CSS rule for the hero clock that could never win** against the component's inline colour, and had to be shown it by the probe reporting the same 3.23:1 twice.
+4. **I fixed one of two reserves** and reported the CLS as improved before checking whether anything else reserved the same space.
+
+---
+
+---
+
+**SESSION 25c — the 25b rulings.** Five commits (`67a3dfd`, `c2c12c2`, `ab529db`, `aff9749`, + this log).
+
+### 1 · The headline is the claim
+
+`h1` is **"We build what your business" + the "runs on." slab**. The four services were never the headline's job — the subline already lists them — and a 13-character lead is what lets the type reach the size the hero needs. The accessible name is still the plain sentence, `We build what your business runs on.`
+
+The size was never a style choice: the divisor in `--type-hero-size` is **the longest line's length in this face**, calibrated at `/9.8` for the old 38-character sentence. And the **vh term, not the column, was what held the type at 67px** — so both moved.
+
+| | font | eyebrow gap | primary CTA |
+|---|---|---|---|
+| 1280×720 | 98px | 18px | 673/720 — above the fold |
+| **1440×900** | **121px** | 24px | 855/900 — above the fold |
+| 1680×1050 | 132px | 94px | 959/1050 — above the fold |
+| 1920×1080 | 132px | 112px | 977/1080 — above the fold |
+
+"runs on." sets on one line in the slab at every width, mobile included.
+
+**The field's safe zone moves with the headline.** Its ink box went from x 0–46% to **x 8–58%, y 6–55%**, and two planes that cleared the old zone did not clear the new one: `cg-testimonials` and `sift-insights` move, the z ladder is untouched. **Zero overlap at 1280, 1440, 1680 and 1920.**
+
+**A 720px-tall desktop cannot hold everything.** Top row + 98px headline + subline + kicker + CTA row overran by 26px and the headline struck the eyebrow. The **kicker is hidden below 820px of height** — it is the one piece that restates the subline. Reported as a deviation rather than absorbed.
+
+### The rail had been sitting in the document flow
+
+Found while measuring the hero, and it is a **Session 25b regression of mine**: `.home-dark > *:not(.clight)` also matched the chapter **rail** and overrode its `position: fixed` to `relative`. A **1440×256 nav was in the document flow at the top of the page, pushing home — hero included — down by 256px.** It is scoped to `.home-dark > section` now.
+
+**Every 25b measurement was taken against that shifted page.** The 25b numbers were real measurements of a page that had this bug in it; 25c's are the corrected ones.
+
+### 2 · The dark footer is accepted
+
+Logged as a locked rule beside the palette instruction. `/services` and `/about` keep the dark footer they get from `usePageEndTone`; the site is moving to the dark standard and this is the migration hook, not a side effect to undo.
+
+### 3 · Ch3 is three real products and their proof
+
+The masked-band object was **one capture cut into five strips**, which read as muddy overlapping panels rather than as work. It is three real captures now — **CapitalCommand's overview, SIFT's command overview, CadenceStack's command centre** — each through the WebP pipeline with a thin window chrome carrying its product name, stacked in depth and sliding apart along z/x as the chapter is read. **`Exploded` is deleted.**
+
+**The cascade rises.** Going down, every card behind put its own chrome bar underneath the plate in front of it, so only the front product was ever named — the one thing the chrome exists to do did not happen. Measured chrome occlusion, rising: **0% / 0% / 0%** at the 0.6 and 0.8 dwells, worst case 27% at 0.4, at both 1440 and 1920.
+
+The lower third carries **a proof tile per product**: the name, that study's own `hero.thesis` verbatim, its verified figure, and a link to its case study. **NO UNVERIFIED FIGURES holds** — of these three only SIFT has a `headlineFigure`, so only SIFT's tile prints one (**42%**); the other two carry their `sector`, which is a fact the data already holds.
+
+**Largest empty rectangle at dwell, against the 15% rule:** **9.6% at 1440** and **13.6% at 1920**, at each of three dwell positions. (Measured as the largest all-empty axis-aligned rectangle over a 48×30 grid, a cell counting as empty when it is both flat and near the bare ground.)
+
+### 25c ruling · the three products take turns at the front
+
+**A card's place in the stack is its RANK FROM THE FRONT, not its index**, and **the rank itself is what springs**. That is the whole mechanism: a swap reads as one plate sliding back while another rises, it stays transforms only (no layout, no repaint), and because the chapter's scroll still drives a separate `spread` scalar, the reorder and the opening **compose** instead of fighting each other.
+
+| | |
+|---|---|
+| Hover / focus / click / tap a tile | brings that product to the front |
+| At dwell, no interaction yet | the stack turns itself every **3s** |
+| First interaction | rotation stops **permanently** |
+| Front card | **100% unobstructed** at 1440 and 1920, all three products |
+| Reduced motion | no rotation; the spring is **bypassed**, not sped up, so a swap is instant |
+| Active tile | lit border + ground, and `aria-pressed` |
+
+**Legibility is measured by PAINT ORDER, not by box overlap.** The front card is nearest the camera, so the other two intersect its rect by 65–78% while covering none of it — the first probe I wrote reported that 65–78% as "covered" and it was meaningless. `elementFromPoint` over a 7×5 lattice inside the front card answers the real question: 35/35 samples hit the front card, for every product, at both widths.
+
+**THE TILE IS A BUTTON, with the case-study link as its own control underneath.** It was one `Link` doing both jobs, and **a tap could not be made to swap without navigating**: react-router runs the navigation in a transition **~240ms after the click**, and `preventDefault` did not hold it — not from React's handler, not from a capture-phase listener that also called `stopPropagation`. A button has no default to fight, so hover, focus, click and tap all mean the same thing on every input, and "read the case study" is explicit. Two tab stops per tile, both useful; all six controls ≥ 44px at 1440 and 375.
+
+**The dwell observer watches the viewport's middle band, not a ratio of the section.** At `threshold: 0.4` the rotation could never start: this chapter pins for 320vh, so in a 900px viewport its intersection ratio tops out near **0.31**. It is `rootMargin: "-40% 0px -40% 0px"` with threshold 0.
+
+*Verified:* all three products reach the front under auto-rotation; hover swaps each one and stops the rotation (7s idle, no further change); keyboard focus on a tile's button swaps and Tab reaches its link; on touch, tapping the tile body swaps **without navigating** and tapping the link opens the study. Worst text in the tiles **5.44:1**.
+
+*Verified on the alias:* auto-rotation reaches **3/3 products** at 1440 and 1920; hovering each tile brings its product to the front with the tile lit and the front card **100% unobstructed**; the rotation **stops** on interaction; on touch, tapping the tile body swaps **without navigating** and tapping the link opens the study. Crash scroll on the alias: 1440 CLS 0.0001/0.0002 · 1920 0.0000/0.0001 · 375 0.0090/0.0167, **zero horizontal overflow, no errors**. Ch3's mobile reserve follows the tile's new link row (159vh → **170vh**).
+
+**Honestly, where this leaves Ch3.** The rotation is the right call — it shows all three products without asking for anything, and it gets out of the way the moment the reader takes over. The two rear captures are still **named more than seen**, but that matters far less now that any of them can be brought forward. The chapter went from the weakest on the page to one that rewards pointing at it.
+
+### Numbers
+
+| | 25b | 25c |
+|---|---|---|
+| Home initial JS (local, same method) | 146.92 kB | **146.91 kB** (−0.01) |
+| Mobile LCP (alias, standard harness) | 1788 ms | **1776 ms** `[1768, 1776, 1776]` |
+| LCP element | `P.hx-sub` | `P.hx-sub` |
+
+*On the alias:* 1440 CLS 0.0001/0.0003 · 1920 0.0000/0.0001 · 375 0.0090/0.0178 — **zero horizontal overflow at all three, no console or page errors.** The h1 reads 121px at 1440 and 132px at 1920 on the alias with the CTA above the fold, and Ch3 serves its three named cards, three tiles and the single 42% figure.
+*Full-page sweeps:* every visible text element on home **≥ 4.5:1**; **no dead frames** across 21 samples at every 5%.
+*Mobile 375:* no text under 13px, no control under 44px, zero overflow.
+*Reduced motion:* every chapter renders, Ch3 included — three cards, three tiles, no pin.
+
+Note on the alias JS figure: measured there it reads **152.64 kB**, because by then the first lazy chapter chunk has been fetched. The comparable local figure, measured exactly as 25b's was, is 146.91 kB.
+
+### Quality gate — honest critique
+
+**The hero is materially better.** At 121px the headline is finally the first thing in the frame, the parch slab is a real anchor rather than a detail, and "We build what your business runs on." is a claim instead of an inventory. The field reads as the room behind it rather than as competition. The 256px the rail was stealing was quietly hurting every frame above the fold.
+
+**Ch3 is no longer the weak chapter.** Three window title bars reading CADENCESTACK / SIFT / CAPITALCOMMAND, a sharp console in front, and three tiles underneath with a real number on one of them — it now makes its argument. The blue light reads clearly as blue without going neon.
+
+**Where Ch3 is still short, honestly.** The two rear captures are **named but barely seen** — you get their chrome bars and a sliver of edge, not their screens. Spreading them further pushes them out of the object column, and shrinking the cards to buy room costs the front capture its legibility; the current balance favours one readable product plus three named windows. The band between the services list and the tiles is the frame's emptiest area — it passes the 15% rule at 9.6%/13.6%, but it passes rather than excels.
+
+**Ch3's two-item service list is still the shortest on the page.** The tiles cover for it now, but the asymmetry with Websites' four and Automation's five is still visible.
+
+### Deviations
+
+1. **The kicker is hidden below 820px of viewport height** on desktop. It restates the subline, and at 1280×720 the block does not otherwise fit.
+2. **`.pt-fig` uses a literal lifted blue**, not the live `--chapter-rgb` token: `color-mix()` against that token did not resolve and collapsed the figure to 1.13:1. This row is Ch3's alone, so a literal is honest, but it does not follow the chapter light if the light changes.
+3. The 12px footer column headings still measure 3.10:1 on the cream footer of the remaining cream routes — pre-existing, site-wide, still queued for the Ship pass.
+
+### My own errors this session
+
+1. **I shipped the 25b rail regression** — a `:not()` selector broad enough to catch a fixed nav and put it in the flow — and did not catch it in 25b because I verified the rail's *behaviour* (which chapter was active, what colour the label was) and never its *position*.
+2. **I reused `.ob-stack__card`**, a class Ch2's website fan already owns, so my new card styles silently restyled Ch2 for several builds.
+3. **I deleted the `Exploded` block by range and took the orb's node count with it**, which the type-checker caught and I had to restore.
+4. **I reported two identical "glyph widths" for GROW and WEBSITES in 25b** that were block boxes, and repeated the same class of mistake here by first measuring `.hx-h1` (which holds the sr-only sentence) at 17px.
+
+---
+
+---
+
+**SESSION 26a — "everything we build starts as pieces".** Five commits (`0ee379b`, `f30ff3e`, `26a-2`, `0c4936b`, `26a-4`) + this log.
+
+**SPLIT REPORTED AND TAKEN.** The brief's split is 26a (accent + light + hero + Websites + Products) / 26b (Automate + Grow + the work section + the rail labels). 26a as specified is ~3,000 lines against the standing 2,000-line rule, so it was taken as **26a-i** (items 0–2: the accent system, the light restyle, the pieces library, the hero) and **26a-ii** (items 3–4: Ch2 and Ch3). Both are now done. **26b is untouched.**
+
+### 0 · One accent set, and light in a room
+
+The tight radial glow is retired — a soft-edged circle reads as a gradient smear behind the content, which is the blob the owner called out. The light is the room's now: **a wide low horizon wash** (the floor bounce) plus **two soft diagonal volumetric beams**, blurred and masked at both ends so they read as light through air. `alpha` is the beams' peak and `x`/`y` steer where they cross.
+
+**Foreground accents are ONE set**: `--accent` #C8763C with `--accent-text` #D98F55, measured **7.04:1** on the dark ground so it can carry small text. The rail's active label and the giant word's edge had followed the LIVE chapter hue since 25b, so the page carried four different accent colours depending on scroll position. **This supersedes the 25b tinting ruling for foreground only** — the chapter hue still drives the light.
+
+### 1 · The pieces
+
+Fifteen primitives in `src/components/home/pieces/`: button, toggle, field, type specimen, colour chips, code card, chart, assistant, network, map pin, phone, booking, cursor, layout, rating. Two shells and nothing else — **glass** (layered translucent fills, inner highlight, accent rim) and **paper** (parch surface, contact shadow). **No `backdrop-filter` anywhere**: it forces a readback of everything behind the element and up to eighteen of these move in 3D.
+
+**EVERY TOY IS CSS** — keyframes and transitions off `:hover`/`:focus-visible`, with the typing done by `steps()` width animations rather than per-character state. Verified: **all 15 respond with a measured property change**, and all 15 are focusable with an accessible name. That is why the whole library cost **−0.11 kB**.
+
+Two were **empty at rest** — the code card and the chart only appeared once hovered, and in a hero field most pieces are never hovered. Both render at rest and replay on interaction. And a piece is a `<button>`, which centres its text: the code card and field label were centred until the shell set `text-align` itself.
+
+### 2 · The hero
+
+The room keeps every mechanic the owner called the standard and holds the **pieces** instead of captures. `HeroField` and `fieldPlan` are **deleted**. The dolly ends in a **gather** — the pieces swirl into a ring that tightens and turns, the same DOM nodes on continuous transforms — rather than flying to a CapitalCommand capture and parking on it.
+
+**TYPED ENTRANCE.** The whole headline is laid out at frame one at 0.12, so the LCP element paints immediately and the entrance cannot move it; each character then inks 0.12 → 1 with a 2px rise on its own delay (32ms, deterministic ±8ms jitter) while a parch caret steps the line, then the slab slams in.
+
+| | |
+|---|---|
+| 300ms | 1/26 inked |
+| 800ms | 11/26 inked, caret mid-line |
+| 1400ms | 26/26 and the slab landed |
+
+Inside the 1.9s budget. Accessible name unchanged, typing layer `aria-hidden`. **LCP 1784 ms against 25c's 1776 — +8 ms**, well inside the ≤100ms allowance.
+
+Composition: **15/15 pieces in frame** at 1440 and 1920, **zero overlap** with the headline or the CTA row, largest empty rectangle **7.8% / 12.2%** against the 30% gate.
+
+### 3 · Ch2 — "From pieces to a page"
+
+B1 the pieces fly to their slots in an **exploded axonometric page** (five layers along z with leader lines: Typography · Colour · Layout · Components · Content); B2 the layers **compress** into one finished page in a browser frame that glows as it lands; B3 a **phone folds out** on its hinge with the same page reflowed while a **booking chip** flies toward the camera. Northgate is the only name in it.
+
+### 4 · Ch3 — "From pieces to a product"
+
+An **app skeleton in isometric 3D** — nav rail, KPI cards, a chart, a table of rows, all primitives, with a contact shadow — which **explodes** into Navigation · Components · Data · Logic · Design system and **re-locks inside a ring** of its own components. The 25c capture stack and proof tiles are gone.
+
+### THE HOME RULE
+
+**Captures appear ONCE on home: the work section.** Audited per chapter on the alias — `build:0 websites:0 products:0 ai:0 marketing:0 work:29 founder:0 start:0`. The giant words are filled with a **tiling pattern of each chapter's own pieces** (an inline SVG data URI) instead of two project captures, and a service link **names** its project rather than showing a thumbnail of it.
+
+### Numbers
+
+| | 25c | 26a |
+|---|---|---|
+| Home initial JS (local, same method) | 146.91 kB | **146.80 kB** (−0.11) |
+| Mobile LCP (alias, standard harness) | 1776 ms | **1820 ms** `[1820, 1820, 1844]` |
+| LCP element | `P.hx-sub` | `P.hx-sub` (unchanged) |
+
+*Crash scroll, three speeds:* 1440 CLS **0.0006**, 1920 **0.0003**, 375 **0.0094**, zero horizontal overflow at all three, no errors. On the alias at 1440: CLS 0.0636, zero overflow, no errors.
+*Contrast:* every visible text element on home **≥ 4.5:1**.
+*Links:* **16/16** service links resolve to `/services#slug`.
+*Mobile 375:* no text under 13px, no control under 44px, zero overflow, hero keeps **8** pieces.
+*Reduced motion:* the headline arrives at once, every chapter renders its content, and **the toys still respond**.
+
+### Quality gate — honest critique
+
+**The hero is the best frame on the site.** Fifteen crafted objects receding into a dark room, lit by real beams, with a headline that writes itself — it holds up beside the Apple and Linear work it is being measured against, and it finally says what the studio does without a single screenshot.
+
+**Ch2 and Ch3 are a large step up from the 2/10 the owner gave the old service chapters** — they are diagrams that build something, with named layers and a payoff. They are not yet the hero's equal: the exploded pages are handsome but **static between beats**, where the hero is alive at rest.
+
+**Where 26a is still short, plainly:**
+- The **gather** that carries the hero into Ch2 is a ring that tightens — Ch2 then starts its own pieces from its own slots. The continuity is thematic, not literally the same nodes travelling, because the two chapters are separate lazy components. **This is a real deviation from the brief**, which asked for the same DOM pieces.
+- Ch2's five layer plates are **visually similar to Ch3's five layer plates**. Two exploded stacks in consecutive chapters is a repeat, and the owner asked explicitly whether anything repeats. It does.
+- The far pieces in the hero are legible but **the room is right-weighted**; the left half below the headline carries nothing.
+
+### Deviations
+
+1. **26a was sub-split** into 26a-i / 26a-ii (~3,000 lines against the 2,000-line rule).
+2. **Ch3's isometric is 44° / −26°, not the specified ~55° / −35°.** At the specified angle the plates are so foreshortened the app reads as a squashed stack and the leader labels are unreadable.
+3. **The hero→Ch2 continuity is thematic, not the same DOM nodes** (see above).
+4. **A 92ms task at 1440 during the crash scroll**, against the brief's "0 long tasks > 50ms during scroll at 1440". 1920 measured 50ms, mobile 0ms.
+5. The old WorkStrip's `.ws-*` CSS (~70 lines) is **dead** — the component was deleted in 25b — and it is what my Ch2 classes collided with. Left in place rather than removed blind.
+
+### My own errors this session
+
+1. **motion writes its own `transform`, and I let it share a node with a stylesheet transform — twice.** In the hero it replaced `translateZ` and the −50% centring, so the depth vanished and ten of fifteen pieces rendered off-frame. In Ch3 it replaced the isometric lean, so the counter-rotated labels were undoing an angle that was not there.
+2. **I collided with an existing class prefix again** — `.ws-layer { opacity: 0 }` from the deleted WorkStrip made Ch2's entire scene invisible. Second session running after `.ob-stack__card`.
+3. **I put every scene opacity on motion inside a sticky pin**, which is the exact locked rule from Sessions 22 and 24a.
+4. **I anchored the light beams with `left`/`top` and wrote them every scroll frame**, which is a layout change: crash-scroll CLS 6.64 against a 0.1 budget, from a change I made to *lighting*.
+5. **My contrast probe compared ink against black** on the paper pieces, because a paper shell paints its parch with a gradient and the probe only walked up for a solid colour.
+
+---
+
+---
+
+**SESSION 27a — home rebuilt on the Nolana system (part 1 of 3).** Five commits (`fed8880`, `9a386ef`, `2579342`, `27a-3`, `27a-4`) + this log.
+
+**A BLOCKER TO STATE FIRST: I do not have the Nolana recording or any Nolana frames.** The quality gate asks for each section side by side with the matching Nolana frame at 1440. That comparison was not possible. Everything below was built from the measured tokens and the structural DNA the brief describes, and critiqued against that plus the usual premium bar — **not** against the reference. If the owner wants the literal comparison, the frames need to be in the repo or attached.
+
+### The palette, measured
+
+| token | value | measured |
+|---|---|---|
+| `--n-ink` | `#0F1117` | 17.24:1 on `--bg` |
+| `--ink-2` | **`#6E6E80`** | **4.56:1** — darkened from the given value |
+| `--ink-2-display` | `#898997` | 3.15:1 — the measured grey, **≥ 24px only** |
+| `--bg` on `--black` | | 18.14:1 |
+| white on navy `#121C27` | | 17.20:1 |
+| `--hair` `#D4D4DA` | | 1.35:1 — a hairline rule, not text |
+
+**`--ink-2` as given is 3.15:1 and fails AA for normal text.** The minimum darkening that clears 4.5:1 is `#6E6E80`, so that is the token; the measured grey survives as `--ink-2-display` for the large two-tone continuations, where the threshold is 3:1.
+
+### The hero
+
+Navy, full viewport. Everything above the mesh is plain DOM text that paints at frame one; the mesh is lazy and mounts on an idle callback after it. **The LCP element is now `SPAN.nh-line` — the headline itself.**
+
+**The pill** cycles "a website / software / automation / customers" every 2.8s, and its width springs to each token's **measured** width — the words are rendered once into a hidden ruler carrying the pill's own typography, because a width animated to a guessed target is what makes a swap like this look cheap. The first interaction stops the carousel for good and hands over manual stepping. The accessible name is the whole sentence with every token, read once.
+
+**The mesh is raw WebGL2, not three.js.** The brief allows three + `@react-three/fiber` inside 180 kB gzip; three's core alone is ~170 kB gzip before the renderer, and this is **one draw call of `gl.POINTS`**. The shipped lazy chunk is **2.4 kB**. A grid of points displaced in a vertex shader: a travelling swell, a ripple following the cursor, amplitude lifting with scroll, colour teal → lavender → peach on the crests, far rows fading into the navy. It stops when the hero leaves the viewport or the tab is hidden. **60 fps at 1440**, on the alias, with hardware-backed GL.
+
+**The client row is its own solid band**, not an overlay on the mesh: over the live mesh its dimmest name measured **2.26:1** against a wave crest showing through the scrim. Contrast cannot depend on where a wave happens to be. On its own band the dimmest name is **5.49:1**, with the focal item at full white and 1.22× scale.
+
+### The light sections
+
+**PROBLEM** fills word by word with scroll — measured 0/24 → 14/24 → 24/24 across its pass; filled outright under reduced motion.
+
+**WHAT WE BUILD** — four hairline cards with gradient icon tiles, corner indices and real copy, each into its `/services` anchor: `marketing-websites`, `product-and-saas-interfaces`, `ai-agents`, `local-search`.
+
+**NUMBERS — every figure traced:**
+
+| figure | source |
+|---|---|
+| 85% | `caseStudies.ts` → `cg-walls-and-floors.headlineFigure`, caption verbatim |
+| 42% | `caseStudies.ts` → `sift.headlineFigure`, caption verbatim |
+| 16 | `servicePillars.ts` — counted, not claimed |
+| 14 days | the studio's standing kickoff promise |
+| 30 min | the standing first-call length |
+| 24 hrs | the standing reply promise |
+
+The heading says which are which — "Measured on real projects, or promised in writing." Nothing else appears. Count-up verified 0 → 82%/41%/15 → final on entry.
+
+### What was removed, and what was kept
+
+Deleted with zero importers outside their own dead cluster: the 26a pieces hero (`Hero.tsx`, `PieceField`, `piecePlan`, `pieces/`), the typed entrance inside it, the four chapter rooms (`ServiceChapter`, `chapterObjects`, `piecePattern`, `scenes/`), the colour-flow light layer (`ChapterLight`, `lightPlan`) and the rail. **One session's worth of 26a is gone; the pieces library it cost is gone with it.**
+
+Kept until 27b/27c, restyled to the new tokens: the work wall (black ground — it is a cinematic moment and the captures need it), the founder and the closer (light ground). Home declares a light end tone now, so the footer follows it back.
+
+### Numbers
+
+| | 26a | 27a |
+|---|---|---|
+| Home initial JS | 146.80 kB | **146.54 kB** (−0.26, budget +3) |
+| The 3D chunk | — | **2.4 kB** (budget 180 kB) |
+| Mobile LCP (alias, standard harness) | 1820 ms | **1768 ms** `[1752, 1768, 1772]` |
+| LCP element | `P.hx-sub` | **`SPAN.nh-line`** — the headline |
+| Mesh fps at 1440 (alias) | — | **60** |
+
+*Crash scroll, three speeds:* 1440 CLS 0.0161, 1920 0.0072, 375 0.0066; zero horizontal overflow; no task over 50ms after 2.5s; no errors.
+*Contrast:* all 70 text elements pass AA (large-text threshold applied at ≥24px).
+*Mobile 375:* no text under 13px, no control under 44px, zero overflow.
+*Reduced motion:* the mesh is a static still, the words are filled, the pill does not cycle but still responds.
+
+### Quality gate — honest critique
+
+**Against the DNA the brief describes, the hero is right and the light sections are right.** The gradient pill in a 64px headline is the strongest single element on the site, the particle wave reads as a real surface with a real cursor ripple rather than a decorative canvas, and the card grid, chips, two-tone headings and corner indices are a coherent system rather than four separate treatments.
+
+**Where it is short, plainly:**
+- **The two-tone heading continuations run long** — "We build the four things your business runs on — from the first search to the booked job." takes three lines at 1440 and the grey half dominates. It wants a shorter continuation or a wider measure.
+- **The hero's right half is empty** above the mesh. The headline column stops at ~1150px and nothing occupies the rest; Nolana-type heroes usually carry something there.
+- **The mesh is a flat field seen edge-on.** It reads well, but it is one surface — no depth layering, no second element.
+- **The page now ends on three carried-over sections in a different design language.** That is the plan (27b/27c), but today home is two-thirds new and one-third old, and the seam at the work wall is visible.
+
+### Deviations
+
+1. **No Nolana reference frames** — the literal side-by-side gate could not be run. Stated above.
+2. **Raw WebGL2 instead of three.js/R3F** — 2.4 kB against a 180 kB allowance for what is one `gl.POINTS` draw. Swappable if the owner prefers the named stack.
+3. **`--ink-2` darkened** from `#898997` to `#6E6E80` to clear AA, with the measured value kept for display sizes.
+4. **The client row is a solid band**, not an overlay on the mesh — a contrast decision, measured.
+5. The hero's `h1` measure is 1150px, not a `ch` value: at 64px the line needs ~1060px and a `ch` measure broke it into one word per line.
+
+### My own errors this session
+
+1. **I set the h1 measure in `ch` without measuring it** — 20ch is 760px where the line needs 1060px, so the headline broke to one word per line and pushed the mesh out of the hero entirely.
+2. **I put the client row over the live mesh** and only found the 2.26:1 by sampling the ground behind it.
+3. **My contrast probe fell through gradient backgrounds twice in two sessions** — the navy hero and the white CTA both came back as false failures because it only walks up for a solid `backgroundColor`.
+4. **I shipped the figures as block-level elements**, so a short number sampled only the first third of the gradient and every figure came out peach.
+
+---
+
+---
+
+**SESSION 27b — the 27a fixes, the pinned device story, and the work.** Seven commits (`27b-F3` … `065c0a0`).
+
+**THE REFERENCE FRAMES ARE IN.** Not at the path the brief gave — `docs/reference/` did not exist and `~/Downloads/nolana-reference-frames.zip` was not there either. They were on the Desktop at `~/Desktop/Nolana/`: **15 frames**, not 16, which shifts the brief's map by one at the tail. They are installed at `docs/reference/nolana/01–15.png` and **`docs/reference/` is gitignored** — the repo is public and they are the owner's material.
+
+### REFERENCE RULE — exceed, don't replicate
+
+Recorded as a locked rule. Nolana is the quality bar, not a template. Every critique below names what we kept from its craft and what ours does better; where I cannot name the second, I say so.
+
+### F1 · The hero is centred
+
+The chip row, headline, subline and CTAs now share one axis — measured at **0px off centre** for all four. The clock moved into the chip row so the top line is one centred unit rather than two things in opposite corners.
+
+**Two of my own edits had silently not matched** earlier in the session, so the h1 was still 1150px and left-aligned and `.nh-inner` was never made a centred column. Found by measuring, not by looking.
+
+### F2 · Depth, and a mesh that answers the pill
+
+Three fields at three depths from one buffer: the far one denser, dimmer, slower, barely moving with the cursor; the near one with bigger points, a brighter crest and real parallax. **60 fps at 1440 on the alias with all three.**
+
+**BEYOND NOLANA — the mesh is the headline's subject, not its wallpaper.** Each pill phrase reshapes the whole field over 1.1s: *a website* a calm ordered lattice · *software* stepped terraces · *automation* flowing parallel streams · *customers* every point drawn toward one bright focus. Nolana's hero field is beautiful and inert; ours is an argument.
+
+### F3 · Two-tone continuations
+
+Both headings ran to three lines. The continuations were already inside 60 characters, so the length was the whole sentence *and* the measure — 22ch is about 484px at 44px.
+
+| | before | after |
+|---|---|---|
+| what we build | "— from the first search to the booked job." (42) | **"— from first search to booked job."** (34) |
+| numbers | "Measured on real projects, or promised in writing." (50) | **"Measured, or promised in writing."** (33) |
+
+Two lines at 1440 and 1920.
+
+### 1 · The pinned device story
+
+One scroll value drives the step and the panel — no timers. **420vh of wrap gives each step 80vh of dwell** against the 25vh floor, the step list is a real control that takes over from the scroll for good once clicked, and each step links to its `/services` chapter. **No dead frames across 21 samples** of the whole page.
+
+**Kept from Nolana (frame 09):** the material language — a dark device over a misty procedural atmosphere, glass panels with a low-alpha fill and a hairline light border, a glowing orb.
+
+**What ours does better:** Nolana's device is a still image inside a card, and the panel inside it is a *blurred screenshot*. Ours is the subject — it **tilts toward the cursor (±4°)**, its **glow spills onto the page in that step's own colour**, and the panel is **live at every step**: a search typing with Northgate climbing to #1 and a pulsing map pin; a site building itself headline-first; a calendar with a ghost cursor taking the 2:00 slot and confirming; an agent reply with the held time in **Cormorant italic on the gradient** and a ghost cursor pressing Approve.
+
+The atmosphere is procedural — an SVG sky gradient, a lavender bloom, three ridge silhouettes and an `feTurbulence` mist. No photographs.
+
+### 2 · The work
+
+Two cinematic case cards over the same atmosphere, each holding a real capture in a glass device frame, with the project, its thesis verbatim from `caseStudies.ts`, and its **verified figure where one exists** — SIFT carries 42%, CapitalCommand carries none because it has none. Then the roster row and "Open the vault". `WorkWall` is deleted and **captures still appear exactly once on home**, audited per section.
+
+**Kept from Nolana (frames 09, 11):** a real screen in a glass frame over the atmosphere, a glowing ring, a title with one grey continuation line.
+
+**What ours does better:** Nolana's orb is fixed to the centre of its card. Ours **follows the cursor** across the card while the frame pushes in, so the light behaves like a light in the room rather than a decal — and ours carries a **traced figure** where Nolana's cards carry none.
+
+### Numbers
+
+| | 27a | 27b |
+|---|---|---|
+| Home initial JS | 146.54 kB | **147.84 kB** (+1.30, budget +3) |
+| Mobile LCP (alias) | 1768 ms | **1872 ms** `[1832, 1872, 1888]` |
+| LCP element | `SPAN.nh-line` | `SPAN.nh-line` (unchanged) |
+| Mesh fps at 1440 (alias) | 60 (1 layer) | **60** (3 layers) |
+
+*Crash scroll:* 1440 CLS 0.0365, 1920 0.0173, 375 0.0424; zero overflow; no task over 50ms after 2.5s; no errors.
+*Dead frames:* none across 21 samples.
+*Mobile 375:* no text under 13px, no control under 44px, zero overflow, the story's steps become tabs.
+*Reduced motion:* the mesh is a still, the words are filled, the story shows one panel and its steps still respond to clicks.
+
+### Quality gate — honest critique against the frames
+
+**Hero vs frames 01–02.** Ours is at least as refined and more alive: the centred column, the 60px headline and the gradient pill match their discipline, and the pill-reactive mesh is something their hero does not attempt. **Theirs is still better in one respect** — their hero carries more vertical rhythm; mine has a quiet band between the CTAs and the mesh crest.
+
+**Problem vs frame 02.** Theirs runs ~62% of the frame in four lines; mine was a 20ch column and is now 1180px in three. Equal, not better — the difference is only that ours is shorter.
+
+**Story vs frames 09–10.** Ours is clearly ahead: live panels against their blurred screenshot, a device that reacts to the cursor, and a glow that belongs to the step. **Where theirs wins:** their card compositions are denser — floating sub-panels above and below the focal object — where my glass panel still has visible dead space top and bottom at 1440.
+
+**Work vs frames 11–12.** Ours is ahead on substance (a traced figure, a cursor-tracking orb). **Where theirs wins:** their captures are composed *into* the scene with overlapping UI fragments; mine is one rectangle in a frame.
+
+### Deviations
+
+1. **15 reference frames, not 16**, and not at the stated path — found on the Desktop.
+2. **LCP rose 104 ms** (1768 → 1872). Still well inside 2.5s, but it is a regression and the third field in the mesh is the likely cause.
+3. **The story's glass panel has dead space** at 1440 — named above rather than hidden.
+4. The `01`/`02` step numerals and the panels' inner labels were under 13px on mobile until fixed; they depict interfaces but their type is still type.
+
+### My own errors this session
+
+1. **Two CSS edits silently did not match** and I reported F1 as done before measuring it — the hero was still left-aligned at 1150px.
+2. **I replaced a working React `onMouseMove` with a window listener on a false signal.** My probe moved the mouse in one jump, which Playwright coalesces into no intermediate `pointermove`; with `steps: 8` the original would have passed too.
+3. **I left a 27a carry-over rule** (`#ch-work { background: black }`) that outranked the new section and painted it dark.
+4. **I shipped both new sections into the initial graph**, +4.43 kB against a +3 budget, and only caught it on the bundle measurement.
+
+---
+
+---
+
+**SESSION 27c — home complete on the Nolana system.** Six commits (`27c-G1` … `27c-2`).
+
+### The three gaps 27b named
+
+**G1 · Hero rhythm.** Measured before: gaps 41 / 23 / 31 with the content block ending at 52% of the hero. The rhythm is a three-step scale now and the column is centred in the space between the nav and the client band: **43 / 20 / 31, block centre 9px off the optical centre at 1440 and 4px at 1920.**
+
+A gap my own 27b critique had missed, visible once the frames were side by side: **frame 01's wave is a diagonal ribbon** sweeping lower-left to upper-right, where mine was a symmetric dome — and a dome is what makes a point field look generated. The swell runs diagonally now with the ridge riding higher to the right. Their client row also carries a mono label and hairline separators; ours has both, in Averr's words.
+
+**G2 · Card density.** Measured dead space per step before: **19.6 / 45.8 / 24.6 / 20.9%** against a 15% limit. Each step now carries two glass sub-panels lifted out of the panel's plane with live content from that step, and the content stretches to occupy its box.
+
+| step 0 | step 1 | step 2 | step 3 |
+|---|---|---|---|
+| 6.9% | 13.1% | 5.6% | **15.4%** |
+
+Step 3 is **0.4pp over and reported as such**. Step 1's original 45.8% was partly my detector reading the site's deliberate gradient hero block as flat; that block carries real content now.
+
+**G3 · Composed captures.** Not one rectangle in a frame: the screen leans into the stage in perspective, a rim light from the orb rakes its glass, the atmosphere hazes back over the device's edges, and **two details of the same capture** are lifted out in z beside it — crops of the very same file, not second assets. All four move apart on hover.
+
+### 1 · One studio
+
+**The PU mark is really extruded.** The owner chose three.js ExtrudeGeometry over a CSS stack. The mark is a **filled path with `fill-rule: evenodd`**, so `SVGLoader` returns shapes with their counters already holed out and the extrusion is honest rather than a silhouette. The site gradient is baked into the geometry as **vertex colours along x** — no texture, no second material — with a key light, a lavender rim and a warm point light raking the bevel. It turns slowly and leans toward the cursor. **three@0.179.1, pinned** (published 2025-08-02). **60 fps at 1440.**
+
+Four capability chips orbit on a tilted ring, each into its `/services` anchor. They rendered as 9–16px slivers through three attempts before the real cause: **the `li` had no `transform-style: preserve-3d`**, so the chip's counter-rotation was flattened into the ring's tilted plane and could never come face-on. The counter also has to undo the ring **in reverse order** — Rz(−θ) then Rx(−62).
+
+### 2 · Who builds it
+
+The founder card on the light ground with a gradient rim, the mark, the statement with the Cormorant accent on *earn their portfolio slot*, the three credit lines from the existing data, and the link to `/about`. **No photo exists at `public/about/`**, so the mark carries it, as the brief allows.
+
+### 3 · The ending
+
+The statement fills word by word over a rising mesh, with the two CTAs. Filled outright under reduced motion.
+
+### 4 · The footer
+
+Navy on every route, replacing the giant-wordmark footer: the wordmark, what we do, the mailing line, Studio and Contact columns, "Start a project", the live Toronto clock and a hairline bottom bar. **Verified on `/`, `/work`, `/about` and `/contact`.** The Legal column is omitted — **no privacy route exists**.
+
+### 5 · Tools row — NOT BUILT
+
+Held per the brief, pending the owner's list. Recorded as an owner item in §7.
+
+### 6 · Cleanup
+
+`FounderChapter`, `StartChapter` and `FooterMark` deleted with zero importers; home no longer declares a footer end tone. **`src/` is 16 kB smaller.**
+
+### Numbers
+
+| | 27b | 27c |
+|---|---|---|
+| Home initial JS | 147.84 kB | **144.50 kB** (−3.34 — lighter than before) |
+| The 3D chunk (three + Mark3D) | — | **134.9 kB transferred** (≈175 kB accepted) |
+| Mobile LCP (alias) | 1872 ms | **1820 ms** `[1760, 1820, 1852]` |
+| LCP element | `SPAN.nh-line` | `SPAN.nh-line` (unchanged) |
+| Mesh fps · mark fps | 60 · — | **60 · 60** |
+
+LCP is **under 2000 ms, so the third mesh layer stays** — the brief's trim condition is not triggered.
+*Crash scroll on the alias:* 1440 CLS 0.0342, 375 0.0353, zero overflow, no errors.
+*Mobile 375:* no text under 13px (12px in the footer), zero overflow. **Two inline text links remain under the 44px house target** at 18px and 27px tall; WCAG 2.5.8 asks 24×24, so they pass the standard and not our stricter bar.
+*Reduced motion:* the mesh is a still, the 3D mark falls back to the flat gradient mark, the ring stops, both statements are filled, the story's steps still respond.
+
+### Quality gate — kept / better, against the frames
+
+**Hero vs 01–02.** Kept: the centred column, the gradient pill, the mono chip, the separator'd client row. **Better:** the pill cycles and *reshapes the wave field* — four formations — where theirs is a fixed word over a fixed wave.
+
+**Story vs 09–10.** Kept: the dark device over a misty procedural atmosphere, glass panels, the glowing orb. **Better:** live panels at every step against their blurred screenshot, a device that tilts to the cursor, a glow that spills in the step's own colour, and sub-panels carrying real state.
+
+**Work vs 11–12.** Kept: a real screen in a glass frame over the atmosphere, a title with a grey continuation. **Better:** the orb follows the cursor, details of the same capture are lifted out in z, and each card carries a figure traced to its case study — theirs carry none.
+
+**One studio vs 14.** Kept: a centred hero object over a dark field with a soft bloom. **Better:** ours is a **genuinely extruded 3D object** with the brand gradient in its geometry, orbited by four real links — theirs is a flat mark with a glow ring.
+
+**Ending vs 15.** Kept: the centred closing statement and the paired CTAs. **Better:** ours fills word by word and drives the mesh's amplitude as it does.
+
+**Where Nolana still wins.** Their section-to-section *transitions* are smoother — they carry a continuous background treatment between light and dark blocks, where ours cuts at each boundary. That is the honest remaining gap and the first thing I would take next.
+
+### Deviations
+
+1. **Step 3's panel is 15.4% empty** against a 15% limit.
+2. **Two inline links under the 44px house target** (pass WCAG's 24×24).
+3. **No tools row** — held for the owner's list.
+4. **No Legal column** — no privacy route exists.
+5. The reference set is **15 frames, not 16**, so the brief's map shifts by one at the tail.
+
+### My own errors this session
+
+1. **I chased the orbiting chips through three wrong fixes** — radius, counter-animation, rotation order — before finding the actual cause, a missing `preserve-3d` on the parent.
+2. **My "dead space" detector reads a deliberate gradient as empty**, which sent me after a 45.8% figure that was partly an artifact.
+3. **I reported G1 complete in 27b** without noticing the dome-versus-ribbon difference that the frames made obvious in seconds.
+
+---
+
+---
+
+**SESSION 28a — the fidelity pass, items 1–4.** Four commits. Owner's verdict on 27c: **2/10 — too small, empty, not premium, the italic must go.**
+
+**SPLIT REPORTED AND TAKEN:** 28a = items 1–4 (the most visible), 28b = items 5–7. **28b is untouched.**
+
+### 1 · One typeface
+
+**Cormorant is retired from home.** Every italic accent is gone — the story's site headline and agent reply, the One studio heading, the founder heading and statement. Emphasis is now only: the two-tone heading, the scroll word-fill, or the gradient on one key word.
+
+*Audited on the rendered DOM:* **zero elements carrying text are italic**, and zero use Cormorant. (A first audit reported 47 italic elements; they are decorative `<i>` bars with no text content — `<i>` is italic by default. The audit now tests for text.)
+
+### 2 · Scale, measured from the frames
+
+The owner said "too small". Measured at the frames' own proportions:
+
+| | Nolana | ours (before) |
+|---|---|---|
+| frame 01 hero headline | 15.57% of frame | **15.56%** — already there |
+| frame 01 content block | 37.43% | 41.0% — already there |
+| frame 02 statement | 22.98% tall / 61.9% wide | 19.9% / **81.9%** |
+| frame 09 card row | 67.94% / 90% | **72.9% / 92%** — already larger |
+
+**So the big headings and the device were never the problem.** The hero headline already matched Nolana to within 0.01%, and the device was larger than theirs. What was small was every **interior**: card type, panel content, the step list, labels and figures. All of those scale up.
+
+The statement takes Nolana's treatment properly — their ~52px in a 1040px measure at **1.02 leading**, four tight lines. Mine was a wide thin band at 1.2 leading across 81.9% of the frame; it is a 1000px measure at 1.08 now.
+
+### 3 · Atmosphere imagery — BLOCKED, reported
+
+Six candidate Unsplash photos downloaded cleanly. **Every route to the photographer's name is behind a bot challenge**: the photo pages are JS-rendered and `/oembed` returns an HTML challenge instead of JSON. The brief requires each photo's URL **and photographer** in `docs/credits.md`. I will not ship images whose authors I cannot verify, and I will not invent credits. **The files are deleted and no `docs/credits.md` was written.**
+
+**What shipped instead**, carrying the same weight: the procedural atmosphere is rebuilt — a four-stop sky, a lavender bloom and a warm secondary, a deterministic **90-star field**, **drifting low cloud** from two-axis turbulence, **five ridges** instead of three with haze pooling in front of each, and film grain over all of it.
+
+**To unblock:** either supply the photos with their photographers, or an Unsplash API key, and the duotone/grain processing and credits file go in next session.
+
+### 4 · The device story, fully populated
+
+No grey placeholder blocks at any step.
+
+- **01 Found** — panel header, typed search, three real result rows with names and categories, a "Highly rated" chip, a map card with the position chip and pin tag, a views-this-week stat with bars.
+- **02 Chosen** — a full browser card (nav, wordmark, headline, sub, hero, CTA, three-card row) beside a phone card running the same page.
+- **03 Booked** — day-of-week header, month grid, slots with the ghost cursor, the confirmation, an SMS-style reminder card.
+- **04 Runs itself** — a four-message thread, a sources chip, the approve bar, a "3 drafts waiting" toast.
+
+| step 0 | step 1 | step 2 | step 3 |
+|---|---|---|---|
+| 2.6% | 10.0% | 3.7% | 5.8% |
+
+Against the **10%** limit, and **zero sub-panel collisions** at every step. No figure appears that is not illustrative — the stat reads "Up", not an invented number.
+
+### Verification
+
+*Crash scroll:* 1440 CLS 0.0375, 375 CLS 0.0171, zero overflow, no errors.
+*Mobile 375:* no text under 13px, zero overflow.
+
+### Honest critique
+
+**This is the first version that looks like the reference.** The panels are dense working UIs rather than grey bars, the atmosphere has real depth, and one typeface reads cleaner and more confident than the italic did.
+
+**Where it is still short:** the light sections (what we build, the numbers, the work) are *scaled* but still **compositionally sparse** — four cards in a row on a flat ground is the weakest thing left on the page, and item 5's cursor interactivity plus item 6's blended transitions are what will carry them. The missing atmosphere imagery is also most felt there.
+
+### Deviations
+
+1. **Item 3 not delivered** — attribution unobtainable; procedural atmosphere shipped instead. *(Resolved in the 28a item 3 entry below, once the owner supplied owner-generated images.)*
+2. Step 1 sits exactly at the 10.0% limit.
+3. 28b (items 5–7) untouched.
+
+### My own errors
+
+1. **I assumed "too small" meant the headings** and only found out by measuring that they already matched Nolana exactly — the interiors were the whole problem.
+2. **My 28a scale block outranked my own earlier mobile floors**, putting three labels back under 13px until I re-ordered them.
+3. **My italic audit counted decorative `<i>` bars**, which reported 47 italic elements on a page that had none carrying text.
+
+---
+
+**28a item 3** `9d1d30b` — **Atmosphere imagery** (the item 28a could not deliver). Prachets supplied ten **owner-generated Midjourney images on a paid plan — owned, no attribution required**, which removed the blocker that killed the Unsplash attempt.
+
+**What shipped**
+
+- `tools/derive-atmosphere.mjs` — the derivative pipeline. Sources live in `assets-src/atmosphere/` (**gitignored**, ~60 MB of PNG); only derivatives ship. The grade is deliberately light, per the owner: the images already sit in the Nolana palette, so a duotone would flatten the mist they exist for. Black point lifted to the site navy `#121C27` per channel, saturation 0.88, the site's deterministic grain laid over in `soft-light`, WebP q76. Widths 960/1440/1920/2560, **never upscaled** — a source gets only the widths below its own, plus its native width. Output: **38 derivatives, 2.92 MB.**
+- `src/data/atmosphere.ts` — generated manifest (`{w, h, widths}` per image), so the srcset can never offer a width the source cannot fill.
+- `src/components/nolana/Atmos.tsx` — the plate. `<picture>` with a `(max-width: 860px)` portrait source where a landscape crop has nothing left in it; everything below the fold is `loading="lazy"` + `fetchPriority="low"`.
+- Placements: ridges behind the device story's glass UI, warm/cool behind the two work cards, the valley behind the 3D PU mark, the lake behind the ending — each with a portrait plate on mobile where the owner supplied one. **No spare (07/08/09) was needed**; every placement passed legibility.
+- `docs/credits.md` — provenance, pipeline, placement map and the measured contrast table.
+
+**Measured AA scrims.** The section-wide gradients were not enough. Each text block now carries its own band on `.en-inner::before` / `.os-inner::before`, sized to the text and feathered **only outside it**, so no glyph sits on a partly-faded edge; the story's step list got its own panel so it never depends on the sky. Both inners are already `position: relative; z-index: 1`, which is what makes the pseudo's `z-index: -1` land above the plate and below the type. Measured with the text hidden, brightest ground pixel:
+
+| | 1440 | 390 |
+|---|---|---|
+| ending statement | 11.91:1 | 12.05:1 |
+| ending chip | 12.83:1 | 10.89:1 |
+| ending CTAs | 14.69:1 | 9.26:1 |
+| One studio heading | 15.67:1 | 13.46:1 |
+| One studio line | 14.72:1 | 13.51:1 |
+| story steps (worst run) | 6.26:1 | — |
+
+The first pass of this scrim measured 19:1 — which meant it had blacked the photograph out entirely. Dialling it back to 0.62/0.5 keeps AA with margin *and* lets the image read; **a contrast probe passing is not the same as the design being right.**
+
+**Also fixed:** on mobile the device story's `Learn more →` rendered at **x = -40**, off the horizontal scroller's left edge, as a clipped `E →` fragment. Hidden there, consistent with `.ds-step__l` which was already hidden for the same reason.
+
+**Cost.** Built `HEAD~1` in a throwaway worktree and measured both under one harness (390×844, 4× CPU, 1.6 Mbps/150 ms, cache disabled, fresh context, median of 3):
+
+```
+BASE (HEAD~1)     LCP 1644 ms   initial transfer 329.9 kB
+WITH ATMOSPHERE   LCP 1660 ms   initial transfer 330.2 kB
+```
+
+**+16 ms LCP (inside run-to-run noise: 1660/2008/1652 against 1644/1636/1652) and +0.3 kB initial.** The plates are all lazy and below the fold, so none of the 2.92 MB touches the critical path.
+
+> ⚠️ **The alias could not be used for this.** `https://averr-git-redesign-v2-...vercel.app` now returns **403 "Vercel Security Checkpoint"** — Vercel deployment protection is on, to both `curl` and a real browser. The owner's 1820 ms / 144.5 kB baseline was taken on the alias, so these local absolutes are **not comparable to it**; the delta above is, because both sides were measured identically. **Until protection is lifted or a bypass token is supplied, the handoff's standing "verify against the alias, not localhost" rule cannot be followed** — verification in this entry is against local `vite preview`.
+
+### Deviations
+
+1. **The alias is unreachable** (403). Everything here was verified on a local preview build instead. This supersedes the standing alias rule until the owner acts.
+2. 28b (items 5–7) still untouched at the time of this entry.
+
+### My own errors
+
+1. **I read the first scrim failures as real and the pass as success — both backwards.** The ending's `rgb(243,243,244)` was the light section bleeding into an unclamped clip box, and the step list's reading came from hiding the very element that carried the scrim I had just added. Then when the numbers finally said 19:1 I nearly took it as done, when what it actually meant was that I had obliterated the photograph.
+2. **Two bright-pixel readings were edge artifacts, not grounds** — a 1px antialiased corner at the step panel's `border-radius`, and a step scrolled outside its own horizontal scroller so the clip landed on the page background. The fix was measuring each text run's own box, not the container's.
+3. The brightest-pixel method is **conservative by construction**: it reports the worst pixel anywhere in a box, whether or not a glyph sits on it. Useful as a floor, misleading as a verdict.
+
+---
+
+**28b** `7232912` — **Items 5–7: the cursor system, the section blends, the ending fill.**
+
+**Item 5 — cursor response.** New `src/components/nolana/Motion.tsx` holds the whole system: one rAF-coalesced `window` pointer listener per effect, writing **custom properties only**. Nothing writes `transform` from script, which is what lets each element's own stylesheet transform still compose — the rule that cost two earlier sessions when motion silently replaced one.
+
+- `useTilt(ref, 4)` — cards lean ±4° toward the cursor and publish `--mx`/`--my` for the sheen. Measured: 2.56° at 82% across, −2.91° at 15%, zero off-card.
+- `useSpotlight(ref)` — a cursor-following radial on the light sections, **capped at 6%** per the brief. Anything stronger on `#F5F4F9` reads as a smudge rather than light in the room. Measured at exactly 0.06.
+- `useMagnetic(ref, 7, 90)` / `<Magnetic>` — the CTAs drift toward the cursor and release. Measured: 0 at centre, 4.25px at +60, 1.59px at +120, **0 at +200 and beyond**.
+- Everything is off under `prefers-reduced-motion`, and behind `(hover: hover) and (pointer: fine)` so a touch device never carries the listeners.
+
+**It also fixed a latent CLS bug.** `.wc-orb` positioned itself with `left: var(--ox); top: var(--oy)`, rewritten every pointer frame. **Per-frame `left`/`top` writes are layout changes** — the same pattern that scored CLS 6.64 on the light beams. It is a transform now (`cqw`/`cqh` against the stage, so no JS needs the card's size) and reads the `--mx`/`--my` the tilt hook already publishes, so each card runs one listener instead of two.
+
+**Item 6 — the boundaries.** Six light/dark seams on home are now 34vh blends instead of cuts: hero→Problem, device story→Numbers, Numbers→work, work→One studio, One studio→founder, founder→ending. Each `<Blend from to />` names the two grounds it joins.
+
+Two things make it work:
+
+1. **They cost the page no height.** 34vh tall, pulled 17vh into each neighbour with negative margins, so they occupy padding that was already empty rather than adding 100vh of new emptiness to a page the owner already called empty.
+2. **The ends are MASKED, not merely colour-matched.** Colour-matching was my first attempt and it was wrong: the band is a sibling at `z-index: 1`, so an opaque end paints over any text inside the neighbour's padding and **erases** it. With a mask the ends show the real ground — the same colour either way, so the blend is unchanged — and only the middle third is solid. That third straddles the boundary, where no section has content.
+
+The mid stops mix **in oklab**. Straight sRGB between `#F5F4F9` and navy runs through a muddy grey that reads as banding.
+
+**Item 7 — the ending.** The fill starts at **45% visibility**, **latches**, and finishes on full white. Measured on a fresh approach: first word lights at **48% visible**, all 12 white by 100%. The latch matters — it used to un-fill as the section left, so a reader who scrolled past and back saw it half-lit.
+
+The unlit word is **still text somebody is reading**, so it has to clear AA on its own. Against the ending's measured ground `rgb(51,55,60)`: 0.3 alpha was 2.4:1 and 0.46 was 3.7:1 — both under. The floor is **0.58**, which computes to **5.2:1** against that ground, and the lift to full white still reads. The ghost CTA now carries its own ground (`rgba(10,14,22,0.58)` + blur) instead of depending on whichever pixel happens to sit behind it; lit CTAs measured 14.69:1 at 1440 and 9.26:1 at 390.
+
+**Verified** at 1440 and 390: CLS **0.0143 / 0.0120**, six blends present at 34vh between the right neighbours, tilt in range, spotlight at the cap, magnet releasing, reduced motion fully off (no tilt, no spotlight class, no magnet, sheen `display: none`, ending all-white at rest). **Entry JS 24.72 → 25.62 kB gzip (+0.90)**, CSS 29.74 → 30.33 (+0.59) — inside the +12 kB gate.
+
+### Deviations
+
+1. **Verified on a local preview, not the alias** — it still returns 403 (see the 28a item 3 entry). Unchanged from that session.
+2. Under reduced motion the build card keeps its static 4px hover lift: `.nw-card:hover` outranks the reduced-motion `transform: none`. It is an offset, not an animation, and the transition is removed, so it was left alone.
+
+### My own errors
+
+1. **I called my own working code broken, twice, on bad probe readings.** The tilt and magnet vars came back empty and I was ready to debug the hooks — the cause was `scroll-behavior: smooth`, so every rect I read immediately after `scrollIntoView` was the pre-scroll one and I was hovering empty space. **Read rects AFTER the scroll settles, or pass `behavior: "instant"`.**
+2. **I measured the ending fill after scrolling to the bottom**, which latched it, then reported "12/12 white at 0% visibility" as if it were a result. It was my own scroll path.
+3. **I measured `.en-stmt`'s computed `color` instead of the spans'** — the container inherits, so it reported 1.25:1 on text that was actually white. It did surface a real fault underneath, which is the only reason the unlit floor got fixed.
+4. **My first blend design would have erased text.** Opaque ends matched to the ground colour look identical but still paint over whatever is under them. Caught by reasoning about the padding, not by a probe.
+
+---
+
+## 3. SITE MAP AS BUILT
+
+### `/` — Home (`src/pages/Home.tsx`)
+
+| Order | Component | Signature mechanic |
+|---|---|---|
+| 1 | `Hero` | **The "serious." takeover.** Split h1 at `display-2xl`; a slab pill on the word "serious." expands via scroll-linked `clip-path` from the measured pill rect into a full dark frame carrying a 4-case-study reel that pans. Publishes a nav-dark override. **This is the quality floor for every other page.** |
+| 2 | `Chapter tone="cream" from="dark"` → `ThreeScenes` + `ThreeDoors` | Three unpinned scenes (template sameness → client specificity → full-bleed result); then three service doors with live hover previews clamped against both the name and the promise, Grow showing a mini dashboard labelled ILLUSTRATIVE; each door prints its pillar's first four service names in mono under the promise, read from `PILLAR_SERVICES` |
+| 3 | `Chapter tone="dark" from="cream-alt"` → `ProofLedger` + `Manifesto` | Ledger rows count up, hairline draws left→right; `FeaturedCard` above carries the 85% |
+| 4 | `Chapter tone="cream" from="dark"` → `FinalCTA markerNumber="06"` | Contains the only remaining home `PillHl` ("actually") |
+
+Data: `src/data/homeScenes.ts`, `src/data/heroReel.ts`, `src/data/servicePillars.ts`, `src/data/caseStudies.ts` (figures).
+
+### `/work` — The vault (`src/pages/Work.tsx`)
+
+Desktop is a **single relative wrapper**: `ProjectFilm lead={1.5}` with `VaultDoors lead={1.5}` absolutely positioned over its first 1.5 screens.
+
+| Component | Signature mechanic |
+|---|---|
+| `VaultDoors` | **Two cream panels part** to reveal the film already playing behind them. Title halves ride outward ±32vw and fade. Overlay, `pointer-events: none`, returns `null` under reduced motion. |
+| `ProjectFilm` | One pinned dark stage over `(count + 1 + lead) × 100vh`. Position is a **continuous float**, not an index; text leaves before the next arrives; images crossfade. Each project: meta, name full-width (`display-xl`), then a 30/70 grid of facts + screenshot at natural aspect. Room lit in the client's tint at 18%. |
+| `FilmIndex` (inside ProjectFilm) | Compact dot column + active name; hover/focus expands all names, each on its own dark ground. Dots are buttons with `aria-label` = project name. |
+| `OpenTransition` | Clone of the screen grows from its rect to fill the viewport over the study's tint, then the route changes. Falls back to plain navigation on reduced motion / missing image / throw. |
+| `WorkMobile` | < 768px: static hero, then one `100svh` scroll-snap section per project, progress dots. |
+| `VaultCloser` | Kept from Session 14, inside `Chapter tone="cream" from="dark"` |
+
+Back from a case study restores the exact segment via `sessionStorage` + `useNavigationType() === "POP"`.
+
+### `/work/:slug` — Case studies (`src/pages/CaseStudy.tsx`)
+
+Order, each wrapped in `SectionBoundary`:
+
+1. `ReadingRail` — fixed, **≥1700px only**; below that a tinted 2px bar under the nav. Labels come from `caseSections.ts`. Replaced `ScrollProgress` (now orphaned — see §7).
+2. `CaseHero` — **zoom into the work**: one screenshot scaling 0.62→1, flattening rotateX 12°→0°, radius 12→8, landing at exactly `--container-wide`; two blurred tinted depth copies of the *same* image fan out behind it.
+3. `Context` — statement (first sentence, `type-h2`, ink) + support (rest, muted, offset right), both read-fill; verbatim tint highlighter on the statement; numerals fill `--hair` → tint.
+4. `Approach` — pinned split: blocks scroll left, one sticky frame right, images wipe up. Pillar names render as **outline + fill clipped by one `--fill` var per block**, with a 2px tint rule. Counter `"DESIGN · 1 / 3"` under the frame.
+5. `Inventory` — self-ticking checklist; each item's box draws a check in the tint; counter `"05 / 07 shipped"`; labels (h3) over detail (body); stack chips assemble after the last tick.
+6. `Chapter tone="dark" from="cream"` → `Signatures` (if any) + `Gallery` (if any) + `Outcome`
+   - `Signatures` — full-width rows, image zooms 1→1.35 with `transform-origin` on the signature's own `focal` point.
+   - `Outcome` — figure-led where a `headlineFigure` exists (counts up, tint glow); otherwise leads with the headline. **Never a placeholder.**
+7. `Chapter tone="cream-alt" from="dark"` → `Next` — a lit timeline, one node per sentence, phase openers ("Weeks 4–12", "Before") promoted to mono labels.
+8. `CaseFinale` — next study's hero image full-bleed expanding to viewport width, then the label + Continue CTA + one booking link **below it on clean cream**.
+
+`useDeclarePageEndTone("cream")` so the Footer reveals over cream.
+
+### `/work/careerclarity-ai` — draft
+
+`status: "draft"` routes to `ComingSoon`. **Never linked from the finale cycle.** Appears in the /work film as the final segment: muted name, `IN PROGRESS`, no image, no figure, no link, neutral (non-tint) light.
+
+### `/services` — "Watch us build your business" (`src/pages/Services.tsx`)
+
+**Rebuilt across 17c-1 … 17c-5 and swapped in here in 17c-5**, replacing the flat 16-row service index. Signature mechanic: **the build**.
+
+One continuous pinned scene. A generic GTA home-services business (**Northgate**, `northgate.ca`) is built as you scroll, and each of the sixteen services is the caption of the step happening on screen. **The story is the list — no service is named twice on the page.**
+
+| Order | Component | What it is |
+|---|---|---|
+| 1 | `BuildHero` | Eyebrow counts `SERVICE_COUNT`; h1 "Watch us build *your* business." on one `CharReveal`; scroll cue |
+| 2 | `ServicesBuild` | **The stage.** 16 beats + 2 chapter transitions on one pin |
+| 3 | `Chapter dark from cream` → `NoList` | unchanged |
+| 4 | `Chapter cream-warm from dark` → `KickoffPass` | **17g**: guided two-step conversation (visible name field + live typing hint, arrows/neighbours/month popover) building a live boarding pass; in-page Cal.com modal; flips to CONFIRMED on a real booking |
+| 5 | `Chapter dark from cream-warm` → `ServicesCloser` | `useDeclarePageEndTone("dark")` |
+
+**Slot model.** Beats are not evenly spaced, so scroll maps onto SLOTS, not beats: 5 Design beats at 65vh, an 80vh transition, 5 Automate beats, an 80vh transition, 6 Grow beats. **Travel 1200vh, wrapper 1300vh** (the n+1 rule, §5.4). Per beat: caption in 0–0.15, screen builds 0.05–0.40, **dwell 0.40–0.85**, caption out 0.85–1.00. One continuous float drives caption, canvas and rail.
+
+**The sixteen screens** live in `components/services/build/`: `BuildScreens.tsx` (Design), `AutomateScreens.tsx`, `GrowScreens.tsx`. Each is a different piece of software, each has a `compact` mobile variant — **restructured, never scaled — with 11px the floor for every text node across all sixteen.**
+
+**Systems:** `WindowChrome` (the window, 67% of a stage capped at 1680 on this route only), `GhostCursor` (choreographed from the same scroll value, so a click and its response cannot drift), `camera.ts` + `FocusSpotlight` (**spotlight only — there is no scale; every push-in value tried cropped the frame, which is arithmetic, not tuning**), and `ALL_SPECS`, which mounts only the active slot ±1.
+
+**Chapter anchors.** Home's doors link to `/services#design|#automate|#grow`. Those ids are no longer sections — the chapters are scroll positions inside one pin — so `ServicesBuild` reads the hash (from `useLocation`, so it reacts to a same-document hash change too) and jumps to that chapter's first beat, retrying until layout settles and cancelling on a real gesture.
+
+**Map data.** `src/data/osmOshawa.ts` is a committed static extract of real streets over central Oshawa and Whitby: **OpenStreetMap, © OpenStreetMap contributors, licensed ODbL.** Pulled once from Overpass, projected flat and Douglas-Peucker simplified — 880 ways, 9.4 kB gzip. **No tiles, no API call at runtime, no map library.** The attribution renders inside the map window at 11px and must stay there.
+
+**Mobile / reduced motion** drop the pin: one section per service, each screen at its finished state.
+
+**Deleted in the swap** (zero importers each, verified): `pages/ServicesNext.tsx`, `components/services/ServiceIndex.tsx`, `components/services/AutomatePipeline.tsx`, and the whole of the old `Services.tsx` (`ServicesHeader`, `PillarSequence`, `PillarSection`, `StackedPillar`, `StaticAmbient`, the three pillar ambients).
+
+### `/about`, `/contact`, `*` (404)
+
+`/about` — **complete as of 18e.** A cream hero with the centred PU mark (height-driven, tilts toward the cursor); a **fly-into-the-mark** transition into **the desk** (`components/about/desk/`, one pinned stage, four full-scale screens, blue only inside `.studio-screen`); then **the process scene** (`components/about/process/`, a second pinned stage on cream-alt holding ONE browser window in which a bakery homepage rises in fidelity across the five stages); then **the founder as credits** (`FounderCredits.tsx`, sticky split, the mark with a push-in, five sourced credit lines); then the closer on dark, opening with the mark drawing once more (`SignatureMark.tsx`). `Chapter`'s clip-path slabs at every boundary. `/contact` — **rebuilt in Session 19.** A cream hero with the h1 and **two path cards** (book / brief); the dark "24 hours. Every message." statement; the **booking** framed in the site's window chrome, mounting one viewport early and preserving the `?date` / `?notes` handoff (`components/contact/BookingSection.tsx` + a lazy `CalEmbed` chunk); **the brief** — a conversational form whose answers compose a reply beside it live, folding into an Outbox and returning a Received receipt on submit (`BriefSection.tsx`, `ReplyPreview.tsx`); the direct row with email, LinkedIn, service area and response time; the dark "Talk soon." closer. **No budget field and no `$` anywhere.** `404` (`NotFound`) — carries its own `PillHl` ("doesn't exist").
+
+### Image-usage map (rendered)
+
+**Zero content repeats on every case-study page**, verified on the alias:
+
+| Study | Content images | Repeats |
+|---|---|---|
+| CG Walls | 3 | none |
+| CapitalCommand | 8 | none |
+| SIFT | 8 | none |
+| CadenceStack | 8 | none |
+
+Two categories must be **excluded** from any image audit or you will get false positives:
+- `.case-zoom-wrap div[aria-hidden="true"] img` — the hero's 2 blurred depth copies (same src as the front, by design).
+- `[data-frame-base] img` — the Approach frame's base layer, which stays mounted at rest holding the same image as the top layer (dropping it reintroduced a blank first paint).
+
+The **data** still lists `heroImages[1]` and `[2]` per study; they are **never rendered** (the hero uses `heroImage` alone). They are documented in the type as droppable — removing them plus the `heroImages?.[0]` fallbacks in `CaseHero` and `CaseFinale` is safe cleanup.
+
+---
+
+## 3b. SITE STANDARD — the one colour flow
+
+**Owner instruction, Session 25, overriding the cream/ink chapter rhythm.** The site palette is **the dark ground + chapter light + parch type**. **Cream grounds are retired site-wide.** Home is migrated; the other pages migrate in later sessions. This section is the pattern to copy.
+
+### The three layers, in order
+
+1. **One ground.** A single wrapper (`.home-dark`) carries `--color-dark` from the first pixel to the last. No section paints its own ground. A chapter that used to be cream is made `background: transparent`.
+2. **The light, ON the ground.** One `position: fixed` layer (`.clight`) whose colour interpolates with scroll between chapter entries. It sits at `z-index: 0` **above the wrapper's background**; content sits at `z-index: 1`.
+   **The trap that cost two sessions:** if the wrapper's background is opaque and the light is a child painted behind it, the light is invisible and nothing errors. The wrapper needs `isolation: isolate` and the content needs an explicit `z-index` above the light.
+3. **Parch type on top**, never sitting on the hotspot — the glow is parked in the object column (x ≈ 24%), the text column stays off it.
+
+### The light's own shape
+
+Per chapter: `{ rgb, alpha ≤ 0.5, horizon ≤ 0.3, x, y }`. A tight glow radial (`34% 40%`) plus a wide low horizon radial (`118% 46% at 50% 108%`). The chapter's rgb is published as `--chapter-rgb` on `:root`, which is how the giant word's 1px edge stroke and the active rail label pick it up for free. Under reduced motion it snaps to the nearest chapter instead of interpolating.
+
+### What makes it read as colour and not as cheap
+
+Measured, not asserted: it is **never the brightest thing in frame**, it is **occluded by the object in front of it**, and it **falls off into black before the text column**. Those three together are why it does not look like a gradient blob. Raise any of them and it will.
+
+### The rules that come with the standard
+
+- **Every colour flips with the ground, including the inherited one.** Overriding each *named* element to parch is not enough — set `color` on the section wrapper too, or anything that inherits comes out ink-on-dark and is invisible without erroring. This bit three times in one session.
+- **`--color-muted`, `--color-ink`, `--color-ink-soft`, `--color-muted-2` are CREAM-ground tokens.** On the dark ground use `--color-parch`, `--color-muted-l`, or an explicit `rgba(237,233,226,…)`.
+- **An inline colour can only be beaten by that component's own `style` prop.** `TorontoClock` and `MagneticCTA` both paint inline; `MagneticCTA` takes `tone="dark"`.
+- **The global footer takes the tone of the page it closes**, via `useDeclarePageEndTone`. A page that ends dark declares `"dark"` and the footer follows. This is the migration hook: as each page moves to the dark ground, it declares its end tone and the footer comes with it.
+- **Verify by sampling the pixel, with the text hidden.** Sampling with glyphs present returns anti-aliased parch edges, not ground.
+
+### The migration checklist for the next page
+
+1. Wrap the page in the dark ground; make every section's own background transparent.
+2. Mount the light layer and give the page its chapter entries.
+3. Flip the inherited `color` on every section wrapper, not just the named elements.
+4. `useDeclarePageEndTone("dark")`.
+5. Sweep **every text-owning element against the ground actually behind it** and require ≥ 4.5:1. Expect to find ink-on-dark that renders in the DOM and is invisible on screen.
+6. Trace every 5% for dead frames, and crash-scroll for CLS — a lazy reserve written for one breakpoint will collapse the page on another.
+
+
+## 4. LOCKED RULES + STANDING RULES
+
+**Never break these without Prachets explicitly unlocking them in the session brief.**
+
+### Locked
+
+- **THE PALETTE RULE IS UPDATED BY OWNER INSTRUCTION (25).** Cream grounds are RETIRED site-wide. The palette is the dark ink ground + chapter LIGHT + parch type. A page is one continuous ground; the story is told by a fixed light layer whose colour interpolates with scroll, not by switching grounds. Home is the pilot (Session 25); the other pages migrate in later sessions. Screen and photo interiors still keep their own colours.
+- **THE SITE STANDARD, as the owner approved it (25).** Three patterns carry every page from here: (1) the 3D room of real work, (2) the giant word with real captures moving inside the letterforms, (3) dark plus parch typographic confidence. A chapter is: a 3D object that answers the cursor, the giant word, a line addressed to the reader, and a ruled list that links onward.
+- **VISUAL OCCLUSION IS PAINT ORDER, NOT BOX OVERLAP (25c ruling).** In a 3D stack the front plane is nearest the camera: the planes behind it intersect its rect by 65-78% while covering none of it. `getBoundingClientRect()` cannot answer "is this covered" — sample `elementFromPoint` over a lattice inside the element and require every point to hit it.
+
+- **A CONTROL THAT MUST DO TWO THINGS IS TWO CONTROLS (25c ruling).** Ch3's tile was one `Link` meant to both reorder the stack and open a case study, and a tap could not be made to do the first without the second: react-router navigates in a transition ~240ms after the click, and `preventDefault` does not hold it — not from React's handler, not from a capture-phase listener with `stopPropagation`. The tile body is a `<button>` and the case-study link is its own control. Anything reaching for `pointerType`, `(hover: none)` or a "first tap arms it" ref is working around a structure that is wrong: a tap synthesizes `mouseenter` BEFORE `pointerdown`, so no ordering-based test is sound either.
+
+- **AN INTERSECTION THRESHOLD IS A RATIO OF THE OBSERVED ELEMENT (25c ruling).** Home's chapters pin for 320vh, so in a 900px viewport a chapter's intersection ratio tops out near 0.31 and `threshold: 0.4` never fires. For "is the reader at this chapter", observe the viewport's middle band with `rootMargin: "-40% 0px -40% 0px"` and threshold 0.
+
+- **A SELECTOR THAT SETS `position` MUST NAME WHAT IT MEANS (25c).** `.home-dark > *:not(.clight)` was written to lift the chapters above the light layer and also caught the fixed chapter RAIL, overriding `position: fixed` to `relative`: a 1440x256 nav sat in the document flow and pushed the whole page down 256px for a session. It is `.home-dark > section`. Verifying a component's BEHAVIOUR is not verifying its POSITION — the rail tracked chapters and tinted correctly the whole time.
+
+- **THE HERO TYPE SIZE IS A MEASUREMENT, NOT A STYLE (25c).** The divisor in `--type-hero-size` is the longest line's length in this face, and the vh term is the other half of the `min()`. When the copy changes, both change: the 25c headline is 13 characters where the old one was 38, and the vh term — not the column — was what held the type at 67px when the ruling asked for >= 120px. The field's safe zone is downstream of this: the headline's ink box moved from x 0-46% to x 8-58%, and planes that cleared the old zone did not clear the new one.
+
+- **A LAZY RESERVE IS ONLY CORRECT UNTIL ITS CHAPTER CHANGES (25c).** Ch3's proof tiles took it from 93vh to 159vh on a phone. Any session that changes a chapter's height re-measures and updates BOTH of its reserves.
+
+- **EXCEED, DON'T REPLICATE (27b, OWNER INSTRUCTION).** Nolana is the QUALITY BAR, not a template. Keep its palette discipline, material language and step-by-step storytelling; never copy its layouts, copy, icons, chip wording or section order one-to-one. Every section's critique must state (1) what we kept from Nolana's craft and (2) what ours does BETTER — if you cannot name what is better, it is not done. Averr's voice stays: the Cormorant italic accent on one key word per section, Averr's own copy throughout. The frames live in `docs/reference/nolana/` and **`docs/reference/` is gitignored — the repo is public.**
+
+- **ONE TYPEFACE ON HOME (28, OWNER RULING).** Cormorant is retired from home. Emphasis is only: a two-tone heading (ink lead + `--ink-2` continuation), the scroll word-fill, or `--grad` on ONE key word per section via `background-clip: text`. Other pages migrate later. Audit it by testing elements that CARRY TEXT — a decorative `<i>` is italic by default and will false-positive.
+
+- **THE SITE PALETTE IS THE NOLANA SYSTEM (27, OWNER DIRECTION).** This **SUPERSEDES** the Session 25 dark-ground + chapter-light rule. Light dominates: `--bg #F5F4F9`, `--bg-alt #EFEEF5`, hairlines `--hair #D4D4DA`, ink `--n-ink #0F1117`. Navy (`#121C27`/`#182633`/`#232837`) and black (`#080A0A`) are **cinematic moments only**. ONE gradient, `--grad`, applied PER ELEMENT — `background-clip: text` for words and numbers, `fill` for pills and glyphs — never as a wash. Home is migrated; the other pages follow in later sessions. The shared parts live in `src/components/nolana/Bits.tsx`: the mono chip, the two-tone heading, the corner index, the hairline guides, the gradient icon tile. The dark glass nav bar sits on EVERY section of home.
+
+- **`--ink-2` IS TWO TOKENS (27a).** The measured grey `#898997` is 3.15:1 on `--bg` and fails AA for normal text. `--ink-2` is `#6E6E80` (4.56:1) and is the default; `--ink-2-display` is the measured grey and may only be used at **≥ 24px**, where the threshold is 3:1.
+
+- **A GRADIENT TEXT FILL SAMPLES THE ELEMENT'S BOX, NOT ITS GLYPHS (27a).** A block-level number takes the full cell width, so a short figure like "16" showed only the first third of the ramp and every number came out peach. Anything with `background-clip: text` is `display: inline-block`.
+
+- **A CONTRAST PROBE MUST KNOW THE GRADIENT GROUNDS (27a).** Walking up for a solid `backgroundColor` falls through every gradient surface — the navy hero, the paper pieces, a white button inside a dark section — and silently compares text against the wrong ground in both directions. Name the known grounds in the probe before trusting a sweep.
+
+- **CAPTURES APPEAR ONCE ON HOME: THE WORK SECTION (26, OWNER DIRECTION).** The project dashboards repeated in the hero, the service chapters, the work wall and the case studies. On home they now appear in Ch6 only. Everything else is built from the PIECES (`src/components/home/pieces/`) — including the giant words, whose fill is a tiling SVG pattern of the chapter's own pieces, and the service links, which name their project instead of showing a thumbnail. Audit it with a per-chapter `img` count.
+
+- **ONE FOREGROUND ACCENT SET (26).** Parch plus `--accent` #C8763C / `--accent-text` #D98F55 (7.04:1 on the dark ground). The chapter hue belongs to the LIGHT, never to foreground elements: following `--chapter-rgb` in the foreground gave the page four different accent colours depending on scroll position. Supersedes the 25b tinting ruling for foreground only.
+
+- **A STYLESHEET TRANSFORM AND A MOTION TRANSFORM CANNOT SHARE A NODE (26a).** motion builds its own `transform` string from x/y/z/scale/rotate and it REPLACES the CSS one — silently, with no error. Twice in one session: the hero's pieces lost their translateZ and centring (ten of fifteen rendered off-frame) and Ch3's isometric lean never applied. One element owns placement, a child owns the motion.
+
+- **MOVE THINGS WITH TRANSFORMS, NOT `left`/`top` (26a).** The chapter light's two beams were anchored with left/top and rewritten every scroll frame, which is a layout change: the browser scored it as a layout shift and crash-scroll CLS hit 6.64 against a 0.1 budget. Anything written per frame moves by transform, and positions travel as vw/vh so a translate can consume them.
+
+- **BEFORE ADDING A CLASS PREFIX, GREP FOR IT (26a).** `.ws-layer { opacity: 0 }` survived the WorkStrip's deletion and made Ch2's whole scene invisible. The second collision in two sessions after `.ob-stack__card`.
+
+- **THE FOOTER TAKES THE TONE OF THE PAGE IT CLOSES (25b, ACCEPTED BY OWNER IN 25c).** `useDeclarePageEndTone` drives it: a page that ends dark gets the dark footer. Home, `/services` and `/about` are dark today; `/work` and the remaining cream routes keep the cream footer until they migrate. **The owner has accepted the dark footer on `/services` and `/about`** — the site is moving to the dark standard and this is the migration hook, not a side effect to undo.
+
+- **THE SITE PALETTE IS THE DARK GROUND + CHAPTER LIGHT + PARCH TYPE (25, OWNER INSTRUCTION).** This **UPDATES** the earlier locked palette rule: **cream grounds are retired site-wide.** Home is migrated; the other pages migrate in later sessions. The pattern, the traps and the per-page checklist are in **§3b SITE STANDARD**. The global footer takes the tone of the page it closes (`useDeclarePageEndTone`), which is the migration hook.
+
+- **HOME IS EIGHT CHAPTERS ON ONE GROUND (25).** What we build (the hero) · Websites · Products · Automation · Marketing · The work (/work) · Who builds it (/about) · Your move (/contact). This **supersedes** the five- and six-chapter rules below. The rail carries all eight and its active label is tinted by the chapter light.
+
+- **A COLOUR IS VERIFIED BY SAMPLING THE PIXEL, NOT THE STYLESHEET (25b).** The chapter light was computed correctly, written to the node correctly, and invisible for two whole sessions because an opaque background painted over it — and nothing errored. Sample the glow's own centre; sample the ground **with the text hidden**, because glyphs present return anti-aliased parch edges.
+
+- **EVERY COLOUR FLIPS WITH THE GROUND, INCLUDING THE INHERITED ONE (25b).** Overriding each *named* element to parch leaves anything that inherits rendering ink-on-dark: in the DOM, invisible on screen, no error. Three separate instances in one session, including Ch7's entire CTA. Set `color` on the section wrapper, and remember an inline colour can only be beaten by that component's own `style` prop.
+
+- **A LAZY RESERVE IS PER BREAKPOINT, AND THERE ARE TWO OF THEM (25b).** Home's chapters pin for 320vh on a desktop and stand at ~100vh on a phone; one reserve for both collapsed the page by ~1,843px under the reader and took mobile CLS to 0.4363. `LazyBelowFold`'s placeholder **and** the `Suspense` fallback behind it both reserve, and both have to agree.
+
+- **BUNDLE SIZE IS MEASURED ON A REAL LOAD (25a).** Rollup's split is a function of the module graph, so the entry chunk's gzip is not comparable across a restructure — rearranging home moved React into the entry and read as a 14 kB regression that did not exist. `vite.config.ts` pins react and motion into their own chunks, and the metric is the total JS transferred on a real page load.
+
+- **HOME IMPORTS NOTHING FROM ANOTHER PAGE'S COMPONENTS (24b ruling).** Every plane in the hero field is a real case-study capture, and no home module imports from `services/build`. The screen chunks (37.12 kB gzip) are off home's graph and live inside /services' own lazy `ServicesBuild`.
+
+- **HOME IS SIX CHAPTERS AND EVERY ONE REACHES A PAGE (24).** Your customer (the hero) · Seen it before (the argument) · The work (/work) · How we do it (/services) · Who you'll work with (/about) · Your move (/contact). A chapter previews a destination's IDEA and never mounts its components or copies its mechanic — `ServicePanels` was deleted for doing exactly that.
+
+- **THE LUMINANCE RULE IS RELATIVE TO THE SUBJECT (24a).** 23b's "no frame below the at-rest mean" was written for a bright landing. CapitalCommand's capture has a mean luminance of 38.6 where CG Walls' was 224.4, against a room at 52.9 — a dark destination can never clear it. The tests that hold: the landed frame matches the CAPTURE's own luminance (full brightness, nothing dimming it), no frame is empty, and the sweep into the landing is monotonic.
+- **HOME'S ARGUMENT COPY IS RESTORED, NOT REWRITTEN (24a).** The three beats in chapter 2 are verbatim from `src/data/homeScenes.ts`, which outlived the component that used them (`ThreeScenes.tsx`, deleted in `b8dd1bc`). Anything that re-stages this argument takes the copy from there.
+
+- **A SCROLL SEQUENCE IS JUDGED BY PIXELS (23b).** Sample mean luminance of a downsample at every 5% of the pin and compare each frame to the at-rest frame. No frame may be darker than the composition the reader arrived on. "It looks murky" found a 20-point stretch that did not exist; the measurement found one crater 28 points deep at a single 5% mark.
+
+- **THE HOME HERO IS MADE OF REAL WORK ONLY (23).** Every plane in the field is an existing case-study capture through the WebP pipeline or a live /services screen component. No generated sites, no stock, no placeholders, no invented figures — a plane prints a `headlineFigure` only where `caseStudies.ts` has one. The 21b generator and its presets are deleted.
+- **A 3D FIELD IS AUTHORED IN SCREEN SPACE (23).** `translateZ` moves a plane toward the perspective origin and shrinks it, so layout coordinates are not where the plane lands. `fieldPlan.ts` stores where each plane should APPEAR and `HeroField` divides by that plane's own `k = perspective / (perspective − z)`. Authoring in layout coordinates put six to eight planes on top of the headline.
+- **A DOLLY NEEDS AN EVEN DEPTH LADDER (23).** Clustered z values leave a stretch of the fly-through with nothing at a visible distance, and the frame empties out. The field's sixteen planes run +80 to −2000 at about 139px a rung, and the landing overlaps the field's exit by 18 points of the pin so there is never a gap.
+
+- **HOME IS FIVE CHAPTERS, AND EACH ONE PREVIEWS A PAGE (22).** Your business → The work (/work) → What we do (/services) → Who builds it (/about) → Start (/contact). A chapter previews the destination's IDEA and never copies its signature mechanic: home's monogram is drawn by the scroll, /about's draws on a timer. Each chapter carries `id` and `data-tone`, which is what the rail reads.
+- **NO UNVERIFIED FIGURES (22).** The three Averr Studio numbers (40+, 15×, 1.4s) are gone with `ProofLedger`. A case-study card prints a `headlineFigure` only where the data has one — two of the four do — and prints the sector and pillars where it does not. Nothing on the site invents a number.
+
+- **THE TYPED NAME IS MEMORY ONLY (21b).** `lib/businessName.tsx` is React state at the app root: no localStorage, no sessionStorage, no cookie, no analytics, no network. It dies with the tab. It travels only in a `?notes=` the visitor clicks, and the context is the fallback for a navigation that carries none.
+- **THE HERO SLAB IS A CONTROL NOW (21b).** It is PillHl's box with an `<input>` in it. Anything done to the slab has to keep: the ruler measuring at the UNSCALED size, the step-down fitting the CONTENT box, the line box fixed so the page cannot move under it, and the first frame painted in ink before the surface arrives.
+
+- **A SCREEN'S INTERIOR IS NOT THE PAGE'S PALETTE (21 ruling).** /services' screens carry their own colours wherever they are reused — the navy agent console in the home hero is correct and stays. The 18d rule governs the PAGE: cream/ink chapter rhythm and tokens, with blue/violet confined to `.studio-screen`. A reused screen inside its own window frame is not an extrapolation.
+- **A PINNED HERO MUST FIT 100vh, SO IT ONLY PINS WHERE IT FITS (21 ruling).** A sticky 100vh frame clips. When the hero's composition stacks, it stops pinning — `FLAT_QUERY` is `max-width: 1023px`, the same breakpoint at which the hero stops being two columns. At 1024×768 before this, the headline's first line sat 53px above the viewport.
+
+- **A MEASURED BOX NEVER ANIMATES AS LAYOUT (21).** Anything whose width depends on its content — the hero's cycling slab is the case — is measured in the type it will actually render in, fixed at the widest, and animated on `scaleX`. A ruler that does not carry the rendering element's own classes is not a measurement: `.pill-hl__word` re-tracks text to `-0.015em` and measuring without it came out 8% short at every width.
+- **PillHl IS STILL HOME ONLY, AND STILL 2 (21).** The hero's pill is now `PhraseSlab`, which renders PillHl's own `.pill-hl--bare` classes rather than a copy of them. The measured `.pill-hl` inventory is unchanged: 2 on `/` (hero + FinalCTA), 0 on every other route.
+
+- **PillHl IS HOME ONLY (20).** The hero and FinalCTA, nowhere else. It was removed from the 404 in Session 20; the inventory is measured at 2 on `/` and 0 on every other route.
+
+- **PALETTE SCOPE (18d, after a 0/10).** An element the owner likes is **kept and applied LOCALLY**. It is **never extrapolated into a page or site palette** without an explicit instruction. 18c-1 took the blue/violet of one panel — "A site that ages well" — and made it the whole of /about's ground, replacing the cream/ink chapter rhythm. Every page follows the site's tokens and chapter rhythm; a liked treatment stays inside the element it belongs to (on /about: `.studio-screen`, which is the monitor and nothing else).
+1. **`type-*` utility classes only.** No per-page inline font sizes. Tiers: `display-2xl`, `display-xl`, `display-l`, `h1`, `h2`, `h3`, `body-lg`, `body`, `small`, `eyebrow`, plus `type-accent` (Cormorant italic).
+2. **Motion tokens only** — `src/lib/motion.ts` (`duration`, `ease`, `easing`, `spring`). No ad-hoc durations or beziers.
+3. **`useReducedMotion` everywhere**, with a real final state (not just "no animation").
+4. **`useScrollStyle` for ALL scroll-linked opacity inside sticky frames.** Non-negotiable — see §5.
+5. **`easing.*` (cubicBezier callables) for `useTransform`'s `ease` option** — never the `ease.*` tuples. See §5.
+6. **Measured pixels, not `calc()`**, for animated sizes/positions. See §5.
+7. **Screenshots at natural aspect (`object-fit: contain`)** — never cropped, never upscaled past natural size.
+8. **No prices anywhere on a live route.** Timelines instead. The contact form's budget bands are the sole exception (asking a client's budget ≠ publishing ours).
+9. **`PillHl` = home hero + `FinalCTA` "actually" + `/nope` only.** Note `FinalCTA` is shared by home and `/services`, so "actually" legitimately appears on both.
+10. **Client tint is ambient only** — glows, small progress accents, highlighter grounds. Never body text, headings, or Averr buttons.
+11. **ASSET RULE** — if an asset the spec references is missing or inconsistent with the other studies, **STOP and flag before building.** Do not ship visible inconsistencies.
+12. **Never invent figures.** Only `headlineFigure` values may be shown as results. Sample numbers must carry the ILLUSTRATIVE label.
+13. **Verbatim rule** — any emphasis/highlighted phrase must be an exact substring of the copy it sits in; labels must be built only from that item's own words. Verify programmatically before shipping; if it isn't verbatim, don't ship it.
+14. **One signature mechanic per page, never reused.** Home = the takeover. /work = doors + film. Case studies = the zoom + the rail. /services and /about must each get their own.
+15. **The home "serious." takeover is the quality floor.** Any new page that reads weaker than it is not done.
+
+### Standing (process)
+16. **`npm run build` UNFILTERED, exit code 0, before every push — and report the exit code.** Never pipe it through `grep`: that is how two broken commits were pushed (`64e8bcd` fixed them). `npx vite build` skips `tsc` and will happily produce a bundle from code that does not typecheck.
+17. **Visually review every screenshot you take and describe what you see.** Measurements alone have repeatedly passed while the page looked wrong.
+18. **Commit + push after each verified item**, so a usage limit mid-session loses nothing. **This outranks the `Commit:` line at the foot of a brief** — that line is the session *summary for the final report*, not one commit message to squash the work onto. Ruled by Prachets in 17-fix after Session 17 shipped as ten commits against a brief that supplied one message.
+19. **Verification protocol:** build exit 0 → push → confirm remote hash matches local → wait for Vercel → poll the alias until it serves the new bundle hash → DOM sweep **on the alias** → screenshots → hand back the preview URL.
+20. **Zero horizontal overflow at 375** on all routes, every session.
+21. **Zero ViewTimeline/ScrollTimeline on sticky descendants**, every session.
+22. **Bundle gate:** report the delta; flag anything over **+12 KB gzip JS**.
+23. **Crash-scroll before reporting.** Before reporting ANY session, scroll every touched route top → bottom at three speeds — slow wheel, normal, fast/large steps — and back up again, with **zero console errors and zero React errors**. A route that crashes anywhere means the session is not verified, whatever the DOM sweep says. Added in 17c-4 after 17c-3 shipped a React #185 that a position-sampling probe never hit: the probe jumped straight to each dwell midpoint and the crash lived in the travel between them.
+24. **Report your own probe errors.** Several "bugs" were bad measurements (the 234px sliver, a rotation inflating `getBoundingClientRect`, reading `strokeDashoffset` when motion animates `stroke-dasharray`, sampling a segment before its count-up finished). Re-probe before changing working code.
+
+---
+
+## 5. TECHNICAL LEARNINGS (every gotcha, with cause + fix)
+
+**1 · motion 12.43.0 ViewTimeline acceleration.** *Cause:* motion hardware-accelerates scroll-linked `opacity` into a native WAAPI animation bound to a **`ViewTimeline`** — the element's own progress through its scrollport — not the `useScroll` progress it was derived from. Inside `position: sticky` the element never moves, so the timeline is meaningless; once WAAPI owns the property motion stops writing inline style, and **WAAPI outranks inline style in the cascade**. `transform` is unaffected (not accelerated). *Diagnosis:* `el.getAnimations()`. *Fix:* `src/lib/useScrollStyle.ts` — subscribe to the MotionValue and write `el.style.opacity` by hand. Returns a **callback ref** so conditionally-mounted nodes paint correctly on attach.
+
+**2 · `useTransform`'s `ease` option crashes on a bezier tuple.** *Cause:* `transition` accepts `[0.65,0,0.35,1]`, but `useTransform`'s `ease` **calls** what it's given; motion's `pipe()` throws `"a is not a function"`. TypeScript does not catch it. *Fix:* `easing.inOut` etc. in `lib/motion.ts` (`cubicBezier(...)`), passed as an **array**: `{ ease: [easing.inOut] }` — one easing per segment.
+
+**3 · `calc()` → `100vw` does not interpolate.** *Cause:* motion cannot tween `calc(var(--container-wide) * 0.6)` against `100vw`; it snaps to the end value on the first frame. *Fix:* measure both ends to pixels (`clientWidth`, a container probe) and interpolate numbers. Same rule for `clip-path` insets — use px, not %.
+
+**4 · Sticky pin math.** A wrapper of height H containing a `100vh` sticky child pins for **H − 100vh**, not H.
+- A **160vh** wrapper pins for only **60vh** — the hero zoom was timed over 0→0.55 of the wrapper and finished *after* the pin released.
+- An **n × 100vh** wrapper pins a 100vh stage for **n − 1** segments — the last project never got pinned time. Fix: wrapper `(n + 1) × 100vh`, and map progress over `height − innerHeight`.
+
+**5 · CharReveal word overflow.** *Cause:* `CharReveal` lays each word out as an `inline-block`, so nothing breaks mid-word: a word wider than its column **overflows silently while still reporting one line**. Line-count checks miss it entirely — that is how "CadenceStack" ended up sitting on top of a screenshot. *Fix:* measure the **widest single word** against the column width. And when no tier fits, the layout is wrong, not the type scale — the /work name moved to its own full-width row.
+
+**6 · `AnimatePresence` with no `exit` drops the outgoing layer instantly.** *Cause:* keyed on the active index with no `exit` prop, the old layer unmounts the moment the key changes, while the incoming layer mounts fully clipped (`inset(100%)`). For the length of the wipe there is **nothing to draw**. Preloading cannot help — the gap is structural. *Fix:* keep the outgoing image mounted underneath until the incoming one has wiped over it. Keep it mounted at rest too (dropping it at rest reintroduces a blank first paint); mark it `[data-frame-base]` so audits exclude it.
+
+**7 · `IntersectionObserver` ignores `clip-path`, and the nav collects targets once.** *Cause:* the nav's tone detector queries `[data-tone='dark']` **once per route** (a rAF after mount) and observes a 1px band under the nav. A clipped dark stage still reports its full box, so the nav flipped the instant a 1px slit appeared; and adding `data-tone` later doesn't register the element. *Fix — the marker pattern:* keep a marker element **always in the DOM, outside any clipped ancestor**, and move it in and out of the nav's band by changing `top`. Make it span the frame once open, or it falls above the band as the frame scrolls away.
+
+**8 · React state survives `/work/:slug` changes.** *Cause:* React reuses the component instance across a param change, so `Approach`'s `active` index survived from a three-pillar study into a two-pillar one and `entries[2].pillar` threw **during render** — blanking the whole route, and only via client-side navigation. *Fix:* clamp indexes in render (not just in the scroll handler, which runs after), and wrap each section in `SectionBoundary` so one throw drops a section instead of the page.
+
+**9 · framer adds `tabIndex` to `whileHover` spans.** Any `motion` element with a hover/tap prop becomes focusable, creating phantom tab stops. Audit tab stops per section; give decorative links `aria-hidden` + `tabIndex={-1}`.
+
+**10 · Grid blowout.** `1fr` means `minmax(auto, 1fr)`; large type sets `min-content` and breaks out of the track, clipping inside `overflow: hidden`. Use **`minmax(0, 1fr)`** (or `max-content` for a name that must not squeeze).
+
+**11 · The double-gutter trap.** `--container-wide: min(1440px, calc(100vw - 2 * var(--gutter)))` **already subtracts the gutter.** Adding `padding: 0 var(--gutter)` inside it insets twice and clips radii. It bit the /services stage and the finale CTA.
+
+**12 · Filtered build output hides errors.** `npm run build | grep …` swallows `tsc` failures and exits 0 from the grep. Two commits were pushed that did not typecheck. Always run it unfiltered and echo `$?`.
+
+**13 · Timer-vs-scroll desync.** A CSS/`animate` crossfade on a 300ms timer, driven by an index that flips instantly at a scroll boundary, means the index and the visible content disagree for the whole transition — and on a fast scroll the entire dwell is consumed by the fade. CapitalCommand appeared to never render because of this. *Fix:* derive visibility from a **continuous scroll position**, and move the index's switch point to the middle of the hand-over.
+
+**15 · A continuous loop inside a sticky frame wants a hand-written rAF, not motion.** *Cause:* gotcha 1 again, from the other direction — an ambient loop inside a pin has no meaningful `useScroll` progress to hang off, and handing its opacity to motion invites the same WAAPI/ViewTimeline capture. *Fix:* the Automate pipeline writes `style.transform` and `style.opacity` itself in a rAF, so nothing else ever owns those properties, and suspends the loop entirely on an `IntersectionObserver`. `useScrollStyle` does not apply — there is no MotionValue to subscribe to.
+
+**16 · `transform: translate(%)` resolves against the element, not its container.** *Cause:* a CSS transform percentage is a percentage of the transformed element's own border box. `translate(55%)` on a 90px chip moves it 49px, not 55% of the 720px diagram. *Fix:* measure the host (`ResizeObserver`) and translate in px. Same class of bug as 3: percentages and `calc()` both look like they mean what you want and do not.
+
+**17 · A strike that must survive wrapping is a background, not a bar.** *Cause:* an absolutely-positioned 2px bar draws exactly one line; "projects we can't ship in 90 days" takes three at 375. *Fix:* paint the rule as a `linear-gradient` background on the inline phrase with `box-decoration-break: clone`, which gives every wrapped fragment its own full-width rule, and animate `background-size`. It costs a paint property instead of a transform — the right trade against being visibly wrong on mobile.
+
+**18 · CSS grid auto-placement will backfill the holes you left.** *Cause:* cells and cards shared one 7-column grid; the week-one cards occupied columns 1–4 of their row, so week two's first three cells flowed into columns 5–7 *beside them* and the rest wrapped below. Week two was split across two visual rows. *Fix:* name `gridRow` and `gridColumn` on every item in a grid that mixes item sizes. Nothing in the DOM sweep caught this — only looking at the screenshot did.
+
+**19 · `getBoundingClientRect()` is inflated by rotation.** *Cause:* it returns the axis-aligned bounding box, so a rotated card reports a larger, differently-proportioned box than its layout. Measuring the mood cards this way made correct natural-aspect boxes look wrong (1.63 vs 1.80). *Fix:* use `offsetWidth`/`offsetHeight` for layout questions and reserve the client rect for on-screen position. Listed in §4.23 as a recurring source of false bugs; this is the second time it has bitten.
+
+**20 · Scaling a still shrinks its labels with it.** *Cause:* `StaticAmbient` scales a 720px composition to a 327px column, so every label inside scales too — the ILLUSTRATIVE label landed near 5px, small enough to stop discharging rule 12. *Fix:* lift compliance-critical text *outside* the scaled box and print it at full size. Measure effective on-screen font size as `fontSize × (clientRect.width / offsetWidth)`, not `fontSize`, when anything above the element is scaled.
+
+**21 · Vercel silently drops builds after rapid pushes.** *Cause:* nine pushes in ~15 minutes; the ninth commit reached `origin` and Vercel created **no deployment at all** — not queued, not building, not errored, nothing in the deployments list. *Diagnosis:* compare `git rev-parse origin/redesign-v2` against the newest deployment's `githubCommitSha` (the Vercel MCP `list_deployments` is faster than the dashboard here). *Fix:* push an empty commit to refire the webhook (`git commit --allow-empty`); it built immediately. **Never assume a green local build plus a successful push means the alias will update.**
+
+**22 · The preview alias serves a 403 Security Checkpoint under automated polling.** *Cause:* polling the alias every 5s for a new bundle hash trips Vercel's bot protection; the alias then returns `403` with a "Vercel Security Checkpoint" HTML page to *every* automated request, including Playwright. It clears on its own after a few minutes and never affects a real browser. *Fix:* **poll at 60s intervals or slower.** A tight `until` loop on the bundle hash is the exact shape that trips it.
+
+**23 · A `<link rel="preload">` is a *priority* decision, not a free win.** *Cause:* the hero fonts were preloaded on the reasoning that the hero needs them. A preload is a high-priority fetch, so 344 kB of Inter sat in front of the 151 kB entry chunk and more than doubled its download time on a 1.6 Mbps link — first contentful paint 2992 ms. *Fix:* preload only what is both small and visually load-bearing (Geist 29 kB, Cormorant 23 kB). Everything else loads behind the JS with `font-display: swap`. **Measure the waterfall before adding a preload; `performance.getEntriesByType("resource")` with `startTime`/`responseEnd` shows the contention immediately.**
+
+**24 · A swapped font reflows the text above the LCP element.** *Cause:* `/work/sift` and `/work/cadencestack` carried 0.035–0.049 CLS at ~2.4 s. It looked like the Inter swap; it was **Cormorant**, which sets the accent words *inside* the headline at `1.12em`. When it arrived the headline relaid and pushed the subhead down. *Fix:* preload Cormorant (23 kB) — CLS went to **0.000** on both. *Method note:* the first two attempts (metric-matched Inter fallback, then re-checking the preload) were guesses. **Attributing the shift to its source node took one run** — `PerformanceObserver` on `layout-shift` with `entry.sources[].node` — and named the timestamp and the element. Same lesson as the chapter anchors: instrument before the second guess.
+
+**25 · `useState(false)` + `matchMedia` in an effect renders the wrong branch first.** *Cause:* `/work`'s `useMedia` initialised to `false`, so every phone visit mounted the entire desktop `ProjectFilm` for one commit before the effect flipped it — four eager images, 431 kB, fetched on the critical path and discarded. *Fix:* read `window.matchMedia(q).matches` in the `useState` initialiser (`Nav.tsx` already did). **Any media hook that gates which subtree mounts must be initialised synchronously, not in an effect.** One that only gates behaviour can stay in an effect.
+
+**26 · An `<img>` can never be the LCP element and paint at first render.** React has to render it before the browser can request it, so the fetch starts after mount no matter what `fetchPriority` says. Give it `width`/`height` so it does not shift (that alone took `/work` from 0.054 to 0.016), keep it eager, and accept that the only real fixes are a smaller file or prerendered markup.
+
+**27 · A route-chunk preload is the same trade as a font preload.** Preloading `/services`' 40 kB chunk pushes first contentful paint out slightly — it shares the pipe with the entry chunk, exactly as the Inter preload did (§5.23) — but the chunk is then already there when React mounts, so LCP lands 560 ms earlier. **Net positive here only because the route chunk is on the critical path for the render; a preload that is not is pure contention.** Judge every preload by the measured net, never by "the page needs it".
+
+**28 · Intrinsic size belongs in one generated place.** `/work`'s previews carried hand-written `w`/`h` in `workIndex.ts` from 19-pre; `src/data/screenshots.ts` is generated from the files themselves. Two copies of the same number drift the moment a screenshot is replaced. The hand-written pair is gone.
+
+**29 · A 600px-step probe scroll invents layout shift.** A full-scroll CLS probe reported **0.155 on /work/sift** and 0.076 on cadencestack, attributed to the nav. Under a gentle 100px-step scroll both read **0.009 and 0.000**. Jumping 600px at a time skips the sticky nav's intermediate states, so a 4px compaction registers as a large unanchored shift that no visitor could experience. **Scroll in steps a human could produce, or the number is fiction.** (§4.24 again.)
+
+**30 · `backdrop-filter` inside a transformed ancestor paints an opaque box.** *Cause:* the spotlight bands carried `backdrop-filter: blur(2px)` with a comment saying it was kept because it "costs nothing where it works". Inside a transformed ancestor Chromium does not fail quietly — it composites the band as a solid fill, which is the white box over the Approvals diff. *Fix:* removed. **A filter documented as unreliable in the exact context it runs in is not free; delete it rather than leaving it in as a maybe.**
+
+**31 · Two colours cross-fading from opposite ends always collide.** *Cause:* the nav CTA's pill background and its label ran the same duration and easing in opposite directions, so at the midpoint both were mid-grey — 1.09:1, a pill with no label, for roughly 80ms of every tone flip. *Fix:* the label does not ramp. It **steps once at the halfway point**, and the background uses `ease.inOut`, the only token that is point-symmetric, so the step lands when the pill is exactly mid-value in both directions. Minimum 3.56:1. **Any two-colour transition where both sides move needs one of them to be a step.**
+
+**32 · A caption keyed to beat index cannot read a slot-space playhead.** *Cause:* see §2's 17d entry. *Fix:* `slotForBeat(beat.index)`. **Every scroll-linked value on /services is in SLOT space — if a component indexes by beat, convert first.** The screens already did; the caption did not, and it had shipped that way since 17c-2.
+
+**33 · `type-accent` must NEST inside the size class, never sit beside it.** *Cause:* its `font-size: 1.12em` resolves against the PARENT's computed size. On `className="type-h2 type-accent"` the accent measured against the inherited body size and rendered a display date at roughly a third of its neighbours. *Fix:* `<span className="type-h2"><span className="type-accent">…</span></span>`. **Anywhere the accent voice is wanted at a display size, it goes in a child.**
+
+**34 · A clipped odometer column is as wide as its widest glyph.** *Cause:* each rolling digit is a column of 0–9 with `overflow: hidden`, so the box takes the width of the widest numeral and a "1" floats in it — "14" rendered as "1 4". `font-variant-numeric: tabular-nums` fixes it only in a face that has tabular figures; Cormorant does not. *Fix:* size the column with an invisible copy of the digit it is currently showing and absolutely position the rolling strip over it. Correct in every face.
+
+**35 · Civil dates must not be built with the local-time `Date` constructor.** *Cause:* "add 14 days" to a local-midnight Date lands on the day before twice a year, and a CI box in UTC disagrees with a reader in Toronto about what "today" is. *Fix:* `src/lib/businessDays.ts` pins every date to **12:00 UTC** and reads only UTC getters; "today" comes from `Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto" })`. Unit tested — `npm run test:dates`.
+
+**36 · A clipped odometer needs a window TALLER than one em.** *Cause:* Cormorant's italic figures draw outside their 1em line box, so a window of exactly 1em cut them and let the tail of the next digit in the column show above — a stray stroke over the accented date. *Fix:* window and cells at **1.35em**, with the rolling strip lifted by half the extra leading so the glyph keeps the baseline of the text beside it. **Any face with real ascenders or a slanted axis needs the bleed.**
+
+**37 · "+3 business days" needs two anchors, not one.** *Cause:* counting from the first business day on or after the call makes a Saturday call land a day LATER than the Monday after it. *Fix:* a call on a business day counts from the day after; a call on a weekend or holiday counts the following business day as day one. Saturday → Wednesday, Monday → Thursday. Unit tested both ways.
+
+**38 · Two single-class selectors, later wins — and it silently moved a CTA off the page.** *Cause:* `.kp2-face--back { position: absolute }` was declared before `.kp2-pass { position: relative }` in the same `<style>` block. Equal specificity, so the later rule won, the back face sat in normal flow, the card measured twice its height and the booking CTA ended 700px below the fold. *Fix:* compound selectors (`.kp2-pass.kp2-face--back`). **In a component-scoped `<style>` block, order is the only thing separating two single-class rules; make the one that must win compound.**
+
+**39 · A flipped card must size to the face that is showing.** *Cause:* with the back face `position: absolute; inset: 0`, it is clipped to the FRONT face's height. The back was taller, so the CONFIRMED stamp and barcode were cut off. *Fix:* take the hidden face out of flow instead of always the back one.
+
+**40 · Compositing matters when measuring a border's contrast.** *Cause:* reading `rgba(20,20,18,0.18)` as if it were opaque reports 17.5:1 — the ink's contrast, not the border's. Composited over the fill it is **1.47:1**, failing WCAG 1.4.11's 3:1 for a control boundary. *Fix:* composite `fg·α + bg·(1−α)` first, and check against BOTH adjacent colours (the fill inside and the page ground outside).
+
+**41 · A per-digit odometer is the wrong mechanism for a date.** *Cause:* each digit is a column of ten glyphs clipped to a window. Even measured carefully the window cut the neighbours at rest — a leading "1" rendered as a bar with strokes above it, and "15" read as "1g". *Fix:* transition the WHOLE token, so only one string is ever in the box, and measure the box from the font's real ink (`actualBoundingBoxAscent`/`Descent` via canvas, re-run after `document.fonts.ready`) rather than from its line box. **Any rolling-digit effect in a face with real ascenders is a clipping bug waiting to happen.**
+
+**42 · Baseline alignment needs a grid row, not `align-items: center`.** *Cause:* the date control centred three numerals of different sizes by box, so the neighbours sat half a line off the main date. *Fix:* a grid with the numerals in one row and `align-items: baseline`; the weekday and tag get their own rows. A wrapper per column cannot work — its baseline is its FIRST line's, which was the weekday.
+
+**43 · A single sample per beat misses state-dependent type.** *Cause:* the density probe measures each screen once, at its dwell. A tick that only renders after a step completes is invisible to that pass — a 10px glyph survived a session whose whole point was an 11px floor. *Fix:* a second probe that scans EVERY scroll position and reports any sub-floor text, run after any change to the screens. It also mis-attributes the beat during a crossfade, since both screens are mounted; trust the size, not the caption it names.
+
+**44 · Measure where the blank actually is before filling it.** *Cause:* told the brand board had a 24% flat region, I assumed the empty bottom strip and raised two heights. The measurement did not move. The region was the right-hand column below the van decal. *Fix:* look at the screenshot first — the flat-rectangle number says how big, never where.
+
+**45 · Misc, already fixed:** `.pill-hl > span` (0,1,1) beat `.pill-hl__slab` (0,1,0) and applied the text gradient → scope with `:not(.pill-hl--bare)`. `animate={{opacity:1}}` overwrites a style-prop opacity on the same element (the /work row dim). `--color-border` **does not exist** — hairlines are `--hair`, `--hair-hi`, `--hair-d`, `--hair-d-hi`. `ReadFill` must not set `margin` inline or callers can't offset it via a class. `type-eyebrow` uppercases, so case-sensitive text assertions on it fail.
+
+**46 · A pinned element cannot read-fill off its own position.** *Cause:* a panel held by a sticky stage is not moving through its own scrollport, so `useScroll` on it never progresses and `--p` stays 0 forever. *Fix:* derive the fill from the SAME scroll value that drives the stage, mapped to the slice where that panel is arriving and sitting on its mark. Stacked or in normal flow, the element does move through the scrollport and can read off itself.
+
+**47 · A fixed-height demo frame leaves dead space you will not notice in the DOM.** *Cause:* four demos whose natural heights ran 200–420px all got a 538px slot, so each floated in 100–140px of nothing. Every probe passed — clipping was zero, fonts were legal — because emptiness is not a measurement any gate takes. *Fix:* size the frame to its content under a cap that only bites on a short viewport, and **read the screenshots**; a clip of 0 does not mean the composition is right.
+
+**48 · `preview_start` by name can start another project's dev server.** *Cause:* from inside this repo, `{name: "averr-dev"}` twice started `job-command-center` on :3000. The name resolved against a different `launch.json`. *Fix:* verify against the alias, which is this project's standard verification path anyway.
+
+**49 · Piping a probe through `head` kills it mid-run.** *Cause:* `node .probe.mjs | head -3` closes the pipe after three lines and SIGPIPE ends the script, so the captures it was about to take never happen. I then read the previous run's screenshots and concluded a deploy had not landed. *Fix:* never pipe a probe or a build — the same rule that already covers `tail` (§5) and `grep`. Run it unfiltered and read the output.
+
+**50 · A 200 on the new asset does not mean the page is serving the new build.** *Cause:* polling `/assets/About-<newhash>.js` until 200 says the file is uploaded, not that the edge is handing out the HTML that references it. Two probes reported stale measurements against a "live" deploy. *Fix:* intercept requests and assert which chunk the page actually asks for before trusting any measurement taken after a push.
+
+**51 · Animating `top` on an overlay is a layout shift on every frame.** *Cause:* the monitor's hand-off scanline swept by animating `top` from -12% to 112%. `top` is a layout property, so each frame registered a shift — attribution put **0.1295 of 0.142 on that one span**. *Fix:* animate `y`, with `top` static. Note `y` as a percentage resolves against the ELEMENT'S OWN height, not its parent's, so a 16%-tall band crossing the full screen travels 775%.
+
+**52 · A lazy route mounts after the nav has already looked for dark surfaces.** *Cause:* `useDarkUnderNav` scans for `[data-tone="dark"]` on a rAF keyed to the pathname — which is already the new path while the route's chunk is still downloading. /about's wrapper was never seen and the Averr logo stayed dark on a near-black ground. *Fix:* the page publishes its own tone with `useSetNavDarkOverride`, which is what that override exists for.
+
+**53 · A glow wider than its box needs `overflow-x: clip` outside a sticky frame.** *Cause:* the monitor's light spill is 168% wide. Pinned, the sticky stage's `overflow: hidden` clipped it for free; stacked, nothing did, and /about scrolled horizontally — 469px at 375, 1833px at 1440 under reduced motion. *Fix:* `overflow-x: clip` on the stacked container — `clip`, not `hidden`, so the spill still bleeds vertically where it should. **Any reduced-motion path that reuses the mobile layout inherits the mobile layout's bugs at desktop width.**
+
+**54 · Measure a scroll-linked transform at the scroll position you mean.** *Cause:* I read the monitor's width before scrolling into the pin, while the dolly still held it at 0.88, and concluded the column was 8% too narrow. *Fix:* take the measurement at the dwell. A `getBoundingClientRect` includes the transform, which is the point.
+
+**55 · A liked element is not a palette.** *Cause:* the owner praised one panel's blue/violet and I rebuilt a whole page's ground from it. *Fix:* the locked rule in §4 — keep it local, scope its tokens to the element (`.studio-screen`), and leave the page on the site's own rhythm. **Ask before generalising a treatment.**
+
+**56 · Two halves of a before/after slider need the SAME content.** *Cause:* the drag comparison gave each half its own copy, so the seam read as corruption — "We provide quality solu|where it is." *Fix:* identical content in identical boxes, differing only in treatment. It is legible and it is the stronger argument, because nothing changed except the craft.
+
+**57 · Adding a cell to a fixed-height screen silently stacks the others.** *Cause:* the direction sheet gained a live mini page, making five cells where four fit; the grid ran past the glass and PALETTE landed on the header while Replay landed on a list item. Every probe passed — clipping was 0 because the flex children overlapped rather than overflowed. *Fix:* **read the screenshot.** A clip of 0 does not mean the composition is intact.
+
+**58 · `querySelector` inside a section can match decoration.** *Cause:* I measured the hero mark's tilt through `.about-hero svg`, which matched an ambient brand fragment that happens to come first in the DOM; it reported no transform and I briefly concluded the tilt was dead. *Fix:* target by `aria-label` or another identity the decoration cannot share.
+
+**59 · `motion.path` owns the dash properties once `pathLength` is set.** *Cause:* a scroll-driven stroke draw set `style={{ strokeDashoffset }}` on a `motion.path` that also had `pathLength={1}`. Motion implements path-length support by writing `stroke-dasharray` and `stroke-dashoffset` itself, so it overwrote the style every frame and the offset sat at 1 forever — nothing ever drew. *Fix:* a plain `<path>` with the dash attributes set directly, or motion's own `pathLength` animation prop — never both. **The tell:** the same scroll value was driving other things on the same screen correctly, which proves the value is fine and the element is not.
+
+**60 · A full-bleed decorative overlay eats the pointer at opacity 0.** *Cause:* the Direction wireframe SVG spans the whole page and fades out from Design onward, but opacity 0 is still hit-testable — so the Build stage's deliberately-live buttons could not be hovered or clicked at all. *Fix:* `pointer-events: none` on every decorative overlay. Playwright names the interceptor in its hover timeout, which is the fastest way to find it.
+
+**61 · `scrollIntoView` plus `scroll-behavior: smooth` invalidates an immediate measurement.** *Cause:* this site sets `scroll-behavior: smooth` on `html`, so a probe that calls `scrollIntoView` and reads 400ms later is measuring mid-flight. I reported the founder credits as "never revealing" on that basis; they were fine. *Fix:* scroll with `window.scrollTo` to a computed y and wait ~700ms, or assert the scroll position before measuring.
+
+**62 · `innerText` cannot see a collapsed listbox.** *Cause:* the no-"$" sweep read `document.body.innerText`, and `CustomSelect` only mounts its options while open — so five "$" price bands sat on /contact and were reported clean every session. *Fix:* `.money.mjs` opens every `[role=combobox]`, `[aria-haspopup]`, `details`, `summary` and `select` on every route before scanning. **Any content-rule sweep has to open what the page hides.**
+
+**63 · A third-party iframe grows in STEPS, and every step is a layout shift.** *Cause:* Cal's embed settles at 570px on desktop but **1433px at 375**, and it gets there in stages as it hydrates. Reserving the right height was necessary but not sufficient — in normal flow each stage still moved everything below it (0.91 CLS at 375, then 0.157 after the reserve was corrected). *Fix:* reserve the measured height on the container AND take the embed out of flow inside it (`position: absolute; inset: 0`), so the iframe can resize freely and nothing below can move. **Measure the settled height per breakpoint; do not guess one number.**
+
+**64 · A probe hard-coded to one route will happily poll the wrong page.** *Cause:* `.await.mjs` watched `/assets/About*` on `/about`; pointed at a /contact deploy it waited ten minutes against a page that would never request that chunk. *Fix:* it takes a route and derives the asset prefix from the chunk name.
+
+**65 · `AnimatePresence` costs a mount before your animation can start.** *Cause:* the page-transition panel was created on click, and the ~60ms React spent mounting it ran before the cover began — enough to push a 700ms transition to 876–971ms against an 800ms budget. *Fix:* keep the panel mounted and inert (`visibility: hidden`, fully inset) and animate it in place. **Anything on a latency budget should already exist when the clock starts.**
+
+**66 · An SVG text viewBox wider than its ink fits by the wrong axis.** *Cause:* "Averr" is 237 units of ink in a 420-unit viewBox, so `preserveAspectRatio="... meet"` scaled to fit the HEIGHT and the wordmark filled under half its container — while a width check still passed, because the SVG element was full width and only the glyphs inside were small. *Fix:* measure `getBBox()` and set the viewBox from it, re-measuring after `document.fonts.ready` because the fallback's metrics are not the webfont's. **Measure the element that holds the ink, not the box around it.**
+
+**67 · A page can have no `h1` and nothing will tell you.** *Cause:* /contact's headline was a `CharReveal` span with a display class. It looked like a heading, so nobody noticed there was no `h1` on the route — until the page transition tried to move focus to one and landed on an `h2`. *Fix:* wrap it. **A feature that needs the main heading is a good way to find out you never had one.**
+
+**68 · `AnimatePresence initial={false}` silences every animation NESTED under it, not just its children's.** *Cause:* the hero slab's parch reveal was a `motion.span` inside the keyed word, and its `initial` clip-path was dropped on mount — so the parch copy was fully visible from frame one, covering the ink copy, and the sweep that was supposed to turn the words parch as the slab passed under them never ran. The trace showed the clip at its final value at 150ms with the surface still at scaleX 0. *Fix:* the clip rides a wrapper OUTSIDE the `AnimatePresence`, which is never remounted. **`initial={false}` is inherited context, not a prop on one element.**
+
+**69 · A lazy chunk inside an `AnimatePresence` blanks the whole scene when it suspends.** *Cause:* the hero's three screens were `lazy()` under one `Suspense fallback={null}`. Switching to a phrase whose chunk was not in yet suspended the subtree, and the fallback of null emptied the window — correct chrome, correct title, nothing inside. On a desktop over localhost the chunk arrived in milliseconds and it was never visible; on a phone it was a blank frame. *Fix:* fetch the modules into state and render from state, so a switch is a render and never a suspension, and a phrase whose chunk has not landed holds the previous screen. **A Suspense fallback of null inside a presence animation is a blank screen waiting for a slow network.**
+
+**70 · `z-index: 1` on a shared class decides which of your two stacked copies wins.** *Cause:* `.pill-hl__word` carries `position: relative; z-index: 1`. The ink copy underneath therefore painted ON TOP of the absolutely positioned parch copy, and the words stayed ink over a dark slab. *Fix:* the reveal wrapper takes `z-index: 2`. **Reusing a class for its type brings its stacking with it.**
+
+**71 · A reused BrowserContext makes every throttled timing after the first a lie.** *Cause:* the Session 21 LCP harness measured three runs in ONE context, navigating via `about:blank` between them. Runs 2 and 3 served the page from the browser's memory cache and never touched the emulated network, so home read **600 ms** against a documented ~1,900 ms baseline for the same method. *Fix:* a fresh `BrowserContext` per run plus `Network.setCacheDisabled: true`, with the EDGE warmed by a throwaway load that is not measured. Home then read 2000 ms and /about 2168 ms, both in line with every prior session. **"Warm" means a warm edge, never a warm browser — and a number far better than the baseline is a bug report about your harness.**
+
+**72 · Growing the type is a layout change, not a type change.** *Cause:* raising the hero from 112px to 162px broke two things nowhere near the font declaration — the composition stopped fitting the pinned 100vh frame between 1024 and 1239 (h1 top −53px), and the absolutely positioned SCROLL cue ended up under the primary CTA at 1280×720. *Fix:* both, above. **After a size change, re-measure the things that are positioned against the frame rather than against the text.**
+
+**73 · An invisible full-bleed layer is still a layer.** *Cause:* the hero's reel stage is `inset: 0` at opacity 0 from the first frame of the page. It swallowed every pointer event over the hero — the name field could not be clicked at all — and its four card links sat in the tab order behind an invisible surface. *Fix:* `pointer-events: none` plus `inert` and `aria-hidden` until the scroll actually brings it on screen. **This is the third time this class of bug has shipped here. Opacity 0 is not display none.**
+
+**74 · `getBoundingClientRect` on a 3D-rotated element measures the box AROUND it.** *Cause:* the sketch window is tilted, and the fill scale was computed as `viewport / rect.width`. A rect is the axis-aligned bounding box of the rotated element, which is wider than the element — so the scale came out short and the window stopped 62px from the right edge at full fill. *Fix:* `offsetWidth`/`offsetHeight`, which are layout, not geometry. **Measure the layout box when you are going to scale the layout box.**
+
+**75 · A font that steps down moves everything under it.** *Cause:* the hero field scales its type to fit a long name, and the line box followed the font size — so each step, and each placeholder of a different length, reflowed the page: load CLS 0.0364 at 390. *Fix:* height and line-height from the UNSCALED size, so only the glyphs change. 0.0005 after. **An element that resizes its own text needs a box that does not.**
+
+**76 · Two `:root` blocks, and source order decides.** *Cause:* the mobile `--hero-copy-w` override was written above the base `:root` that set it. Same specificity, later wins, so the phone got the desktop value — a 152px copy column — and the headline wrapped to six lines. *Fix:* the override goes after. **A media query does not outrank anything; it only narrows when a rule applies.**
+
+**77 · A `pointer-events: none` layer needs YOUR classes to switch back on.** *Cause:* the hero's copy layer is inert so the window behind stays hoverable, with `:is(input, a, button)` re-enabled. MagneticCTA sets pointer-events on its own anchor, beat the element selector, and the primary CTA computed `none` — unclickable. *Fix:* re-enable by the hero's own class names. **Do not re-enable with a selector someone else's component can outrank.**
+
+**78 · A fixed rail is as wide as its labels, and its labels are over your content.** *Cause:* the chapter rail's five labels were in flow beside the dots, making it 150px wide — straight on top of chapter 2's cards and their figures. *Fix:* the labels are an absolutely positioned overlay revealed on hover, the rail is 57px at rest (inside the page's own gutter), and a `::before` keeps the 5px dots at a 44px hit target. **Measure what a fixed element covers, not just what it is.**
+
+**79 · A screen driven by one value has a RESTING value, and it is rarely zero.** *Cause:* home's Design panel mounted `ScreenBrandBoard` with `local` at 0. That screen draws itself across 0.08 → 0.40, so the panel opened on an empty sheet. *Fix:* each reused screen rests where its own "before" state is — the board drawn but un-tinted, the agent not yet run, the pin not yet climbed. **Read the transform ranges before you pick a starting value.**
+
+**80 · In a 3D scene, layout coordinates are not screen coordinates.** *Cause:* the hero field's planes were authored with `left`/`top` percentages, but each one also carries a `translateZ`, and perspective pulls a distant element toward the perspective origin while shrinking it. A plane written at x 4% rendered at 27%. Six to eight of sixteen sat on the headline at every width. *Fix:* store where the plane should LAND and divide by its own foreshortening, `k = perspective / (perspective − z)`, at render time. **If you can scroll past it in 3D, you cannot position it in 2D.**
+
+**81 · A dolly through clustered depths empties the frame.** *Cause:* the field's planes bunched between +80 and −940 with a thin tail. Once the near group had flown past, nothing was at a visible distance for a fifth of the pin and the screen went to near-black — the same fault the owner had just rejected. *Fix:* an even z ladder across the whole range, plus a landing frame that rises BEFORE the field leaves so the two overlap. **Trace a scroll sequence at every 5% and look at the frames; a counter that says "two elements visible" will not tell you the screen is empty.**
+
+**82 · A vignette that exists for text contrast must leave with the text.** *Cause:* the hero's radial darkening is there so the headline holds AA over the planes. It stayed at full strength through the fly-through, where there is no headline — the middle of the sequence sat at roughly half the brightness it should have. *Fix:* fade it on the same scroll range as the copy. **Ask what every layer is FOR, then ask when that reason stops applying.**
+
+**83 · A dark frame in a 3D fly-through is usually an EMPTY one.** *Cause:* the hero's pin had a luminance crater at 40%. The instinct was lighting, and a per-plane key light moved the number by exactly zero. The planes were not dark — they had scaled toward the eye and swept outside the frame: SIFT 6,828px past the right edge, CG Walls 6,666px past the left. *Fix:* bring the landing forward so the destination carries the window the room cannot, and cull planes as they reach the eye so none magnifies one pixel across the screen. **Before you light a frame, list what is actually in it.**
+
+**84 · A buffered PerformanceObserver reports what happened before you were watching.** *Cause:* a 54ms long task was attributed to the fly-through and chased for a session. `buffered: true` had replayed it from startTime 191ms — the app's initial render, long before any scrolling. *Fix:* read `startTime`, not just `duration`. **A long task has a clock as well as a length.**
+
+**85 · You cannot clamp a child of a 3D-transformed element to the viewport.** *Cause:* the field's hover labels clipped on edge planes. Flipping their side by measurement left six of sixteen still off screen at 1280, because `right: 0` inside a plane whose own right edge is past the viewport is still past it, and a pixel offset inside a transformed parent is itself transformed. *Fix:* one label for the whole scene, rendered OUTSIDE the transform and positioned from the hovered element's measured rect. **If the parent is transformed, position the tooltip somewhere else.**
+
+**86 · clip-path is accelerated the same way opacity is.** *Cause:* the hero's landing wipe was handed to motion as a scroll-linked `clipPath` inside a sticky frame. It read `inset(8% 2% 78% 74%)` — its START value — at the END of the pin, because the WAAPI animation motion compiled it into was running on the pinned element's own ViewTimeline, which never advances. The frame just looked dark, so the cause was invisible. *Fix:* `useScrollProp`, the sibling of `useScrollStyle`, writing the property straight to the node. **Anything scroll-linked inside a pin: assume it is accelerated until you have read its computed value at the end of the pin.**
+
+**87 · `Screenshot` sets `height: auto` inline, and inline beats your stylesheet.** *Cause:* chapter 2's chosen card gave its image `height: 100%; object-fit: cover` in CSS and the capture still letterboxed, showing the grey skeleton below it. The component's own inline style won. *Fix:* pass the override through its `style` prop, which it spreads last. **A shared component's inline defaults are not suggestions.**
+
+**88 · `background-clip: text` needs the fill to out-contrast the ground.** *Cause:* home's three acts put real captures inside giant letterforms on the dark chapter. Three of the six are dark dashboards, so AUTOMATE read as an empty grey word — the picture was there and invisible. *Fix:* a parch wash in the background stack above the images lifts every fill into legibility while their texture still reads, plus a 1px stroke so the letterform keeps its edge where the capture goes dark. **Image-in-type is a contrast problem before it is a typography one.**
+
+**89 · `sizes` describes the LAYOUT width, so an element that scales picks the wrong rung.** *Cause:* chapter 2's card is 24% of the frame and scales 2.35x. Its `sizes` matched the layout width, the browser chose a 640w rung, and the capture was soft through the whole move. *Fix:* pin `sizes` near the viewport so the largest rung is chosen from the start; it then renders at 0.58x of natural and is downscaled throughout. **For anything that scales up, size the image for where it ends, not where it starts.**
+
+**90 · Never call a setter from inside another setter's updater.** *Cause:* the hero field cleared its hover label with `setTip(null)` written inside a `setHover` updater function. A leaving plane's `blur` fires around the arriving plane's `focus`, so one plane's exit wiped the label the next plane had just set — and after an unrelated change to the component's render cadence, **only the first plane in the field ever showed a label**. It had passed 16/16 the session before. *Fix:* keep the owning id in a ref and clear outside the updater. **An updater runs in the render phase and may run twice; a side effect in one is a race waiting for a re-render that changes.**
+
+**91 · A chunk-size "regression" can be Rollup moving something, not you adding it.** *Cause:* restructuring home made the entry chunk jump 91.4 → 105.6 kB gzip with almost no new eager code. Rollup had re-partitioned and pulled React into the entry, emitting a new `motion` chunk in its place. *Fix:* measure the TOTAL JS transferred on a real load — it had moved 144.42 → 146.53 — and pin the shared libraries with `manualChunks` so the split stops drifting. **Compare payloads, not chunk names.**
+
+---
+
+## 6. DATA FACTS
+
+### Tints (additive `tint`, ambient only)
+
+| Study | Tint | Source |
+|---|---|---|
+| CG Walls & Floors | `#9E4139` | data says "copper accent"; hex sampled from `cgwalls/hero.jpg` (hue 0–12°, corroborated by `testimonials.jpg`) |
+| CapitalCommand | `#87B6EB` | sampled from `01-overview.jpg` (hue 216°, corroborated by `05-signal-desk.jpg`) |
+| SIFT | `#F2A93C` | **stated in the data twice** — "sodium amber (#F2A93C) as the primary accent" |
+| CadenceStack | `#447ED2` | sampled from `01-command-center.jpg` (hue 216°) |
+| CareerClarity AI | — | draft; the film uses a neutral `#8A8377` light |
+
+CapitalCommand and CadenceStack share hue 216° — approved, both products are genuinely blue.
+
+### Figures / statuses
+
+| Study | `headlineFigure` | Status tail | Year | Sector | Pillars |
+|---|---|---|---|---|---|
+| CG Walls | **85%** — "Reduction in manual outreach hours" | ongoing | 2025 | Home renovation, GTA | Design/Automate/Grow |
+| CapitalCommand | *(none)* → shows "Internal alpha" | internal alpha | 2026 | Fintech — portfolio intelligence | Design/Automate |
+| SIFT | **42%** — "ATS-score improvement average after AI resume rewrite" | ongoing | 2025 | SaaS — job search | Design/Automate |
+| CadenceStack | *(none)* → shows "Ongoing" | ongoing | 2025 | SaaS — LinkedIn presence | Design/Automate/Grow |
+| CareerClarity AI | *(none)* | — | — | AI for education | Automate |
+
+Home's ledger: **85% / 3.2× / 42% / 40+ / 15× / 1.4s** (CG, CareerClarity, SIFT, then three Averr Studio figures). `ProofLedger` reads CG's and SIFT's from `caseStudies.ts` via `fromData()`; the other four are literals.
+
+### /work film order + cyclic finale
+
+Film order = `vault` (live first, data order): **CG Walls → CapitalCommand → SIFT → CadenceStack → CareerClarity AI** (last, not a link).
+Finale cycle (live only): **CG → CapitalCommand → SIFT → CadenceStack → CG**.
+Film slide = each study's `heroImage`, which **equals its case-hero front image**, so the open-transition lands on the same screen.
+
+### `src/data/servicePillars.ts`
+
+`PILLAR_TIMELINE` = Design `"2 – 3 weeks"` · Automate `"1 – 2 weeks"` · Grow `"Ongoing"` (read by /services **and** home's doors).
+`GROW_METRICS` = Impressions 48.2K +42% · Engagement 6.8% +18% · CTR 3.4% +24% · Sessions 12.1K +36%. **Sample figures — every surface rendering them must show `ILLUSTRATIVE_LABEL` ("Illustrative").**
+
+### `src/data/caseSections.ts`
+
+`context` 01 · `approach` 02 · `inventory` 03 (id `built`, label "what we built") · `signatures` 04 ("signature moments") · `outcome` 05 · `next` 06. The rail labels itself from these, so it can never drift from the page.
+
+### Additive text data (all verified verbatim / word-sourced)
+
+- **`contextEmphasis[]`** (11 phrases), e.g. CG ¶2 `"no ad budget, no headcount, no time to burn"`, SIFT ¶3 `"craft, not volume"`.
+- **`outcome.emphasis`** (4), e.g. SIFT `"Source → score → tailor → apply → track"`.
+- **`inventoryLabels[]`** (28 labels, each ≤6 words and built only from its own item's words).
+- **`approach[].emphasis`** (10), e.g. CadenceStack Design `"a product system, not a prompt box"`.
+- **`signatures[].focal`** — 9 focal points, e.g. SIFT sync-engine `{x:0.52, y:0.58}`.
+
+---
+
+## 7. OPEN ITEMS (owner actions — Prachets)
+
+- **TOOLS ROW (27c, owner item).** The brief held it: no logos may be guessed. Supply the list of tools Averr actually uses or integrates and it gets built into home between the story and the work.
+
+
+
+1. **Number truth check.** CareerClarity AI's **3.2×** opens the home ledger while CareerClarity itself is a draft with no case study; and the three Averr Studio figures (**40+ sites, 15× AI agents/workflows, 1.4s Core Web Vitals**) have never been audited in-session. Confirm each is defensible or replace it.
+2. **Founder photo for /about** — wanted, but **NOT blocking**. Ruled 2026-10-06: the spec keeps the PU mark until a real photo exists, and **no placeholder is ever used**. Supply one and the mark's slot takes it.
+3. **A /contact recording** — useful, but **NOT blocking**. Session 19 captures /contact's current state in its own pre-flight instead.
+4. **Iubenda + legal pages** — the footer links `/privacy`, `/cookies`, `/terms`; confirm these resolve.
+5. **`RESEND_API_KEY` on Vercel** — the contact form cannot deliver without it.
+6. **Contact-form budget bands** — Under $5K / $5K–$10K / $10K–$25K / $25K+. Deliberately kept under the no-prices rule; confirm the bands.
+7. **`og-image.svg` → PNG** — several platforms won't render SVG OG images.
+8. **"sales at Google" wording on /about** — flagged earlier, never resolved.
+9. **Full mobile review** — automated checks confirm zero overflow, but no human pass has been done on a real device. The Session 17 stacked stills are no longer a concern here: **Prachets ruled the ~6px Automate labels a defect, and 17-fix-2 replaced that still below 900px with a purpose-built vertical composition** — five nodes on a straight vertical path, every label at real `type-eyebrow` size. Design and Grow still scale, and both were checked as readable at 375.
+10. ~~**`/work`'s LCP image.**~~ **APPROVED and DONE in 19-pre-2.** Prachets ruled that resized derivatives of existing screenshots are not new assets, so rule 11 does not apply. `/work` is 2320 ms.
+11. **Prerendering the shell — deferred to the Ship pass by Prachets.** First contentful paint is 1.64–1.86 s on every route because nothing paints until 152 kB of JS downloads and React mounts. Static-rendering each route's hero into its HTML would put LCP near first byte. Build-pipeline decision, not a page change.
+12. **Weekend bookability depends on the Cal.com availability schedule.** The pass offers Saturday and Sunday, and both showed slots when checked — but if the schedule is ever narrowed to weekdays, the page will offer a day the booking page refuses. **Keep weekend availability on, or tell me to grey weekends out again.**
+13. **The holiday table ends after 2027.** `businessDays.ts` covers 2026–2027; past that the proposal count silently degrades to weekends only. `holidayCoverageEndsAfter` exists so a future session can assert on it.
+14. ~~**Six /services screens over the ~15% blank target.**~~ **CLOSED in 17h — 17/17 at both 1440 and 1680.** One of the six, Reporting, had never been failing; its number came from a probe sampling below the released pin.
+15. **A second, larger WebP rung is fetched on some case-study loads** — `01-command-overview-1280.webp` *and* `-1680.webp` on `/work/sift`, about 32 kB wasted. Seen in two probes, **not reproducible in a third, and I did not identify which element re-selects.** Both are lazy and land after LCP, so it costs bytes, not a metric. Worth one instrumented pass next time something touches that page.
+16. **`/work/sift` carries 0.009 CLS** from the hero meta grid moving 27 px at ~3.1 s — almost certainly the Inter swap relaying the one subhead long enough to change line count, despite the metric-matched fallback. Inside "good" and the route passes; left alone deliberately rather than chased.
+17. **Cleanup (safe, unowned):** `src/components/case-study/ScrollProgress.tsx` is now orphaned (no importers). `heroImages[1..2]` are dead data. `src/legacy/components-v1/**` is unreachable and still contains old price strings.
+18. ~~**"System average: 12h/week returned"**~~ — **RESOLVED in Session 17.** This unsourced result claim sat unlabelled in the Automate ambient. Prachets ruled: cut entirely, nothing in its place. The illustrative task chips that replaced the space carry an ILLUSTRATIVE label.
+19. ~~**Commit-message convention.**~~ **CLOSED — Prachets ruled in 17-fix: standing rule 18 wins, always.** Commit + push per verified item. The `Commit:` line at the foot of a brief is the **summary for the final report**, not a single commit message to squash onto. See §4.18.
+
+---
+
+## 8. ROADMAP REMAINING
+
+**ACCESSIBILITY, for the Ship pass.** Two site-wide controls are under the 44px touch target on a phone and were deliberately NOT changed from a home session, because both are shared by every route: the **global nav** ("Averr" 27px, "Work" 22px) and **MagneticCTA's `variant="text"`** (27px). Home's own chapter controls all meet 44px. Fixing these is a site-wide change and belongs with the Ship pass's accessibility work.
+
+- ~~**Session 17 — /services.**~~ **DONE** (`08965f2` … `4642136`). It now has its own signature mechanic — the 14-day kickoff calendar — plus a live illustrative pipeline, a struck "no" list and its own closer. See §2 and §3.
+- ~~**Session 17 — /services.**~~ **COMPLETE** (17 → 17c-5). The page is the build scene; see §3.
+- ~~**Session 18e — /about's second half.**~~ **DONE** (`822eeca` … `915d9ec`). The "one site, idea to live" process scene, the founder credits and the signature closer. **Settled by the 18e rulings:** one statement line is restored verbatim under the name ("Started Averr Studios…"); the other bio sentences stay retired with their facts in the credit lines, and the SALES line is now "B2B SaaS for Google" by owner ruling. `FounderStatement.tsx` stays as the provenance record.
+- ~~**Session 18d — /about reworked onto the site palette.**~~ **DONE** (`72fb655` … `f7c2fed`). The palette restore, the restored centred hero with cursor tilt, the fly-into-the-mark transition, drag-to-compare, click-to-recolour, the clickable process line. **18c-1's palette is reverted; its LOCKED RULE is in §4.**
+- **Blocked on the founder photograph:** the tall-frame photo composition and its parallax (18d items 2 and 6) are the only parts of that brief not built. `public/about/` does not exist; the mark holds the hero and no placeholder is used.
+- ~~**Session 18c-1 — /about "inside the studio".**~~ **DONE** (`5f0b0bc` … `5cea0e6`). The dark blue-black world, the clear hero, and the principle monitor. **Session 18c-2 is next:** the process light trail, founder credits and closer horizon — those sections currently work on the new ground with their colours restyled and no new mechanics.
+- **Founder photograph still absent** — `public/about/` does not exist. The mark holds the slot and no placeholder is used (§7.2).
+- ~~**Session 18 — /about ("proof of a person").**~~ **DONE** (`5b5ab00` … `6f256aa`). The principles playground, the drawn process line, the founder section. The PU mark still holds the photograph's slot and **no placeholder is used** — supply a photo and it drops in (§7.2).
+- ~~**Session 17i — the pass sheen + /services off the critical path.**~~ **DONE** (`a6d63af`, `84be54b`). Services route chunk **51.06 → 3.17 kB** gzip, /services LCP **2464 → 1932 ms**.
+- ~~**Session 19-pre — site-wide LCP.**~~ **DONE** (`f47c12d` … `341a231`).
+- ~~**Session 19-pre-2 — Prachets's four rulings.**~~ **DONE** (`e521774` … `895313d`). **All eleven routes under 2.5 s.** See §2.
+- ~~**Session 17h — the remaining /services density debt.**~~ **DONE.** All sixteen screens meet base 13px, min 11px and ≤15% blank at 1440 and 1680. §7.14 closed.
+- ~~**Session 17g-fix — start pass display fixes.**~~ **DONE.** Whole-token dates, a placeholder that reads as one, a single contextual tag, spaced arrows on a shared baseline, simulateBooking preview-only.
+- ~~**Session 17g — guided conversation + in-page booking.**~~ **DONE** (`267c248` … `b51fa7d`). The call is 30 minutes site-wide, the name field is unmissable, the date control is obvious, booking happens in a modal and the pass flips to CONFIRMED. **One owner item — §7.12 (weekend availability).**
+- ~~**Session 17f — "Your project start pass".**~~ **DONE** (`b6ea58f` … `231f1f2`). Weekends bookable, Ontario stat holidays in the business-day count, kickoff clipping fixed.
+- ~~**Session 17e — /services kickoff section.**~~ **DONE** (`aae26c8` … `ccd4c1f`). The 14-day calendar is an interactive personal timeline; `KickoffCalendar` removed.
+- ~~**Session 17d — /services quality + two site-wide fixes.**~~ **DONE** (`608a0c6` … `d925553`). Captions, spotlight, density, nav CTA, ledger, hero CTAs. **Six screens remain over the blank target — §7.12.**
+- ~~**Session 19 — /contact.**~~ **DONE** (`7143d8d` … `ff01a34`). Two paths, a lazy framed booking, the brief with its live reply preview, the Outbox fold and the Received receipt. **OWNER ITEM: `RESEND_API_KEY` is still unset** — the form's failure path is graceful now (one honest sentence plus a prefilled mailto, never the server's words), but no brief reaches the inbox until the key is set in Vercel.
+- ~~**Session 20 — site-wide.**~~ **DONE** (`342ce75` … `54c6285`). Page transitions, the new footer, home's live door previews and reel hover, the new 404, PillHl home-only.
+- ~~**Session 21 — the home hero.**~~ **DONE** (`edd31d8` … `60b2bab`). The headline speaks to the business, the slab cycles three measured outcomes, the reader can drive it three ways, and /services' real screens run beside it after LCP. Home initial JS +2.92 kB gzip; mobile LCP 600ms.
+- ~~**Session 21 rulings.**~~ **DONE** (`d6da1c7`, `8f02bb1`). Headline 147.9px at 1440 measured to the column; kicker, reel heading and meta description rewritten; navy agent screen kept by ruling; home mobile LCP re-measured honestly at 2000 ms.
+- ~~**Session 21b — the home flagship, reconceived.**~~ **DONE** (`021d6c8` … `ec38108`). The visitor types their business name into the slab and a premium site for it builds itself live in a large tilted window; seven industry presets, a generated monogram, self-scrolling; the scroll fills the screen and hands to the real reel; the name carries to /services and /contact. Home initial JS +1.97 kB gzip, generator 5.19 kB out of band, mobile LCP 2024 ms.
+- ~~**Session 22 — home as a five-chapter journey.**~~ **DONE** (`49501a1` … `73dce33`). Headline back to 104px, seven preset section shapes, a scroll-panned film strip of the work, three playable live service panels with all 16 chips deep-linking, a scroll-drawn founder chapter, a personalised slab closer, and a chapter rail. Home initial JS 106.80 → 94.31 kB gzip; mobile LCP 1788 ms.
+- ~~**Session 23 — the hero rebuilt from real work.**~~ **DONE** (`1f96a2e`). Sixteen real planes in a CSS 3D room, cursor-steered depth, hover-to-pull-forward with verified figures, and a fly-through that lands on CG Walls & Floors' own capture. Home initial JS 94.31 → 91.52 kB gzip; mobile LCP 1772 ms.
+- ~~**Session 23b — the hero's open items.**~~ **DONE** (`fb0eb76` … `2fd9aec`). The fly-through is lit (no frame below the at-rest mean at 1440 or 1920, against a 28-point crater), hover labels never clip (16/16 at 1280 and 1920), and the phone runs the specced scale-through. The 54ms long task was initial render at 191ms, not the fly-through.
+- ~~**Session 24a — chapters 1–3.**~~ **DONE** (`592dab6` … `547cfca`). The fly-through lands on CapitalCommand and occludes; "You've seen this website before." stages the restored argument as a wall of templates with one breaking out into real work; the strip's end card teases the vault; the rail reads six chapters.
+- ~~**Session 24b — chapters 4–6 and the journey layer.**~~ **DONE** (`0c50d81` … `f918e18`). The Ch1→Ch2 hand-over composed, Ch2 sharp, three image-in-type acts replacing `ServicePanels`, Ch5 and Ch6 lines, the six-chapter rail, no dead frames anywhere. Home initial JS 92.15 kB gzip; mobile LCP 1732 ms.
+- ~~**24b ruling — the hero field is all real work.**~~ **DONE** (`b0af4ee`). Four live /services screens replaced by unused case-study captures; the 37.12 kB gzip of screen chunks off home's graph; home entry 91.39 kB gzip; mobile LCP 1824 ms.
+- ~~**Session 25a — one colour flow + Ch1–4.**~~ **DONE** (`0bee86f` … `83cc51a`). The palette rule updated, the interpolating light layer, the new hero sentence, and the Websites / Products / Automation chapters. Total home JS 146.53 kB; mobile LCP 1752 ms.
+- **SESSION 25b — Ch5–8 and the rail.** Marketing (gold, the rings object), the work wall replacing `WorkStrip` (delete it), Ch7 and Ch8 restyled onto the flow, the 8-label rail tinted by the current light, and the per-chapter 5% dead-frame trace.
+- **STILL OPEN from 23b:** 11–12px text inside the reused /services screens on mobile; the LCP element is the kicker rather than the h1.
+- **STILL OPEN from 22:** CareerClarity has no screenshot and no case study, so its card is text-only; CapitalCommand and CadenceStack have no `headlineFigure`; `public/about/` has no founder photograph. All three are owner-supplied assets, not code.
+- **STILL OPEN for the Ship pass:** `RESEND_API_KEY` is unset (no brief reaches the inbox); `/privacy`, `/cookies` and `/terms` have no routes and their footer links are now removed rather than pointed anywhere; prerendering; the single `[S10 TEST]` submission.
+- **Ship pass.** **Now also carries prerendering** (§7.11): FCP is pinned at ~1.7 s by SPA boot on every route, and static-rendering the hero is the only lever left on it. The ship-pass amendments: **BLOCKED-ON-PRACHETS gates**, the TBT lab proxy, flag-don't-fix copy, exactly one test submission, Cal.com load-only, og-image.
+
+---
+
+## 9. RATINGS HISTORY (Prachets's own scores)
+
+| Surface | Trajectory |
+|---|---|
+| Home | **2 → 4–5 → 6 → 4–5 → 4 (21 verdict) → awaiting (21b, 22)** |
+| Case studies | **2 → 4–5** |
+| /services | **4** |
+| /about | **4** |
+| **Target** | **9/10 everywhere** |
+
+Read these as the reason for the "one signature mechanic per page" and "the takeover is the floor" rules. Incremental polish has not moved these numbers; structural rebuilds have.
+
+---
+
+## 10. HOW TO START THE NEXT SESSION
+
+Paste this as the first message of a fresh session:
+
+```
+Read docs/AVERR-V2-HANDOFF-V3.md in /Users/prachetsupadhyay/Developer/averr-site
+before doing anything. It is your only memory of this project — the repo,
+branch, HEAD, every locked rule, every technical gotcha, and the data facts.
+
+Then confirm back to me, in a few lines:
+  - HEAD hash + branch, and that it matches git log
+  - the last verified bundle size
+  - the three locked rules you think are most likely to be violated by the
+    work I'm about to describe
+  - anything in the handoff that no longer matches the code
+
+Do not start building until I paste the session brief.
+```
+
+Then paste the session brief. A brief normally carries: PRE-FLIGHT (report before writing), numbered items, the ASSET RULE, the verification protocol, and the commit message.
+
+### What to do first, mechanically
+
+```bash
+cd /Users/prachetsupadhyay/Developer/averr-site
+git log --oneline -5          # confirm HEAD
+git status                    # expect clean
+npm run build                 # unfiltered; expect exit 0
+```
+
+Verify against the alias, not localhost, for anything you report as done:
+`https://averr-git-redesign-v2-prachets-upadhyay-s-projects.vercel.app`
+
+### The shape of a good session here
+
+Pre-flight and report **before** writing. Build → commit → push per verified item. Poll the alias for your bundle hash before sweeping. Take screenshots **and look at them**. Report probe errors as your own. Flag deviations rather than absorbing them — every session so far has surfaced at least one thing the spec assumed that the code did not support, and saying so early has been more useful than working around it silently.

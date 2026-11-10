@@ -1,0 +1,324 @@
+import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useReducedMotion,
+} from "motion/react";
+import { duration, ease, spring } from "../lib/motion";
+
+type Variant = "primary" | "ghost" | "text";
+type Size = "sm" | "md" | "lg";
+type Tone = "light" | "dark";
+
+export interface MagneticCTAProps {
+  to?: string;
+  onClick?: (e?: React.MouseEvent | React.FormEvent) => void;
+  variant?: Variant;
+  size?: Size;
+  /** Ground the CTA sits on. "light" (default) is the original behaviour,
+   *  byte-identical. "dark" inverts every variant for --color-dark surfaces. */
+  tone?: Tone;
+  icon?: React.ReactNode | null;
+  children: React.ReactNode;
+  className?: string;
+  ariaLabel?: string;
+  type?: "button" | "submit";
+}
+
+const MAGNET_RADIUS = 80;
+const MAGNET_STRENGTH = 0.15; // 80 * 0.15 = 12px max displacement
+
+const sizeStyles: Record<Size, React.CSSProperties> = {
+  sm: { padding: "8px 16px" },
+  md: { padding: "12px 24px" },
+  lg: { padding: "16px 32px" },
+};
+
+const sizeClass: Record<Size, string> = {
+  sm: "type-small",
+  md: "type-body",
+  lg: "type-body-lg",
+};
+
+function isExternal(to?: string): boolean {
+  if (!to) return false;
+  return /^(https?:)?\/\//.test(to) || to.startsWith("mailto:");
+}
+
+export default function MagneticCTA(props: MagneticCTAProps) {
+  const {
+    to,
+    onClick,
+    variant = "primary",
+    size = "md",
+    tone = "light",
+    icon,
+    children,
+    className,
+    ariaLabel,
+    type,
+  } = props;
+
+  const reduce = useReducedMotion();
+  /** Tone cross-fade length. Reduced motion swaps both in one frame. */
+  const toneMs = reduce ? 0 : duration.base * 1000;
+  const ref = useRef<HTMLElement | null>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, spring.soft);
+  const springY = useSpring(y, spring.soft);
+  const [hovered, setHovered] = useState(false);
+
+  function handleMove(e: React.MouseEvent<HTMLElement>) {
+    if (reduce || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const dist = Math.hypot(dx, dy);
+    if (dist > MAGNET_RADIUS) {
+      x.set(0);
+      y.set(0);
+      return;
+    }
+    x.set(dx * MAGNET_STRENGTH);
+    y.set(dy * MAGNET_STRENGTH);
+  }
+
+  function handleLeave() {
+    x.set(0);
+    y.set(0);
+  }
+
+  const base: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderRadius: 999,
+    fontWeight: 500,
+    textDecoration: "none",
+    cursor: "pointer",
+    userSelect: "none",
+    /* The label must never cross-fade through its own pill.
+     *
+     * Background and colour used to run the same duration from opposite
+     * ends, so they met in the middle: 175ms into a nav tone flip the pill
+     * was rgb(133,131,127) and the label rgb(127,125,119) — 1.09:1, which
+     * is the "grey pill with no label" in the 17d recording. Arithmetic,
+     * not tuning: two opposite ramps over one duration always cross.
+     *
+     * So the colour does not ramp at all. It steps, once, at the halfway
+     * point, and `ease.inOut` is used for the ramp because it is the one
+     * token that is point-symmetric ([0.65,0,0.35,1]) — it reaches exactly
+     * half its distance at exactly half its time, in both directions. The
+     * pill is therefore mid-value at the instant the label flips, which
+     * leaves ~3.5:1 going either way and only improves from there. */
+    transitionProperty: "background-color, border-color, box-shadow, color",
+    transitionDuration: `${toneMs}ms, ${toneMs}ms, ${toneMs}ms, 0ms`,
+    transitionDelay: `0ms, 0ms, 0ms, ${toneMs / 2}ms`,
+    transitionTimingFunction: `cubic-bezier(${ease.inOut.join(",")})`,
+    ...sizeStyles[size],
+  };
+
+  const onDark = tone === "dark";
+
+  const primary: React.CSSProperties = {
+    ...base,
+    backgroundColor: onDark ? "var(--color-parch)" : "var(--color-dark)",
+    color: onDark ? "var(--color-dark)" : "var(--color-bg)",
+    border: `1px solid ${onDark ? "var(--color-parch)" : "var(--color-dark)"}`,
+    boxShadow: onDark ? "0 0 0 rgba(237,233,226,0)" : "0 0 0 rgba(20,20,18,0)",
+  };
+
+  const ghost: React.CSSProperties = {
+    ...base,
+    backgroundColor: "transparent",
+    color: onDark ? "var(--color-parch)" : "var(--color-ink)",
+    border: `1px solid ${onDark ? "var(--color-parch)" : "rgba(20,20,18,0.18)"}`,
+  };
+
+  const text: React.CSSProperties = {
+    ...base,
+    background: "transparent",
+    color: onDark ? "var(--color-parch)" : "var(--color-ink)",
+    border: "1px solid transparent",
+    padding:
+      size === "sm" ? "4px 8px" : size === "md" ? "6px 10px" : "8px 12px",
+  };
+
+  const finalStyle =
+    variant === "primary" ? primary : variant === "ghost" ? ghost : text;
+
+  function onEnter(e: React.MouseEvent<HTMLElement>) {
+    setHovered(true);
+    const el = e.currentTarget;
+    if (variant === "primary") {
+      el.style.backgroundColor = onDark
+        ? "var(--color-bg)"
+        : "var(--color-dark-alt)";
+      el.style.boxShadow = onDark
+        ? "0 8px 24px rgba(0,0,0,0.35)"
+        : "0 8px 24px rgba(20,20,18,0.15)";
+    } else if (variant === "ghost") {
+      el.style.backgroundColor = onDark
+        ? "rgba(237,233,226,0.08)"
+        : "rgba(20,20,18,0.04)";
+      el.style.borderColor = onDark
+        ? "var(--color-parch)"
+        : "rgba(20,20,18,0.32)";
+    } else {
+      // text: reveal underline
+      const underline = el.querySelector<HTMLElement>(".mcta-underline");
+      if (underline) underline.style.transform = "scaleX(1)";
+    }
+  }
+
+  function onLeaveStyles(e: React.MouseEvent<HTMLElement>) {
+    setHovered(false);
+    const el = e.currentTarget;
+    if (variant === "primary") {
+      el.style.backgroundColor = onDark
+        ? "var(--color-parch)"
+        : "var(--color-dark)";
+      el.style.boxShadow = onDark
+        ? "0 0 0 rgba(237,233,226,0)"
+        : "0 0 0 rgba(20,20,18,0)";
+    } else if (variant === "ghost") {
+      el.style.backgroundColor = "transparent";
+      el.style.borderColor = onDark
+        ? "var(--color-parch)"
+        : "rgba(20,20,18,0.18)";
+    } else {
+      const underline = el.querySelector<HTMLElement>(".mcta-underline");
+      if (underline) underline.style.transform = "scaleX(0)";
+    }
+    handleLeave();
+  }
+
+  const content = (
+    <>
+      <span className={sizeClass[size]} style={{ position: "relative" }}>
+        {children}
+        {variant === "text" ? (
+          <span
+            className="mcta-underline"
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: -4,
+              height: 1,
+              background: "currentColor",
+              transform: "scaleX(0)",
+              transformOrigin: "left",
+              transition: `transform ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
+              pointerEvents: "none",
+            }}
+          />
+        ) : null}
+      </span>
+      {icon !== null ? (
+        <span
+          aria-hidden
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            transform: hovered && !reduce ? "translateX(4px)" : "translateX(0)",
+            transition: `transform ${duration.base * 1000}ms cubic-bezier(${ease.outQuart.join(",")})`,
+          }}
+        >
+          {icon ?? "→"}
+        </span>
+      ) : null}
+    </>
+  );
+
+  const motionStyle = { x: springX, y: springY, ...finalStyle };
+  const hoverScale = variant === "primary" ? 1.03 : 1.02;
+  const scaleProps = {
+    whileHover: { scale: hoverScale, transition: spring.snappy },
+    whileTap: { scale: 0.98 },
+  };
+
+  if (type === "submit" || type === "button" || (onClick && !to)) {
+    return (
+      <motion.button
+        ref={ref as React.Ref<HTMLButtonElement>}
+        type={type ?? "button"}
+        onClick={
+          onClick ? (e) => onClick(e as React.MouseEvent) : undefined
+        }
+        onMouseMove={handleMove}
+        onMouseEnter={onEnter}
+        onMouseLeave={onLeaveStyles}
+        style={motionStyle}
+        className={className}
+        aria-label={ariaLabel}
+        {...scaleProps}
+      >
+        {content}
+      </motion.button>
+    );
+  }
+
+  if (to && isExternal(to)) {
+    return (
+      <motion.a
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        href={to}
+        target={to.startsWith("mailto:") ? undefined : "_blank"}
+        rel={to.startsWith("mailto:") ? undefined : "noopener noreferrer"}
+        onMouseMove={handleMove}
+        onMouseEnter={onEnter}
+        onMouseLeave={onLeaveStyles}
+        onClick={onClick ? (e) => onClick(e as React.MouseEvent) : undefined}
+        style={motionStyle}
+        className={className}
+        aria-label={ariaLabel}
+        {...scaleProps}
+      >
+        {content}
+      </motion.a>
+    );
+  }
+
+  // Internal link (or missing to — treat as home)
+  const target = to || "/";
+  return (
+    <motion.span
+      ref={ref as React.Ref<HTMLSpanElement>}
+      onMouseMove={handleMove}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeaveStyles}
+      style={motionStyle}
+      className={className}
+      // framer-motion auto-adds tabIndex={0} to non-interactive elements that
+      // carry whileHover/whileTap, which made every internal-link CTA two tab
+      // stops. The real <a> below is the only focusable element.
+      tabIndex={-1}
+      {...scaleProps}
+    >
+      <Link
+        to={target}
+        onClick={onClick ? (e) => onClick(e as React.MouseEvent) : undefined}
+        aria-label={ariaLabel}
+        style={{
+          all: "unset",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          cursor: "pointer",
+          color: "inherit",
+        }}
+      >
+        {content}
+      </Link>
+    </motion.span>
+  );
+}

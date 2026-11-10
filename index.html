@@ -4,24 +4,40 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0B0B0D" />
 
-    <title>Averr Studio — Websites, AI Agents & SaaS Products</title>
-    <meta name="description" content="Premium websites, AI agents, and full SaaS products — built by one operator who ships product, not just decks. Based in the Greater Toronto Area." />
+    <!-- The home values. Every other route swaps the title and the
+         description on mount and puts these back on unmount, so this
+         pair is both the default and Home's own. -->
+    <meta name="description" content="A Toronto studio building websites, web apps, AI automation and marketing for businesses across the GTA. You work directly with the person who builds it." />
+    <!-- Navy, with the document itself: cream here tinted the mobile
+         browser chrome against a dark page. -->
+    <meta name="theme-color" content="#121C27" />
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Averr Studio — Websites, AI Agents & SaaS Products" />
-    <meta property="og:description" content="Premium websites, AI agents, and full SaaS products — built by one operator who ships product, not just decks." />
-    <meta property="og:image" content="/og-image.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:title" content="Averr Studios — Websites, Web Apps, AI Automation and Marketing" />
+    <meta property="og:description" content="A Toronto studio building websites, web apps, AI automation and marketing for businesses across the GTA. You work directly with the person who builds it." />
+    <meta property="og:url" content="https://averrstudios.com" />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Averr Studio — Websites, AI Agents & SaaS Products" />
-    <meta name="twitter:description" content="Premium websites, AI agents, and full SaaS products — built by one operator who ships product, not just decks." />
-    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="twitter:title" content="Averr Studios — Websites, Web Apps, AI Automation and Marketing" />
+    <meta name="twitter:description" content="A Toronto studio building websites, web apps, AI automation and marketing for businesses across the GTA. You work directly with the person who builds it." />
+
+    <title>Averr Studios — Websites, Web Apps, AI Automation and Marketing</title>
+
+    <!-- All fonts are self-hosted. No third-party font origins.
+
+         Only Geist is preloaded. On the 1.6 Mbps lab profile a preload is a
+         high-priority request that shares the pipe with the entry chunk, so
+         preloading Inter as well pushed first contentful paint out by about
+         300ms to save a swap on body copy. Geist carries every display
+         headline — two routes LCP on one — and is 29 kB, so it keeps its
+         preload. Inter loads at normal priority behind the JS and swaps in;
+         every face is font-display: swap. -->
+    <link rel="preload" href="/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Cormorant too: it is only 23 kB, it sets the accent words inside
+         headlines, and swapping it in at ~2.4s reflowed the headline and
+         pushed the subhead down — 0.05 of layout shift on two case studies. -->
+    <link rel="preload" href="/fonts/cormorant-garamond-latin-600-italic.woff2" as="font" type="font/woff2" crossorigin>
   </head>
   <body>
     <div id="root"></div>

@@ -1,35 +1,94 @@
+import MagneticCTA from "./MagneticCTA";
+import TorontoClock from "./TorontoClock";
+
+const STUDIO_LINKS = [
+  { label: "Work", href: "/work" },
+  { label: "Services", href: "/services" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
+
+const CONTACT_LINKS = [
+  { label: "prachets@averrstudios.com", href: "mailto:prachets@averrstudios.com" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/prachetsupadhyay" },
+  { label: "Instagram", href: "https://www.instagram.com/averrstudios" },
+];
+
+const YEAR = new Date().getFullYear();
+
 export default function Footer() {
+  /* Session 27c: the navy footer, site-wide. It replaces the
+     giant-wordmark footer and the per-route tone switch — the Nolana
+     system has one footer and it is dark everywhere. */
   return (
-    <footer className="border-t border-[var(--border)] py-16 px-6 md:px-8 bg-[var(--surface-alt)]">
-      <div className="max-w-[1240px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr] gap-16">
-          <div>
-            <div className="font-display font-bold text-lg tracking-tight">
-              AVERR<span className="text-[var(--accent)]">.</span>
-            </div>
-            <p className="text-[var(--text-muted)] text-sm mt-3 max-w-[280px]">
-              Websites, AI agents, and SaaS products &mdash; built by one operator,
-              from the GTA.
+    <footer className="nf">
+      <div className="nf-inner">
+        <div className="nf-top">
+          <div className="nf-brand">
+            <span className="nf-mark">Averr</span>
+            <p className="nf-say">
+              Websites, software and AI for businesses across the GTA.
+            </p>
+            <p className="nf-mail">
+              <a href="mailto:prachets@averrstudios.com">prachets@averrstudios.com</a>
             </p>
           </div>
-          <div>
-            <h4 className="text-[13px] text-[var(--text-muted)] uppercase tracking-[0.04em] mb-4">Studio</h4>
-            <div className="flex flex-col gap-2.5">
-              <a href="#work" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">Work</a>
-              <a href="#how" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">How I Work</a>
-              <a href="#services" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">Services</a>
+
+          <nav className="nf-cols" aria-label="Footer">
+            <div>
+              <h2 className="nf-ct">Studio</h2>
+              <ul>
+                {STUDIO_LINKS.map(function l(x) {
+                  return (
+                    <li key={x.label}>
+                      <a href={x.href}>{x.label}</a>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-          </div>
-          <div>
-            <h4 className="text-[13px] text-[var(--text-muted)] uppercase tracking-[0.04em] mb-4">Get in touch</h4>
-            <div className="flex flex-col gap-2.5">
-              <a href="#contact" className="text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">Start a project</a>
+            <div>
+              <h2 className="nf-ct">Contact</h2>
+              <ul>
+                {CONTACT_LINKS.map(function l(x) {
+                  return (
+                    <li key={x.label}>
+                      <a
+                        href={x.href}
+                        target={x.href.startsWith("http") ? "_blank" : undefined}
+                        rel={x.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                      >
+                        {x.label}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-          </div>
+            <div className="nf-act">
+              <MagneticCTA to="/contact" variant="primary" tone="dark">
+                Start a project
+              </MagneticCTA>
+              <div className="nf-now">
+                {/* "same-day" contradicted the promise Contact and About
+                    both make; the footer now says the same thing they do. */}
+                <span>Replies within 24 hours.</span>
+                <TorontoClock style={{ color: "rgba(255,255,255,0.82)" }} />
+              </div>
+            </div>
+          </nav>
         </div>
-        <div className="flex justify-between items-center mt-16 pt-6 border-t border-[var(--border)] text-[13px] text-[var(--text-muted)] flex-wrap gap-3">
-          <div>&copy; 2026 Averr</div>
-          <div>Greater Toronto Area</div>
+
+        <div className="nf-bottom">
+          <span>© {YEAR} Averr Studios · Toronto</span>
+          {/* a plain anchor, like every other internal link in this
+              footer — not a router <Link>, so the one odd one out does
+              not become the pattern someone copies next. */}
+          <span className="nf-small">
+            <a href="/privacy">Privacy</a>
+            <span aria-hidden="true">·</span>
+            <span>Toronto &amp; the GTA</span>
+          </span>
         </div>
       </div>
     </footer>

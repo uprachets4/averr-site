@@ -1,0 +1,381 @@
+/* ═══════════════════════════════════════════════════════════════
+   /contact — spec 34, the approved reference ported under `.ct`.
+
+   Everything here is the reference's own values. Not ported, and why:
+     - its `@font-face` blocks: the repo self-hosts Geist already;
+     - its `html, body` rules: step 1 put the navy on the document;
+     - its `:root` block: those tokens live on `.ct` instead, so they
+       cannot leak into another route.
+
+   Two things are deliberately NOT the reference's:
+     - `font-size` and `line-height` are restated on `.ct`. The sheet
+       was written against a root that hands down 16px and `normal`;
+       this repo's body hands down 17px and 1.6, and anything here
+       that sets padding but no line-height would come out taller.
+       Spec 33 lost a CTA row's height to exactly this.
+     - the three SVG gradient ids are `ctgrad` / `ctfill` / `cttrail`,
+       not `mgrad` / `mfillg` / `tg`. /about already owns `mgrad` and
+       `mfillg` with different stops; the routes never share a screen
+       today, but a duplicate id is not worth the risk.
+
+   Every animation name is `ct-*` and every keyframes block defining
+   one is in this file — spec 33 shipped seven `animation:` references
+   pointing at renamed keyframes that no longer existed.
+   ═══════════════════════════════════════════════════════════════ */
+
+.ct {
+  --navy:#121C27; --navy-2:#182633; --navy-3:#232837; --black:#080A0A;
+  --light:#F5F4F9; --ink:#0F1117;
+  --mute:rgba(245,244,249,.66); --faint:rgba(245,244,249,.12); --line:rgba(245,244,249,.2);
+  --web:#F9AF97; --app:#D5818C; --ai:#9874E8; --bridge:#708DF8; --mkt:#569AFA; --ok:#8FD1A9;
+  --grad:linear-gradient(90deg,#F9AF97,#D5818C,#9874E8,#708DF8,#569AFA);
+  --display:"Geist", ui-sans-serif, system-ui, sans-serif;
+  --mono:"Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ease:cubic-bezier(.25,.1,.25,1); --out:cubic-bezier(.25,1,.5,1);
+  color-scheme:dark;
+
+  background:var(--navy);color:var(--light);font-family:var(--display);-webkit-font-smoothing:antialiased;
+  font-size:16px;line-height:normal;
+}
+.ct, .ct * {box-sizing:border-box}
+.ct a {color:inherit}
+.ct button, .ct input, .ct textarea {font-family:inherit}
+.ct :focus-visible {outline:2px solid var(--light);outline-offset:3px}
+.ct .gut {padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.ct .wrap {max-width:1280px;margin:0 auto;width:100%}
+.ct .eyebrow {font:500 12px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);display:inline-flex;gap:14px;align-items:center}
+.ct .eyebrow::before {content:"";width:28px;height:1px;background:currentColor;opacity:.6}
+.ct .mono {font:500 11px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.ct h1, .ct h2, .ct h3 {margin:0;font-weight:500;letter-spacing:-.05em;line-height:.98;text-wrap:balance}
+.ct .gt {background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ct .grain {position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.05;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.ct .rv {opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease),transform .8s var(--out)}
+.ct .rv.in {opacity:1;transform:none}
+.ct .btn {display:inline-flex;gap:10px;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:var(--navy);background:var(--light);padding:15px 22px;border-radius:999px;text-decoration:none;border:0;cursor:pointer;transition:transform .3s var(--out),opacity .3s,box-shadow .3s}
+.ct .btn:hover {transform:translateY(-2px);box-shadow:0 12px 30px -10px rgba(245,244,249,.35)}
+.ct .btn[aria-disabled="true"] {opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.ct .ghost {display:inline-flex;gap:10px;align-items:center;font-weight:500;font-size:15px;padding:14px 20px;border-radius:999px;border:1px solid var(--line);text-decoration:none;color:var(--light);background:transparent;cursor:pointer;transition:border-color .3s}
+.ct .ghost:hover {border-color:rgba(245,244,249,.6)}
+
+/* The orbs are transform-only and blurred ONCE: `filter` is set here
+   and never animated, so the blur is rasterised a single time and the
+   drift is a cheap composited transform. */
+.ct .orb {position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;opacity:.5}
+@keyframes ct-drift {0%,100%{transform:translate(0,0)}50%{transform:translate(4%,-6%)}}
+
+/* ================= OPENING ================= */
+.ct .open {position:relative;min-height:100svh;display:flex;align-items:center;padding-block:120px 80px;overflow:hidden}
+.ct .open .orb.a {width:46vw;height:46vw;right:-6vw;top:8vh;background:radial-gradient(closest-side,rgba(152,116,232,.55),transparent);animation:ct-drift 26s ease-in-out infinite}
+.ct .open .orb.b {width:34vw;height:34vw;left:-8vw;bottom:-10vh;background:radial-gradient(closest-side,rgba(249,175,151,.32),transparent);animation:ct-drift 32s ease-in-out infinite reverse}
+.ct .open::after {content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(245,244,249,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(245,244,249,.035) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(60% 60% at 50% 50%,#000,transparent);mask-image:radial-gradient(60% 60% at 50% 50%,#000,transparent)}
+.ct .opengrid {position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(32px,5vw,80px);align-items:center}
+.ct .opengrid>* {min-width:0}
+.ct .open h1 {font-size:clamp(46px,6.2vw,100px);margin-top:22px}
+.ct .open h1 .w {display:inline-block;opacity:0;transform:translateY(30%);transition:opacity .7s var(--ease),transform .9s var(--out)}
+.ct.ready .open h1 .w {opacity:1;transform:none}
+.ct .lede {margin:24px 0 0;font-size:clamp(16px,1.25vw,19px);line-height:1.55;color:rgba(245,244,249,.82);max-width:40ch}
+.ct .presence {display:flex;align-items:center;gap:14px;margin-top:32px;padding:10px 18px 10px 10px;border-radius:999px;border:1px solid var(--faint);background:rgba(245,244,249,.035);width:fit-content;max-width:100%}
+.ct .presence .av {position:relative;flex:none}
+.ct .presence img {width:44px;height:44px;border-radius:50%;object-fit:cover;display:block;box-shadow:0 0 0 2px rgba(245,244,249,.22)}
+.ct .presence .av::after {content:"";position:absolute;right:0;bottom:1px;width:11px;height:11px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--navy);animation:ct-pulse 2.4s ease-in-out infinite}
+@keyframes ct-pulse {50%{box-shadow:0 0 0 3px var(--navy),0 0 0 7px rgba(143,209,169,.25)}}
+.ct .presence b {display:block;font-size:15px;font-weight:600;letter-spacing:-.01em}
+.ct .presence span {display:block;font:500 10.5px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-top:3px}
+.ct .doors {display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ct .door {position:relative;display:flex;flex-direction:column;gap:18px;min-height:340px;padding:22px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(165deg,rgba(245,244,249,.06),rgba(245,244,249,.015));text-decoration:none;color:var(--light);overflow:hidden;transition:transform .5s var(--out),border-color .35s}
+.ct .door::before {content:"";position:absolute;inset:0;background:radial-gradient(70% 60% at var(--mx,50%) var(--my,30%),color-mix(in srgb,var(--dc) 20%,transparent),transparent 70%);opacity:.5;transition:opacity .4s;pointer-events:none}
+.ct .door:hover {transform:translateY(-6px);border-color:color-mix(in srgb,var(--dc) 65%,transparent)}
+.ct .door:hover::before {opacity:1}
+.ct .vign {position:relative;flex:1;border-radius:16px;border:1px solid var(--faint);background:rgba(8,10,10,.35);padding:16px;overflow:hidden}
+.ct .door .t {position:relative}
+.ct .door .t .mono {color:var(--mute)}
+.ct .door h2 {font-size:clamp(26px,2.3vw,36px);margin:8px 0 6px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ct .door h2 i {font-style:normal;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:16px;letter-spacing:0;transition:background .3s,color .3s,transform .4s var(--out)}
+.ct .door:hover h2 i {background:var(--light);color:var(--navy);transform:translateX(3px)}
+.ct .door p {margin:0;font-size:14.5px;line-height:1.45;color:rgba(245,244,249,.8)}
+
+/* write vignette: a tiny letter typing itself */
+.ct .mini {font-size:12.5px;line-height:1.75;color:rgba(245,244,249,.86)}
+.ct .mini .mh {font:500 9.5px/1 var(--mono);letter-spacing:.12em;color:var(--mute);margin-bottom:10px;display:block}
+.ct .mini .tl {display:block;white-space:nowrap;overflow:hidden;width:0;border-right:1.5px solid transparent}
+.ct .mini .tl.on {animation:ct-type var(--d,1.2s) steps(var(--n,30)) forwards}
+.ct .mini .tl.cur {border-right-color:#F9AF97}
+@keyframes ct-type {to{width:var(--w,100%)}}
+.ct .mini .tags {display:flex;gap:5px;margin:8px 0 2px;opacity:0;transition:opacity .4s}
+.ct .mini .tags.on {opacity:1}
+.ct .mini .tags span {font-size:10px;padding:4px 7px;border-radius:999px;background:var(--c);color:#0F1117;font-weight:600}
+
+/* talk vignette: a slot being picked */
+.ct .wk {display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.ct .wk b {font:500 9.5px/1 var(--mono);letter-spacing:.1em;color:var(--mute);text-align:center;font-weight:500}
+.ct .wk span {aspect-ratio:1;border-radius:8px;background:rgba(245,244,249,.07);display:grid;place-items:center;font-size:12px;transition:background .3s,color .3s}
+.ct .wk span.on {background:var(--light);color:var(--navy);font-weight:600}
+.ct .slots {display:grid;gap:6px;margin-top:12px}
+.ct .slots span {padding:7px 10px;border-radius:8px;border:1px solid var(--faint);font-size:11.5px;text-align:center;transition:background .3s,color .3s,border-color .3s}
+.ct .slots span.on {background:#9874E8;border-color:#9874E8;color:#fff;font-weight:600}
+.ct .booked {position:absolute;left:16px;right:16px;bottom:14px;display:flex;align-items:center;gap:8px;font:500 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#BFE6CD;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .5s var(--out)}
+.ct .booked::before {content:"";width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.ct .booked.on {opacity:1;transform:none}
+
+/* ================= WRITE ================= */
+.ct .write {position:relative;padding-block:clamp(96px,14vh,140px);overflow:hidden}
+.ct .write .orb.c {width:40vw;height:40vw;right:-10vw;top:20%;background:radial-gradient(closest-side,rgba(86,154,250,.25),transparent);animation:ct-drift 30s ease-in-out infinite}
+.ct .whead {position:relative;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:34px}
+.ct .whead h2 {font-size:clamp(36px,4.2vw,66px);margin-top:16px}
+.ct .whead p {margin:0;color:var(--mute);font-size:15px;max-width:36ch;line-height:1.5}
+.ct .desk {position:relative;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;align-items:start}
+.ct .desk>* {min-width:0}
+.ct .brief {border-radius:24px;border:1px solid var(--line);background:linear-gradient(170deg,rgba(245,244,249,.05),rgba(245,244,249,.015));padding:clamp(22px,2.6vw,34px)}
+.ct .part {padding:4px 0 26px;border-bottom:1px solid var(--faint);margin-bottom:24px}
+.ct .part:last-of-type {border-bottom:0;margin-bottom:6px;padding-bottom:6px}
+.ct .ph {display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.ct .ph .n {font:500 11px/1 var(--mono);color:var(--mute);letter-spacing:.1em}
+.ct .ph h3 {font-size:22px;letter-spacing:-.035em;line-height:1.1}
+.ct .ph .opt {margin-left:auto;font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.ct .tiles {display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ct .tile {all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:flex;flex-direction:column;gap:8px;padding:16px 16px 15px;border-radius:16px;border:1px solid var(--line);background:rgba(245,244,249,.025);transition:border-color .3s,background .3s,transform .35s var(--out)}
+.ct .tile:hover {border-color:color-mix(in srgb,var(--sc) 70%,transparent);transform:translateY(-2px)}
+.ct .tile .top {display:flex;justify-content:space-between;align-items:center}
+.ct .tile .dot {width:10px;height:10px;border-radius:50%;background:var(--sc);box-shadow:0 0 0 4px color-mix(in srgb,var(--sc) 18%,transparent)}
+.ct .tile .chk {width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:11px;color:transparent;transition:background .25s,border-color .25s,color .25s}
+.ct .tile b {font-size:17px;font-weight:500;letter-spacing:-.02em}
+.ct .tile span.d {font-size:13px;line-height:1.4;color:var(--mute)}
+.ct .tile[aria-pressed="true"] {border-color:var(--sc);background:linear-gradient(160deg,color-mix(in srgb,var(--sc) 16%,transparent),rgba(245,244,249,.02))}
+.ct .tile[aria-pressed="true"] .chk {background:var(--sc);border-color:var(--sc);color:#0F1117}
+.ct .tile:focus-visible {outline:2px solid var(--light);outline-offset:3px}
+
+/* `.show`, NOT `.open`: `.open` is the opening SECTION's class, and
+   the reference itself hit this — `.subs.open` matched the section
+   rule and opened a 900px gap. A state class never reuses a
+   section's name. */
+.ct .subs {display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--out)}
+.ct .subs.show {grid-template-rows:1fr}
+.ct .subs>div {overflow:hidden;min-height:0}
+.ct .subgrp {padding-top:14px}
+.ct .subgrp+.subgrp {padding-top:12px}
+.ct .subgrp .sh {font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sc);margin-bottom:9px;display:flex;gap:8px;align-items:center}
+.ct .subgrp .sh::before {content:"";width:6px;height:6px;border-radius:50%;background:var(--sc)}
+.ct .chips {display:flex;flex-wrap:wrap;gap:7px}
+.ct .chip {all:unset;box-sizing:border-box;cursor:pointer;font-size:13.5px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);color:rgba(245,244,249,.86);transition:background .2s,border-color .2s,color .2s}
+.ct .chip:hover {border-color:var(--sc)}
+.ct .chip[aria-pressed="true"] {background:color-mix(in srgb,var(--sc) 22%,transparent);border-color:var(--sc);color:var(--light)}
+.ct .chip[aria-pressed="true"]::before {content:"✓ ";color:var(--sc)}
+.ct .chip:focus-visible {outline:2px solid var(--light);outline-offset:2px}
+.ct .unsure {all:unset;cursor:pointer;margin-top:12px;display:inline-flex;align-items:center;gap:9px;font-size:14px;color:var(--mute)}
+.ct .unsure i {width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:11px;color:transparent;transition:background .2s,color .2s}
+.ct .unsure[aria-pressed="true"] {color:var(--light)}
+.ct .unsure[aria-pressed="true"] i {background:var(--light);color:var(--navy);border-color:var(--light)}
+.ct .unsure:focus-visible {outline:2px solid var(--light);outline-offset:3px}
+.ct .fields {display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ct .fields .full {grid-column:1/-1}
+.ct .f {position:relative}
+.ct .f input, .ct .f textarea {width:100%;font-size:16px;color:var(--light);background:rgba(8,10,10,.3);border:1px solid var(--line);border-radius:14px;padding:22px 14px 9px;outline:none;transition:border-color .25s,background .25s}
+.ct .f textarea {resize:vertical;min-height:120px;line-height:1.5}
+.ct .f label {position:absolute;left:15px;top:16px;font-size:15px;color:var(--mute);pointer-events:none;transition:transform .2s var(--out),font-size .2s,top .2s,color .2s}
+.ct .f input:focus, .ct .f textarea:focus {border-color:#9874E8;background:rgba(8,10,10,.45)}
+.ct .f input:focus-visible, .ct .f textarea:focus-visible {outline:none;box-shadow:0 0 0 3px rgba(152,116,232,.3)}
+.ct .f input:not(:placeholder-shown)+label, .ct .f input:focus+label, .ct .f textarea:not(:placeholder-shown)+label, .ct .f textarea:focus+label {top:8px;font-size:11px;letter-spacing:.04em}
+.ct .f .err {display:block;font-size:12.5px;color:#F2B6BE;margin-top:6px;min-height:0}
+.ct .when {display:flex;flex-wrap:wrap;gap:8px}
+.ct .when button {all:unset;box-sizing:border-box;cursor:pointer;font-size:14px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);transition:background .2s,border-color .2s,color .2s}
+.ct .when button:hover {border-color:rgba(245,244,249,.55)}
+.ct .when button[aria-pressed="true"] {background:var(--light);color:var(--navy);border-color:var(--light);font-weight:600}
+.ct .when button:focus-visible {outline:2px solid var(--light);outline-offset:2px}
+.ct .bfoot {display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:22px;padding-top:20px;border-top:1px solid var(--faint)}
+.ct .bfoot .hint {font-size:14px;color:var(--mute)}
+.ct .bfoot .hint b {color:var(--light);font-weight:500}
+
+/* the letter */
+.ct .letter {position:sticky;top:90px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(170deg,#1D2C3B,#152230);box-shadow:0 60px 120px -60px rgba(0,0,0,.9);padding:clamp(22px,2.4vw,32px);transform-origin:50% 50%}
+.ct .letter::before {content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background-image:linear-gradient(transparent calc(100% - 1px),rgba(245,244,249,.04) 1px);background-size:100% 32px;-webkit-mask-image:linear-gradient(transparent 0,#000 22%,#000 90%,transparent);mask-image:linear-gradient(transparent 0,#000 22%,#000 90%,transparent)}
+.ct .letter::after {content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;background:linear-gradient(115deg,#F5F4F9 0%,#E4E2EE 46%,#C9CCDD 47%,#EDECF4 100%);transition:opacity .35s .15s}
+.ct .letter.folding::after {opacity:1}
+.ct .lhd {position:relative;display:flex;justify-content:space-between;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--faint);color:var(--mute)}
+.ct .lhd .st {display:flex;align-items:center;gap:7px}
+.ct .lhd .st i {width:6px;height:6px;border-radius:50%;background:#9874E8;animation:ct-blink 1.4s infinite}
+@keyframes ct-blink {50%{opacity:.25}}
+.ct .lbody {position:relative;font-size:17px;line-height:1.75;color:rgba(245,244,249,.92);min-height:300px}
+.ct .lbody p {margin:0 0 12px}
+.ct .lbody .bl {color:rgba(245,244,249,.36);border-bottom:1px dashed rgba(245,244,249,.28)}
+.ct .lbody .v {color:var(--light);transition:background .6s}
+.ct .lbody .v.flash {background:rgba(152,116,232,.28);border-radius:4px}
+.ct .lbody .svcw {font-weight:500;color:var(--light);box-shadow:inset 0 -2px 0 var(--sc)}
+.ct .lbody .gist {white-space:pre-wrap;color:rgba(245,244,249,.86)}
+.ct .lsig {display:flex;align-items:center;gap:12px;margin-top:6px}
+.ct .lsig b {font-weight:500}
+.ct .lfoot {position:relative;margin-top:14px;padding-top:12px;border-top:1px solid var(--faint);font:500 10px/1.5 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(245,244,249,.5)}
+
+/* The flight layer is fixed and outside `.ct`'s stacking flow, so it
+   carries its own scope class rather than relying on an ancestor. */
+.ct-flight {position:fixed;inset:0;pointer-events:none;z-index:80}
+.ct-flight svg {position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.ct-flight .trail {fill:none;stroke:url(#cttrail);stroke-width:3;stroke-linecap:round}
+
+/* sent */
+.ct .sent {display:none}
+.ct .desk.done .brief, .ct .desk.done .letter {display:none}
+.ct .desk.done {display:block}
+.ct .desk.done .sent {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:stretch}
+.ct .sentL {border-radius:24px;border:1px solid var(--line);background:radial-gradient(70% 70% at 50% 30%,rgba(152,116,232,.18),transparent 70%),rgba(245,244,249,.03);padding:clamp(28px,4vw,56px);display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.ct .sentL svg {width:64px;height:auto}
+.ct .sentL .mstroke {fill:none;stroke:url(#ctgrad);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.ct .sentL .mfill {fill:url(#ctfill);opacity:0;transition:opacity .8s var(--ease)}
+.ct .sentL.signed .mfill {opacity:1}
+.ct .sentL h3 {font-size:clamp(46px,5.4vw,88px)}
+.ct .sentL p {margin:0;font-size:16.5px;line-height:1.55;color:rgba(245,244,249,.84);max-width:40ch}
+.ct .sentL .row {display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:10px}
+.ct .next {border-radius:24px;border:1px solid var(--line);background:rgba(245,244,249,.025);padding:clamp(24px,3vw,40px);display:flex;flex-direction:column;gap:6px}
+.ct .next .mono {color:var(--mute);margin-bottom:10px}
+.ct .nx {display:grid;grid-template-columns:36px 1fr;gap:14px;padding:16px 0;border-top:1px solid var(--faint);opacity:0;transform:translateY(10px);transition:opacity .5s,transform .6s var(--out)}
+.ct .nx.on {opacity:1;transform:none}
+.ct .nx i {width:36px;height:36px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font:500 12px/1 var(--mono);font-style:normal;color:var(--light)}
+.ct .nx:first-of-type i {background:var(--ok);border-color:var(--ok);color:#0F1117}
+.ct .nx b {display:block;font-size:17px;font-weight:500;letter-spacing:-.02em;margin-bottom:3px}
+.ct .nx span {font-size:14.5px;line-height:1.45;color:var(--mute)}
+
+/* The send failure notice. Not in the reference, which only animates:
+   the port posts for real, so it needs somewhere to say it didn't. */
+/* one line of microcopy under the send button, spec 35 part B */
+.ct .sendnote {flex-basis:100%;margin:2px 0 0;font-size:13px;line-height:1.5;color:var(--mute)}
+.ct .sendnote a {color:var(--light);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(245,244,249,.45)}
+.ct .sendnote a:hover {text-decoration-color:var(--light)}
+.ct .sendfail {flex-basis:100%;margin:0;font-size:14px;line-height:1.5;color:#F2B6BE}
+.ct .sendfail a {color:var(--light);text-decoration:underline;text-underline-offset:3px}
+
+/* ================= TALK ================= */
+.ct .talk {position:relative;padding-block:clamp(96px,14vh,140px);overflow:hidden}
+.ct .talk .orb.d {width:44vw;height:44vw;left:20%;top:10%;background:radial-gradient(closest-side,rgba(152,116,232,.22),transparent);animation:ct-drift 34s ease-in-out infinite}
+.ct .talkgrid {position:relative;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr);gap:clamp(28px,4vw,64px);align-items:center}
+.ct .talkgrid>* {min-width:0}
+.ct .talk h2 {font-size:clamp(36px,4.2vw,66px);margin-top:16px}
+.ct .talk .lede {max-width:34ch}
+.ct .facts {list-style:none;margin:28px 0 0;padding:0}
+.ct .facts li {display:grid;grid-template-columns:110px 1fr;gap:14px;padding:13px 0;border-top:1px solid var(--faint);font-size:15px;color:rgba(245,244,249,.88)}
+.ct .facts li span {font:500 10.5px/1.7 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.ct .cal {border-radius:24px;border:1px solid var(--line);background:#0F1720;overflow:hidden;box-shadow:0 60px 120px -60px rgba(0,0,0,.9)}
+.ct .calbar {display:flex;align-items:center;gap:7px;padding:12px 16px;border-bottom:1px solid var(--faint)}
+.ct .calbar i {width:9px;height:9px;border-radius:50%;background:rgba(245,244,249,.2)}
+.ct .calbar span {margin-left:10px;font:500 11px/1 var(--mono);color:var(--mute)}
+/* The reference's three columns were `.cmeta | .cgrid | .times`, and
+   the last two were the faked month grid and time list. The real
+   embed takes both their places as one `.calembed`, so the frame,
+   the side panel and the carry-over note survive exactly as drawn
+   and only the sample is gone. 1.7fr + 1fr = 2.7fr. */
+.ct .calbody {display:grid;grid-template-columns:.85fr 2.7fr;min-height:440px}
+.ct .calembed {min-width:0;position:relative}
+.ct .calwait {position:absolute;inset:0;display:grid;place-items:center;font:500 13px/1 var(--mono);color:var(--mute)}
+.ct .calbody>* {min-width:0}
+.ct .cmeta {padding:24px;border-right:1px solid var(--faint);display:flex;flex-direction:column;gap:12px}
+.ct .cmeta img {width:44px;height:44px;border-radius:50%;object-fit:cover}
+.ct .cmeta b {font-size:20px;font-weight:600;letter-spacing:-.02em}
+.ct .cmeta .k {font-size:13.5px;color:var(--mute);display:flex;gap:8px;align-items:center}
+.ct .cmeta .k i {width:6px;height:6px;border-radius:50%;background:var(--ok)}
+/* The reference rests this at `opacity: .5`, which blends #CFEBD9
+   over the panel to #71847F — 4.28, under AA for 12.5px text, and
+   axe flags it at rest. Raised to the minimum that passes with a
+   little headroom: .55 gives 4.93. It is still visibly the quieter
+   "before" state against `.carry.on` at full strength. */
+.ct .carry {margin-top:auto;padding:11px 12px;border-radius:12px;background:rgba(143,209,169,.07);border:1px solid rgba(143,209,169,.28);font-size:12.5px;line-height:1.45;color:#CFEBD9;opacity:.55;transition:opacity .4s}
+.ct .carry.on {opacity:1}
+.ct .cgrid {padding:24px;border-right:1px solid var(--faint)}
+.ct .cgrid .mh {display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:16px;font-weight:600}
+.ct .cgrid .mh span {font:500 10px/1 var(--mono);color:var(--mute);letter-spacing:.12em}
+.ct .days {display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.ct .days .dh {font:500 10px/1 var(--mono);letter-spacing:.1em;color:var(--mute);text-align:center;padding-bottom:6px}
+.ct .days button {all:unset;aspect-ratio:1;display:grid;place-items:center;border-radius:12px;font-size:14px;color:rgba(245,244,249,.28)}
+.ct .days button.av {background:rgba(245,244,249,.07);color:var(--light);cursor:pointer;transition:background .2s}
+.ct .days button.av:hover {background:rgba(245,244,249,.16)}
+.ct .days button.sel {background:var(--light);color:var(--navy);font-weight:600}
+.ct .days button:focus-visible {outline:2px solid var(--light);outline-offset:2px}
+.ct .times {padding:24px;display:flex;flex-direction:column;gap:8px}
+.ct .times .mh {font-size:15px;font-weight:600;margin-bottom:6px}
+.ct .times .none {font-size:13.5px;color:var(--mute);line-height:1.45}
+.ct .times button {all:unset;cursor:pointer;padding:11px 12px;border-radius:11px;border:1px solid var(--line);font-size:14px;text-align:center;transition:border-color .2s,background .2s}
+.ct .times button:hover {border-color:var(--light)}
+.ct .times button.sel {background:#9874E8;border-color:#9874E8;color:#fff;font-weight:600}
+.ct .times button:focus-visible {outline:2px solid var(--light);outline-offset:2px}
+.ct .calnote {padding:10px 16px;border-top:1px solid var(--faint);font:500 10px/1.5 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:rgba(245,244,249,.45)}
+
+/* ================= OTHER WAYS ================= */
+.ct .ways {padding-block:0 clamp(80px,12vh,120px)}
+.ct .waysrow {display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--faint);border-bottom:1px solid var(--faint)}
+.ct .waysrow>* {min-width:0;padding:22px 20px;display:flex;flex-direction:column;gap:8px;text-decoration:none;border-left:1px solid var(--faint);transition:background .3s}
+.ct .waysrow>*:first-child {border-left:0}
+.ct .waysrow a:hover {background:rgba(245,244,249,.04)}
+.ct .waysrow span {font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.ct .waysrow b {font-size:17px;font-weight:500;letter-spacing:-.02em;overflow-wrap:anywhere}
+
+/* ================= 404 =================
+   Part B has no reference file: it is built out of this page's own
+   parts, under the same `.ct` root, so there is nothing second to
+   keep in step. `nf404*` rather than `nf*` — the old cream page's
+   class names are gone, and these must not be mistaken for them. */
+.ct .nf404 {position:relative;min-height:100svh;display:flex;align-items:center;padding-block:120px 80px;overflow:hidden}
+.ct .nf404 .orb.a {width:44vw;height:44vw;right:-8vw;top:6vh;background:radial-gradient(closest-side,rgba(152,116,232,.45),transparent);animation:ct-drift 28s ease-in-out infinite}
+.ct .nf404::after {content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(245,244,249,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(245,244,249,.035) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(60% 60% at 50% 50%,#000,transparent);mask-image:radial-gradient(60% 60% at 50% 50%,#000,transparent)}
+.ct .nf404in {position:relative;z-index:1;max-width:760px;display:flex;flex-direction:column;align-items:flex-start;gap:0}
+.ct .nf404mark {width:64px;height:auto;margin-bottom:26px}
+.ct .nf404mark .mstroke {fill:none;stroke:url(#ctgrad);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.ct .nf404mark .mfill {fill:url(#ctfill);opacity:0;transition:opacity .8s var(--ease)}
+.ct .nf404mark.signed .mfill {opacity:1}
+.ct .nf404 h1 {font-size:clamp(40px,5.6vw,84px);margin-top:22px}
+.ct .nf404 .lede {margin-top:20px}
+.ct .nf404rows {display:flex;flex-direction:column;width:100%;margin-top:40px;border-top:1px solid var(--faint)}
+.ct .nf404rows a {display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px 4px;border-bottom:1px solid var(--faint);text-decoration:none;transition:background .3s,padding-left .3s var(--out)}
+.ct .nf404rows a:hover {background:rgba(245,244,249,.04);padding-left:12px}
+.ct .nf404rows span {display:flex;flex-direction:column;gap:5px;min-width:0}
+.ct .nf404rows b {font-size:20px;font-weight:500;letter-spacing:-.02em}
+/* `em` for the line, never italic: the old page's serif italic was
+   half of its 17 contrast failures. */
+.ct .nf404rows em {font-style:normal;font-size:14.5px;line-height:1.45;color:rgba(245,244,249,.72)}
+.ct .nf404rows i {font-style:normal;flex:none;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:15px;transition:background .3s,color .3s,transform .4s var(--out)}
+.ct .nf404rows a:hover i {background:var(--light);color:var(--navy);transform:translateX(3px)}
+.ct .nf404cta {margin-top:36px}
+
+@media (max-width:900px) {
+  .ct .nf404 {padding-block:100px 56px;min-height:auto}
+  .ct .nf404rows a {padding:17px 2px}
+  .ct .nf404rows b {font-size:18px}
+  .ct .nf404cta {width:100%}
+}
+
+@media (max-width:1100px) and (min-width:901px) {
+  .ct .doors {grid-template-columns:1fr}
+  .ct .door {min-height:0}
+  .ct .vign {min-height:150px}
+}
+@media (max-width:900px) {
+  .ct .open {padding-block:100px 56px;min-height:auto}
+  .ct .opengrid {grid-template-columns:1fr}
+  .ct .doors {grid-template-columns:1fr}
+  .ct .door {min-height:0}
+  .ct .vign {min-height:150px}
+  .ct .desk {grid-template-columns:1fr}
+  .ct .letter {position:relative;top:auto}
+  .ct .lbody {min-height:0;font-size:16px}
+  .ct .tiles {grid-template-columns:1fr 1fr}
+  .ct .tile {padding:13px}
+  .ct .tile span.d {display:none}
+  .ct .fields {grid-template-columns:1fr}
+  .ct .desk.done .sent {grid-template-columns:1fr}
+  .ct .talkgrid {grid-template-columns:1fr}
+  .ct .calbody {grid-template-columns:1fr;min-height:0}
+  .ct .cmeta {border-right:0;border-bottom:1px solid var(--faint);flex-direction:row;flex-wrap:wrap;align-items:center}
+  .ct .carry {margin-top:0;width:100%}
+  .ct .cgrid {border-right:0;border-bottom:1px solid var(--faint)}
+  .ct .calembed {min-height:520px}
+  .ct .times {display:grid;grid-template-columns:1fr 1fr}
+  .ct .times .mh, .ct .times .none {grid-column:1/-1}
+  .ct .waysrow {grid-template-columns:1fr 1fr}
+  .ct .waysrow>*:first-child, .ct .waysrow>*:nth-child(2) {grid-column:1/-1;border-left:0}
+  .ct .waysrow>*:nth-child(n+2) {border-top:1px solid var(--faint)}
+  .ct .waysrow>*:nth-child(3) {border-left:0}
+  .ct .facts li {grid-template-columns:96px 1fr}
+}
+@media (prefers-reduced-motion:reduce) {
+  .ct, .ct *,
+  .ct *::before, .ct *::after {transition:none!important;animation:none!important}
+  .ct .rv, .ct .open h1 .w {opacity:1!important;transform:none!important}
+  .ct .mini .tl {width:var(--w,100%)!important}
+  .ct .mini .tags {opacity:1}
+}

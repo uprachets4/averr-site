@@ -1,0 +1,1536 @@
+/**
+ * Built by Averr — styles ported from `docs/reference/work/index.html`.
+ * Prefix `bb-`, grepped for first. Every length, duration and easing is
+ * the reference's; where it declared a colour the repo already has a
+ * token for, the token is used instead of a second copy of the hex.
+ *
+ * Not ported: the reference's Google Fonts link (Geist and Geist Mono
+ * are self-hosted here), its `html,body` rules, and its `.draft` badge,
+ * which labels the reference as a sample.
+ *
+ * This file carries the index. The case file appends to it.
+ */
+
+.bb-page {
+  /* the reference's own names, on the repo's tokens where they exist */
+  --bb-light: #f5f4f9;
+  --bb-mute: rgba(245, 244, 249, 0.66);
+  --bb-faint: rgba(245, 244, 249, 0.14);
+  --bb-line: rgba(245, 244, 249, 0.22);
+  /* identical to STUDIO_GRADIENT in data/serviceColors.ts */
+  --bb-grad: linear-gradient(90deg, #f9af97, #d5818c, #9874e8, #708df8, #569afa);
+  --bb-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --bb-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  position: relative;
+  background: var(--navy-1);
+  color: var(--bb-light);
+  font-family: var(--font-display);
+  color-scheme: dark;
+}
+
+.bb-gut {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.bb-wrap {
+  max-width: 1360px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.bb-eyebrow {
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bb-mute);
+  display: inline-flex;
+  gap: 14px;
+  align-items: center;
+}
+.bb-eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+.bb-eyebrow b {
+  color: var(--bb-light);
+  font-weight: 500;
+}
+
+/* Section titles are h2s carrying .bb-eyebrow, and the heading reset
+   below is a class-plus-element selector, so it out-specifies the
+   eyebrow's own font shorthand. Put the eyebrow's metrics back. */
+.bb-page h2.bb-eyebrow {
+  letter-spacing: 0.16em;
+  line-height: 1;
+  font-weight: 500;
+  text-wrap: initial;
+}
+
+.bb-page h1,
+.bb-page h2,
+.bb-page h3 {
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.94;
+  text-wrap: balance;
+}
+
+.bb-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+  display: inline-block;
+  flex: none;
+}
+
+/* the studio gradient, as text */
+.bb-gt {
+  background: var(--bb-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bb-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* the stage glow, which takes the open project's colour */
+.bb-glow {
+  position: fixed;
+  left: 50%;
+  top: 40%;
+  width: 120vmax;
+  height: 90vmax;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--gc, #9874e8), transparent);
+  opacity: 0.13;
+  pointer-events: none;
+  transition: background 1.2s var(--bb-ease);
+}
+
+/* ---------- index: the wall ---------- */
+.bb-intro {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  padding-bottom: clamp(48px, 9vh, 96px);
+}
+.bb-wall {
+  position: absolute;
+  inset: 0;
+  perspective: 1500px;
+  pointer-events: none;
+  overflow: hidden;
+}
+.bb-plane {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 170vmax;
+  display: flex;
+  gap: 22px;
+  justify-content: center;
+  transform: translate(-50%, -52%) rotateX(calc(42deg - var(--p, 0) * 18deg))
+    rotateZ(-16deg) translateZ(calc(var(--p, 0) * -260px));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.bb-col {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: 0 0 clamp(220px, 19vw, 340px);
+  animation: bb-drift var(--d, 80s) linear infinite;
+  will-change: transform;
+}
+.bb-col--rev {
+  animation-direction: reverse;
+}
+.bb-col img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 10px;
+  display: block;
+  box-shadow:
+    0 0 0 1px rgba(245, 244, 249, 0.08),
+    0 20px 40px -18px rgba(0, 0, 0, 0.7);
+  background: var(--navy-3);
+}
+@keyframes bb-drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+.bb-paused .bb-col {
+  animation-play-state: paused;
+}
+.bb-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      75% 65% at 55% 40%,
+      rgba(18, 28, 39, 0.12),
+      rgba(18, 28, 39, 0.7) 70%,
+      #121c27 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(18, 28, 39, 0.6) 0%,
+      rgba(18, 28, 39, 0.1) 30%,
+      rgba(18, 28, 39, 0.75) 72%,
+      #121c27 100%
+    );
+}
+.bb-intro .bb-wrap {
+  position: relative;
+  z-index: 1;
+}
+.bb-intro h1 {
+  font-size: clamp(48px, 7.5vw, 128px);
+  letter-spacing: -0.07em;
+  text-shadow: 0 4px 60px rgba(8, 10, 10, 0.55);
+  transform: translateY(calc(var(--p, 0) * -40px));
+  margin-top: 18px;
+}
+.bb-sub {
+  margin: 24px 0 0;
+  font-size: clamp(18px, 1.6vw, 26px);
+  letter-spacing: -0.02em;
+  max-width: 36ch;
+  line-height: 1.35;
+}
+.bb-cue {
+  margin-top: 34px;
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bb-mute);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.bb-cue i {
+  width: 1px;
+  height: 34px;
+  background: linear-gradient(var(--bb-light), transparent);
+  animation: bb-cue 2.2s var(--bb-ease) infinite;
+}
+@keyframes bb-cue {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  50% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  51% {
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+
+/* proof strip */
+.bb-proof {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(64px, 10vh, 112px) clamp(40px, 6vh, 64px);
+}
+.bb-figs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--bb-faint);
+}
+.bb-fig {
+  all: unset;
+  cursor: pointer;
+  padding: 30px 28px 30px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-right: 1px solid var(--bb-faint);
+  min-width: 0;
+}
+.bb-fig + .bb-fig {
+  padding-left: 28px;
+}
+.bb-fig:last-child {
+  border-right: 0;
+}
+.bb-fig:focus-visible {
+  outline: 2px solid var(--bb-light);
+  outline-offset: -2px;
+}
+.bb-fig .bb-v {
+  font-size: clamp(44px, 4.6vw, 80px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+}
+.bb-fig .bb-cap {
+  font-size: 16px;
+  line-height: 1.45;
+  max-width: 30ch;
+}
+.bb-fig .bb-who {
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bb-mute);
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  transition: color 0.3s;
+}
+.bb-fig:hover .bb-who {
+  color: var(--bb-light);
+}
+
+/* rows */
+.bb-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: clamp(40px, 7vh, 72px);
+  padding-bottom: 22px;
+}
+.bb-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.bb-filters button {
+  all: unset;
+  cursor: pointer;
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid var(--bb-faint);
+  border-radius: 999px;
+  padding: 10px 14px;
+  display: inline-flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--bb-mute);
+  transition:
+    color 0.3s,
+    border-color 0.3s;
+}
+.bb-filters button[aria-pressed="true"] {
+  color: var(--bb-light);
+  border-color: var(--c);
+}
+.bb-filters button:focus-visible {
+  outline: 2px solid var(--bb-light);
+  outline-offset: 3px;
+}
+.bb-count {
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  color: var(--bb-mute);
+}
+.bb-list {
+  position: relative;
+  z-index: 1;
+  padding-bottom: clamp(80px, 14vh, 160px);
+}
+.bb-row {
+  border-top: 1px solid var(--bb-faint);
+  transition: opacity 0.5s var(--bb-ease);
+}
+.bb-row:last-child {
+  border-bottom: 1px solid var(--bb-faint);
+}
+.bb-row.bb-dim {
+  opacity: 0.22;
+}
+/* the reference hangs this off the SECTION, not the row list, so the
+   filter bar counts as hovering the section too */
+.bb-list:hover .bb-row:not(:hover):not(.bb-open) {
+  opacity: 0.4;
+}
+.bb-rowbtn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  padding: clamp(18px, 2.2vw, 28px) 0;
+}
+.bb-rowbtn:focus-visible {
+  outline: 2px solid var(--bb-light);
+  outline-offset: 4px;
+}
+.bb-num {
+  font: 500 13px/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  color: var(--bb-mute);
+}
+.bb-rname {
+  font-size: clamp(26px, 3.4vw, 56px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+  transition: transform 0.6s var(--bb-out);
+}
+.bb-row:hover .bb-rname,
+.bb-row.bb-open .bb-rname {
+  transform: translateX(10px);
+}
+.bb-rmeta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  text-align: right;
+}
+.bb-rmeta .bb-svc {
+  display: flex;
+  gap: 7px;
+}
+.bb-rmeta span {
+  font: 500 12px/1.3 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bb-mute);
+}
+.bb-peek {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.7s var(--bb-out);
+}
+.bb-row.bb-open .bb-peek {
+  grid-template-rows: 1fr;
+}
+.bb-peek > div {
+  overflow: hidden;
+}
+.bb-peekin {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 48px);
+  padding: 0 0 clamp(26px, 3.6vw, 44px) 96px;
+  align-items: end;
+}
+.bb-pv {
+  position: relative;
+  aspect-ratio: 16/9;
+  max-width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--black);
+  box-shadow:
+    0 30px 80px -24px rgba(0, 0, 0, 0.8),
+    0 0 0 1px var(--bb-faint);
+}
+.bb-pv video,
+.bb-pv > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.bb-pvside {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: flex-start;
+  min-width: 0;
+}
+.bb-pvside .bb-th {
+  margin: 0;
+  font-size: clamp(22px, 2vw, 32px);
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+.bb-pvside .bb-stat {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+}
+.bb-pvside .bb-stat b {
+  font-size: clamp(34px, 3vw, 48px);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+.bb-pvside .bb-stat span {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--bb-mute);
+  max-width: 24ch;
+}
+.bb-open-cta {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--navy-1);
+  background: var(--bb-light);
+  padding: 14px 20px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: transform 0.3s var(--bb-out);
+}
+.bb-open-cta:hover {
+  transform: translateY(-2px);
+}
+.bb-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.bb-chip {
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--bb-faint);
+  border-radius: 999px;
+  padding: 7px 10px;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+.bb-chip i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c);
+}
+
+/* slideshow (projects without a recording) */
+.bb-slides {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.bb-slides img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0;
+  animation: bb-kb 20s var(--bb-ease) infinite;
+}
+@keyframes bb-kb {
+  0% {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  4% {
+    opacity: 1;
+  }
+  24% {
+    opacity: 1;
+  }
+  28% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .bb-plane {
+    width: 240vmax;
+    gap: 14px;
+  }
+  .bb-col {
+    gap: 14px;
+    flex-basis: 44vw;
+  }
+  .bb-figs {
+    grid-template-columns: 1fr;
+  }
+  .bb-fig,
+  .bb-fig + .bb-fig {
+    padding: 24px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--bb-faint);
+  }
+  .bb-rowbtn {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 12px;
+  }
+  .bb-rmeta {
+    grid-column: 2;
+    align-items: flex-start;
+    text-align: left;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .bb-peekin {
+    grid-template-columns: 1fr;
+    padding-left: 0;
+  }
+}
+
+/* ---------- case file ---------- */
+
+/* The reveal. The reference clips its fixed overlay from
+   inset(50% 0 50% 0) to inset(0); as a route the same clip-path would
+   be measured against the whole document, so the bottom edge would
+   sweep the entire page instead of half a viewport. Two covers
+   retracting from the middle give the identical picture, viewport
+   anchored, on transforms only. Same 0.9s, same easing. */
+.bb-reveal-cover {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 50vh;
+  z-index: 86;
+  background: var(--navy-1);
+  pointer-events: none;
+  transition: transform 0.9s var(--bb-out);
+}
+.bb-reveal-cover--t {
+  top: 0;
+}
+.bb-reveal-cover--b {
+  bottom: 0;
+}
+.bb-case--open .bb-reveal-cover--t {
+  transform: translateY(-100%);
+}
+.bb-case--open .bb-reveal-cover--b {
+  transform: translateY(100%);
+}
+
+.bb-close {
+  position: fixed;
+  z-index: 85;
+  top: calc(18px + env(safe-area-inset-top, 0px));
+  right: calc(max(16px, env(safe-area-inset-right, 0px)) + 4px);
+  all: unset;
+  cursor: pointer;
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: rgba(8, 10, 10, 0.7);
+  border: 1px solid var(--bb-line);
+  color: var(--bb-light);
+  padding: 12px 16px;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: opacity 0.4s;
+}
+.bb-close:focus-visible {
+  outline: 2px solid var(--bb-light);
+  outline-offset: 3px;
+}
+
+.bb-rail {
+  position: fixed;
+  z-index: 84;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: transparent;
+  pointer-events: none;
+}
+.bb-rail i {
+  display: block;
+  height: 100%;
+  background: var(--bb-grad);
+  transform-origin: left;
+  transform: scaleX(var(--r, 0));
+}
+
+.bb-chero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-block: 110px clamp(36px, 6vh, 64px);
+  overflow: hidden;
+}
+.bb-chero > video,
+.bb-chero > .bb-slides {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transform: scale(1.05);
+  transition: transform 1.8s var(--bb-out);
+}
+.bb-case--open .bb-chero > video,
+.bb-case--open .bb-chero > .bb-slides {
+  transform: scale(1);
+}
+.bb-chero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(18, 28, 39, 0.94) 0%,
+      rgba(18, 28, 39, 0.78) 38%,
+      rgba(18, 28, 39, 0.2) 70%,
+      rgba(18, 28, 39, 0.1) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(8, 10, 10, 0.8) 0%,
+      rgba(8, 10, 10, 0.3) 30%,
+      rgba(18, 28, 39, 0.5) 60%,
+      #121c27 100%
+    );
+}
+.bb-chero .bb-wrap {
+  position: relative;
+  z-index: 1;
+}
+.bb-chero h1 {
+  font-size: clamp(40px, 5.6vw, 96px);
+  letter-spacing: -0.065em;
+  text-shadow: 0 2px 40px rgba(8, 10, 10, 0.6);
+  margin-top: 16px;
+}
+.bb-thesis {
+  margin: 16px 0 0;
+  font-size: clamp(20px, 2vw, 32px);
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+  font-weight: 500;
+  max-width: 24ch;
+  text-shadow: 0 2px 30px rgba(8, 10, 10, 0.7);
+}
+.bb-facts {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--bb-faint);
+  border: 1px solid var(--bb-faint);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.bb-facts div {
+  background: rgba(18, 28, 39, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.bb-facts b {
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bb-mute);
+  font-weight: 500;
+}
+.bb-facts span {
+  font-size: 15px;
+  line-height: 1.4;
+}
+.bb-facts .bb-svcs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.bb-facts .bb-svcs em {
+  font-style: normal;
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.bb-sec {
+  padding-block: clamp(72px, 12vh, 128px);
+  position: relative;
+}
+.bb-sec + .bb-sec {
+  padding-top: 0;
+}
+.bb-label {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.bb-label .bb-n {
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  color: var(--bb-mute);
+}
+
+/* 01 the problem: one line, three pointers */
+.bb-prob {
+  font-size: clamp(30px, 3.6vw, 60px);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+  max-width: 20ch;
+  margin: 0;
+}
+/* MEASURED, NOT ASSUMED: the reference dims unread words to .16, which
+   is #F5F4F9 at 1.60:1 on the navy ground — axe calls it 12 serious
+   contrast failures, and the spec asks for AA and a clean axe run. The
+   line is large text at every width (its clamp floors at 30px), so the
+   threshold is 3:1, and .3458 is the least that clears it. .35 is
+   3.04:1. It is the smallest change that keeps the effect and passes. */
+.bb-prob .bb-w {
+  opacity: 0.35;
+  transition: opacity 0.35s var(--bb-ease);
+}
+.bb-prob .bb-w.bb-on {
+  opacity: 1;
+}
+.bb-ptrs {
+  margin-top: clamp(32px, 5vh, 52px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.bb-ptr {
+  padding: 22px 22px 24px;
+  border-radius: 14px;
+  border: 1px solid var(--bb-faint);
+  background: rgba(24, 38, 51, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bb-ptr i {
+  width: 22px;
+  height: 2px;
+  background: var(--c);
+  border-radius: 2px;
+}
+.bb-ptr span {
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 1.45;
+}
+
+/* 02 approach */
+.bb-built {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: clamp(28px, 5vw, 80px);
+}
+.bb-steps {
+  display: flex;
+  flex-direction: column;
+}
+/* MEASURED, NOT ASSUMED: the reference dims the inactive steps to .26,
+   which is 2.25:1 on the navy ground — axe measures 2.24 on the
+   blended pixel and calls it serious. The binding element is the 12px
+   .bb-k label, normal text, so the threshold is 4.5:1 and .4759 is the
+   least that clears it. .48 is 4.56:1. The step still reads as dim
+   against the active one; it is simply legible while it does. */
+.bb-step {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  opacity: 0.48;
+  transition: opacity 0.5s var(--bb-ease);
+}
+.bb-step.bb-on {
+  opacity: 1;
+}
+.bb-step .bb-k {
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.bb-step p {
+  margin: 0;
+  font-size: clamp(20px, 1.7vw, 28px);
+  line-height: 1.35;
+  max-width: 24ch;
+  letter-spacing: -0.025em;
+}
+.bb-hl {
+  color: var(--bb-light);
+  background: linear-gradient(var(--c), var(--c)) no-repeat 0 96% / 100% 2px;
+}
+.bb-step p .bb-hl {
+  font-weight: 600;
+}
+.bb-stick {
+  position: sticky;
+  top: 12vh;
+  height: 76vh;
+  display: flex;
+  align-items: center;
+}
+.bb-device {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/10;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--black);
+  box-shadow:
+    0 40px 100px -30px rgba(0, 0, 0, 0.85),
+    0 0 0 1px var(--bb-faint);
+}
+.bb-device .bb-chrome {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 30px;
+  background: #0e141c;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 0 12px;
+  z-index: 2;
+}
+.bb-device .bb-chrome i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(245, 244, 249, 0.22);
+}
+.bb-device .bb-chrome span {
+  margin-left: 10px;
+  font: 500 10px/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bb-mute);
+}
+.bb-device img {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 30px;
+  width: 100%;
+  height: calc(100% - 30px);
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0;
+  transform: scale(1.03);
+  transition:
+    opacity 0.6s var(--bb-ease),
+    transform 0.9s var(--bb-out);
+}
+.bb-device img.bb-on {
+  opacity: 1;
+  transform: none;
+}
+
+/* 03 build: compact cards */
+.bb-ledger {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.bb-li {
+  padding: 22px 20px 24px;
+  border-radius: 14px;
+  border: 1px solid var(--bb-faint);
+  background: rgba(24, 38, 51, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--bb-out);
+}
+.bb-li:hover {
+  border-color: var(--bb-line);
+  transform: translateY(-3px);
+}
+.bb-li h3 {
+  margin: 0;
+  font-size: clamp(18px, 1.35vw, 21px);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.bb-li h3 i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c);
+  flex: none;
+}
+.bb-li p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(245, 244, 249, 0.78);
+}
+
+/* 04 signatures: pinned zoom into the detail */
+.bb-sigs {
+  position: relative;
+}
+.bb-sig {
+  position: relative;
+  height: 170vh;
+}
+.bb-sigstick {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+.bb-siggrid {
+  position: absolute;
+  inset: clamp(130px, 17vh, 170px) 0 clamp(40px, 7vh, 72px);
+  display: grid;
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+  gap: clamp(24px, 3vw, 48px);
+  align-items: center;
+}
+.bb-sframe {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  max-height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--black);
+  box-shadow:
+    0 50px 120px -40px rgba(0, 0, 0, 0.9),
+    0 0 0 1px var(--bb-faint);
+}
+.bb-sframe img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transform-origin: var(--fx) var(--fy);
+  transform: scale(var(--z, 1));
+  will-change: transform;
+}
+.bb-sframe::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    60% 60% at var(--fx) var(--fy),
+    transparent 30%,
+    rgba(8, 10, 10, calc(var(--v, 0) * 0.3)) 100%
+  );
+  pointer-events: none;
+}
+.bb-scard {
+  position: relative;
+  padding: 28px 26px 26px;
+  border-radius: 16px;
+  background: rgba(24, 38, 51, 0.7);
+  border: 1px solid var(--bb-faint);
+  border-top: 2px solid var(--c);
+  opacity: var(--o, 1);
+  transform: translateY(calc((1 - var(--o, 1)) * 24px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bb-scard .bb-k {
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bb-mute);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.bb-scard h3 {
+  margin: 0;
+  font-size: clamp(24px, 2.2vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+.bb-scard p {
+  margin: 0;
+  font-size: clamp(16px, 1.15vw, 18px);
+  line-height: 1.6;
+}
+.bb-sighead {
+  position: absolute;
+  top: clamp(76px, 10vh, 100px);
+  left: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.bb-sigin {
+  position: relative;
+  height: 100%;
+}
+
+/* gallery */
+.bb-gallery {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+}
+.bb-g {
+  all: unset;
+  cursor: zoom-in;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--black);
+  box-shadow: 0 0 0 1px var(--bb-faint);
+  aspect-ratio: 16/10;
+  grid-column: span 2;
+  transition:
+    transform 0.5s var(--bb-out),
+    box-shadow 0.4s;
+}
+.bb-g:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 1px var(--bb-line),
+    0 20px 50px -20px rgba(0, 0, 0, 0.8);
+}
+.bb-g:focus-visible {
+  outline: 2px solid var(--bb-light);
+  outline-offset: 3px;
+}
+.bb-g img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  transition: transform 0.8s var(--bb-out);
+}
+.bb-g:hover img {
+  transform: scale(1.03);
+}
+.bb-g figcaption {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(8, 10, 10, 0.72);
+  padding: 7px 9px;
+  border-radius: 999px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.bb-g:hover figcaption,
+.bb-g:focus-visible figcaption {
+  opacity: 1;
+  transform: none;
+}
+.bb-g.bb-w3 {
+  grid-column: span 3;
+}
+.bb-g.bb-big {
+  grid-column: span 4;
+  grid-row: span 2;
+  aspect-ratio: auto;
+}
+.bb-g.bb-w6 {
+  grid-column: span 6;
+  aspect-ratio: 21/9;
+}
+
+/* 05 outcome */
+.bb-out {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: end;
+}
+.bb-bigfig {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bb-bigfig .bb-v {
+  font-size: clamp(72px, 9vw, 160px);
+  font-weight: 500;
+  letter-spacing: -0.07em;
+  line-height: 0.82;
+}
+.bb-bigfig .bb-cap {
+  font-size: clamp(16px, 1.3vw, 20px);
+  line-height: 1.4;
+  max-width: 28ch;
+}
+.bb-status {
+  position: relative;
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  font: 500 13px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid var(--bb-line);
+  border-radius: 999px;
+  padding: 12px 16px;
+}
+.bb-status i {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+  flex: none;
+}
+/* Owner ruling: the reference pulses this with an animated box-shadow.
+   Same 2.4s, same ring, on transform and opacity only. */
+.bb-status i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(245, 244, 249, 0.35);
+  animation: bb-pulse 2.4s var(--bb-ease) infinite;
+}
+@keyframes bb-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(3.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(3.5);
+    opacity: 0;
+  }
+}
+.bb-out h3 {
+  font-size: clamp(28px, 3.2vw, 52px);
+}
+.bb-out p {
+  margin: 22px 0 0;
+  font-size: clamp(17px, 1.35vw, 21px);
+  line-height: 1.6;
+}
+
+/* 06 next + stack */
+.bb-nextup {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 80px);
+  padding: clamp(32px, 4vw, 56px);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(35, 40, 55, 0.7), rgba(24, 38, 51, 0.5));
+  border: 1px solid var(--bb-faint);
+}
+.bb-nextup h3 {
+  font-size: clamp(30px, 3.2vw, 52px);
+}
+.bb-nextup ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.bb-nextup li {
+  font-size: 16px;
+  line-height: 1.45;
+  padding-top: 14px;
+  border-top: 1px solid var(--bb-line);
+}
+.bb-stack {
+  margin-top: 28px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.bb-stack b {
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bb-mute);
+  margin-right: 6px;
+  font-weight: 500;
+}
+.bb-stack span {
+  font: 500 13px/1 var(--font-mono);
+  letter-spacing: 0.04em;
+  border: 1px solid var(--bb-line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: rgba(8, 10, 10, 0.3);
+}
+
+.bb-nextcase {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  min-height: 80vh;
+  overflow: hidden;
+  border-top: 1px solid var(--bb-faint);
+}
+.bb-nextcase > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0.18;
+  transition:
+    opacity 0.6s,
+    transform 1.4s var(--bb-out);
+}
+.bb-nextcase:hover > img {
+  opacity: 0.3;
+  transform: scale(1.04);
+}
+.bb-nextcase::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    #121c27 0%,
+    rgba(18, 28, 39, 0.3) 50%,
+    #121c27 100%
+  );
+}
+.bb-nextcase .bb-in {
+  position: relative;
+  z-index: 1;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+.bb-nextcase h3 {
+  font-size: clamp(40px, 5.6vw, 96px);
+}
+.bb-nextcase .bb-th {
+  font-size: clamp(18px, 1.6vw, 24px);
+  letter-spacing: -0.02em;
+  max-width: 34ch;
+}
+.bb-nextcase:focus-visible {
+  outline: 2px solid var(--bb-light);
+  outline-offset: -6px;
+}
+
+.bb-lb {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  background: rgba(8, 10, 10, 0.94);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  cursor: zoom-out;
+}
+.bb-lb img {
+  max-width: min(1600px, 100%);
+  max-height: 84vh;
+  border-radius: 10px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+}
+.bb-lb span {
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bb-mute);
+}
+
+.bb-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.8s var(--bb-ease),
+    transform 0.9s var(--bb-out);
+}
+.bb-reveal.bb-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 1100px) {
+  .bb-ledger {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .bb-chero > video,
+  .bb-chero > .bb-slides {
+    opacity: 0.4;
+  }
+  .bb-chero h1 {
+    font-size: clamp(38px, 11vw, 72px);
+  }
+  .bb-chero .bb-eyebrow b {
+    display: none;
+  }
+  .bb-nextcase h3 {
+    font-size: clamp(38px, 11vw, 72px);
+  }
+  .bb-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bb-built,
+  .bb-out,
+  .bb-nextup {
+    grid-template-columns: 1fr;
+  }
+  .bb-stick {
+    position: relative;
+    top: auto;
+    height: auto;
+    order: -1;
+  }
+  .bb-step {
+    min-height: auto;
+    padding-block: 26px;
+    opacity: 1;
+  }
+  .bb-ledger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bb-ptrs,
+  .bb-nextup ul {
+    grid-template-columns: 1fr;
+  }
+  .bb-sig {
+    height: auto;
+    padding-block: 20px;
+  }
+  .bb-sigstick {
+    position: relative;
+    height: auto;
+  }
+  .bb-siggrid {
+    position: relative;
+    inset: auto;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding-top: 16px;
+  }
+  .bb-sframe {
+    width: 100%;
+    max-height: none;
+    order: -1;
+  }
+  .bb-sframe img {
+    transform: scale(1.7);
+  }
+  .bb-scard {
+    opacity: 1;
+    transform: none;
+  }
+  .bb-sighead {
+    position: relative;
+    top: auto;
+  }
+  .bb-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bb-g,
+  .bb-g.bb-w3 {
+    grid-column: span 1;
+  }
+  .bb-g.bb-big,
+  .bb-g.bb-w6 {
+    grid-column: span 2;
+    grid-row: auto;
+    aspect-ratio: 16/10;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-page *,
+  .bb-page *::before,
+  .bb-page *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+  .bb-slides img:first-child {
+    opacity: 1;
+  }
+  .bb-reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .bb-prob .bb-w {
+    opacity: 1;
+  }
+  .bb-scard {
+    --o: 1;
+  }
+  .bb-reveal-cover {
+    display: none;
+  }
+}

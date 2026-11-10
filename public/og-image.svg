@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#F4F0E6"/>
+
+  <!-- soft radial wash -->
+  <radialGradient id="wash" cx="0.5" cy="0.5" r="0.6">
+    <stop offset="0" stop-color="#E8E1D0" stop-opacity="0.6"/>
+    <stop offset="1" stop-color="#F4F0E6" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1200" height="630" fill="url(#wash)"/>
+
+  <!-- Averr mark + wordmark lockup, centered -->
+  <g transform="translate(600 300)">
+    <!-- geometric mark -->
+    <g transform="translate(-232 -8)">
+      <circle cx="0" cy="0" r="34" fill="#141412"/>
+      <circle cx="0" cy="0" r="12" fill="#F4F0E6"/>
+    </g>
+    <!-- wordmark -->
+    <text
+      x="-165"
+      y="24"
+      font-family="Cormorant Garamond, Georgia, serif"
+      font-size="128"
+      font-weight="500"
+      letter-spacing="-2"
+      fill="#141412"
+    >Averr</text>
+  </g>
+
+  <!-- STUDIOS eyebrow -->
+  <text
+    x="600"
+    y="380"
+    text-anchor="middle"
+    font-family="Geist Mono, ui-monospace, monospace"
+    font-size="22"
+    letter-spacing="8"
+    fill="#141412"
+    opacity="0.75"
+  >STUDIOS</text>
+
+  <!-- tagline -->
+  <text
+    x="600"
+    y="460"
+    text-anchor="middle"
+    font-family="Inter, system-ui, sans-serif"
+    font-size="26"
+    fill="#6B665C"
+  >Design + build studio · Toronto</text>
+</svg>

@@ -1,170 +1,324 @@
 @import "tailwindcss";
 
-/* ============================================================
-   AVERR — DESIGN TOKENS (Phase 1 rewrite, Apple-restraint pass)
-   ============================================================
-   Direction: Apple-style chassis (typography, whitespace, restraint,
-   real materiality) carrying the motion sophistication already built
-   (magnetic buttons, real 3D, real ring charts) — NOT a gradient-
-   forward SaaS-dashboard look. Color is used as emphasis, not decoration.
-   ============================================================ */
+/* ═══════════════════════════════════════════════════════════════
+   Self-hosted variable fonts — all same-origin, latin subset only.
+   No fonts.googleapis.com / fonts.gstatic.com requests anywhere.
+   ═══════════════════════════════════════════════════════════════ */
 
+/* Geist — display face. Variable weight, replaces the Google request
+   which asked for 300/400/500/600/700; the 100-900 axis covers all. */
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/geist-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Geist Mono — eyebrows, numerals, code-ish labels. Google request was
+   400/500; variable axis covers both. */
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/geist-mono-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Cormorant Garamond — the accent voice. Italic 600 only.
+   Never used as a roman face; the display roman is Geist. */
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/fonts/cormorant-garamond-latin-600-italic.woff2') format('woff2');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Self-hosted variable fonts — Inter (roman + italic)
+   ═══════════════════════════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/InterVariable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/InterVariable-Italic.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Metric-matched stand-in for Inter.
+ *
+ * Inter is not preloaded (a preload races the entry chunk for the pipe and
+ * cost ~370ms of first contentful paint), so body copy paints in a system
+ * face and swaps. Without this the swap reflowed the hero subhead and put
+ * 0.05 of layout shift on two case studies at ~2.5s.
+ *
+ * size-adjust is measured, not guessed: the site's own body copy rendered
+ * at 400/100px is 10317px in Inter and 10612px in Helvetica/Arial, so the
+ * stand-in is drawn at 97.22% and occupies the same width. The overrides
+ * are Inter's own hhea metrics (1984 / -494 / 0 over a 2048 em).
+ *
+ * Helvetica Neue, Helvetica and Arial cover macOS, iOS and Windows. Where
+ * none of the three exists (most Android) the face fails to load and the
+ * stack falls through to the unadjusted generic, as it did before.
+ */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Helvetica Neue'), local('Helvetica'), local('Arial');
+  size-adjust: 97.22%;
+  ascent-override: 96.88%;
+  descent-override: 24.12%;
+  line-gap-override: 0%;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AVERR STUDIOS — Design Tokens v2 (Nolana-anchored)
+   ═══════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* Colors */
+  --color-bg:         #F4F0E6;
+  --color-bg-alt:     #EDE9E2;
+  --color-bg-warm:    #E8E1D0;
+  /* The ground the document itself stands on.
+     Most routes are dark now, and `body` was still cream, so cream
+     showed through wherever a section had not painted yet — a full
+     cream screen on Home between the service film and "Here's what
+     that looks like", and the macOS overscroll bounce on every route.
+     `--color-dark` is the warm near-black the cream pages use for
+     their dark bands; this is the navy the dark ROUTES are built on,
+     which until now was typed as #121C27 in each page's nav effect. */
+  --color-navy:       #121C27;
+  --color-dark:       #141412;
+  --color-dark-alt:   #1C1B18;
+  --color-ink:        #141412;
+  --color-ink-soft:   #2A2926;
+  --color-parch:      #EDE9E2;
+  --color-muted:      #6B665C;
+  --color-muted-2:    #8A8377;
+  /* On-dark secondary text. AA against --color-dark (#141412) at 5.45:1. */
+  --color-muted-l:    #918B80;
+
+  /* ══ Session 27 — THE NOLANA SYSTEM ════════════════════════════════
+     Owner direction, superseding the dark-ground + chapter-light
+     palette for home. Light dominates; navy and black are reserved for
+     cinematic moments. The other pages migrate later, so the older
+     tokens above stay until they do.
+
+     MEASURED, NOT ASSUMED: --ink-2 as given (#898997) is 3.15:1 on the
+     light ground, which fails AA for normal text. It is kept at the
+     measured value for LARGE display continuations only, where the
+     threshold is 3:1, and --ink-2 itself is darkened minimally to
+     #6E6E80 (4.56:1) so anything body-sized is safe by default. */
+  --bg:            #F5F4F9;
+  --bg-alt:        #EFEEF5;
+  --hair:          #D4D4DA;   /* hairline rules — decorative, not text */
+  --hair-strong:   #DADAE0;
+  --n-ink:         #0F1117;   /* 17.24:1 on --bg */
+  --ink-2:         #6E6E80;   /* 4.56:1 on --bg — the safe grey */
+  --ink-2-display: #898997;   /* 3.15:1 — the measured grey, >= 24px only */
+
+  /* the cinematic darks */
+  --navy-1:        #121C27;
+  --navy-2:        #182633;
+  --navy-3:        #232837;
+  --black:         #080A0A;
+  --foot-1:        #10141D;
+  --foot-2:        #252C39;
+
+  /* glass panels */
+  --glass-1:       #13181F;
+  --glass-2:       #151C25;
+  --glass-fill:    rgba(57, 64, 83, 0.38);
+  --glass-edge:    rgba(255, 255, 255, 0.08);
+
+  /* the one gradient, applied PER ELEMENT */
+  --grad: linear-gradient(90deg, #F9AF97 0%, #D5818C 22%, #9874E8 52%, #708DF8 78%, #569AFA 100%);
+  --glow-lav:      #A6B3EB;
+  --glow-lav-2:    #AF9EE0;
+  --glow-peach:    #F9AF97;
+  --mesh-teal:     #55848E;
+
+  /* ── Session 26: ONE foreground accent set ──────────────────────────
+     Everything in the FOREGROUND is parch or this single warm accent at
+     a controlled strength. The chapter hues stay where they belong —
+     in the room's light, behind everything. Before this, foreground
+     accents followed --chapter-rgb, so the page carried four different
+     accent colours depending on where the reader had scrolled to. */
+  --accent:        #C8763C;
+  --accent-rgb:    200, 118, 60;
+  /* measured on --color-dark: 7.04:1, so it may carry small text */
+  --accent-text:   #D98F55;
+
+  /* Icon sizes — Phosphor lockstep. */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 32px;
+
+  /* Fonts */
+  --font-display: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "Geist Mono", ui-monospace, monospace;
+}
+
+/* Opacity-based hairlines (not @theme, kept as raw vars) */
 :root {
-  /* ---- Color: one confident accent, not a rainbow ---- */
-  --primary: #0B0B0D;
-  --accent: #7C5CFC;              /* the one true interactive violet — CTAs, links, focus */
-  --accent-2: #5B4FD6;            /* deeper tonal cousin of accent — same hue family, used for duotone depth only */
-  --accent-3: #C97B63;            /* rare warm counter-note — sparing use only (one signature moment), never a default gradient stop */
-  --accent-dim: rgba(124, 92, 252, 0.14);
+  --hair:      rgba(20, 20, 18, 0.10);
+  --hair-hi:   rgba(20, 20, 18, 0.18);
+  --hair-d:    rgba(237, 231, 218, 0.10);
+  --hair-d-hi: rgba(237, 231, 218, 0.18);
 
-  /* ---- Surfaces: true black at the two bookends (Hero, Footer) — dark is punctuation, not the default ---- */
-  --surface: #0B0B0D;             /* true near-black — Hero */
-  --surface-alt: #0B0B0D;         /* same true near-black — Footer */
-  --surface-elevated: #15181F;    /* card backgrounds within dark sections */
+  /* ── Type scale v2 — editorial display, fluid across the whole range.
+     Every level is clamp()-based, so the old max-width:768px override
+     block is gone; the scale interpolates continuously instead of
+     stepping at one breakpoint. ── */
 
-  --text: #F5F5F7;
-  --text-muted: #8C8C9C;
-  --border: rgba(255, 255, 255, 0.09);
+  /* 11vw, not 13: the hero offsets this line 38% into the measure, and
+     "serious." (≈4.99em wide incl. pill padding) overflows above ~11.4vw. */
+  --type-display-2xl-size: clamp(56px, 11vw, 208px);
+  --type-display-2xl-weight: 500;
+  --type-display-2xl-tracking: -0.055em;
+  --type-display-2xl-leading: 0.88;
 
-  /* ---- Light-section overrides ---- */
-  --light-surface: #FBFBFC;
-  --light-surface-alt: #FFFFFF;
-  --light-surface-elevated: #FFFFFF;
-  --light-text: #1D1D1F;
-  --light-text-muted: #6E6E73;
-  --light-border: rgba(0, 0, 0, 0.08);
+  /* The home hero's size (Session 23). The two lines are "Your next
+     customer is" and the slab "already looking." — the longer measures
+     about 10.4 x the font size, and the headline lives in a safe zone
+     of 46% of the container, so that ratio and the height budget set
+     it. 7.4vh keeps the h1, subline, kicker and CTAs inside the fold
+     at 720. */
+  --hero-copy-w: calc(var(--container-wide) * 0.55);
+  /* The divisor is the LONGEST LINE's length in this face, not a style
+     choice: at /9.8 it was calibrated for a 38-character sentence, and
+     Session 25c's lead is 13 characters ("We build what"), so the same
+     column carries far bigger type. The vh term rises with it — at
+     7.4vh the viewport height, not the column, was what held the hero
+     at 67px when the ruling asked for >= 120px. */
+  --type-hero-size: clamp(34px, min(calc(var(--hero-copy-w) / 6.0), 13.6vh), 170px);
+  --type-hero-weight: 500;
+  --type-hero-tracking: -0.05em;
+  --type-hero-leading: 0.92;
 
-  /* ---- Spacing scale (unchanged — already correct) ---- */
-  --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
-  --sp-6: 24px; --sp-8: 32px;  --sp-12: 48px; --sp-16: 64px;
-  --sp-24: 96px; --sp-32: 128px;
+  --type-display-xl-size: clamp(48px, 10vw, 160px);
+  --type-display-xl-weight: 500;
+  --type-display-xl-tracking: -0.045em;
+  --type-display-xl-leading: 0.92;
 
-  /* ---- Type scale: Apple-proportioned, deliberate tracking per level ---- */
-  --fs-display: clamp(3rem, 6vw, 6rem);       /* 48–96px */
-  --fs-h1: clamp(2.25rem, 4vw, 3rem);          /* 36–48px */
-  --fs-h2: clamp(1.5rem, 2.4vw, 2rem);         /* 24–32px */
-  --fs-h3: 1.375rem;                            /* 22px */
-  --fs-body-lg: 1.1875rem;                      /* 19px — feature copy */
-  --fs-body: 1.0625rem;                         /* 17px — Apple's actual base size */
-  --fs-caption: 0.8125rem;                      /* 13px */
+  --type-display-l-size: clamp(40px, 7vw, 104px);
+  --type-display-l-weight: 500;
+  --type-display-l-tracking: -0.035em;
+  --type-display-l-leading: 0.95;
 
-  --ls-display: -0.03em;
-  --ls-h1: -0.02em;
-  --ls-h2: -0.015em;
-  --ls-body: -0.005em;
+  --type-h1-size: clamp(36px, 5vw, 72px);
+  --type-h1-weight: 500;
+  --type-h1-tracking: -0.03em;
+  --type-h1-leading: 1.0;
 
-  /* ---- Motion: real, verified curves (not invented) ---- */
-  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --ease-overlay-in: cubic-bezier(0.12, 0.23, 0.5, 1);   /* decisive entrance */
-  --ease-overlay-out: cubic-bezier(0.5, 0, 0.88, 0.77);  /* fast, asymmetric exit */
-  --dur-micro: 0.15s;
-  --dur-standard: 0.3s;
-  --dur-overlay: 0.2s;
-  --dur-slow: 0.6s;
+  --type-h2-size: clamp(30px, 3.6vw, 56px);
+  --type-h2-weight: 500;
+  --type-h2-tracking: -0.025em;
+  --type-h2-leading: 1.05;
 
-  /* ---- Corner geometry: real squircle, progressive enhancement ---- */
-  --radius-sm: 12px;
-  --radius-md: 20px;
-  --radius-lg: 28px;
+  --type-h3-size: clamp(22px, 2vw, 28px);
+  --type-h3-weight: 500;
+  --type-h3-tracking: -0.015em;
+  --type-h3-leading: 1.15;
 
-  /* ---- required by the real Bklit UI ring chart component ---- */
-  --chart-background: transparent;
-  --chart-foreground: var(--text);
-  --chart-foreground-muted: var(--text-muted);
-  --chart-label: var(--text-muted);
-  --chart-1: var(--accent);
-  --chart-2: var(--accent-2);
-  --chart-3: var(--text-muted);
-  --chart-4: #4ADE80;
-  --chart-5: #FBBF24;
+  --type-body-lg-size: clamp(18px, 1.4vw, 20px);
+  --type-body-lg-weight: 400;
+  --type-body-lg-tracking: -0.005em;
+  --type-body-lg-leading: 1.5;
+
+  --type-body-size: 17px;
+  --type-body-weight: 400;
+  --type-body-tracking: 0;
+  --type-body-leading: 1.6;
+
+  --type-small-size: 14px;
+  --type-small-weight: 400;
+  --type-small-tracking: 0;
+  --type-small-leading: 1.5;
+
+  --type-eyebrow-size: 13px;
+  --type-eyebrow-weight: 500;
+  --type-eyebrow-tracking: 0.08em;
+  --type-eyebrow-leading: 1.4;
+
+  /* ── Measure system ── */
+  --gutter: clamp(20px, 4vw, 64px);
+  --container-wide: min(1440px, calc(100vw - 2 * var(--gutter)));
+  --measure-body: 62ch;
+
+  /* Motion — easing */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Motion — duration */
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 600ms;
+  --duration-hero: 800ms;
 }
 
-@supports (corner-shape: superellipse(2)) {
-  button, .card, .pill, input, textarea, .squircle {
-    corner-shape: superellipse(2);
-  }
-}
-
-.light-section {
-  --surface: var(--light-surface);
-  --surface-alt: var(--light-surface-alt);
-  --surface-elevated: var(--light-surface-elevated);
-  --text: var(--light-text);
-  --text-muted: var(--light-text-muted);
-  --border: var(--light-border);
-  background: var(--surface-alt);
-  color: var(--text);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
+/* Reset */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+/* Both, not just body: the canvas behind the overscroll bounce takes
+   its colour from `html` when `html` sets one, and from `body` only
+   when it doesn't. Setting one and not the other is what left the
+   bounce cream. Each route still paints its own surface over this. */
+html { scroll-behavior: smooth; background: var(--color-navy); }
 body {
-  margin: 0;
-  background: var(--surface);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: var(--fs-body);
-  letter-spacing: var(--ls-body);
+  font-family: var(--font-body);
+  background: var(--color-navy);
+  color: var(--color-ink);
+  font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
+img, video { display: block; max-width: 100%; height: auto; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+a { color: inherit; text-decoration: none; }
 
-.font-display {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-weight: 700;
-  letter-spacing: var(--ls-display);
+/* Focus */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--color-dark);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
-/* Reserved for rare, singular emphasis moments — not a default treatment */
-.gradient-text {
-  background: linear-gradient(100deg, var(--accent) 10%, var(--accent-2) 90%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* Stat numbers: simplified to the same violet duotone family (no coral third stop) —
-   monochromatic-with-tonal-variation reads premium; a rainbow reads like a SaaS dashboard */
-.gradient-text-stat {
-  background: linear-gradient(100deg, var(--accent) 0%, var(--accent-2) 70%, #A78BFA 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.pill {
-  border-radius: 999px !important;
-}
-
+/* Selection */
 ::selection {
-  background: var(--accent);
-  color: #fff;
+  background: var(--color-dark);
+  color: var(--color-bg);
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* Grain overlays */
+.grain-light {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.grain-light {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  mix-blend-mode: multiply;
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-  color: inherit;
-}
 
-input, textarea {
-  color: var(--text);
-}
-
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
@@ -173,3 +327,150 @@ input, textarea {
     scroll-behavior: auto !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Type utility classes — single source of truth for headings + body
+   ═══════════════════════════════════════════════════════════════ */
+
+@layer utilities {
+  .type-display-l {
+    font-family: var(--font-display);
+    font-size: var(--type-display-l-size);
+    font-weight: var(--type-display-l-weight);
+    letter-spacing: var(--type-display-l-tracking);
+    line-height: var(--type-display-l-leading);
+  }
+  /* Last-line orphan guard for every display/heading tier. `pretty` only
+     re-breaks the closing lines, so existing ragging and block heights are
+     preserved; unsupported browsers just ignore it. */
+  .type-display-l {
+    text-wrap: pretty;
+  }
+  .type-body-lg {
+    font-family: var(--font-body);
+    font-size: var(--type-body-lg-size);
+    font-weight: var(--type-body-lg-weight);
+    letter-spacing: var(--type-body-lg-tracking);
+    line-height: var(--type-body-lg-leading);
+  }
+  .type-body {
+    font-family: var(--font-body);
+    font-size: var(--type-body-size);
+    font-weight: var(--type-body-weight);
+    letter-spacing: var(--type-body-tracking);
+    line-height: var(--type-body-leading);
+  }
+  .type-small {
+    font-family: var(--font-body);
+    font-size: var(--type-small-size);
+    font-weight: var(--type-small-weight);
+    letter-spacing: var(--type-small-tracking);
+    line-height: var(--type-small-leading);
+  }
+  .type-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--type-eyebrow-size);
+    font-weight: var(--type-eyebrow-weight);
+    letter-spacing: var(--type-eyebrow-tracking);
+    line-height: var(--type-eyebrow-leading);
+    text-transform: uppercase;
+  }
+
+  /* Visible to screen readers, not to the eye. */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Tabular numerals — keeps count-ups from jittering horizontally
+     as digits change width mid-animation. */
+  .tnum {
+    font-feature-settings: "tnum" 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+}
+
+/* The last four v1 section wrappers — `.sp`, `.st`, `.nh` and `.ds` —
+   are gone from here.
+
+   They were the only rules the CSS cull could not take, because their
+   names are two letters long and four v2 service mocks use the same
+   two letters for something else. They were never dormant: they matched
+   those v2 elements and won declarations on them, so /services rendered
+   a 900px-tall workflow node, a sticky full-height cream <p>, and
+   status pills painted #141412.
+
+   Nothing outside v2 renders any of them — the only elements carrying
+   these classes are `services/v2/mocks/I2Agent` (.nh x4),
+   `W2Site` (.sp), `A1Dashboard` (.st), `A3System` (.ds) and
+   `contact/v2/Letter` (.st) — and each already has its own scoped rule
+   in services.css or contact.css (`.sv .nh`, `.sv .sp`, `.sv .st`,
+   `.sv .ds`, `.ct .lhd .st`). So the rules are deleted outright rather
+   than re-scoped: the v2 elements now get only their own.
+
+   Two letters is not a class name. If a wrapper ever needs one again,
+   give it a prefix nothing else can collide with. */
+
+/* ══ 27c · the navy footer, site-wide ══════════════════════════════ */
+.nf {
+  background: linear-gradient(168deg, var(--foot-1), var(--foot-2));
+  color: rgba(255,255,255,0.72);
+  padding: clamp(56px, 8vh, 90px) 0 clamp(26px, 3.6vh, 42px);
+}
+.nf-inner { width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter); }
+.nf-top { display: grid; grid-template-columns: minmax(0, 38fr) minmax(0, 62fr); gap: clamp(28px, 4vw, 70px); }
+.nf-mark { display: block; font-family: var(--font-display); font-weight: 500; font-size: clamp(26px, 2.6vw, 36px); letter-spacing: -0.03em; color: #fff; }
+.nf-say { margin: 12px 0 0; max-width: 32ch; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.64); }
+.nf-mail { margin: 14px 0 0; font-size: 14px; }
+.nf-mail a { color: #fff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3); }
+.nf-mail a:hover { border-bottom-color: #fff; }
+.nf-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(0, 1.2fr); gap: clamp(20px, 3vw, 46px); }
+.nf-ct { margin: 0 0 14px; font-family: var(--font-mono); font-size: 12px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.55); }
+.nf-cols ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.nf-cols li a {
+  display: inline-flex; align-items: center; min-height: 36px;
+  font-size: 14px; color: rgba(255,255,255,0.8); text-decoration: none;
+  transition: color 0.25s ease;
+}
+.nf-cols li a:hover { color: #fff; }
+.nf-act { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.nf-now { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: rgba(255,255,255,0.6); }
+.nf-bottom {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
+  margin-top: clamp(34px, 5vh, 62px); padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  font-size: 13px; color: rgba(255,255,255,0.56);
+}
+/* the small links beside the locality line */
+.nf-small { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.nf-small a { color: rgba(255,255,255,0.82); border-bottom: 1px solid rgba(255,255,255,0.28); }
+.nf-small a:hover { color: #fff; border-bottom-color: #fff; }
+.nf-small > span[aria-hidden] { opacity: 0.5; }
+
+@media (max-width: 860px) {
+  .nf-top { grid-template-columns: 1fr; }
+  .nf-cols { grid-template-columns: 1fr 1fr; }
+  .nf-act { grid-column: 1 / -1; }
+}
+
+@media (max-width: 860px) {
+  .nf-cols li a { min-height: 44px; }
+}
+
+@media (max-width: 860px) {
+  .nf-cols li a { min-width: 44px; }
+}
+
+
+/* Session 29, owner instruction: the nav CTA never wraps to two lines at
+   narrow widths. Scoped to the nav's own pill rather than applied to
+   MagneticCTA, whose longer labels elsewhere are meant to wrap. */
+.nav-cta--nowrap { white-space: nowrap; }
