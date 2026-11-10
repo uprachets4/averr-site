@@ -1,0 +1,190 @@
+/* Planet hero: the hero block and the four-services beat. Prefix `lp-`; reuses `ph-`. */
+
+/* two beats + hold + takeover */
+.lp-story { height: 420vh; }
+
+/* hidden beats take no pointer */
+.lp-beat[data-on="0"],
+.lp-beat[data-on="0"] * { pointer-events: none !important; }
+.ph-beat--hero[data-on="0"] .ph-ctas { pointer-events: none; }
+.lp-beat[data-on="1"] .lp-col { pointer-events: auto; }
+
+/* ── 0 · hero: one block under the planet ─────────────────────────── */
+.lp-herobot { bottom: clamp(32px, 6.5vh, 64px); }
+.lp-svcrow {
+  list-style: none;
+  margin: 0 0 22px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 34px;
+  font: 500 clamp(17px, 1.35vw, 22px)/1 var(--font-display);
+  letter-spacing: -0.01em;
+  color: #F5F4F9;
+  text-shadow: 0 0 18px rgba(18, 28, 39, 0.95);
+}
+.lp-svcrow li { display: inline-flex; align-items: center; gap: 11px; }
+.lp-svcrow i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 12px var(--c); }
+.lp-setup {
+  margin: 0 0 6px;
+  font-size: clamp(18px, 1.7vw, 28px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #F5F4F9;
+  text-shadow: 0 0 24px rgba(18, 28, 39, 0.9);
+}
+.lp-herobot .ph-ctas { margin-top: 28px; }
+.ph-beat--hero .ph-payoff { text-transform: none; }
+
+.lp-eyebrow {
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 244, 249, 0.66);
+  display: inline-flex; gap: 14px; align-items: center;
+}
+.lp-eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; opacity: 0.6; }
+
+/* ── 2 · services in one frame ────────────────────────────────────── */
+.lp-svc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: clamp(104px, 14vh, 136px);
+  padding-bottom: clamp(28px, 5vh, 56px);
+}
+.lp-svctop {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 16px;
+  padding: 0 16px;
+  will-change: transform;
+}
+.lp-h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(34px, 4.6vw, 76px);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  color: #F5F4F9;
+  text-wrap: balance;
+  text-shadow: 0 0 48px rgba(18, 28, 39, 0.95), 0 0 16px rgba(18, 28, 39, 0.7);
+}
+.lp-svcsub {
+  margin: 0;
+  max-width: 52ch;
+  font-size: clamp(15px, 1.1vw, 18px);
+  line-height: 1.55;
+  color: rgba(245, 244, 249, 0.8);
+  text-wrap: balance;
+}
+.lp-grid {
+  margin: auto 0;
+  width: min(1240px, calc(100% - 64px));
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(12px, 1.6vw, 24px);
+  will-change: transform;
+}
+.lp-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0 4px 6px;
+  color: #F5F4F9;
+  text-decoration: none;
+  border-radius: 16px;
+  outline: none;
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.lp-col.off { opacity: 0.42; }
+.lp-col.on { transform: translateY(-4px); }
+.lp-col:focus-visible { outline: 2px solid #F5F4F9; outline-offset: 6px; }
+.lp-art {
+  width: 100%;
+  height: clamp(170px, 34vh, 340px);
+  margin-bottom: 8px;
+  position: relative;
+}
+/* the column's own light, under its drawing */
+.lp-art::after {
+  content: "";
+  position: absolute;
+  left: 10%; right: 10%; bottom: -6px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c), transparent);
+  opacity: 0.35;
+  transition: opacity 0.35s ease;
+}
+.lp-col.on .lp-art::after { opacity: 1; }
+.lp-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245, 244, 249, 0.82);
+}
+.lp-name i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); }
+.lp-line {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(19px, 1.6vw, 26px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  text-wrap: balance;
+  text-shadow: 0 0 24px rgba(18, 28, 39, 0.95);
+}
+.lp-inc {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font: 500 11px/1.4 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(245, 244, 249, 0.66);
+}
+
+/* ── tablet ───────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .lp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; }
+  .lp-art { height: clamp(110px, 16vh, 170px); }
+  .lp-inc { display: none; }
+}
+
+/* ── phone ────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .lp-svcrow { display: grid; grid-template-columns: auto auto; gap: 12px 24px; font-size: 16px; margin-bottom: 18px; }
+  .lp-svcrow i { width: 9px; height: 9px; }
+  .lp-setup { font-size: 18px; }
+  .lp-herobot .ph-ctas { margin-top: 22px; }
+
+  .lp-svc { padding-top: 84px; padding-bottom: 20px; }
+  .lp-svctop { gap: 10px; }
+  .lp-svcsub { display: none; }
+  .lp-h2 { font-size: clamp(30px, 8.6vw, 40px); }
+  .lp-grid { width: calc(100% - 32px); gap: 22px 14px; }
+  .lp-art { height: clamp(110px, 19vh, 170px); margin-bottom: 4px; }
+  .lp-col { gap: 7px; padding: 0; }
+  .lp-name { font-size: 10.5px; letter-spacing: 0.1em; }
+  .lp-line { font-size: 17px; }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-col { transition: none; }
+}
+
+/* tablet: the eyebrow clears the taller nav */
+@media (min-width: 641px) and (max-width: 820px) {
+  .lp-story .ph-top { top: 108px; }
+  .lp-art { margin-bottom: 16px; }
+}
