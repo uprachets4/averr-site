@@ -131,7 +131,8 @@ export default function HomeFilm() {
     };
   }, []);
 
-  /* 0 -> n over 900ms, ease-out, 80ms apart, once. */
+  /* 0 -> n over 700ms, ease-out, 80ms apart, once. Starts the
+     moment the row reveals, not after its entrance. */
   useEffect(
     function countUp() {
       if (!statsIn || countedRef.current) return;
@@ -147,7 +148,7 @@ export default function HomeFilm() {
       }
       let raf = 0;
       const t0 = performance.now();
-      const DUR = 900;
+      const DUR = 700;
       const STEP = 80;
       (function frame(now: number) {
         let running = false;

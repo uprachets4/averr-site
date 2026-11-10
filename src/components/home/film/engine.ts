@@ -121,6 +121,30 @@ const WORK_OUT_FROM = 0.68;
 const WORK_OUT_TO = 0.6855;
 const SIG_IN_TO = 0.691;
 
+/**
+ * The partners act is HELD LONGER than the rest of the film.
+ *
+ * Its figures were on screen, fully opaque, for 400px at both sizes —
+ * under half a viewport — so an ordinary scroll swept past them
+ * mid-count. The fix is scroll length, not faster animation: `.hf-film`
+ * grew 1500vh -> 1570vh, and that extra 70vh goes to this act alone.
+ *
+ * Rather than restate thirty constants in the new scale, the raw
+ * progress is mapped back into the space every one of them was written
+ * in. Partners is stretched; everything after it is shifted and keeps
+ * its original LENGTH in pixels, because the film grew by exactly the
+ * same proportion. The map is continuous at both ends — at the seam it
+ * gives T.pE from either side, and at 1 it gives 1 — so no act moves
+ * and no constant below changes.
+ */
+const PRT_EXTRA = 0.05;
+const PRT_END_NEW = (0.1 + PRT_EXTRA) / (1 + PRT_EXTRA);
+
+export function toActSpace(pNew: number): number {
+  if (pNew <= PRT_END_NEW) return (pNew / PRT_END_NEW) * 0.1;
+  return pNew * (1 + PRT_EXTRA) - PRT_EXTRA;
+}
+
 /** 1 before `from`, 0 after `to`. */
 const fadeOut = (P: number, from: number, to: number) => clamp((to - P) / (to - from), 0, 1);
 /** 0 before `from`, 1 after `to`. */
@@ -645,7 +669,10 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
     const pp = clamp(P / T.pE, 0, 1);
     /* The figures start counting off the SAME progress that fades the
        marks in, once the last of them is on its way. */
-    if (!statsFired && pp > 0.62) { statsFired = true; opts.onPartnersIn?.(); }
+    /* The last client name is fully in at pp = 0.308 — `sm(pp*6 - 0.1 -
+       5*0.15)` reaches 1 there. The row follows it, 80ms behind, which
+       is a delay on the row itself in film.css. */
+    if (!statsFired && pp >= 0.308) { statsFired = true; opts.onPartnersIn?.(); }
     layers.partners.style.opacity = (
       small ? fadeOut(P, T.pE, PRT_OUT_TO) : P < T.pE ? 1 : 1 - clamp((P - T.pE) / 0.02, 0, 1)
     ).toFixed(3);
@@ -764,10 +791,11 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
     document.fonts.ready.then(() => { if (!disposed) { buildWorld(); fitWord(); } });
   }
 
+
   const progress = () => {
     const r = film.getBoundingClientRect();
     const tot = film.offsetHeight - innerHeight;
-    return clamp(-r.top / tot, 0, 1);
+    return toActSpace(clamp(-r.top / tot, 0, 1));
   };
 
   /* Idle while the film is off screen, and warm the videos one viewport

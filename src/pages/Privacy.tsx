@@ -68,7 +68,7 @@ export default function Privacy() {
           <span className="pveyebrow">Privacy</span>
           <h1>What happens to what you send us.</h1>
           <p className="pvlede">
-            Averr Studios is one person and a small studio in Toronto. We ask for
+            Averr Studios is a small studio in Toronto. We ask for
             what we need to answer you and build your project, and nothing else.
             This page says exactly what that is, in plain English.
           </p>
