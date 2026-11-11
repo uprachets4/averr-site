@@ -24,11 +24,11 @@ function escapeHtml(s: string) {
     .replace(/'/g, "&#39;");
 }
 
-export default async function handler(req: Request): Promise<Response> {
-  if (req.method !== "POST") {
-    return bad(405, { error: "Method not allowed" });
-  }
-
+/* Web-standard handler. Vercel's Node runtime treats a default export as
+   `(req, res) => void` and ignores a returned Response, so the form's
+   messages never reached Resend. A named POST export gets a real Request
+   and its Response is sent. */
+export async function POST(req: Request): Promise<Response> {
   let payload: ContactPayload;
   try {
     payload = (await req.json()) as ContactPayload;
