@@ -68,6 +68,11 @@ export const META = {
     title: "Privacy — Averr Studios",
     description: "How Averr Studios handles the information you send us.",
   },
+  card: {
+    title: "Prachets Upadhyay — Averr Studios",
+    description:
+      "Founder of Averr Studios, Toronto. Save my contact or book a 30-minute discovery call.",
+  },
   /** The 404 takes the home description, as the table specifies. */
   notFound: {
     title: "Not found — Averr Studios",

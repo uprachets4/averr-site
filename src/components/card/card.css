@@ -1,0 +1,71 @@
+/* averrstudios.com/prachets — the digital business card. Same navy,
+   gradient and type as the printed card and the home film. */
+.pc {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(96px, 14vh, 140px) 16px clamp(48px, 8vh, 96px);
+  background-color: #121C27;
+  background-image:
+    radial-gradient(circle, rgba(245, 244, 249, 0.06) 1px, transparent 1.2px),
+    radial-gradient(circle at 50% 12%, #263A55 0%, #121C27 55%);
+  background-size: 18px 18px, 100% 100%;
+  color: #F5F4F9;
+  font-family: var(--font-display);
+}
+.pc-card { width: min(440px, 100%); display: flex; flex-direction: column; gap: 24px; }
+.pc-head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+.pc-ring {
+  width: 112px; height: 112px; border-radius: 50%; padding: 3px; margin-bottom: 8px;
+  background: linear-gradient(140deg, #F9AF97, #D5818C 30%, #9874E8 62%, #569AFA);
+}
+.pc-ring img {
+  width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block;
+  border: 3px solid #121C27; box-sizing: border-box;
+}
+.pc h1 { margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
+.pc-role { margin: 0; font-size: 16px; color: #B4BDC9; }
+.pc-line { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: #C3CAD4; max-width: 32ch; }
+
+.pc-actions { display: flex; flex-direction: column; gap: 10px; }
+.pc-save, .pc-book {
+  min-height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  gap: 10px; text-decoration: none; font-size: 16px; font-weight: 600;
+  transition: transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.25s, background-color 0.25s;
+}
+.pc-save { background: #F5F4F9; color: #121C27; }
+.pc-save:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -12px rgba(245, 244, 249, 0.45); }
+.pc-book {
+  color: #F5F4F9; font-weight: 500;
+  background: linear-gradient(100deg, rgba(249, 175, 151, 0.18), rgba(152, 116, 232, 0.18) 60%, rgba(86, 154, 250, 0.18));
+  box-shadow: inset 0 0 0 1px rgba(245, 244, 249, 0.16);
+}
+.pc-book:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px rgba(245, 244, 249, 0.3); }
+
+.pc-rows {
+  list-style: none; margin: 0; padding: 0; border-radius: 16px;
+  background: rgba(245, 244, 249, 0.04); box-shadow: inset 0 0 0 1px rgba(245, 244, 249, 0.1);
+}
+.pc-rows li + li { border-top: 1px solid rgba(245, 244, 249, 0.08); }
+.pc-rows a {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 16px; color: #F5F4F9; text-decoration: none; transition: background-color 0.2s;
+}
+.pc-rows a:hover { background: rgba(245, 244, 249, 0.05); }
+.pc-k { font: 500 11px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: #9AA5B4; }
+.pc-v { font-size: 15px; min-width: 0; overflow-wrap: anywhere; text-align: right; }
+
+.pc-svcs {
+  list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 10px 18px; font: 500 11px/1 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: #9AA5B4;
+}
+.pc-svcs li { display: inline-flex; align-items: center; gap: 7px; }
+.pc-svcs i { width: 7px; height: 7px; border-radius: 50%; }
+
+.pc a:focus-visible { outline: 2px solid #F5F4F9; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .pc-save, .pc-book { transition: none; }
+  .pc-save:hover, .pc-book:hover { transform: none; }
+}
