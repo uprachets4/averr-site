@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import { CLIENTS, LEAD_STAT, OUTCOMES, PARTNERS, PROJECTS, SERVICES, STATS } from "./content";
 import type { FilmHandle } from "./engine";
@@ -59,11 +59,10 @@ export default function HomeFilm() {
   const countedRef = useRef(false);
   const [statsIn, setStatsIn] = useState(false);
 
-  /* The typed name lives in React state and a ref, and nowhere else:
-     no network call, no storage. It dies with the tab. */
-  const [name, setName] = useState("");
+  /* Owner ruling: the finale no longer takes a name — the particle word
+     stays "Your business." and the booking happens in the start pass
+     that follows the film. */
   const nameRef = useRef("");
-  nameRef.current = name;
   const handleRef = useRef<FilmHandle | null>(null);
 
   useEffect(function startEngine() {
@@ -181,20 +180,13 @@ export default function HomeFilm() {
     [statsIn]
   );
 
-  /* The name rebuilds 420ms after typing stops, as in the reference. */
-  useEffect(
-    function rebuildName() {
-      if (!handleRef.current) return;
-      const t = window.setTimeout(() => handleRef.current?.setName(), 420);
-      return () => window.clearTimeout(t);
-    },
-    [name],
-  );
-
-  function onSubmit(e: FormEvent) {
+  /* The finale's CTA drops straight down to the start pass. */
+  function toStart(e: MouseEvent<HTMLAnchorElement>) {
+    const el = document.getElementById("start");
+    if (!el) return;
     e.preventDefault();
-    handleRef.current?.setName();
-    (document.activeElement as HTMLElement | null)?.blur();
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   }
 
   return (
@@ -407,20 +399,6 @@ export default function HomeFilm() {
             <div className="hf-ftop hf-glow" ref={fTopRef}>
               <span className="hf-eyebrow">Yours next</span>
               <h2>What would it look like for you?</h2>
-              <form className="hf-field" autoComplete="off" onSubmit={onSubmit}>
-                <label className="hf-sr" htmlFor="hf-biz">
-                  Your business name
-                </label>
-                <input
-                  id="hf-biz"
-                  maxLength={28}
-                  placeholder="Type your business name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-                <button type="submit">Build it</button>
-              </form>
-              <span className="hf-hint">Stays in your browser · nothing is sent</span>
             </div>
             <div ref={outsRef}>
               {OUTCOMES.map(([n, c, txt]) => (
@@ -437,10 +415,10 @@ export default function HomeFilm() {
               <p className="hf-ts" ref={tsRef}>
                 Taken seriously.
               </p>
-              {/* the site's own booking action, not a new link */}
-              <Link className="hf-cta" to="/contact">
-                Book a discovery call →
-              </Link>
+              {/* the start pass right below the film */}
+              <a className="hf-cta" href="#start" onClick={toStart}>
+                Book a discovery call ↓
+              </a>
               <span className="hf-prev">Preview · what your business could look like with us</span>
             </div>
           </section>
