@@ -160,10 +160,10 @@
 .ab .cue i {width:1px;height:30px;background:linear-gradient(var(--light),transparent);animation:ab-cue 2.2s var(--ease) infinite}
 @keyframes ab-cue {0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 .ab .sigtext {position:absolute;left:50%;top:50%;width:min(620px,46vw);transform:translate(calc(-2vw + (1 - var(--q,0))*40px),-50%);opacity:var(--q,0);display:flex;flex-direction:column;gap:22px}
-.ab .sigtext h1 {font-size:clamp(40px,4.6vw,78px)}
+.ab .sigtext h1 {font-size:clamp(33px,3.77vw,64px)}
 .ab .sigtext h1 .w {opacity:.14;transition:opacity .35s var(--ease)}
 .ab .sigtext h1 .w.on {opacity:1}
-.ab .sigtext .sub {margin:0;font-size:clamp(17px,1.35vw,21px);line-height:1.5;color:rgba(245,244,249,.86);max-width:38ch}
+.ab .sigtext .sub {margin:0;font-size:clamp(16px,1.26vw,19.5px);line-height:1.5;color:rgba(245,244,249,.86);max-width:38ch}
 .ab .credits {display:flex;flex-direction:column;border-top:1px solid var(--faint)}
 .ab .cr {display:grid;grid-template-columns:120px 1fr;gap:16px;padding:12px 0;border-bottom:1px solid var(--faint);font-size:15px;line-height:1.45;opacity:0;transform:translateY(10px);transition:opacity .5s var(--ease),transform .7s var(--out)}
 .ab .cr.on {opacity:1;transform:none}
@@ -192,7 +192,7 @@
 .ab .words {position:absolute;inset:0}
 .ab .word {position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);opacity:0;transition:opacity .25s linear;display:flex;flex-direction:column;align-items:center;gap:clamp(10px,2vh,20px)}
 .ab .word.on {opacity:1;transition:opacity .45s var(--ease)}
-.ab .wd {position:relative;display:flex;white-space:nowrap;font-weight:600;letter-spacing:-.04em;line-height:.8;font-size:var(--fs,160px);padding:.12em 0}
+.ab .wd {position:relative;display:flex;white-space:nowrap;font-weight:600;letter-spacing:-.04em;line-height:.8;font-size:var(--fs,131px);padding:.12em 0}
 .ab .kwl {display:inline-block;will-change:transform;transform-origin:50% 60%}
 .ab .wtag {font:500 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);display:inline-flex;gap:9px;align-items:center;transition:color .3s}
 .ab .wtag::before {content:"";width:7px;height:7px;border-radius:50%;background:var(--tc,rgba(245,244,249,.35));transition:background .3s}
@@ -245,7 +245,7 @@
 /* bottom line */
 .ab .kwbot {position:absolute;left:0;right:0;bottom:clamp(28px,6vh,64px);display:flex;justify-content:space-between;align-items:flex-end;gap:24px}
 .ab .lines {position:relative;flex:1;max-width:560px;min-height:84px}
-.ab .kl {position:absolute;left:0;bottom:0;margin:0;font-size:clamp(17px,1.35vw,21px);line-height:1.5;color:rgba(245,244,249,.86);opacity:0;transform:translateY(10px);transition:opacity .15s linear,transform .3s var(--out)}
+.ab .kl {position:absolute;left:0;bottom:0;margin:0;font-size:clamp(16px,1.26vw,19.5px);line-height:1.5;color:rgba(245,244,249,.86);opacity:0;transform:translateY(10px);transition:opacity .15s linear,transform .3s var(--out)}
 .ab .kl.on {opacity:1;transform:none;transition:opacity .4s var(--ease) .1s,transform .6s var(--out) .1s}
 .ab .kl b {display:block;font:500 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-bottom:12px;font-weight:500}
 .ab .kdots {display:flex;gap:8px;flex:none}
@@ -262,14 +262,14 @@
 .ab .ln {position:relative;width:100%;min-width:0;height:calc(5*80vh + 100vh)}
 .ab .lnstage {position:sticky;top:0;width:100%;min-width:0;height:100vh;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:clamp(14px,2.6vh,28px)}
 .ab .lnhead {display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
-.ab .lnhead h2 {font-size:clamp(30px,3.4vw,56px);margin-top:14px}
+.ab .lnhead h2 {font-size:clamp(26px,2.89vw,48px);margin-top:14px}
 .ab .lnhead p {margin:0;font-size:15px;line-height:1.5;color:var(--mute);max-width:30ch}
 .ab .rail {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .ab .rail button {all:unset;cursor:pointer;display:flex;flex-direction:column;gap:9px;padding-top:14px;position:relative;min-width:0}
 .ab .rail button::before {content:"";position:absolute;left:0;right:0;top:0;height:3px;border-radius:2px;background:var(--faint)}
 .ab .rail button i {position:absolute;left:0;right:0;top:0;height:3px;border-radius:2px;background:var(--grad);transform:scaleX(var(--f,0));transform-origin:left}
 .ab .rail .mono {color:rgba(245,244,249,.5);transition:color .3s}
-.ab .rail b {font-size:clamp(15px,1.3vw,20px);font-weight:500;letter-spacing:-.03em;color:rgba(245,244,249,.5);transition:color .25s;display:flex;align-items:center;gap:8px}
+.ab .rail b {font-size:clamp(15px,1.21vw,18.6px);font-weight:500;letter-spacing:-.03em;color:rgba(245,244,249,.5);transition:color .25s;display:flex;align-items:center;gap:8px}
 .ab .rail b::before {content:"";width:7px;height:7px;border-radius:50%;background:var(--light);transform:scale(0);transition:transform .35s var(--out);margin-right:-15px}
 .ab .rail button:hover b {color:rgba(245,244,249,.78)}
 .ab .rail button.done b,
@@ -289,7 +289,7 @@
 .ab .cap {position:absolute;left:0;top:0;right:0;display:flex;flex-direction:column;gap:10px;opacity:0;transform:translateY(10px);transition:opacity .12s linear,transform .3s var(--out);pointer-events:none}
 .ab .cap.on {opacity:1;transform:none;transition:opacity .3s var(--ease) .1s,transform .55s var(--out) .1s;pointer-events:auto}
 .ab .cap .mono {color:var(--mute)}
-.ab .cap h3 {font-size:clamp(26px,2.4vw,40px);letter-spacing:-.045em}
+.ab .cap h3 {font-size:clamp(22px,2.04vw,34px);letter-spacing:-.045em}
 .ab .cap p {margin:0;font-size:clamp(16px,1.15vw,18px);line-height:1.55;color:rgba(245,244,249,.86)}
 
 /* ================= CLOSE ================= */
@@ -298,8 +298,8 @@
 .ab .close .wrap {position:relative;display:flex;flex-direction:column;align-items:center;gap:22px}
 .ab .minimark {width:74px;height:auto;margin-bottom:6px}
 .ab .minimark .mstroke {stroke-width:3}
-.ab .close h2 {font-size:clamp(42px,5.8vw,100px);max-width:14ch;margin:0 auto}
-.ab .close p {margin:0;font-size:clamp(17px,1.3vw,20px);color:rgba(245,244,249,.82)}
+.ab .close h2 {font-size:clamp(34px,4.76vw,82px);max-width:14ch;margin:0 auto}
+.ab .close p {margin:0;font-size:clamp(16px,1.21vw,18.6px);color:rgba(245,244,249,.82)}
 .ab .ctas {display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 @media (min-width:901px) and (max-height:780px) {
   .ab .lnhead p {display:none}
@@ -325,14 +325,14 @@
   .ab .ln {height:calc(5*70svh + 100svh)}
   .ab .lnstage {justify-content:center;padding-top:40px}
   .ab .lnhead p {display:none}
-  .ab .lnhead h2 {font-size:clamp(26px,7.4vw,34px);margin-top:10px}
+  .ab .lnhead h2 {font-size:clamp(23px,6.51vw,30px);margin-top:10px}
   .ab .rail {gap:6px}
   .ab .rail .mono {display:none}
   .ab .rail b {font-size:12px;letter-spacing:-.01em}
   .ab .rail b::before {display:none}
   .ab .draw {height:34svh;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
   .ab .caps {min-height:150px}
-  .ab .cap h3 {font-size:26px}
+  .ab .cap h3 {font-size:24px}
   .ab .cap p {font-size:15px;line-height:1.45}
 }
 @media (prefers-reduced-motion:reduce) {
@@ -385,7 +385,7 @@
 .ab .dsw b {font-size:12.5px;font-weight:500;line-height:1.2}
 .ab .dsw span {font:500 9.5px/1.2 var(--mono);letter-spacing:.04em;color:var(--mute)}
 .ab .dcard {display:flex;flex-direction:column;justify-content:space-between;gap:8px;padding:14px;border-radius:14px;border:1px solid var(--faint);background:rgba(245,244,249,.03);min-width:0}
-.ab .dcard .g1 {font-size:34px;font-weight:500;letter-spacing:-.05em;line-height:1}
+.ab .dcard .g1 {font-size:30px;font-weight:500;letter-spacing:-.05em;line-height:1}
 .ab .dcard .g2 {font:500 10.5px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
 .ab .dmark {height:50px;width:auto;align-self:flex-start}
 .ab .pmk {fill:url(#mgrad);fill-rule:evenodd}
@@ -420,7 +420,7 @@
 .ab .pf-tim {display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .ab .pf-tim .trends {grid-column:1/-1}
 .ab .tcard {display:flex;flex-direction:column;gap:14px;padding:16px 18px;border-radius:14px;border:1px solid var(--faint);background:rgba(245,244,249,.03);min-height:128px}
-.ab .tcard b {font-size:clamp(18px,1.9vw,30px);font-weight:600;line-height:1.08;letter-spacing:-.035em}
+.ab .tcard b {font-size:clamp(16px,1.67vw,26px);font-weight:600;line-height:1.08;letter-spacing:-.035em}
 .ab .tcard em {font-style:normal;padding:4px 7px;border-radius:5px;background:rgba(213,129,140,.2);color:#F2B6BE;opacity:0;transition:opacity .3s}
 .ab .tcard em.ok {background:rgba(143,209,169,.16);color:#BFE6CD;opacity:1}
 .ab .cleancard {border-color:rgba(143,209,169,.35)}
@@ -446,7 +446,7 @@
 .ab .det.on {opacity:1}
 .ab .ring {fill:none;stroke:rgba(249,175,151,.28);stroke-width:1.5;stroke-dasharray:3 7}
 .ab #ticks line {stroke:rgba(249,175,151,.55);stroke-width:2}
-.ab .cl {font:500 22px var(--mono);fill:rgba(249,175,151,.75);text-anchor:middle}
+.ab .cl {font:500 20px var(--mono);fill:rgba(249,175,151,.75);text-anchor:middle}
 .ab .needle {transform-box:view-box;transform-origin:500px 300px;opacity:.95}
 .ab .d0.on .needle {animation:ab-swing 2.2s cubic-bezier(.25,1,.5,1) both}
 @keyframes ab-swing {0%{transform:rotate(-70deg)}35%{transform:rotate(28deg)}60%{transform:rotate(-12deg)}80%{transform:rotate(5deg)}100%{transform:rotate(0)}}
@@ -461,12 +461,12 @@
 .ab .d1.on .cursor {transform:translate(1560px,370px)}
 .ab .tag {font:500 18px var(--mono);fill:#F9AF97}
 .ab .dimv {stroke:#F9AF97;stroke-width:1.5}
-.ab .code {font:500 24px var(--mono);fill:#C9B6F5;opacity:0;transition:opacity .4s}
+.ab .code {font:500 22px var(--mono);fill:#C9B6F5;opacity:0;transition:opacity .4s}
 .ab .d2.on .c1 {opacity:1;transition-delay:.2s}
 .ab .d2.on .c2 {opacity:1;transition-delay:.7s}
 .ab .d2.on .c3 {opacity:1;transition-delay:1.2s}
 .ab .shine {fill:none;stroke:rgba(255,255,255,.5);stroke-width:4;stroke-linecap:round}
-.ab .ck {font:500 26px var(--mono);fill:#B6C8FF;opacity:0;transition:opacity .4s}
+.ab .ck {font:500 24px var(--mono);fill:#B6C8FF;opacity:0;transition:opacity .4s}
 .ab .d3.on .ck:nth-child(1) {opacity:1;transition-delay:.3s}
 .ab .d3.on .ck:nth-child(2) {opacity:1;transition-delay:.7s}
 .ab .d3.on .ck:nth-child(3) {opacity:1;transition-delay:1.1s}
@@ -479,14 +479,14 @@
 @keyframes ab-tw {from{opacity:.2}to{opacity:1}}
 .ab .livepill rect {fill:rgba(143,209,169,.14);stroke:rgba(143,209,169,.6);stroke-width:1.5}
 .ab .livepill circle {fill:#8FD1A9}
-.ab .livepill text {font:500 20px var(--mono);fill:#BFE6CD;letter-spacing:.06em}
+.ab .livepill text {font:500 18.6px var(--mono);fill:#BFE6CD;letter-spacing:.06em}
 .ab .steps {position:relative;min-height:340px}
 .ab .step {position:absolute;left:0;right:0;top:50%;display:flex;flex-direction:column;gap:14px;padding:24px 26px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(170deg,rgba(245,244,249,.05),rgba(245,244,249,.015));opacity:0;transform:translateY(calc(-50% + 12px));transition:opacity .15s linear,transform .3s var(--out);pointer-events:none}
 .ab .step.on {opacity:1;transform:translateY(-50%);transition:opacity .35s var(--ease) .08s,transform .55s var(--out) .08s;pointer-events:auto}
 .ab .step .top {display:flex;justify-content:space-between;align-items:center;gap:10px}
 .ab .step .top .mono {color:var(--mute)}
 .ab .when {font:500 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:7px 10px;border-radius:999px;border:1px solid var(--line);color:rgba(245,244,249,.86);white-space:nowrap}
-.ab .step h3 {font-size:clamp(28px,2.4vw,40px);letter-spacing:-.045em}
+.ab .step h3 {font-size:clamp(24px,2.04vw,34px);letter-spacing:-.045em}
 .ab .step p {margin:0;font-size:clamp(15px,1.1vw,17px);line-height:1.5;color:rgba(245,244,249,.86)}
 .ab .who2 {display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
 .ab .who2 div {padding:12px 14px;border-radius:14px;background:rgba(245,244,249,.04);border:1px solid var(--faint);display:flex;flex-direction:column;gap:6px;font-size:14.5px;line-height:1.45;color:rgba(245,244,249,.88)}
@@ -523,7 +523,7 @@
   .ab .dsw b {font-size:9.5px}
   .ab .dsw span {display:none}
   .ab .dcard {padding:10px}
-  .ab .dcard .g1 {font-size:24px}
+  .ab .dcard .g1 {font-size:22px}
   .ab .dcard.navy {display:none}
   .ab .dmark {height:32px}
   .ab .pf-mot {grid-template-columns:1fr}
@@ -540,14 +540,14 @@
   .ab .draw {height:30svh;border-radius:16px}
   .ab .steps {min-height:0;height:clamp(250px,36svh,330px)}
   .ab .step {padding:16px;gap:9px;border-radius:16px}
-  .ab .step h3 {font-size:24px}
+  .ab .step h3 {font-size:22px}
   .ab .step p {font-size:14px}
   .ab .who2 div {padding:9px 10px;font-size:12px}
   .ab .recv span {font-size:12px}
 }
 @media (max-width:900px) and (max-height:760px) {
   .ab .who2 {display:none}
-  .ab .lnhead h2 {font-size:24px}
+  .ab .lnhead h2 {font-size:22px}
 }
 /* The You/Prachets row already drops out on a short phone
    (`max-height:760px`). It has to drop out on a NARROW one too: at

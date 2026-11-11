@@ -105,7 +105,7 @@
 
 .ph-payoff {
   margin: 0;
-  font-size: clamp(52px, 9.2vw, 168px);
+  font-size: clamp(43px, 7.54vw, 138px);
   line-height: 0.9;
   letter-spacing: -0.055em;
   font-weight: 500;
@@ -183,7 +183,7 @@
   .ph-top { top: 84px; }
   .ph-payoff {
     white-space: normal;
-    font-size: clamp(44px, 13vw, 68px);
+    font-size: clamp(36px, 10.66vw, 56px);
   }
 }
 

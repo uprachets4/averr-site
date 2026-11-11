@@ -273,7 +273,7 @@ export default function HomeFilm({ name, onName, pass }: FilmProps) {
               {/* The min came down from 40px so the act clears the nav on a
                   390px phone once the figures are under it; 6vw still
                   governs from ~500px up, so nothing wider changes. */}
-              <h2 className="hf-xl hf-glow" style={{ fontSize: "clamp(30px,6vw,108px)" }}>
+              <h2 className="hf-xl hf-glow" style={{ fontSize: "clamp(25px,4.92vw,89px)" }}>
                 In good company.
               </h2>
               <div className="hf-marks" ref={marksRef}>
@@ -388,7 +388,7 @@ export default function HomeFilm({ name, onName, pass }: FilmProps) {
           <section className="hf-layer" ref={workRef} aria-label="Our work">
             <div className="hf-wtop hf-glow" ref={wTopRef}>
               <span className="hf-eyebrow">The work</span>
-              <h2 className="hf-xl" style={{ fontSize: "clamp(40px,6vw,108px)" }}>
+              <h2 className="hf-xl" style={{ fontSize: "clamp(33px,4.92vw,89px)" }}>
                 Here's what that looks like.
               </h2>
             </div>

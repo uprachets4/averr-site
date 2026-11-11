@@ -185,7 +185,7 @@
 
   /* 11vw, not 13: the hero offsets this line 38% into the measure, and
      "serious." (≈4.99em wide incl. pill padding) overflows above ~11.4vw. */
-  --type-display-2xl-size: clamp(56px, 11vw, 208px);
+  --type-display-2xl-size: clamp(46px, 9.02vw, 171px);
   --type-display-2xl-weight: 500;
   --type-display-2xl-tracking: -0.055em;
   --type-display-2xl-leading: 0.88;
@@ -203,37 +203,37 @@
      column carries far bigger type. The vh term rises with it — at
      7.4vh the viewport height, not the column, was what held the hero
      at 67px when the ruling asked for >= 120px. */
-  --type-hero-size: clamp(34px, min(calc(var(--hero-copy-w) / 6.0), 13.6vh), 170px);
+  --type-hero-size: clamp(30px, min(calc(var(--hero-copy-w) / 6.9), 11.8vh), 148px);
   --type-hero-weight: 500;
   --type-hero-tracking: -0.05em;
   --type-hero-leading: 0.92;
 
-  --type-display-xl-size: clamp(48px, 10vw, 160px);
+  --type-display-xl-size: clamp(39px, 8.2vw, 131px);
   --type-display-xl-weight: 500;
   --type-display-xl-tracking: -0.045em;
   --type-display-xl-leading: 0.92;
 
-  --type-display-l-size: clamp(40px, 7vw, 104px);
+  --type-display-l-size: clamp(33px, 5.74vw, 85px);
   --type-display-l-weight: 500;
   --type-display-l-tracking: -0.035em;
   --type-display-l-leading: 0.95;
 
-  --type-h1-size: clamp(36px, 5vw, 72px);
+  --type-h1-size: clamp(30px, 4.1vw, 59px);
   --type-h1-weight: 500;
   --type-h1-tracking: -0.03em;
   --type-h1-leading: 1.0;
 
-  --type-h2-size: clamp(30px, 3.6vw, 56px);
+  --type-h2-size: clamp(26px, 3.06vw, 48px);
   --type-h2-weight: 500;
   --type-h2-tracking: -0.025em;
   --type-h2-leading: 1.05;
 
-  --type-h3-size: clamp(22px, 2vw, 28px);
+  --type-h3-size: clamp(19.4px, 1.76vw, 25px);
   --type-h3-weight: 500;
   --type-h3-tracking: -0.015em;
   --type-h3-leading: 1.15;
 
-  --type-body-lg-size: clamp(18px, 1.4vw, 20px);
+  --type-body-lg-size: clamp(16.7px, 1.3vw, 18.6px);
   --type-body-lg-weight: 400;
   --type-body-lg-tracking: -0.005em;
   --type-body-lg-leading: 1.5;
@@ -427,7 +427,7 @@ a { color: inherit; text-decoration: none; }
 }
 .nf-inner { width: 100%; max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--gutter); }
 .nf-top { display: grid; grid-template-columns: minmax(0, 38fr) minmax(0, 62fr); gap: clamp(28px, 4vw, 70px); }
-.nf-mark { display: block; font-family: var(--font-display); font-weight: 500; font-size: clamp(26px, 2.6vw, 36px); letter-spacing: -0.03em; color: #fff; }
+.nf-mark { display: block; font-family: var(--font-display); font-weight: 500; font-size: clamp(23px, 2.29vw, 32px); letter-spacing: -0.03em; color: #fff; }
 .nf-say { margin: 12px 0 0; max-width: 32ch; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.64); }
 .nf-mail { margin: 14px 0 0; font-size: 14px; }
 .nf-mail a { color: #fff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3); }
