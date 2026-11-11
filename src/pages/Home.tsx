@@ -60,9 +60,10 @@ export default function Home() {
   return (
     <>
       <PlanetHero />
-      <HomeFilm />
-      {/* Owner ruling: the film ends in the same start pass /services
-          books through — name, services, a day, and the ticket. */}
+      <HomeFilm name={typed} onName={setTyped} />
+      {/* Owner ruling: the finale builds their name, then the CTA drops to
+          the same start pass /services books through, already filled in
+          with that name — they only pick services and a day. */}
       <div className="sv home-pass" ref={passRef}>
         <StartPass typed={typed} onTyped={setTyped} />
       </div>

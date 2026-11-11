@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import { CLIENTS, LEAD_STAT, OUTCOMES, PARTNERS, PROJECTS, SERVICES, STATS } from "./content";
 import type { FilmHandle } from "./engine";
@@ -23,7 +23,13 @@ import "./film.css";
  * already headings in the beats), and the name field has a real label.
  */
 
-export default function HomeFilm() {
+type FilmProps = {
+  /** The business name, shared with the start pass below the film. */
+  name: string;
+  onName: (v: string) => void;
+};
+
+export default function HomeFilm({ name, onName }: FilmProps) {
   const filmRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const lightRef = useRef<HTMLDivElement | null>(null);
@@ -59,10 +65,33 @@ export default function HomeFilm() {
   const countedRef = useRef(false);
   const [statsIn, setStatsIn] = useState(false);
 
-  /* Owner ruling: the finale no longer takes a name — the particle word
-     stays "Your business." and the booking happens in the start pass
-     that follows the film. */
+  /* The typed name lives in the page's React state (shared with the start
+     pass) and nowhere else: nothing is sent until the visitor books. */
   const nameRef = useRef("");
+  nameRef.current = name;
+
+  /* The name rebuilds 420ms after typing stops, as in the reference. */
+  useEffect(
+    function rebuildName() {
+      if (!handleRef.current) return;
+      const t = window.setTimeout(() => handleRef.current?.setName(), 420);
+      return () => window.clearTimeout(t);
+    },
+    [name],
+  );
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    handleRef.current?.setName();
+    (document.activeElement as HTMLElement | null)?.blur();
+  }
+
+  /* Once there's a name, the CTA books for that business. */
+  const biz = name.trim();
+  const ctaLabel =
+    biz && biz.length <= 18
+      ? `Book ${biz}${/s$/i.test(biz) ? "\u2019" : "\u2019s"} call \u2193`
+      : "Book a discovery call \u2193";
   const handleRef = useRef<FilmHandle | null>(null);
 
   useEffect(function startEngine() {
@@ -399,6 +428,20 @@ export default function HomeFilm() {
             <div className="hf-ftop hf-glow" ref={fTopRef}>
               <span className="hf-eyebrow">Yours next</span>
               <h2>What would it look like for you?</h2>
+              <form className="hf-field" autoComplete="off" onSubmit={onSubmit}>
+                <label className="hf-sr" htmlFor="hf-biz">
+                  Your business name
+                </label>
+                <input
+                  id="hf-biz"
+                  maxLength={28}
+                  placeholder="Type your business name"
+                  value={name}
+                  onChange={(e) => onName(e.target.value)}
+                />
+                <button type="submit">Build it</button>
+              </form>
+              <span className="hf-hint">Watch it build · nothing is sent until you book</span>
             </div>
             <div ref={outsRef}>
               {OUTCOMES.map(([n, c, txt]) => (
@@ -417,7 +460,7 @@ export default function HomeFilm() {
               </p>
               {/* the start pass right below the film */}
               <a className="hf-cta" href="#start" onClick={toStart}>
-                Book a discovery call ↓
+                {ctaLabel}
               </a>
               <span className="hf-prev">Preview · what your business could look like with us</span>
             </div>
