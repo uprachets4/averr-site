@@ -35,19 +35,28 @@ export type PlanetOpts = {
   sweep: HTMLElement | null;
   /** Told when the last formation has been built, for tests and probes. */
   onReady?: () => void;
+  /** The four icon slots on the services beat, in stage pixels, untransformed. */
+  slots: () => Array<{ x: number; y: number; w: number; h: number }>;
+  /** Where the story ends and the takeover begins (0–1 of the story). */
+  storyEnd?: number;
+  /** Where the services beat is reached; it holds from there to storyEnd. */
+  holdEnd?: number;
 };
 
 export type PlanetHandle = {
   dispose: () => void;
   /** Scroll the story to chapter `i` of 0..5. */
   goTo: (i: number) => void;
+  /** Light one of the four icons (1–4), 0 for all. */
+  setFocus: (i: number) => void;
 };
 
 export const STORY_END = 0.84;
 const SMALL_QUERY = 820;
 
 const VS = `
-attribute vec3 aTo; attribute vec3 aSeed; attribute float aRing; attribute float aTF; attribute float aTT;
+attribute vec3 aTo; attribute vec3 aSeed; attribute float aRing; attribute float aTF; attribute float aTT; attribute float aGrp;
+uniform vec4 uG; uniform float uFourW,uAlpha;
 uniform float uMix,uTime,uForce,uSize,uPR,uCalm,uFlare,uFront,uSplit,uSide; uniform vec3 uMouse;
 varying float vA; varying vec3 vCol; varying float vTint; varying float vDepth;
 vec3 grad(float x){
@@ -81,8 +90,10 @@ void main(){
   vTint=mix(step(.5,aTF),step(.5,aTT),t);
   gl_Position=projectionMatrix*mv;
   gl_PointSize=keep*uSize*uPR*(.55+aSeed.z*.9)*(17./-mv.z)*(1.+f*.6)*(1.+vTint*(.12+uFlare*.7));
+  float gm=aGrp<.5?1.:aGrp<1.5?uG.x:aGrp<2.5?uG.y:aGrp<3.5?uG.z:uG.w;
+  gl_PointSize*=mix(1.,(.62+gm*.3),uFourW);
   if(keep<.5)gl_Position=vec4(2.,2.,2.,1.);
-  vA=(.42+.58*aSeed.z)*clamp(1.2-(-mv.z-14.)*.06,.25,1.);
+  vA=(.42+.58*aSeed.z)*clamp(1.2-(-mv.z-14.)*.06,.25,1.)*mix(1.,gm,uFourW)*uAlpha;
   vDepth=clamp((-mv.z-17.4)*.11,0.,.6);
 }`;
 
@@ -133,6 +144,9 @@ function hasWebGL(): boolean {
 
 export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   const { story, beats, rail, take, takeIn, sweep } = opts;
+  const S = beats.length - 1;
+  const END = opts.storyEnd ?? STORY_END;
+  const HOLD = opts.holdEnd ?? END;
 
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const isSmall = () => innerWidth < SMALL_QUERY;
@@ -156,6 +170,7 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   const toA = new Float32Array(N * 3);
   const seedA = new Float32Array(N * 3);
   const ringA = new Float32Array(N);
+  const grpA = new Float32Array(N);
   const tfA = new Float32Array(N);
   const ttA = new Float32Array(N);
   for (let i = 0; i < N * 3; i++) seedA[i] = Math.random();
@@ -171,6 +186,9 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     uFlare: { value: 0 },
     uFront: { value: 1 },
     uSplit: { value: -17 },
+    uG: { value: new THREE.Vector4(1, 1, 1, 1) },
+    uFourW: { value: 0 },
+    uAlpha: { value: 1 },
   };
 
   type Layer = {
@@ -197,6 +215,7 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     g.setAttribute("aTo", to);
     g.setAttribute("aSeed", new THREE.BufferAttribute(seedA, 3));
     g.setAttribute("aRing", new THREE.BufferAttribute(ringA, 1));
+    g.setAttribute("aGrp", new THREE.BufferAttribute(grpA, 1));
     g.setAttribute("aTF", tf);
     g.setAttribute("aTT", tt);
     /* Object.assign shares the uniform OBJECTS, so writing uni.uMix.value
@@ -227,7 +246,176 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
      chapter objects follow, long before the reader can scroll to them. */
   let LOOSE: Formation | null = null;
   let HERO: Formation | null = null;
-  const K: Array<Formation | null> = [null, null, null, null, null, null];
+  const K: Array<Formation | null> = new Array(S + 1).fill(null);
+  const DUSTN = Math.floor(N * 0.07);
+  for (let i = 0; i < N; i++) grpA[i] = i < DUSTN ? 0 : (i % 4) + 1;
+  const VH = 2 * 17 * Math.tan(THREE.MathUtils.degToRad(17));
+  /* ── The four service icons, drawn as dotted line-art ──── */
+  type P2 = [number, number];
+  type Icon = { lines: P2[][]; fills: Array<(r: () => number) => P2>; box: [number, number, number, number] };
+  const arc = (cx: number, cy: number, rx: number, ry: number, a0: number, a1: number, n = 48): P2[] => {
+    const o: P2[] = [];
+    for (let k = 0; k <= n; k++) {
+      const a = a0 + ((a1 - a0) * k) / n;
+      o.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]);
+    }
+    return o;
+  };
+  const circ = (cx: number, cy: number, r: number) => arc(cx, cy, r, r, 0, Math.PI * 2, 40);
+  const rr = (x0: number, y0: number, x1: number, y1: number, r: number): P2[] => [
+    ...arc(x1 - r, y1 - r, r, r, 0, Math.PI / 2, 8),
+    ...arc(x0 + r, y1 - r, r, r, Math.PI / 2, Math.PI, 8),
+    ...arc(x0 + r, y0 + r, r, r, Math.PI, Math.PI * 1.5, 8),
+    ...arc(x1 - r, y0 + r, r, r, Math.PI * 1.5, Math.PI * 2, 8),
+    [x1, y1 - r],
+  ];
+  const seg = (x0: number, y0: number, x1: number, y1: number): P2[] => [[x0, y0], [x1, y1]];
+  const quad = (a: P2, c: P2, b: P2, n = 24): P2[] => {
+    const o: P2[] = [];
+    for (let k = 0; k <= n; k++) {
+      const t = k / n, u = 1 - t;
+      o.push([u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]]);
+    }
+    return o;
+  };
+  const box = (x0: number, y0: number, x1: number, y1: number) => (r: () => number): P2 => [x0 + r() * (x1 - x0), y0 + r() * (y1 - y0)];
+  const disc = (cx: number, cy: number, rad: number) => (r: () => number): P2 => {
+    const a = r() * Math.PI * 2, d = Math.sqrt(r()) * rad;
+    return [cx + Math.cos(a) * d, cy + Math.sin(a) * d];
+  };
+
+  function iconWeb(): Icon {
+    return {
+      box: [-1.4, -1, 1.4, 1],
+      lines: [
+        rr(-1.4, -1, 1.4, 1, 0.12),
+        seg(-1.4, 0.7, 1.4, 0.7),
+        circ(-1.22, 0.85, 0.045), circ(-1.08, 0.85, 0.045), circ(-0.94, 0.85, 0.045),
+        rr(-0.7, 0.79, 0.9, 0.92, 0.06),
+        seg(-1.15, -0.08, -0.05, -0.08), seg(-1.15, -0.24, -0.35, -0.24),
+        rr(-1.15, -0.66, -0.45, -0.44, 0.11),
+        rr(0.3, -0.7, 1.18, 0.48, 0.06),
+        [[0.36, -0.62], [0.62, -0.22], [0.78, -0.42], [0.98, -0.12], [1.12, -0.62]],
+        circ(0.98, 0.24, 0.09),
+      ],
+      fills: [box(-1.15, 0.3, 0.1, 0.48), box(-1.15, 0.08, -0.15, 0.22), box(-1.12, -0.63, -0.48, -0.47)],
+    };
+  }
+  function iconApp(): Icon {
+    return {
+      box: [-0.8, -1.2, 1.62, 1.2],
+      lines: [
+        rr(-0.62, -1.2, 0.62, 1.2, 0.2),
+        seg(-0.16, 1.08, 0.16, 1.08),
+        seg(-0.62, 0.78, 0.62, 0.78),
+        rr(-0.48, 0.3, 0.48, 0.64, 0.08), circ(-0.32, 0.47, 0.08), seg(-0.16, 0.52, 0.3, 0.52), seg(-0.16, 0.4, 0.12, 0.4),
+        rr(-0.48, -0.16, 0.48, 0.18, 0.08), circ(-0.32, 0.01, 0.08), seg(-0.16, 0.06, 0.3, 0.06), seg(-0.16, -0.06, 0.12, -0.06),
+        rr(-0.48, -0.62, 0.48, -0.28, 0.08), circ(-0.32, -0.45, 0.08), seg(-0.16, -0.4, 0.3, -0.4), seg(-0.16, -0.52, 0.12, -0.52),
+        seg(-0.62, -0.86, 0.62, -0.86),
+        circ(-0.3, -1.02, 0.05), circ(0, -1.02, 0.05), circ(0.3, -1.02, 0.05),
+        rr(0.74, 0.12, 1.62, 0.5, 0.09),
+        circ(0.9, 0.31, 0.09),
+        [[0.86, 0.31], [0.89, 0.27], [0.95, 0.35]],
+        seg(1.06, 0.36, 1.5, 0.36), seg(1.06, 0.25, 1.36, 0.25),
+      ],
+      fills: [box(-0.46, -0.14, 0.46, 0.16)],
+    };
+  }
+  function iconAI(): Icon {
+    const nodes: P2[] = [[-1.25, 0.62], [-1.35, -0.05], [-1.2, -0.72], [1.25, 0.62], [1.35, -0.05], [1.2, -0.72]];
+    const lines: P2[][] = [rr(-0.34, -0.34, 0.34, 0.34, 0.07), circ(0, 0, 0.14)];
+    for (const k of [-0.18, 0, 0.18]) {
+      lines.push(seg(-0.34, k, -0.46, k), seg(0.34, k, 0.46, k), seg(k, 0.34, k, 0.46), seg(k, -0.34, k, -0.46));
+    }
+    for (const n of nodes) {
+      lines.push(circ(n[0], n[1], 0.11));
+      const sx = n[0] < 0 ? -0.46 : 0.46;
+      lines.push(quad([sx, n[1] * 0.25], [n[0] * 0.55, n[1]], [n[0] - Math.sign(n[0]) * 0.11, n[1]]));
+    }
+    return {
+      box: [-1.46, -0.9, 1.46, 0.9],
+      lines,
+      fills: [disc(0, 0, 0.12), ...nodes.map((n) => disc(n[0], n[1], 0.07))],
+    };
+  }
+  function iconMap(): Icon {
+    const cy = 0.3, R = 0.55;
+    const a0 = -Math.PI * 0.2, a1 = Math.PI * 1.2;
+    const pinArc = arc(0, cy, R, R, a0, a1, 60);
+    const tip: P2 = [0, -0.72];
+    return {
+      box: [-1.15, -1.0, 1.15, 0.92],
+      lines: [
+        pinArc,
+        [pinArc[pinArc.length - 1], tip],
+        [tip, pinArc[0]],
+        circ(0, cy, 0.2),
+        arc(0, -0.76, 0.55, 0.12, 0, Math.PI * 2, 48),
+        arc(0, -0.78, 1.0, 0.22, 0, Math.PI * 2, 64),
+      ],
+      fills: [disc(0, cy, 0.17)],
+    };
+  }
+  const ICONS = [iconWeb, iconApp, iconAI, iconMap];
+
+  /** The four service icons, each fitted into its DOM slot. */
+  function buildIcons() {
+    const W = stage.clientWidth;
+    const H = stage.clientHeight;
+    const slots = opts.slots();
+    const out: Formation = { pos: new Float32Array(N * 3), tint: new Float32Array(N) };
+    const R0 = Math.random;
+    for (let s = 0; s < 4; s++) {
+      const ic = ICONS[s]();
+      const r = slots[s];
+      const rw = (r.w / H) * VH, rh = (r.h / H) * VH;
+      const [bx0, by0, bx1, by1] = ic.box;
+      const k = Math.min(rw / (bx1 - bx0), rh / (by1 - by0)) * 0.8;
+      const wx = ((r.x + r.w / 2 - W / 2) / H) * VH;
+      const wy = (-(r.y + r.h / 2 - H / 2) / H) * VH;
+      const cx = (bx0 + bx1) / 2, cy = (by0 + by1) / 2;
+      // cumulative lengths over every segment of every polyline
+      const segs: Array<[P2, P2, number]> = [];
+      let L = 0;
+      for (const pl of ic.lines) for (let j = 1; j < pl.length; j++) {
+        const a = pl[j - 1], b = pl[j];
+        const l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+        if (l > 0) { L += l; segs.push([a, b, L]); }
+      }
+      const idx: number[] = [];
+      for (let i = DUSTN; i < N; i++) if (i % 4 === s) idx.push(i);
+      const nFill = ic.fills.length ? Math.floor(idx.length * 0.16) : 0;
+      const nLine = idx.length - nFill;
+      idx.forEach((i, q) => {
+        let x: number, y: number;
+        if (q < nLine) {
+          const t = ((q + R0() * 0.5) / nLine) * L;
+          let lo = 0, hi = segs.length - 1;
+          while (lo < hi) { const m = (lo + hi) >> 1; if (segs[m][2] < t) lo = m + 1; else hi = m; }
+          const [a, b, cum] = segs[lo];
+          const l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+          const u = 1 - (cum - t) / l;
+          x = a[0] + (b[0] - a[0]) * u + (R0() - 0.5) * 0.018;
+          y = a[1] + (b[1] - a[1]) * u + (R0() - 0.5) * 0.018;
+        } else {
+          [x, y] = ic.fills[q % ic.fills.length](R0);
+        }
+        out.pos[i * 3] = (x - cx) * k + wx;
+        out.pos[i * 3 + 1] = (y - cy) * k + wy;
+        out.pos[i * 3 + 2] = (R0() - 0.5) * 0.06;
+        out.tint[i] = s + 1;
+      });
+    }
+    const base = HERO ?? LOOSE;
+    if (base) for (let i = 0; i < DUSTN; i++) {
+      out.pos[i * 3] = base.pos[i * 3];
+      out.pos[i * 3 + 1] = base.pos[i * 3 + 1];
+      out.pos[i * 3 + 2] = base.pos[i * 3 + 2];
+      out.tint[i] = base.tint[i];
+    }
+    K[S] = out;
+    lastSeg = -9;
+  }
 
   const builders: Array<() => void> = [
     function loose() {
@@ -240,13 +428,10 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
         for (let i = r[0]; i < r[1]; i++) ringA[i] = k + 1;
       });
       K[0] = HERO;
-      K[5] = HERO;
+      K[1] = LOOSE;
+      buildIcons();
       start();
     },
-    function web() { K[1] = kit.fWeb(); },
-    function apps() { K[2] = kit.fApps(); },
-    function flow() { K[3] = kit.fFlow(); },
-    function map() { K[4] = kit.fMap(); },
   ];
 
   let cancelIdle: (() => void) | null = null;
@@ -299,7 +484,10 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     L.forEach((l) => l.r.setSize(w, h, false));
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    clearTimeout(fourT);
+    fourT = window.setTimeout(buildIcons, 180);
   }
+  let fourT = 0;
   addEventListener("resize", resize);
   resize();
 
@@ -315,7 +503,7 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     const total = story.offsetHeight - innerHeight;
     const top = story.getBoundingClientRect().top + scrollY;
     scrollTo({
-      top: top + total * (i / 5) * STORY_END + 2,
+      top: top + total * (i / S) * END + 2,
       behavior: reduce ? "auto" : "smooth",
     });
   }
@@ -332,6 +520,8 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   const v2 = new THREE.Vector2();
   const t0 = performance.now();
   let smoothQ = 0;
+  let focus = 0;
+  const gW = [1, 1, 1, 1];
   let lockT = reduce ? -99 : 1.75;
   let flared = 0;
   let swept = false;
@@ -363,12 +553,12 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     if (document.hidden || !onScreen) return;
     const t = (now - t0) / 1000;
     const P = progress();
-    const q = Math.min(P / STORY_END, 1) * 5;
+    const q = Math.min(P / HOLD, 1) * S;
     smoothQ += (q - smoothQ) * (reduce ? 1 : 0.12);
 
     // on load the rings arrive scattered and lock into orbit
     const intro = reduce ? 1 : Math.min(1, Math.max(0, (t - 0.3) / 1.45));
-    let seg = Math.min(4, Math.floor(smoothQ));
+    let seg = Math.min(S - 1, Math.floor(smoothQ));
     const local = smoothQ - seg;
     if (intro < 1 && smoothQ < 0.02) seg = -1;
     if (seg !== lastSeg) {
@@ -410,8 +600,17 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     const ft = t - lockT;
     uni.uFlare.value = reduce ? 0 : ft > 0 ? Math.exp(-ft * 1.5) * Math.min(1, ft * 8) : 0;
     const heroW = Math.max(0, 1 - smoothQ * 2.5);
-    const endW = Math.max(0, 1 - (5 - smoothQ) * 2.5);
-    uni.uFront.value = heroW > 0.5 || endW > 0.5 ? 1 : 0;
+    const endW = 0;
+    uni.uFront.value = heroW > 0.5 ? 1 : 0;
+    const fourW = sm(Math.max(0, Math.min(1, smoothQ - (S - 1))));
+    uni.uFourW.value = fourW;
+    uni.uAlpha.value = 1;
+    for (let g = 0; g < 4; g++) {
+      const tgt = focus === 0 || focus === g + 1 ? 1 : 0.22;
+      gW[g] += (tgt - gW[g]) * (reduce ? 1 : 0.1);
+    }
+    uni.uG.value.set(gW[0], gW[1], gW[2], gW[3]);
+
 
     const small = isSmall();
     /* Owner instruction, Session 29: below 380 the setup line runs to
@@ -423,6 +622,7 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
       const d = Math.abs(smoothQ - i);
       const o = Math.max(0, Math.min(1, 1 - (d - 0.2) / 0.32));
       b.style.opacity = o.toFixed(3);
+      b.dataset.on = o > 0.6 ? "1" : "0";
       const y = smoothQ - i;
       const top = b.children[0] as HTMLElement;
       const bot = b.children[1] as HTMLElement;
@@ -439,12 +639,12 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     const book = Math.max(heroW, endW);
     const sc = small
       ? THREE.MathUtils.lerp(0.38, 0.56, book)
-      : THREE.MathUtils.lerp(0.72, 0.86, sm(book));
+      : THREE.MathUtils.lerp(0.72, 0.64, sm(book));
     const py = narrow
       ? THREE.MathUtils.lerp(1.0, 0.38, book)
       : small
         ? THREE.MathUtils.lerp(1.0, 0.7, book)
-        : THREE.MathUtils.lerp(0.55, -0.06, sm(book));
+        : THREE.MathUtils.lerp(0.55, 1.1, sm(book));
     ptr.x += (ptr.tx - ptr.x) * 0.07;
     ptr.y += (ptr.ty - ptr.y) * 0.07;
     const spin = reduce ? 0 : t * 0.07;
@@ -453,10 +653,11 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
         THREE.MathUtils.lerp(0.55, 1, book) +
       spin * book;
     const rx = 0.12 - ptr.y * 0.16;
+    const L4 = THREE.MathUtils.lerp;
     L.forEach((l) => {
-      l.p.position.set(0, py, 0);
-      l.p.scale.setScalar(sc);
-      l.p.rotation.set(rx, ry, 0);
+      l.p.position.set(0, L4(py, 0, fourW), 0);
+      l.p.scale.setScalar(L4(sc, 1, fourW));
+      l.p.rotation.set(L4(rx, -ptr.y * 0.05, fourW), L4(ry, ptr.x * 0.08, fourW), 0);
     });
     uni.uSplit.value = -camera.position.z;
 
@@ -474,7 +675,7 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     uni.uForce.value = ptr.force;
 
     // takeover: light opens out of the planet's core into the rest of the page
-    const k = Math.max(0, Math.min(1, (P - STORY_END) / (1 - STORY_END - 0.04)));
+    const k = END >= 1 ? 0 : Math.max(0, Math.min(1, (P - END) / (1 - END - 0.04)));
     const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
     const W = stage.clientWidth;
     const H = stage.clientHeight;
@@ -511,6 +712,7 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     cancelAnimationFrame(raf);
     cancelIdle?.();
     io.disconnect();
+    clearTimeout(fourT);
     removeEventListener("resize", resize);
     removeEventListener("pointermove", onPointerMove);
     document.removeEventListener("pointerleave", onPointerLeave);
@@ -524,5 +726,5 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     });
   }
 
-  return { dispose, goTo };
+  return { dispose, goTo, setFocus: (i: number) => { focus = i; } };
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { CLIENTS, OUTCOMES, PARTNERS, PROJECTS, SERVICES, STATS } from "./content";
+import { CLIENTS, LEAD_STAT, OUTCOMES, PARTNERS, PROJECTS, SERVICES, STATS } from "./content";
 import type { FilmHandle } from "./engine";
 import "./film.css";
 
@@ -54,6 +54,7 @@ export default function HomeFilm() {
      textContent on these refs from a rAF loop, so ninety frames of
      counting cost no renders. */
   const statNumRefs = useRef<Array<HTMLElement | null>>([]);
+  const leadNumRef = useRef<HTMLElement | null>(null);
   const countedRef = useRef(false);
   const [statsIn, setStatsIn] = useState(false);
 
@@ -144,6 +145,7 @@ export default function HomeFilm() {
           const el = els[i];
           if (el) el.textContent = String(s.n);
         });
+        if (leadNumRef.current) leadNumRef.current.textContent = String(LEAD_STAT.n);
         return;
       }
       let raf = 0;
@@ -152,13 +154,20 @@ export default function HomeFilm() {
       const STEP = 80;
       (function frame(now: number) {
         let running = false;
+        /* easeOutCubic — fast off the mark, settles onto the figure */
+        const ease = (k: number) => 1 - Math.pow(1 - k, 3);
+        /* the lead runs with the first of the four, no stagger */
+        const lead = leadNumRef.current;
+        if (lead) {
+          const k = Math.max(0, Math.min(1, (now - t0) / DUR));
+          lead.textContent = String(Math.round(LEAD_STAT.n * ease(k)));
+          if (k < 1) running = true;
+        }
         STATS.forEach((s, i) => {
           const el = els[i];
           if (!el) return;
           const k = Math.max(0, Math.min(1, (now - t0 - i * STEP) / DUR));
-          /* easeOutCubic — fast off the mark, settles onto the figure */
-          const e = 1 - Math.pow(1 - k, 3);
-          el.textContent = String(Math.round(s.n * e));
+          el.textContent = String(Math.round(s.n * ease(k)));
           if (k < 1) running = true;
         });
         if (running) raf = requestAnimationFrame(frame);
@@ -227,6 +236,23 @@ export default function HomeFilm() {
               {/* The figures. Deliberately NOT inside `.hf-marks`: the
                   engine drives every `.hf-mark` in there by the act's
                   own progress, and these have their own entrance. */}
+
+              {/* The lead figure. "$" and "M" are text nodes in the same
+                  span as the number, so one `background-clip: text` ramp
+                  runs across all of "$90M" — and they are not <i>, which
+                  would render them italic. */}
+              <div className={`hf-lead${statsIn ? " in" : ""}`}>
+                <span className="hf-leadn" aria-hidden="true">
+                  {LEAD_STAT.prefix}
+                  <b ref={leadNumRef}>{countedRef.current ? LEAD_STAT.n : 0}</b>
+                  {LEAD_STAT.suffix}
+                </span>
+                <span className="hf-leadl" aria-hidden="true">{LEAD_STAT.label}</span>
+                <span className="hf-sr">
+                  {`${LEAD_STAT.prefix}${LEAD_STAT.n}${LEAD_STAT.suffix} in ${LEAD_STAT.label}`}
+                </span>
+              </div>
+
               <ul className={`hf-stats${statsIn ? " in" : ""}`}>
                 {STATS.map((s, i) => (
                   <li

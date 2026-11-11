@@ -111,6 +111,18 @@ export const CLIENTS = ["CG Walls & Floors", "SIFT", "CadenceStack"];
  * the one case `serviceColors` allows a single colour: a surface that
  * names ONE service.
  */
+/**
+ * The lead figure, owner-supplied and used verbatim. It sits on its own
+ * line above the four, painted with the hero's sweep ramp rather than a
+ * single service colour: it belongs to no one service.
+ */
+export const LEAD_STAT = {
+  n: 90,
+  prefix: "$",
+  suffix: "M",
+  label: "marketing budget managed at Google",
+};
+
 export type Stat = { n: number; suffix: string; label: string; color: string };
 
 export const STATS: Stat[] = [

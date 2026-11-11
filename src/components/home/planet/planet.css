@@ -94,13 +94,6 @@
   gap: 14px;
   align-items: center;
 }
-.ph-eyebrow .ph-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--c);
-  margin-right: -4px;
-}
 .ph-eyebrow::before,
 .ph-eyebrow::after {
   content: "";
@@ -108,22 +101,6 @@
   height: 1px;
   background: currentColor;
   opacity: 0.6;
-}
-
-/* Spec 30 step 1 — readability. The supporting lines were the muted 66%
-   the hero reference used; over a moving particle field that is not
-   enough, so they are full light with the big lines' own navy glow
-   behind them. Eyebrow labels stay muted: they are labels, not reading. */
-.ph-setup {
-  margin: 16px 0 0;
-  font-size: clamp(20px, 2vw, 32px);
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-  font-weight: 400;
-  color: #F5F4F9;
-  text-shadow: 0 0 24px rgba(18, 28, 39, 0.9);
-  max-width: 34ch;
-  text-wrap: balance;
 }
 
 .ph-payoff {
@@ -160,23 +137,6 @@
   to { background-position: 0% 0; }
 }
 
-.ph-payoff--ch {
-  font-size: clamp(40px, 6.6vw, 120px);
-  white-space: normal;
-  text-wrap: balance;
-  max-width: 16ch;
-}
-
-.ph-sub {
-  margin: 22px 0 0;
-  font-size: clamp(16px, 1.25vw, 20px);
-  line-height: 1.55;
-  color: #F5F4F9;
-  text-shadow: 0 0 24px rgba(18, 28, 39, 0.9);
-  max-width: 56ch;
-  text-wrap: balance;
-}
-
 .ph-ctas {
   margin-top: 24px;
   display: flex;
@@ -184,53 +144,6 @@
   flex-wrap: wrap;
   justify-content: center;
   pointer-events: auto;
-}
-
-/* The rail. Real buttons, visible focus, and a chapter's own colour on
-   the active mark. */
-.ph-rail {
-  position: absolute;
-  z-index: 5;
-  right: max(20px, env(safe-area-inset-right, 0px));
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.ph-rail button {
-  all: unset;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: flex-end;
-  font: 500 11px/1 var(--font-mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(245, 244, 249, 0.66);
-}
-.ph-rail button i {
-  width: 22px;
-  height: 1px;
-  background: currentColor;
-  transition: width 0.3s ease;
-}
-.ph-rail button span {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.ph-rail button[aria-current="true"] span,
-.ph-rail button:hover span,
-.ph-rail button:focus-visible span { opacity: 1; }
-.ph-rail button[aria-current="true"] { color: #F5F4F9; }
-.ph-rail button[aria-current="true"] i {
-  width: 40px;
-  background: var(--c, currentColor);
-}
-.ph-rail button:focus-visible {
-  outline: 2px solid #F5F4F9;
-  outline-offset: 4px;
 }
 
 /* The takeover. Spec 30 step 1: the circle still opens out of the
@@ -267,21 +180,11 @@
 }
 
 @media (max-width: 820px) {
-  .ph-rail { display: none; }
   .ph-top { top: 84px; }
-  .ph-setup { max-width: 22ch; }
   .ph-payoff {
     white-space: normal;
     font-size: clamp(44px, 13vw, 68px);
   }
-  .ph-payoff--ch { font-size: clamp(34px, 10vw, 52px); }
-  .ph-sub { font-size: 15px; }
-}
-
-/* Owner instruction: below 380 the setup line must clear the top ring,
-   so it keeps 17px even though step 1 raised the clamp above it. */
-@media (max-width: 379px) {
-  .ph-setup { font-size: 17px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -290,6 +193,4 @@
     color: #F5F4F9;
     filter: none;
   }
-  .ph-rail button i,
-  .ph-rail button span { transition: none; }
 }
