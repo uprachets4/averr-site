@@ -346,8 +346,10 @@ export default function HomeFilm() {
                   </div>
                   <h3>{p.name}</h3>
                   <p>{p.line}</p>
-                  <Link to={p.href} style={{ "--c": p.color } as CSSProperties}>
-                    View case study →
+                  {/* Into the Work index, not the single case study: visitors
+                      land where they can see every project, not just this one. */}
+                  <Link to="/work" style={{ "--c": p.color } as CSSProperties}>
+                    See all our work →
                   </Link>
                 </div>
               ))}
