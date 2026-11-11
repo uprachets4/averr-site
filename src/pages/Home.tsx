@@ -60,13 +60,18 @@ export default function Home() {
   return (
     <>
       <PlanetHero />
-      <HomeFilm name={typed} onName={setTyped} />
-      {/* Owner ruling: the finale builds their name, then the CTA drops to
-          the same start pass /services books through, already filled in
-          with that name — they only pick services and a day. */}
-      <div className="sv home-pass" ref={passRef}>
-        <StartPass typed={typed} onTyped={setTyped} />
-      </div>
+      <HomeFilm
+        name={typed}
+        onName={setTyped}
+        pass={
+          /* Owner ruling: Signature → this pass → the Finale. It scrolls
+             over the pinned film (hold.ts); the finale's button comes
+             back up to it with the name filled in. */
+          <div className="sv home-pass" ref={passRef}>
+            <StartPass typed={typed} onTyped={setTyped} />
+          </div>
+        }
+      />
     </>
   );
 }

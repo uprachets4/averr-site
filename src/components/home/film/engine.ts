@@ -22,6 +22,7 @@
  */
 import * as THREE from "three";
 import { clamp, smooth as sm, type Formation } from "../particles/toolkit";
+import { holdRaw, type HoldLayout } from "./hold";
 import { createFilmFormations, isSmall, SCR, SH, SW, type FilmFormations } from "./formations";
 import { PROJECTS, SERVICES } from "./content";
 
@@ -44,6 +45,8 @@ export type FilmOpts = {
   counter: HTMLElement;
   /** A transparent link laid over whichever screen is in front. */
   screenLink?: HTMLElement;
+  /** The start pass's hold inside the film (see hold.ts). */
+  getHold?: () => HoldLayout | null;
   sigCanvas: HTMLCanvasElement;
   sigSvg: SVGSVGElement;
   sigWord: SVGTextElement;
@@ -831,6 +834,8 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
 
   const progress = () => {
     const r = film.getBoundingClientRect();
+    const L = opts.getHold?.();
+    if (L) return toActSpace(holdRaw(-r.top, L));
     const tot = film.offsetHeight - innerHeight;
     return toActSpace(clamp(-r.top / tot, 0, 1));
   };

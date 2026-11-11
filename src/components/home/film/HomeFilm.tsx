@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type CSSProperties, type FormEvent, type MouseEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import { holdLayout, type HoldLayout } from "./hold";
 import { Link } from "react-router-dom";
 import { CLIENTS, LEAD_STAT, OUTCOMES, PARTNERS, PROJECTS, SERVICES, STATS } from "./content";
 import type { FilmHandle } from "./engine";
@@ -27,9 +28,47 @@ type FilmProps = {
   /** The business name, shared with the start pass below the film. */
   name: string;
   onName: (v: string) => void;
+  /** The start pass, scrolled over the pinned stage between Signature
+      and the Finale (see hold.ts). */
+  pass?: ReactNode;
 };
 
-export default function HomeFilm({ name, onName }: FilmProps) {
+export default function HomeFilm({ name, onName, pass }: FilmProps) {
+  const passRef = useRef<HTMLDivElement | null>(null);
+  const holdRef = useRef<HoldLayout | null>(null);
+
+  /* Lay the track out: the film grows by the pass plus one viewport, and
+     the pass sits where Signature holds. Recomputed when the pass changes
+     height or the width changes; small height-only changes (a phone's
+     URL bar) are ignored so the page doesn't jump under a thumb. */
+  useLayoutEffect(function layoutHold() {
+    const film = filmRef.current;
+    const el = passRef.current;
+    if (!film || !el) return;
+    let lastW = -1;
+    let lastH = -1;
+    const apply = (force: boolean) => {
+      const w = innerWidth;
+      const ih = innerHeight;
+      if (!force && w === lastW && Math.abs(ih - lastH) < 140) return;
+      lastW = w;
+      lastH = ih;
+      const L = holdLayout(ih, Math.max(el.offsetHeight, ih));
+      holdRef.current = L;
+      film.style.height = `${Math.round(L.filmH)}px`;
+      el.style.top = `${Math.round(L.passTop)}px`;
+    };
+    apply(true);
+    const onResize = () => apply(false);
+    const ro = new ResizeObserver(() => apply(true));
+    ro.observe(el);
+    addEventListener("resize", onResize);
+    return () => {
+      ro.disconnect();
+      removeEventListener("resize", onResize);
+    };
+  }, []);
+
   const filmRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const lightRef = useRef<HTMLDivElement | null>(null);
@@ -90,8 +129,8 @@ export default function HomeFilm({ name, onName }: FilmProps) {
   const biz = name.trim();
   const ctaLabel =
     biz && biz.length <= 18
-      ? `Book ${biz}${/s$/i.test(biz) ? "\u2019" : "\u2019s"} call \u2193`
-      : "Book a discovery call \u2193";
+      ? `Book ${biz}${/s$/i.test(biz) ? "\u2019" : "\u2019s"} call \u2191`
+      : "Book a discovery call \u2191";
   const handleRef = useRef<FilmHandle | null>(null);
 
   useEffect(function startEngine() {
@@ -135,6 +174,7 @@ export default function HomeFilm({ name, onName }: FilmProps) {
               fBot: fBotRef.current!,
               ts: tsRef.current!,
               getName: () => nameRef.current,
+              getHold: () => holdRef.current,
               /* The stats ride the partners act's own progress, the same
                  value that fades the marks in — not a second observer
                  that would fight the pin. */
@@ -458,7 +498,7 @@ export default function HomeFilm({ name, onName }: FilmProps) {
               <p className="hf-ts" ref={tsRef}>
                 Taken seriously.
               </p>
-              {/* the start pass right below the film */}
+              {/* back up to the start pass, already filled in */}
               <a className="hf-cta" href="#start" onClick={toStart}>
                 {ctaLabel}
               </a>
@@ -467,6 +507,11 @@ export default function HomeFilm({ name, onName }: FilmProps) {
           </section>
         </div>
       </div>
+      {pass && (
+        <div className="hf-pass" ref={passRef}>
+          {pass}
+        </div>
+      )}
     </div>
   );
 }
