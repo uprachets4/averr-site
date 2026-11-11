@@ -42,6 +42,8 @@ export type FilmOpts = {
   wTop: HTMLElement;
   credits: HTMLElement[];
   counter: HTMLElement;
+  /** A transparent link laid over whichever screen is in front. */
+  screenLink?: HTMLElement;
   sigCanvas: HTMLCanvasElement;
   sigSvg: SVGSVGElement;
   sigWord: SVGTextElement;
@@ -291,6 +293,7 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
     poster: THREE.Texture;
     vt: THREE.VideoTexture;
     geoms: THREE.BufferGeometry[];
+    mesh: THREE.Mesh;
   };
   const loader = new THREE.TextureLoader();
   const screens: Screen[] = PROJECTS.map((P, i) => {
@@ -328,8 +331,42 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
     g.add(mesh);
     g.add(refl);
     scene.add(g);
-    return { v, m, rm, g, poster, vt, geoms: [gm, gr] };
+    return { v, m, rm, g, poster, vt, geoms: [gm, gr], mesh };
   });
+
+  /* The front screen is clickable: project its four corners every frame
+     and lay a transparent link over exactly that rectangle. Hidden in the
+     same gaps the credits are, so it never sits over a changeover. */
+  const corner = new THREE.Vector3();
+  function placeScreenLink(sp: number) {
+    const el = opts.screenLink;
+    if (!el) return;
+    const wu = (sp - T.wS) / (T.wE - T.wS);
+    const on =
+      wu > 0.16 && wu < 1 && !(wu > 0.42 && wu < 0.53) && !(wu > 0.74 && wu < 0.85) &&
+      Number(layers.work.style.opacity || 0) > 0.5;
+    if (!on) {
+      el.style.visibility = "hidden";
+      return;
+    }
+    const k = wu < 0.48 ? 0 : wu < 0.79 ? 1 : 2;
+    const mesh = screens[k].mesh;
+    mesh.updateMatrixWorld();
+    const W = renderer.domElement.clientWidth;
+    const H = renderer.domElement.clientHeight;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const [cx, cy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+      corner.set((cx * SW) / 2, (cy * SH) / 2, 0).applyMatrix4(mesh.matrixWorld).project(camera);
+      const px = ((corner.x + 1) / 2) * W;
+      const py = ((1 - corner.y) / 2) * H;
+      x0 = Math.min(x0, px); x1 = Math.max(x1, px);
+      y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+    }
+    el.style.visibility = "visible";
+    el.style.transform = `translate(${x0.toFixed(1)}px, ${y0.toFixed(1)}px)`;
+    el.style.width = `${(x1 - x0).toFixed(1)}px`;
+    el.style.height = `${(y1 - y0).toFixed(1)}px`;
+  }
 
   /** The signature act plays the same three recordings inside the word. */
   const sigVideos = PROJECTS.map((P) => {
@@ -881,6 +918,7 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
        finale caps at 0.3 so the name's letters do not streak. */
     uni.uForce.value = ptr.f * (sp >= T.wS && sp < T.wE ? 0 : sp >= T.fS ? 0.3 : 0.9);
 
+    placeScreenLink(sp);
     renderer.render(scene, camera);
   }
 

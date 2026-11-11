@@ -462,3 +462,29 @@ h2.hf-cap { margin: 0; font-weight: 400; }
   .hf-leadn { font-size: clamp(40px, 12vw, 56px); }
   .hf-leadl { font-size: 11px; letter-spacing: 0.06em; text-align: center; white-space: normal; max-width: 26ch; }
 }
+
+/* Work act: the project name and the screen itself both open /work. */
+.hf-credit a.hf-namelink {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  border-bottom: 0;
+  padding-bottom: 0;
+  transition: opacity 0.25s ease;
+}
+.hf-credit a.hf-namelink:hover { opacity: 0.82; }
+.hf-credit a.hf-namelink:focus-visible,
+.hf-screenlink:focus-visible { outline: 2px solid #F5F4F9; outline-offset: 4px; border-radius: 6px; }
+.hf-screenlink {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 1;
+}
+/* The name always sits above the screen's hit area. */
+.hf-credit { z-index: 2; }

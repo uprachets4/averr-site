@@ -38,6 +38,7 @@ export default function HomeFilm() {
   const wTopRef = useRef<HTMLDivElement | null>(null);
   const creditsRef = useRef<HTMLDivElement | null>(null);
   const counterRef = useRef<HTMLDivElement | null>(null);
+  const screenLinkRef = useRef<HTMLAnchorElement | null>(null);
   const sigCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const sigSvgRef = useRef<SVGSVGElement | null>(null);
   const sigWordRef = useRef<SVGTextElement | null>(null);
@@ -96,6 +97,7 @@ export default function HomeFilm() {
               wTop: wTopRef.current!,
               credits: Array.from(creditsRef.current!.children) as HTMLElement[],
               counter: counterRef.current!,
+              screenLink: screenLinkRef.current ?? undefined,
               sigCanvas: sigCanvasRef.current!,
               sigSvg: sigSvgRef.current!,
               sigWord: sigWordRef.current!,
@@ -344,7 +346,9 @@ export default function HomeFilm() {
                       </span>
                     ))}
                   </div>
-                  <h3>{p.name}</h3>
+                  <h3>
+                    <Link to="/work" className="hf-namelink">{p.name}</Link>
+                  </h3>
                   <p>{p.line}</p>
                   {/* Into the Work index, not the single case study: visitors
                       land where they can see every project, not just this one. */}
@@ -354,6 +358,8 @@ export default function HomeFilm() {
                 </div>
               ))}
             </div>
+            {/* Sits exactly over the front screen; the engine places it each frame. */}
+            <Link to="/work" className="hf-screenlink" ref={screenLinkRef} aria-label="See all our work" />
             <div className="hf-counter" ref={counterRef} aria-hidden="true">
               <b>01</b> / 03
             </div>
