@@ -647,3 +647,7 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+/* Home: the start pass follows the film, so it needs its own top space. */
+.sv.home-pass {padding-top:clamp(88px,14vh,150px)}
+.sv.home-pass #start {scroll-margin-top:clamp(72px,10vh,104px)}

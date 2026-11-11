@@ -11,6 +11,7 @@ import { fieldsFor, type TradeId } from "../data/servicesBuild";
 import { useSetNavDarkOverride } from "../lib/navTone";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import "../components/services/v2/services.css";
+import { useSvReveal } from "../components/services/v2/useSvReveal";
 import { useDocumentMeta, META } from "../lib/documentMeta";
 
 /**
@@ -40,6 +41,8 @@ export default function Services() {
   const buildRef = useRef<HTMLElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const railRef = useRef<HTMLDivElement | null>(null);
+  const svRef = useRef<HTMLDivElement | null>(null);
+  useSvReveal(svRef);
 
   const { beat, step, jump } = useBuildScroll(buildRef, stageRef, railRef);
   const f = useMemo(() => fieldsFor(typed, trade), [typed, trade]);
@@ -68,7 +71,7 @@ export default function Services() {
   useDocumentMeta(META.services.title, META.services.description);
 
   return (
-    <div className="sv">
+    <div className="sv" ref={svRef}>
         <div className="grain" aria-hidden="true" />
 
         <Hero

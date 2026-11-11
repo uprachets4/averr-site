@@ -1,6 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import PlanetHero from "../components/home/planet/PlanetHero";
 import HomeFilm from "../components/home/film/HomeFilm";
+import StartPass from "../components/services/v2/StartPass";
+import "../components/services/v2/services.css";
+import { useSvReveal } from "../components/services/v2/useSvReveal";
 
 import { useSetNavDarkOverride } from "../lib/navTone";
 import { useDocumentMeta, META } from "../lib/documentMeta";
@@ -33,6 +36,11 @@ export default function Home() {
      would leave that route's title and description in place. */
   useDocumentMeta(META.home.title, META.home.description);
 
+  /* The start pass's name: React state only, never sent or stored. */
+  const [typed, setTyped] = useState("");
+  const passRef = useRef<HTMLDivElement | null>(null);
+  useSvReveal(passRef);
+
   /* Session 27, still true: the dark glass bar sits on every section of
      home — it is part of the system, not a reaction to what is under it. */
   const setNavDark = useSetNavDarkOverride();
@@ -52,7 +60,13 @@ export default function Home() {
   return (
     <>
       <PlanetHero />
-      <HomeFilm />
+      <HomeFilm name={typed} onName={setTyped} />
+      {/* Owner ruling: the finale builds their name, then the CTA drops to
+          the same start pass /services books through, already filled in
+          with that name — they only pick services and a day. */}
+      <div className="sv home-pass" ref={passRef}>
+        <StartPass typed={typed} onTyped={setTyped} />
+      </div>
     </>
   );
 }
