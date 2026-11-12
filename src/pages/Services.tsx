@@ -34,6 +34,13 @@ import { useDocumentMeta, META } from "../lib/documentMeta";
  * `passBooking` stays and the new pass books through it; `servicePillars`
  * stays because /contact reads it.
  */
+const DEEP: Record<string, number> = {
+  websites: 0,
+  "web-apps": 1,
+  "ai-automation": 2,
+  marketing: 3,
+};
+
 export default function Services() {
   const [typed, setTyped] = useState("");
   const [trade, setTrade] = useState<TradeId>("reno");
@@ -46,6 +53,18 @@ export default function Services() {
 
   const { beat, step, jump } = useBuildScroll(buildRef, stageRef, railRef);
   const f = useMemo(() => fieldsFor(typed, trade), [typed, trade]);
+
+  /* Deep links from home's services frame: /services#websites etc. land
+     on that service's first beat, not the top of the page. */
+  useEffect(
+    function deepLink() {
+      const g = DEEP[window.location.hash.slice(1)];
+      if (g === undefined) return;
+      const t = window.setTimeout(() => jump(g, true), 60);
+      return () => window.clearTimeout(t);
+    },
+    [jump]
+  );
 
   /* Dark from the first pixel, as on home and /work. */
   const setNavDark = useSetNavDarkOverride();
