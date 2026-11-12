@@ -135,10 +135,11 @@ export function useBuildScroll(
 
   /** Scroll to the first beat of service `g`. */
   const jump = useCallback(
-    function jump(g: number) {
+    function jump(g: number, instant = false) {
       const build = buildRef.current;
       if (!build) return;
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const reduce =
+        instant || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const top = window.scrollY + build.getBoundingClientRect().top;
       const span = build.offsetHeight - window.innerHeight;
       window.scrollTo({

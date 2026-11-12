@@ -153,11 +153,72 @@
   color: rgba(245, 244, 249, 0.66);
 }
 
+/* ── option 3: timeline + deep link, in place ─────────────────────── */
+.lp-more {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+}
+.lp-time {
+  font: 500 11px/1.4 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c);
+}
+.lp-go {
+  font-size: 14px;
+  font-weight: 500;
+  color: #F5F4F9;
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--c) 60%, transparent);
+  padding-bottom: 2px;
+  opacity: 0.78;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+.lp-col.on .lp-go,
+.lp-go:hover { opacity: 1; border-bottom-color: var(--c); }
+.lp-go:focus-visible { outline: 2px solid #F5F4F9; outline-offset: 4px; border-radius: 2px; }
+/* pointer devices: the whole card is the link */
+@media (hover: hover) {
+  .lp-col .lp-go::after { content: ""; position: absolute; inset: 0; border-radius: 16px; }
+  .lp-col { cursor: pointer; }
+}
+.lp-tap,
+.lp-open { display: none; }
+
 /* ── tablet ───────────────────────────────────────────────────────── */
 @media (max-width: 1023px) {
   .lp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; }
   .lp-art { height: clamp(110px, 16vh, 170px); }
   .lp-inc { display: none; }
+}
+
+/* touch: a tap opens the card in place — no extra height, no strip */
+@media (hover: none) {
+  .lp-more { display: none; }
+  .lp-col { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .lp-tap {
+    display: inline-block;
+    font: 500 10.5px/1 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245, 244, 249, 0.6);
+    border-bottom: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+    padding-bottom: 3px;
+  }
+  .lp-col.open .lp-line,
+  .lp-col.open .lp-tap { display: none; }
+  .lp-col.open .lp-open { display: flex; }
+  .lp-open { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .lp-oinc {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-wrap: wrap; gap: 3px 10px;
+    font: 500 10.5px/1.35 var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase;
+    color: rgba(245, 244, 249, 0.86);
+  }
+  .lp-open .lp-go { opacity: 1; border-bottom-color: var(--c); font-size: 15px; }
 }
 
 /* ── phone ────────────────────────────────────────────────────────── */
