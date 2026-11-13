@@ -52,6 +52,7 @@ export default function AverrMark({ variant = "nav", className, tone = "light" }
       >
         <AverrGlyph reduce={!!reduce} hovered={hovered} tone={tone} />
         <span
+          className={isFooter ? undefined : "averr-word"}
           style={{
             fontFamily: "var(--font-display), Georgia, serif",
             fontSize: isFooter ? 28 : 22,

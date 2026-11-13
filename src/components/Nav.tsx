@@ -8,9 +8,7 @@ import {
   useTransform,
   useReducedMotion,
 } from "motion/react";
-import { List, X } from "@phosphor-icons/react";
 import { duration, ease } from "../lib/motion";
-import Icon from "./icons/Icon";
 import MagneticCTA from "./MagneticCTA";
 import AverrMark from "./AverrMark";
 import { BUILT } from "../data/builtByAverr";
@@ -467,34 +465,36 @@ export default function Nav() {
         </Link>
 
         {isMobile ? (
-          <button
-            ref={buttonRef}
-            type="button"
-            onClick={function toggleMenu() {
-              setOpen(function flip(v) {
-                return !v;
-              });
-            }}
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            aria-controls={MENU_ID}
-            style={{
-              width: 44,
-              height: 44,
-              margin: -10,
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "transparent",
-              border: "none",
-              padding: 0,
-              cursor: "pointer",
-              color: open || navDark ? "var(--color-parch)" : "var(--color-ink)",
-              transition: `color ${duration.base * 1000}ms cubic-bezier(${ease.inOut.join(",")})`,
-            }}
-          >
-            <Icon glyph={open ? X : List} size="lg" />
-          </button>
+          /* Owner ruling (Nov 12): no hamburger on phones. Three pages fit
+             in the bar, and hidden navigation gets skipped, so the links
+             and a short "Book" sit in the bar on every screen. */
+          <div className="nav-m">
+            <ul className="nav-m-links">
+              {LINKS.map(function renderPhoneLink(link) {
+                return (
+                  <li key={link.to}>
+                    <DesktopLink
+                      to={link.to}
+                      label={link.label}
+                      current={isCurrent(pathname, link.to)}
+                      reduce={!!reduce}
+                      dark={navDark}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+            <MagneticCTA
+              to="/contact"
+              variant="primary"
+              size="sm"
+              icon={null}
+              className="nav-cta--nowrap nav-m-cta"
+              tone={navDark ? "dark" : "light"}
+            >
+              Book
+            </MagneticCTA>
+          </div>
         ) : (
           <>
             <ul style={linksWrapStyle}>
