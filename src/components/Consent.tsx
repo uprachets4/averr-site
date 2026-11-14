@@ -24,6 +24,9 @@ export default function Consent() {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("strict");
+  /* The first page view waits for the region's rules, so it is sent with
+     the right consent state (with cookies in standard regions). */
+  const [ready, setReady] = useState(false);
 
   useEffect(function boot() {
     if (!analyticsOn()) return;
@@ -33,6 +36,7 @@ export default function Consent() {
       if (!alive) return;
       applyMode(m);
       setMode(m);
+      setReady(true);
       if (!storedChoice()) setOpen(true);
     });
     const reopen = () => setOpen(true);
@@ -62,12 +66,12 @@ export default function Consent() {
 
   useEffect(
     function onRoute() {
-      if (!analyticsOn()) return;
+      if (!analyticsOn() || !ready) return;
       /* after the page has set its own title */
       const t = window.setTimeout(() => pageview(pathname), 80);
       return () => window.clearTimeout(t);
     },
-    [pathname]
+    [pathname, ready]
   );
 
   if (!open) return null;

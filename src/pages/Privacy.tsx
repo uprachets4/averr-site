@@ -119,10 +119,12 @@ export default function Privacy() {
               the services you picked to that form so you do not type them twice.
             </p>
             <p>
-              Nothing else on this site collects anything. The business name you
-              can type into the home page is only ever used to draw the animation
-              in front of you — it never leaves your browser and it is gone when
-              you close the tab.
+              The site also measures how it is used, through Google Analytics, as
+              described under <a href="#cookies">Cookies and tracking</a>. The
+              business name you can type into the home page is only ever used to
+              draw the animation in front of you: analytics records that a name was
+              typed, never the name itself, and the name is gone when you close
+              the tab.
             </p>
           </section>
 
@@ -134,8 +136,9 @@ export default function Privacy() {
             </p>
             <p>
               We do not sell it, rent it, or hand it to anyone for their own use.
-              There is no mailing list to be added to and no advertising of any
-              kind. Sending the form does not subscribe you to anything.
+              There is no mailing list to be added to, and sending the form does
+              not subscribe you to anything. What you write in the form is never
+              sent to Google Analytics or used for advertising.
             </p>
           </section>
 
