@@ -1,3 +1,4 @@
+import { track } from "../../lib/analytics";
 /**
  * The booking side of the start pass, kept out of the component.
  *
@@ -64,7 +65,10 @@ export async function onBooked(fn: (startTimeISO: string) => void) {
   function handler(e: unknown) {
     const detail = (e as { detail?: { data?: { startTime?: string } } })?.detail;
     const startTime = detail?.data?.startTime;
-    if (typeof startTime === "string" && startTime) fn(startTime);
+    if (typeof startTime === "string" && startTime) {
+      track("booking_complete", { via: "start_pass", page: location.pathname });
+      fn(startTime);
+    }
   }
   cal("on", { action: "bookingSuccessfulV2", callback: handler });
   return function off() {

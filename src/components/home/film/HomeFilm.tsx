@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import { track } from "../../../lib/analytics";
 import { holdLayout, type HoldLayout } from "./hold";
 import { Link } from "react-router-dom";
 import { CLIENTS, LEAD_STAT, OUTCOMES, PARTNERS, PROJECTS, SERVICES, STATS } from "./content";
@@ -121,6 +122,8 @@ export default function HomeFilm({ name, onName, pass }: FilmProps) {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
+    /* that a name was built, never the name itself */
+    if (name.trim()) track("finale_name_built");
     handleRef.current?.setName();
     (document.activeElement as HTMLElement | null)?.blur();
   }

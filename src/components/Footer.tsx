@@ -1,4 +1,5 @@
 import MagneticCTA from "./MagneticCTA";
+import { analyticsOn, openConsent } from "../lib/analytics";
 import TorontoClock from "./TorontoClock";
 
 const STUDIO_LINKS = [
@@ -86,6 +87,14 @@ export default function Footer() {
               not become the pattern someone copies next. */}
           <span className="nf-small">
             <a href="/privacy">Privacy</a>
+            {analyticsOn() && (
+              <>
+                <span aria-hidden="true">·</span>
+                <button type="button" className="nf-ck" onClick={openConsent}>
+                  Cookie settings
+                </button>
+              </>
+            )}
             <span aria-hidden="true">·</span>
             <span>Toronto &amp; the GTA</span>
           </span>

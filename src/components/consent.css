@@ -1,0 +1,41 @@
+/* Cookie banner: a small glass card, bottom-left, the film's surface.
+   Accept and Decline carry equal weight (no dark pattern). */
+.ck {
+  position: fixed;
+  left: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 80;
+  width: min(380px, calc(100vw - 32px));
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(18, 28, 39, 0.86);
+  border: 1px solid rgba(245, 244, 249, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 1px 2px rgba(8, 10, 10, 0.3), 0 12px 40px rgba(8, 10, 10, 0.45);
+  color: #F5F4F9;
+  font-family: var(--font-display), system-ui, sans-serif;
+  animation: ck-in 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+}
+.ck-t { margin: 0 0 12px; font-size: 14px; line-height: 1.5; color: #D6DAE1; }
+.ck-t a { color: #F5F4F9; border-bottom: 1px solid rgba(245, 244, 249, 0.4); text-decoration: none; }
+.ck-b { display: flex; gap: 8px; }
+.ck-b button {
+  flex: 1;
+  min-height: 44px;
+  border-radius: 999px;
+  font: 500 14px/1 var(--font-display), system-ui, sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.ck-no { background: transparent; color: #F5F4F9; border: 1px solid rgba(245, 244, 249, 0.36); }
+.ck-no:hover { border-color: #F5F4F9; }
+.ck-yes { background: #F5F4F9; color: #121C27; border: 1px solid #F5F4F9; }
+.ck-yes:hover { background: #fff; }
+.ck-b button:focus-visible, .ck-t a:focus-visible { outline: 2px solid #F5F4F9; outline-offset: 3px; }
+@keyframes ck-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ck { animation: none; } }
+/* footer "Cookie settings" — a link-styled button */
+.nf-ck { all: unset; cursor: pointer; color: rgba(255,255,255,0.82); border-bottom: 1px solid rgba(255,255,255,0.28); }
+.nf-ck:hover { color: #fff; border-bottom-color: #fff; }
+.nf-ck:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
