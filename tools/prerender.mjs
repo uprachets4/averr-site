@@ -166,7 +166,11 @@ function head(html, page, { noindex = false } = {}) {
 /* ── write ────────────────────────────────────────────────────────── */
 let count = 0;
 for (const page of pages) {
+  /* Twice: the first pass resolves the lazy page modules, so the second
+     renders without suspending and the content sits inline in <main>,
+     not in a hidden block that a script moves into place. */
   const body = await render(page.url);
+  if (body.includes('<div hidden id="S:')) throw new Error(`prerender: ${page.url} still has an outlined boundary`);
   if (body.length < 2000) throw new Error(`prerender: ${page.url} rendered almost nothing (${body.length} bytes)`);
   const html = head(template, page).replace('<div id="root"></div>', `<div id="root">${body}</div>`);
   const out = page.url === "/" ? path.join(DIST, "index.html") : path.join(DIST, page.url, "index.html");
