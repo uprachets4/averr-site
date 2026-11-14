@@ -281,7 +281,7 @@ export default function HomeFilm({ name, onName, pass }: FilmProps) {
                   {PARTNERS.map((p) => (
                     <div className="hf-mark" key={p.name}>
                       <span className="hf-plate">
-                        <img src={p.logo} alt={p.name} />
+                        <img src={p.logo} alt={p.name} width={p.w} height={p.h} loading="lazy" decoding="async" />
                       </span>
                       <small>Partner</small>
                     </div>

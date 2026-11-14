@@ -21,6 +21,7 @@
  *  - DPR is min(dpr,1.5) below 820 and min(dpr,2) above, per the spec.
  */
 import * as THREE from "three";
+import { isSoftwareGL, SOFT_FRAME_MS } from "../softGL";
 import { clamp, smooth as sm, type Formation } from "../particles/toolkit";
 import { holdRaw, type HoldLayout } from "./hold";
 import { createFilmFormations, isSmall, SCR, SH, SW, type FilmFormations } from "./formations";
@@ -244,7 +245,10 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
   if (!hasWebGL()) throw new Error("film: no WebGL");
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(dpr);
+  /* CPU-rendered WebGL: 1x pixels, ~12 fps (see softGL.ts). */
+  const soft = isSoftwareGL(renderer);
+  let lastDraw = -1e9;
+  renderer.setPixelRatio(soft ? 1 : dpr);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
 
@@ -275,7 +279,7 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
     uMouse: { value: new THREE.Vector3(0, 0, 999) },
     uForce: { value: 0 },
     uSize: { value: small0 ? 2.3 : 2.1 },
-    uPR: { value: dpr },
+    uPR: { value: soft ? 1 : dpr },
     uCalm: { value: reduce ? 0 : 1 },
     uFlare: { value: 0 },
   };
@@ -864,6 +868,10 @@ export function mount(stage: HTMLElement, opts: FilmOpts): FilmHandle {
   function frame(now: number) {
     raf = requestAnimationFrame(frame);
     if (document.hidden || !onScreen || !F || !F.calm) return;
+    if (soft) {
+      if (now - lastDraw < SOFT_FRAME_MS) return;
+      lastDraw = now;
+    }
     const t = (now - t0) / 1000;
     uni.uTime.value = t;
     const P = progress();

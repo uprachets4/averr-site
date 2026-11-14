@@ -141,7 +141,7 @@
   background: #fff;
   box-shadow: 0 24px 70px -20px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(245, 244, 249, 0.2);
 }
-.hf-plate img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.hf-plate img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
 .hf-row--c b { font-size: clamp(17.6px, 1.94vw, 32px); opacity: 0.85; }
 .hf-mark small { font: 500 12px/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: rgba(245, 244, 249, 0.66); }
 
