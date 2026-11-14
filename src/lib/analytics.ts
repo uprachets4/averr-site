@@ -15,7 +15,7 @@
  */
 
 /** The GA4 web stream's Measurement ID (public by design). */
-export const GA_ID = "";
+export const GA_ID = "G-5T6VJ4G2R8";
 
 const KEY = "averr-consent-v2";
 export type Choice = "all" | "essential";
