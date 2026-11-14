@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from "react-router-dom";
+import Consent from "./components/Consent";
 import RouteWipe from "./components/RouteWipe";
 import { Suspense, lazy, useEffect } from "react";
 import Nav from "./components/Nav";
@@ -80,6 +81,7 @@ function App() {
             </Suspense>
           </main>
         <Footer />
+        <Consent />
       </NavToneProvider>
     </PageToneProvider>
   );

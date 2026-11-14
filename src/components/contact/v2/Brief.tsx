@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { track } from "../../../lib/analytics";
 import { useSearchParams } from "react-router-dom";
 import { EMAIL_ADDR, TIMINGS, validEmail } from "../../../data/contactBrief";
 import ServiceTiles from "./ServiceTiles";
@@ -127,6 +128,7 @@ export default function Brief({
         await request;
         await flying;
         setStatus("sent");
+        track("generate_lead", { form: "contact" });
       } catch (err) {
         if (harnessAllowed()) console.warn("[contact]", err);
         /* Nothing is lost and nothing pretends it went: the plane is

@@ -17,19 +17,18 @@ import "../components/privacy/privacy.css";
  *   - `@calcom/embed-react` is the only third-party embed, on this
  *     route's Talk section and behind the "Book a call" buttons on
  *     /services and the 404;
- *   - there is no analytics, no tag manager, no tracking pixel and no
- *     third-party script in `index.html`; the fonts are self-hosted
- *     under /fonts;
- *   - the site sets no cookies (`document.cookie` appears nowhere);
- *   - the only browser storage is one `sessionStorage` key on /work,
- *     `averr:work-scroll`, which remembers where you were;
- *   - `vercel.json` is a single SPA rewrite, so Vercel's own request
- *     logs are the whole of the hosting story.
+ *   - Google Analytics 4 loads with Google Consent Mode v2, every signal
+ *     denied by default (src/lib/analytics.ts); GA cookies are set only
+ *     after "Accept" in the banner; the fonts are self-hosted under /fonts;
+ *   - the site's own browser storage is the consent choice
+ *     (`averr-consent-v1`, localStorage) and one `sessionStorage` key on
+ *     /work, `averr:work-scroll`, which remembers where you were;
+ *   - Vercel's own request logs are the rest of the hosting story.
  *
  * If any of that changes, this page changes with it.
  */
 
-const UPDATED = "9 November 2026";
+const UPDATED = "14 November 2026";
 
 const SECTIONS: { id: string; nav: string; h2: string }[] = [
   { id: "collect", nav: "What we collect", h2: "What we collect" },
@@ -174,18 +173,31 @@ export default function Privacy() {
           <section className="pvsec" id="cookies" aria-labelledby="h-cookies">
             <h2 id="h-cookies">{SECTIONS[3].h2}</h2>
             <p>
-              This site uses <b>no analytics and no tracking cookies</b>. There is
-              no Google Analytics, no tag manager, no advertising pixel and no
-              third-party script of any kind in the page. The fonts are served
-              from this site rather than from a font network, so loading a page
-              here does not tell anyone else that you did.
+              This site uses <b>Google Analytics</b> to understand which pages help
+              people and to measure our advertising. It runs in Google&rsquo;s
+              Consent Mode: until you choose, analytics and advertising storage are
+              both <b>off</b>, no analytics cookies are set, and Google receives
+              only anonymous, cookieless signals that a page was viewed.
             </p>
             <p>
-              The site itself sets no cookies. The only thing it keeps in your
-              browser is a single note of where you had scrolled to on the work
-              page, so that coming back from a case study puts you where you
-              were. It stays on your device, it is never sent anywhere, and it is
-              cleared when you close the tab.
+              If you choose <b>Accept</b>, Google Analytics sets its cookies
+              (named <code>_ga</code> and <code>_ga_&hellip;</code>, kept for up to
+              two years) and Google can use the visit to measure our ads. If you
+              choose <b>Decline</b>, nothing changes from the default. You can
+              change your mind at any time with <b>Cookie settings</b> at the
+              bottom of every page. Google processes this data, including in the
+              United States, under{" "}
+              <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer noopener">
+                its privacy policy
+              </a>
+              .
+            </p>
+            <p>
+              The site itself keeps two small notes in your browser: your cookie
+              choice, so we don&rsquo;t ask again, and where you had scrolled to on
+              the work page, so coming back from a case study puts you where you
+              were. Neither is sent anywhere. The fonts are served from this site,
+              not a font network.
             </p>
             <p>
               Opening the booking embed loads Cal.com into the page, and at that

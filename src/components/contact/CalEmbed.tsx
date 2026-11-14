@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { track } from "../../lib/analytics";
 import Cal, { getCalApi } from "@calcom/embed-react";
 import { useSearchParams } from "react-router-dom";
 import { fromISO, toISO } from "../../lib/businessDays";
@@ -69,6 +70,10 @@ export default function CalEmbed({
           const cal = await getCalApi({});
           if (cancelled) return;
           cal("ui", { hideEventTypeDetails: false, theme });
+          cal("on", {
+            action: "bookingSuccessfulV2",
+            callback: () => track("booking_complete", { via: "contact_embed", page: location.pathname }),
+          });
           setReady(true);
         } catch (err) {
           if (typeof console !== "undefined") {
