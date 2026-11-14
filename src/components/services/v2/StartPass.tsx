@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { track } from "../../../lib/analytics";
 import { SERVICES } from "../../../data/servicesBuild";
 import {
   bookedLabel,
@@ -110,6 +111,7 @@ export default function StartPass({
 
   async function book() {
     if (busy) return;
+    track("pass_step", { step: "book_pressed", page: location.pathname });
     setBusy(true);
     try {
       await openModal({
@@ -151,6 +153,7 @@ export default function StartPass({
   );
 
   function pick(d: Date) {
+    track("pass_step", { step: "day_picked", page: location.pathname });
     setDay(d);
     setBooked(null);
   }
@@ -236,15 +239,16 @@ export default function StartPass({
                       key={s.id}
                       style={{ "--c": s.color } as CSSProperties}
                       aria-pressed={picked.has(key)}
-                      onClick={() =>
+                      onClick={() => {
+                        track("pass_step", { step: "service_toggled", service: s.name, page: location.pathname });
                         setPicked(function toggle(prev) {
                           const next = new Set(prev);
                           next.delete("x");
                           if (next.has(key)) next.delete(key);
                           else next.add(key);
                           return next;
-                        })
-                      }
+                        });
+                      }}
                     >
                       <i />
                       {s.name}

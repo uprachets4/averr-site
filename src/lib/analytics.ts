@@ -1,22 +1,25 @@
 /**
- * Google Analytics 4 with Consent Mode v2 (advanced).
+ * Google Analytics 4 with Consent Mode v2 (advanced), by region.
  *
- * - Every consent signal starts DENIED. With it denied, GA sets no cookies
- *   and sends only cookieless, anonymous pings that Google uses for modelling.
- * - "Accept" in the banner grants analytics and ads storage; "Decline" keeps
- *   everything denied. The choice is stored in this browser only.
- * - Nothing loads during prerender, or when GA_ID is empty.
+ * STANDARD regions (Ontario and the rest of Canada outside Quebec, the US,
+ * everywhere not listed below): analytics is always on from the first
+ * visit and is disclosed as such in the banner and the privacy page.
+ * Advertising cookies stay off until "Accept all".
  *
- * Events that matter for the studio: book_call_click (any Book / Cal.com
- * link), booking_complete (a Cal.com booking finished on the site),
- * generate_lead (contact form sent), save_contact (vCard download).
+ * STRICT regions (Quebec, the EU/EEA, the UK, Switzerland): everything is
+ * off until "Accept all"; "Reject all" keeps it off. Until the region is
+ * known, the strict defaults apply.
+ *
+ * Events: page_view, book_call_click, booking_complete, generate_lead,
+ * save_contact, service_card_click, pass_step, finale_name_built.
  */
 
 /** The GA4 web stream's Measurement ID (public by design). */
 export const GA_ID = "";
 
-const KEY = "averr-consent-v1";
-type Choice = "granted" | "denied";
+const KEY = "averr-consent-v2";
+export type Choice = "all" | "essential";
+export type Mode = "standard" | "strict";
 
 type Gtag = (...args: unknown[]) => void;
 declare global {
@@ -26,14 +29,35 @@ declare global {
   }
 }
 
+const STRICT_COUNTRIES = new Set(
+  "AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE IS LI NO GB CH".split(" ")
+);
+
 export const analyticsOn = () => typeof window !== "undefined" && !!GA_ID;
 
 export function storedChoice(): Choice | null {
   try {
     const v = localStorage.getItem(KEY);
-    return v === "granted" || v === "denied" ? v : null;
+    return v === "all" || v === "essential" ? v : null;
   } catch {
     return null;
+  }
+}
+
+let mode: Mode = "strict";
+export const currentMode = () => mode;
+
+/** Region → rules. Falls back to strict if the lookup fails. */
+export async function detectMode(): Promise<Mode> {
+  try {
+    const r = await fetch("/api/geo", { cache: "no-store" });
+    const { country, region } = (await r.json()) as { country?: string; region?: string };
+    if (!country) return "strict";
+    if (STRICT_COUNTRIES.has(country)) return "strict";
+    if (country === "CA" && region === "QC") return "strict";
+    return "standard";
+  } catch {
+    return "strict";
   }
 }
 
@@ -53,9 +77,8 @@ export function initAnalytics() {
     ad_user_data: "denied",
     ad_personalization: "denied",
     analytics_storage: "denied",
-    wait_for_update: 500,
+    wait_for_update: 800,
   });
-  if (storedChoice() === "granted") applyConsent("granted");
   gtag("js", new Date());
   gtag("config", GA_ID, { send_page_view: false });
   const s = document.createElement("script");
@@ -64,12 +87,20 @@ export function initAnalytics() {
   document.head.appendChild(s);
 }
 
-function applyConsent(c: Choice) {
+/** Apply the region's rules plus the visitor's choice (if any). */
+export function applyMode(m: Mode) {
+  mode = m;
+  apply(storedChoice());
+}
+
+function apply(c: Choice | null) {
+  const analytics = mode === "standard" || c === "all" ? "granted" : "denied";
+  const ads = c === "all" ? "granted" : "denied";
   window.gtag?.("consent", "update", {
-    ad_storage: c,
-    ad_user_data: c,
-    ad_personalization: c,
-    analytics_storage: c,
+    analytics_storage: analytics,
+    ad_storage: ads,
+    ad_user_data: ads,
+    ad_personalization: ads,
   });
 }
 
@@ -79,7 +110,7 @@ export function setConsent(c: Choice) {
   } catch {
     /* private mode: the choice lasts this visit only */
   }
-  applyConsent(c);
+  apply(c);
   window.dispatchEvent(new CustomEvent("averr:consent", { detail: c }));
 }
 

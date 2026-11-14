@@ -17,11 +17,13 @@ import "../components/privacy/privacy.css";
  *   - `@calcom/embed-react` is the only third-party embed, on this
  *     route's Talk section and behind the "Book a call" buttons on
  *     /services and the 404;
- *   - Google Analytics 4 loads with Google Consent Mode v2, every signal
- *     denied by default (src/lib/analytics.ts); GA cookies are set only
- *     after "Accept" in the banner; the fonts are self-hosted under /fonts;
+ *   - Google Analytics 4 loads with Google Consent Mode v2
+ *     (src/lib/analytics.ts): analytics is always on outside Quebec, the
+ *     EU/EEA, the UK and Switzerland; advertising cookies only after
+ *     "Accept all"; in those strict regions everything waits for "Accept
+ *     all"; the region comes from /api/geo; fonts are self-hosted;
  *   - the site's own browser storage is the consent choice
- *     (`averr-consent-v1`, localStorage) and one `sessionStorage` key on
+ *     (`averr-consent-v2`, localStorage) and one `sessionStorage` key on
  *     /work, `averr:work-scroll`, which remembers where you were;
  *   - Vercel's own request logs are the rest of the hosting story.
  *
@@ -173,18 +175,32 @@ export default function Privacy() {
           <section className="pvsec" id="cookies" aria-labelledby="h-cookies">
             <h2 id="h-cookies">{SECTIONS[3].h2}</h2>
             <p>
-              This site uses <b>Google Analytics</b> to understand which pages help
-              people and to measure our advertising. It runs in Google&rsquo;s
-              Consent Mode: until you choose, analytics and advertising storage are
-              both <b>off</b>, no analytics cookies are set, and Google receives
-              only anonymous, cookieless signals that a page was viewed.
+              This site uses <b>Google Analytics</b> to understand how people use it:
+              which pages they visit, how they arrived, how far they scroll, what
+              they click (such as booking buttons, service cards and the steps of
+              the booking pass), and the device, browser and approximate location
+              they use. We never record what you type into the site&rsquo;s
+              fields.
             </p>
             <p>
-              If you choose <b>Accept</b>, Google Analytics sets its cookies
-              (named <code>_ga</code> and <code>_ga_&hellip;</code>, kept for up to
-              two years) and Google can use the visit to measure our ads. If you
-              choose <b>Decline</b>, nothing changes from the default. You can
-              change your mind at any time with <b>Cookie settings</b> at the
+              <b>In Ontario, the rest of Canada outside Quebec, and the United
+              States,</b> analytics cookies (<code>_ga</code> and{" "}
+              <code>_ga_&hellip;</code>, kept for up to two years) are always on, and
+              the banner tells you so when you first arrive. <b>Advertising</b>{" "}
+              cookies, which let Google measure our ads, are set only if you choose{" "}
+              <b>Accept all</b>; <b>Essential only</b> leaves them off.
+            </p>
+            <p>
+              <b>In Quebec, the European Union, the United Kingdom and
+              Switzerland,</b> analytics and advertising cookies are off until you
+              choose <b>Accept all</b>. With <b>Reject all</b>, no analytics or
+              advertising cookies are set, and Google receives only anonymous,
+              cookieless signals that a page was viewed.
+            </p>
+            <p>
+              We work out which rules apply from your approximate region, which our
+              host provides with each page request; we don&rsquo;t keep it. You can
+              change your choice at any time with <b>Cookie settings</b> at the
               bottom of every page. Google processes this data, including in the
               United States, under{" "}
               <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer noopener">
