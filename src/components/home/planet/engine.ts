@@ -24,6 +24,7 @@
  *     no colour-space chunks are added.
  */
 import * as THREE from "three";
+import { isSoftwareGL, SOFT_FRAME_MS } from "../softGL";
 import { createHeroFormations, type Formation } from "./formations";
 
 export type PlanetOpts = {
@@ -203,9 +204,15 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
     tt: THREE.BufferAttribute;
   };
 
+  /* CPU-rendered WebGL: 1x pixels, ~12 fps (see softGL.ts). */
+  let soft = false;
+  let lastDraw = -1e9;
+  let softP = -1;
+  let softUntil = 0;
   function makeLayer(canvas: HTMLCanvasElement, side: number): Layer {
     const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    r.setPixelRatio(dpr);
+    if (isSoftwareGL(r)) soft = true;
+    r.setPixelRatio(soft ? 1 : dpr);
     const g = new THREE.BufferGeometry();
     const from = new THREE.BufferAttribute(fromA, 3);
     const to = new THREE.BufferAttribute(toA, 3);
@@ -235,6 +242,7 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   }
 
   const L = [makeLayer(backCanvas, 0), makeLayer(frontCanvas, 1)];
+  if (soft) uni.uPR.value = 1;
   const pts = L[0].p;
 
   /* ── formations, built progressively ───────────────────────────────
@@ -518,7 +526,9 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
   const hit = new THREE.Vector3();
   const v2 = new THREE.Vector2();
-  const t0 = performance.now();
+  /* CPU-rendered WebGL starts with the intro already settled (rings in
+     orbit) rather than spending ~2.5 s of 90 ms frames assembling them. */
+  const t0 = performance.now() - (soft ? 2600 : 0);
   let smoothQ = 0;
   let focus = 0;
   const gW = [1, 1, 1, 1];
@@ -551,6 +561,20 @@ export function mount(stage: HTMLElement, opts: PlanetOpts): PlanetHandle {
   function frame(now: number) {
     raf = requestAnimationFrame(frame);
     if (document.hidden || !onScreen) return;
+    if (soft) {
+      /* CPU-rendered: animate during the intro, while the page scrolls or
+         eases, and while the pointer is over the scene; otherwise the canvas
+         keeps its last frame and nothing is drawn. */
+      const P0 = progress();
+      const q0 = Math.min(P0 / HOLD, 1) * S;
+      const busy =
+        now - t0 < 2400 || Math.abs(P0 - softP) > 1e-4 || Math.abs(q0 - smoothQ) > 1e-3 || ptr.in || ptr.force > 0.01;
+      if (busy && lastDraw > 0) softUntil = now + 1500; // let eased values (focus, morphs) settle
+      if (now > softUntil && lastDraw > 0) return;
+      if (now - lastDraw < SOFT_FRAME_MS) return;
+      lastDraw = now;
+      softP = P0;
+    }
     const t = (now - t0) / 1000;
     const P = progress();
     const q = Math.min(P / HOLD, 1) * S;

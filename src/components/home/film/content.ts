@@ -92,10 +92,12 @@ export const PROJECTS: Project[] = [
   },
 ];
 
-export const PARTNERS: Array<{ name: string; logo: string }> = [
-  { name: "Google", logo: "/logos/partners/google.png" },
-  { name: "RE/MAX", logo: "/logos/partners/remax.png" },
-  { name: "Royal LePage", logo: "/logos/partners/royallepage.png" },
+/* WebP at twice their largest displayed width; w/h are the files' own
+   pixels so the browser reserves the space before they load. */
+export const PARTNERS: Array<{ name: string; logo: string; w: number; h: number }> = [
+  { name: "Google", logo: "/logos/partners/google.webp", w: 360, h: 119 },
+  { name: "RE/MAX", logo: "/logos/partners/remax.webp", w: 190, h: 169 },
+  { name: "Royal LePage", logo: "/logos/partners/royallepage.webp", w: 360, h: 114 },
 ];
 
 /* CareerClarity AI is out until its case file is live — it is still a
