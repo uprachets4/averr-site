@@ -1,0 +1,417 @@
+/**
+ * /guides — the index and the article template.
+ *
+ * Light, on the Nolana ground, where the rest of the site reserves
+ * navy and black for cinematic moments. That is also the right call
+ * for the content: these are the only pages on the site someone reads
+ * for ten minutes rather than scrolls through, and long-form reading
+ * on a dark ground is harder work for no gain.
+ *
+ * Scoped to `.gd`. Plain CSS, no utilities — Tailwind v4 utility
+ * generation has put invisible text into production here once
+ * (playbook 05, pitfall 17).
+ *
+ * The measure is the whole design. Body copy sits at 68 characters,
+ * which is inside the 45–75 band that reading research keeps landing
+ * on; everything else is arranged around holding that.
+ */
+
+.gd {
+  /* The cream light system, not the cooler Nolana ground.
+     The nav's light state paints itself cream (rgba(244,240,230,.88),
+     hard-coded in Nav.tsx), so a page on the cool #F5F4F9 put a warm
+     bar against a cool page and the seam showed the moment you
+     scrolled. Matching the nav is one variable; adding a
+     --nav-light-bar to a shared component for one route is not.
+     Named locally so the whole section can move grounds later by
+     changing these six lines. */
+  --g-bg: var(--color-bg);
+  --g-alt: var(--color-bg-alt);
+  --g-ink: var(--color-ink);
+  --g-mute: var(--color-muted);          /* 4.78:1 on cream — AA */
+  --g-hair: rgba(20, 20, 18, 0.14);
+  --g-hair-strong: rgba(20, 20, 18, 0.26);
+
+  background: var(--g-bg);
+  color: var(--g-ink);
+  font-family: var(--font-body, Inter), system-ui, sans-serif;
+  padding-top: 96px;
+}
+
+.gd .gwrap {
+  width: min(100% - 48px, 1280px);
+  margin-inline: auto;
+}
+
+/* The reading column. Everything in an article sits in this except
+   the full-width rules. */
+.gd .gcol {
+  width: min(100% - 48px, 68ch);
+  margin-inline: auto;
+}
+
+.gd .geyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--g-mute);
+}
+.gd .geyebrow::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+/* ── index ───────────────────────────────────────────────────────── */
+
+.gd .ghead {
+  padding-block: clamp(48px, 9vh, 96px) clamp(32px, 5vh, 56px);
+}
+.gd .ghead h1 {
+  margin: 24px 0 0;
+  font-size: clamp(33px, 4.6vw, 64px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  max-width: 18ch;
+}
+.gd .ghead p {
+  margin: 24px 0 0;
+  font-size: clamp(17px, 1.3vw, 20px);
+  line-height: 1.55;
+  color: var(--g-mute);
+  max-width: 56ch;
+}
+
+.gd .glist {
+  border-top: 1px solid var(--g-hair);
+  padding-bottom: clamp(64px, 12vh, 128px);
+}
+/* Whole row is the link: a card where only the title is clickable is
+   the pitfall this site has already shipped once. */
+.gd .gitem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px 32px;
+  align-items: baseline;
+  padding: clamp(24px, 4vh, 40px) 0;
+  border-bottom: 1px solid var(--g-hair);
+  text-decoration: none;
+  color: inherit;
+  transition: padding-left 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.gd .gitem:hover {
+  padding-left: 8px;
+}
+.gd .gitem h2 {
+  margin: 0;
+  font-size: clamp(21px, 2.2vw, 30px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  max-width: 22ch;
+}
+.gd .gitem p {
+  grid-column: 1;
+  margin: 12px 0 0;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--g-mute);
+  max-width: 62ch;
+}
+.gd .gmeta {
+  grid-row: 1;
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--g-mute);
+}
+
+/* ── article ─────────────────────────────────────────────────────── */
+
+.gd .ghero {
+  padding-block: clamp(40px, 7vh, 72px) clamp(28px, 4vh, 44px);
+}
+.gd .ghero h1 {
+  margin: 20px 0 0;
+  font-size: clamp(31px, 4.1vw, 56px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+}
+.gd .gdek {
+  margin: 24px 0 0;
+  font-size: clamp(18px, 1.45vw, 22px);
+  line-height: 1.5;
+  color: var(--g-mute);
+}
+
+/* byline — the E-E-A-T line, and a real link to who wrote it */
+.gd .gby {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--g-hair);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  font-size: 15px;
+  color: var(--g-mute);
+}
+.gd .gby a {
+  color: var(--g-ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--g-hair-strong);
+  transition: border-color 0.3s;
+}
+.gd .gby a:hover {
+  border-bottom-color: var(--g-ink);
+}
+.gd .gby .sep {
+  opacity: 0.4;
+}
+
+/* contents */
+.gd .gtoc {
+  margin-top: 40px;
+  padding: 24px;
+  border: 1px solid var(--g-hair);
+  border-radius: 14px;
+  background: var(--g-alt);
+}
+.gd .gtoc h2 {
+  margin: 0 0 12px;
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--g-mute);
+}
+.gd .gtoc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: toc;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.gd .gtoc li {
+  counter-increment: toc;
+}
+.gd .gtoc a {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  min-height: 44px;
+  padding-block: 10px;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--g-ink);
+  text-decoration: none;
+}
+.gd .gtoc a::before {
+  content: counter(toc);
+  font: 500 11px/1 var(--font-mono);
+  color: var(--g-mute);
+  flex: none;
+  min-width: 1.5ch;
+}
+.gd .gtoc a:hover {
+  color: var(--g-mute);
+}
+
+/* the prose itself */
+.gd .gbody {
+  padding-bottom: clamp(64px, 12vh, 128px);
+}
+.gd .gbody h2 {
+  margin: clamp(44px, 7vh, 72px) 0 0;
+  font-size: clamp(24px, 2.4vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  /* Anchored headings: the contents jump here, and a fixed nav would
+     otherwise cover the heading it just jumped to. */
+  scroll-margin-top: 96px;
+}
+.gd .gbody p {
+  margin: 20px 0 0;
+  font-size: 17.5px;
+  line-height: 1.68;
+}
+.gd .gbody ul,
+.gd .gbody ol {
+  margin: 20px 0 0;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: step;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.gd .gbody li {
+  position: relative;
+  padding-left: 30px;
+  font-size: 17.5px;
+  line-height: 1.6;
+}
+.gd .gbody ul li::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 0.66em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--g-mute);
+}
+.gd .gbody ol li {
+  counter-increment: step;
+}
+.gd .gbody ol li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.18em;
+  font: 500 12px/1.5 var(--font-mono);
+  color: var(--g-mute);
+}
+
+/* the box: what people get wrong, or what we did ourselves */
+.gd .gnote {
+  margin: 28px 0 0;
+  padding: 20px 24px;
+  border: 1px solid var(--g-hair);
+  border-left: 2px solid var(--g-ink);
+  border-radius: 0 12px 12px 0;
+  background: var(--g-alt);
+}
+.gd .gnote b {
+  display: block;
+  margin-bottom: 8px;
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--g-mute);
+}
+.gd .gnote p {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.6;
+}
+
+/* the close */
+.gd .gend {
+  margin-top: clamp(48px, 8vh, 80px);
+  padding: clamp(28px, 4vw, 40px);
+  border: 1px solid var(--g-hair);
+  border-radius: 16px;
+  background: var(--g-alt);
+}
+.gd .gend h2 {
+  margin: 0;
+  font-size: clamp(21px, 2vw, 27px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+.gd .gend p {
+  margin: 14px 0 0;
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: var(--g-mute);
+}
+.gd .gend a.gcta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  min-height: 48px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: var(--g-ink);
+  color: var(--g-bg);
+  font-size: 16px;
+  text-decoration: none;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.gd .gend a.gcta:hover {
+  transform: translateY(-2px);
+}
+
+/* breadcrumbs, same shape as the case files' */
+.gd .gcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--g-mute);
+}
+.gd .gcrumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.gd .gcrumbs li + li::before {
+  content: "›";
+  opacity: 0.5;
+}
+.gd .gcrumbs a {
+  color: var(--g-mute);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.3s, border-color 0.3s;
+}
+.gd .gcrumbs a:hover {
+  color: var(--g-ink);
+  border-bottom-color: currentColor;
+}
+.gd .gcrumbs [aria-current="page"] {
+  color: var(--g-ink);
+}
+
+@media (max-width: 767px) {
+  .gd {
+    padding-top: 80px;
+  }
+  .gd .gitem {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gd .gmeta {
+    grid-row: auto;
+    grid-column: 1;
+  }
+  .gd .gbody p,
+  .gd .gbody li {
+    font-size: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gd .gitem,
+  .gd .gend a.gcta {
+    transition: none;
+  }
+  .gd .gitem:hover,
+  .gd .gend a.gcta:hover {
+    padding-left: 0;
+    transform: none;
+  }
+}

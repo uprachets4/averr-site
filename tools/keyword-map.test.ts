@@ -29,9 +29,13 @@
  */
 import test from "node:test";
 import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { META } from "../src/lib/documentMeta.ts";
 import { BUILT } from "../src/data/builtByAverr.ts";
+import { GUIDES } from "../src/data/guides.ts";
 
 /** Every URL on the site that carries a search target decision. */
 function entries(): { url: string; target: string | null }[] {
@@ -44,7 +48,10 @@ function entries(): { url: string; target: string | null }[] {
     contact: "/contact",
     work: "/work",
     privacy: "/privacy",
-    card: "/card",
+    /* The key is `card`; the route it ships at is /prachets. The
+       sitemap check below is what caught that mismatch. */
+    card: "/prachets",
+    guides: "/guides",
     notFound: "404",
   };
 
@@ -53,6 +60,12 @@ function entries(): { url: string; target: string | null }[] {
   }
   for (const p of BUILT) {
     out.push({ url: `/work/${p.slug}`, target: p.target });
+  }
+  /* Guides are the fastest-growing set of pages on the site and the
+     most likely to collide — one a week, all about the same handful of
+     subjects. They are exactly what the uniqueness check is for. */
+  for (const g of GUIDES) {
+    out.push({ url: `/guides/${g.slug}`, target: g.target });
   }
   return out;
 }
@@ -106,10 +119,29 @@ test("targets are written in one shape", function normalised() {
   }
 });
 
-test("the map covers every indexable route", function complete() {
-  /* 12 live URLs: 7 routes in META that are real pages (notFound is a
-     status, not a URL), plus the 5 case files. If this count moves,
-     a page was added or removed and the map needs the same change. */
-  const urls = entries().filter((e) => e.url !== "404");
-  assert.equal(urls.length, 12, `expected 12 live URLs in the keyword map, found ${urls.length}`);
+test("the map covers every URL in the sitemap", function complete() {
+  /* Counting the map against itself proves nothing — both sides come
+     from the same arrays. The sitemap is the independent list: it is
+     what the build actually shipped and what Google is told to crawl,
+     so a URL in it with no entry here is a page nobody chose a search
+     for, and an entry here that never shipped is a stale decision.
+     Skipped when there is no build to compare against. */
+  const sitemap = join(dirname(fileURLToPath(import.meta.url)), "..", "dist", "sitemap.xml");
+  if (!existsSync(sitemap)) {
+    console.log("  (no dist/sitemap.xml — run npm run build to include this check)");
+    return;
+  }
+
+  const shipped = new Set(
+    [...readFileSync(sitemap, "utf8").matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) =>
+      new URL(m[1]).pathname.replace(/(.)\/$/, "$1")
+    )
+  );
+  const mapped = new Set(entries().filter((e) => e.url !== "404").map((e) => e.url));
+
+  const missing = [...shipped].filter((u) => !mapped.has(u));
+  const stale = [...mapped].filter((u) => !shipped.has(u));
+
+  assert.deepEqual(missing, [], `in the sitemap but not the keyword map: ${missing.join(", ")}`);
+  assert.deepEqual(stale, [], `in the keyword map but not the sitemap: ${stale.join(", ")}`);
 });
