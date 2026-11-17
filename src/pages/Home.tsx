@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import PlanetHero from "../components/home/planet/PlanetHero";
 import HomeFilm from "../components/home/film/HomeFilm";
+import GuidesBand from "../components/home/GuidesBand";
 import StartPass from "../components/services/v2/StartPass";
 import "../components/services/v2/services.css";
 import { useSvReveal } from "../components/services/v2/useSvReveal";
@@ -72,6 +73,11 @@ export default function Home() {
           </div>
         }
       />
+      {/* After the finale, before the footer: the visitor who is not
+          ready to book gets something useful instead of the end of the
+          page. It is also home's only link into /guides, which was
+          otherwise reachable only by typing the URL. */}
+      <GuidesBand />
     </>
   );
 }

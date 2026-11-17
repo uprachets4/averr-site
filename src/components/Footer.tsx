@@ -2,9 +2,17 @@ import MagneticCTA from "./MagneticCTA";
 import { analyticsOn, openConsent } from "../lib/analytics";
 import TorontoClock from "./TorontoClock";
 
+/* Guides sits between Services and About: the order is roughly what a
+   visitor wants in the order they want it, and the section would
+   otherwise be reachable only by typing the URL. The primary nav
+   cannot take a fifth item — at 360px it has about 47px of room and
+   this needs 65 — and turning that nav into a hamburger to fit one
+   link is a worse trade than putting it here, where content hubs
+   conventionally live anyway. */
 const STUDIO_LINKS = [
   { label: "Work", href: "/work" },
   { label: "Services", href: "/services" },
+  { label: "Guides", href: "/guides" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
