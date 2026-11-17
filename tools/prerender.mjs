@@ -36,7 +36,7 @@ globalThis.document = {
 };
 try { globalThis.navigator = { userAgent: "prerender", maxTouchPoints: 0 }; } catch { /* read-only in some runtimes */ }
 
-const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS } = await import(
+const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS, GUIDES, readingMinutes, guideMeta } = await import(
   path.join(ROOT, "dist-ssr/entry-server.js")
 );
 
@@ -149,6 +149,46 @@ const pages = [
       crumbs([["Home", "/"], ["Work", "/work"], [p.name, `/work/${p.slug}`]]),
     ],
   })),
+  /* Guides. The index is an ItemList so the set is legible to a crawler
+     as a set; each guide is an Article with the founder as its author,
+     which is the E-E-A-T signal the checklist asks for — Google weighs
+     who wrote this kind of content, and the byline on the page and the
+     author in the schema are the same person by construction.
+     `dateModified` is the guide's own `checked` date, not the build
+     date: a rebuild is not a revision, and claiming it was would make
+     every guide look freshly updated every deploy. */
+  {
+    url: "/guides", meta: META.guides, og: "guides", priority: "0.8",
+    graph: [
+      studio,
+      {
+        "@type": "ItemList", name: "Averr Studios guides", inLanguage: "en-CA",
+        itemListElement: GUIDES.map((g, i) => ({
+          "@type": "ListItem", position: i + 1, name: g.title, url: `${SITE}/guides/${g.slug}`,
+        })),
+      },
+      crumbs([["Home", "/"], ["Guides", "/guides"]]),
+    ],
+  },
+  ...GUIDES.map((g) => ({
+    url: `/guides/${g.slug}`,
+    meta: guideMeta(g),
+    og: g.og,
+    priority: "0.7",
+    graph: [
+      studio,
+      founder,
+      {
+        "@type": "Article", headline: g.title, description: clip(g.dek, 300),
+        author: { "@id": FOUNDER_ID }, publisher: { "@id": ORG_ID },
+        datePublished: g.published, dateModified: g.checked,
+        image: `${SITE}/og/${g.og}.png`, url: `${SITE}/guides/${g.slug}`,
+        mainEntityOfPage: `${SITE}/guides/${g.slug}`, inLanguage: "en-CA",
+        wordCount: readingMinutes(g) * 200,
+      },
+      crumbs([["Home", "/"], ["Guides", "/guides"], [g.title, `/guides/${g.slug}`]]),
+    ],
+  })),
   { url: "/about", meta: META.about, og: "about", priority: "0.7", graph: [studio, founder, crumbs([["Home", "/"], ["About", "/about"]])] },
   { url: "/contact", meta: META.contact, og: "contact", priority: "0.8", graph: [studio, crumbs([["Home", "/"], ["Contact", "/contact"]])] },
   { url: "/privacy", meta: META.privacy, og: "home", priority: "0.3", graph: [] },
@@ -219,11 +259,19 @@ const SOURCES = {
   "/work": ["src/pages/Work.tsx", "src/components/work", "src/data/builtByAverr.ts"],
   "/about": ["src/pages/About.tsx", "src/components/about"],
   "/contact": ["src/pages/Contact.tsx", "src/components/contact"],
+  "/guides": ["src/pages/Guides.tsx", "src/components/guides", "src/data/guides.ts"],
   "/privacy": ["src/pages/Privacy.tsx"],
   "/prachets": ["src/pages/Prachets.tsx", "src/components/card"],
 };
 const lastmod = (url) => {
-  const files = SOURCES[url] || (url.startsWith("/work/") ? ["src/pages/CaseStudy.tsx", "src/components/work/built", "src/data/builtByAverr.ts"] : []);
+  /* The two templated routes have no entry of their own in SOURCES —
+     one set of files backs every case file, and another every guide. */
+  const templated = url.startsWith("/work/")
+    ? ["src/pages/CaseStudy.tsx", "src/components/work/built", "src/data/builtByAverr.ts"]
+    : url.startsWith("/guides/")
+      ? ["src/pages/Guide.tsx", "src/components/guides", "src/data/guides.ts"]
+      : [];
+  const files = SOURCES[url] ?? templated;
   const shared = ["src/lib/documentMeta.ts", "tools/prerender.mjs"];
   try {
     const d = execSync(`git log -1 --format=%cs -- ${[...files, ...shared].join(" ")}`, { encoding: "utf8" }).trim();

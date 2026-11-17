@@ -18,6 +18,8 @@ const DOTS = [["Websites", "#F9AF97"], ["Web Apps", "#D5818C"], ["AI Automation"
 const CARDS = [
   { id: "home", eyebrow: "A full-service studio · Toronto", title: "Websites, Web Apps, AI Automation and Marketing.", sub: "For businesses that want to be Taken Seriously." },
   { id: "services", eyebrow: "Services", title: "Four services. Built around your business.", sub: "Websites · Web Apps · AI Automation · Marketing" },
+  { id: "guides", eyebrow: "Guides", title: "Guides for Toronto businesses.", sub: "The things we get asked about most, in plain language." },
+  { id: "guide-google-maps", eyebrow: "Guide · Local search", title: "Get on Google Maps.", sub: "The whole process, in order, for a Toronto business." },
   { id: "work", eyebrow: "Work", title: "Built by Averr.", sub: "Real products for businesses across the GTA." },
   { id: "about", eyebrow: "About", title: "You work directly with the person who builds it.", sub: "Averr Studios · Toronto" },
   { id: "contact", eyebrow: "Contact", title: "Write to the person who builds it.", sub: "Or book a 30-minute discovery call." },

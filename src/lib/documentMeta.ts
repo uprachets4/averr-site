@@ -94,6 +94,16 @@ export const META = {
       "Real projects built by Averr Studios in Toronto: websites, web apps, AI automation and marketing, each with the problem, the build and the result.",
     target: "web design case studies toronto",
   },
+  /** The guides index. Each guide owns its own target, in `guides.ts`;
+   *  this is the hub's, and it is deliberately a different kind of
+   *  search from any single guide's — someone browsing rather than
+   *  someone with one question. */
+  guides: {
+    title: "Guides for Toronto Small Businesses | Averr Studios",
+    description:
+      "Plain-language guides to the things Toronto and GTA business owners ask us about most: Google Maps, Search Console, analytics and site speed. Free, no sign-up.",
+    target: "small business guides toronto",
+  },
   privacy: {
     title: "Privacy — Averr Studios",
     description: "How Averr Studios handles the information you send us, including cookies and analytics.",
