@@ -11,6 +11,7 @@ const STUDIO_LINKS = [
 
 const CONTACT_LINKS = [
   { label: "prachets@averrstudios.com", href: "mailto:prachets@averrstudios.com" },
+  { label: "+1 647-643-2496", href: "tel:+16476432496" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/prachetsupadhyay" },
   { label: "Instagram", href: "https://www.instagram.com/averrstudios" },
 ];
@@ -26,7 +27,7 @@ export default function Footer() {
       <div className="nf-inner">
         <div className="nf-top">
           <div className="nf-brand">
-            <span className="nf-mark">Averr</span>
+            <span className="nf-mark" aria-label="Averr Studios">averr<i className="nf-dot" aria-hidden="true" /></span>
             <p className="nf-say">
               Websites, software and AI for businesses across the GTA.
             </p>

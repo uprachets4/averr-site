@@ -40,36 +40,36 @@ export function useDocumentMeta(title: string, description: string) {
  */
 export const META = {
   home: {
-    title: "Averr Studios — Websites, Web Apps, AI Automation and Marketing",
+    title: "Averr Studios | Web Design, Apps & AI Automation in Toronto",
     description:
       "A Toronto studio building websites, web apps, AI automation and marketing for businesses across the GTA. You work directly with the person who builds it.",
   },
   services: {
-    title: "Services — Averr Studios",
+    title: "Web Design, Web Apps, AI & Marketing Services | Averr Studios",
     description:
-      "Websites, Web Apps, AI Automation and Marketing, built around your business. Watch all four come together, then book a call.",
+      "Websites, web apps, AI automation and marketing for Toronto and GTA businesses. What's included, how long each takes, and a free 30-minute call to start.",
   },
   about: {
-    title: "About — Averr Studios",
+    title: "About Averr Studios — Toronto Web Design and AI Studio",
     description:
-      "You work directly with the person who builds it. How Averr thinks and works, from the first call to launch.",
+      "Averr Studios is a Toronto studio where you work directly with the person who builds it. How we think and work, from the first call to launch.",
   },
   contact: {
-    title: "Contact — Averr Studios",
+    title: "Contact Averr Studios — Book a Free 30-Minute Call",
     description:
-      "Write to the person who builds it, or book a 30-minute call. Replies within 24 hours.",
+      "Write to Averr Studios or book a free 30-minute call about your website, web app, AI automation or marketing in Toronto and the GTA. Replies within 24 hours.",
   },
   work: {
-    title: "Built by Averr — Averr Studios",
+    title: "Website, Web App and AI Case Studies | Averr Studios",
     description:
-      "Every screen is a real product we built: websites, web apps, AI automation and marketing for businesses across the GTA.",
+      "Real projects built by Averr Studios in Toronto: websites, web apps, AI automation and marketing, each with the problem, the build and the result.",
   },
   privacy: {
     title: "Privacy — Averr Studios",
-    description: "How Averr Studios handles the information you send us.",
+    description: "How Averr Studios handles the information you send us, including cookies and analytics.",
   },
   card: {
-    title: "Prachets Upadhyay — Averr Studios",
+    title: "Prachets Upadhyay, Founder of Averr Studios, Toronto",
     description:
       "Founder of Averr Studios, Toronto. Save my contact or book a 30-minute discovery call.",
   },
@@ -80,3 +80,20 @@ export const META = {
       "A Toronto studio building websites, web apps, AI automation and marketing for businesses across the GTA. You work directly with the person who builds it.",
   },
 } as const;
+
+/** What a case study is, in the words people search with. */
+const CASE_KIND: Record<string, string> = {
+  websites: "Website",
+  webApps: "Web App",
+  aiAutomation: "AI Automation",
+  marketing: "Marketing",
+};
+
+/** One case study's title and description, shared by the page and the prerender. */
+export function caseMeta(p: { name: string; svc: readonly string[]; thesis: string; problem: string; sector: string }) {
+  const kind = CASE_KIND[p.svc[0]] ?? "Project";
+  const title = `${p.name}: ${kind} Case Study | Averr Studios`;
+  const raw = `${p.name} (${p.sector}): ${p.thesis} ${p.problem} Built by Averr Studios, Toronto.`;
+  const description = raw.length <= 158 ? raw : raw.slice(0, raw.lastIndexOf(" ", 157)) + "…";
+  return { title, description };
+}

@@ -1,0 +1,18 @@
+# After every successful production deploy on Vercel, tell IndexNow
+# (Bing, Yandex, Seznam, Naver…) which URLs exist, so changes are
+# re-crawled within hours instead of weeks. The key file lives at
+# /13836b5ba512e121f0759827ef9704a2.txt on the site.
+name: IndexNow
+on:
+  deployment_status:
+jobs:
+  ping:
+    if: github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit sitemap URLs
+        run: |
+          set -e
+          URLS=$(curl -fsSL https://www.averrstudios.com/sitemap.xml | grep -o '<loc>[^<]*' | sed 's/<loc>//' | jq -R . | jq -s -c .)
+          BODY=$(jq -n -c --argjson urls "$URLS" '{host:"www.averrstudios.com",key:"13836b5ba512e121f0759827ef9704a2",keyLocation:"https://www.averrstudios.com/13836b5ba512e121f0759827ef9704a2.txt",urlList:$urls}')
+          curl -sS -o /dev/null -w "IndexNow: %{http_code}\n" -X POST https://api.indexnow.org/indexnow -H 'Content-Type: application/json; charset=utf-8' -d "$BODY"

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { BUILT, BUILT_BY_SLUG, nextAfter } from "../data/builtByAverr";
+import { caseMeta } from "../lib/documentMeta";
 import CaseHero from "../components/work/built/CaseHero";
 import Problem from "../components/work/built/Problem";
 import Approach from "../components/work/built/Approach";
@@ -99,10 +100,11 @@ export default function CaseStudy() {
     function titleAndDescription() {
       if (!project) return;
       const prev = document.title;
-      document.title = `${project.name} — Averr Studios`;
+      const cm = caseMeta(project);
+      document.title = cm.title;
       const meta = document.querySelector('meta[name="description"]');
       const prevDesc = meta?.getAttribute("content") ?? null;
-      meta?.setAttribute("content", `${project.name}: ${project.thesis} ${project.sector}.`);
+      meta?.setAttribute("content", cm.description);
       return function restore() {
         document.title = prev;
         if (prevDesc !== null) meta?.setAttribute("content", prevDesc);
