@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Hero from "../components/services/v2/Hero";
-import Refusals from "../components/services/v2/Refusals";
+import Included from "../components/services/v2/Included";
+import BuildSteps from "../components/services/v2/BuildSteps";
 import StartPass from "../components/services/v2/StartPass";
 import Questions from "../components/services/v2/Questions";
+import Close from "../components/services/v2/Close";
 import Rail from "../components/services/v2/Rail";
 import BeatCards from "../components/services/v2/BeatCard";
 import BuildStage, { StageGlow } from "../components/services/v2/BuildStage";
@@ -25,8 +27,17 @@ import { useDocumentMeta, META } from "../lib/documentMeta";
  * twelve mocks and the start pass all read them. They never leave:
  * no request, no storage, and the field is capped at 28 characters.
  *
- * Then the three refusals, the start pass — where the same name picks
- * a day and the ticket writes its own timeline — and the questions.
+ * Then what every engagement includes whichever service it starts
+ * with, the five steps the build runs through, the start pass — where
+ * the same name picks a day and the ticket writes its own timeline —
+ * the questions, and the call.
+ *
+ * "What we don't do", three refusals struck through with a rule, sat
+ * where `Included` sits now. It was removed in the v3 rework: it spent
+ * the page's quietest moment telling visitors what they would not be
+ * getting, directly before asking them to book. Its one fact that was
+ * not already stated elsewhere — no project we can't ship in 90 days —
+ * is still in the FAQ, under "How long does it take?".
  *
  * What it replaced, each confirmed to have no importer outside this
  * route first: ServicesBuild and its seven `build/*` screens, NoList,
@@ -118,9 +129,11 @@ export default function Services() {
           </div>
         </section>
 
-        <Refusals />
+        <Included />
+        <BuildSteps />
         <StartPass typed={typed} onTyped={setTyped} />
         <Questions />
+        <Close />
       </div>
   );
 }
