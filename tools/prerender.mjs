@@ -36,7 +36,7 @@ globalThis.document = {
 };
 try { globalThis.navigator = { userAgent: "prerender", maxTouchPoints: 0 }; } catch { /* read-only in some runtimes */ }
 
-const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS } = await import(
+const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS, WEBSITES_FAQ } = await import(
   path.join(ROOT, "dist-ssr/entry-server.js")
 );
 
@@ -127,6 +127,23 @@ const pages = [
       crumbs([["Home", "/"], ["Services", "/services"]]),
     ],
   },
+  /* /services/websites — one service, one search ("web design Toronto").
+     Its Service node points at this page rather than at the /services
+     anchor, and its FAQPage is this page's own six questions, so the two
+     pages do not compete for the same rich result. */
+  {
+    url: "/services/websites", meta: META.servicesWebsites, og: "services-websites", priority: "0.9",
+    graph: [
+      studio,
+      {
+        "@type": "Service", name: "Website design and development", serviceType: "Web design",
+        description: SERVICE_DESC.websites, provider: { "@id": ORG_ID },
+        areaServed: "Greater Toronto Area", url: `${SITE}/services/websites`,
+      },
+      { "@type": "FAQPage", mainEntity: WEBSITES_FAQ.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
+      crumbs([["Home", "/"], ["Services", "/services"], ["Websites", "/services/websites"]]),
+    ],
+  },
   { url: "/work", meta: META.work, og: "work", priority: "0.9", graph: [studio, crumbs([["Home", "/"], ["Work", "/work"]])] },
   ...BUILT.map((p) => ({
     url: `/work/${p.slug}`,
@@ -215,7 +232,12 @@ fs.writeFileSync(
    behind each page, so it only moves when the page really changes. */
 const SOURCES = {
   "/": ["src/pages/Home.tsx", "src/components/home", "src/data/servicesBuild.ts"],
-  "/services": ["src/pages/Services.tsx", "src/components/services", "src/data/servicesBuild.ts"],
+  /* Narrowed from `src/components/services` to the v2 folder: that directory
+     now also holds `services/websites`, and the wider glob would have moved
+     /services' lastmod every time the Websites page changed — the one thing
+     this map exists to prevent. */
+  "/services": ["src/pages/Services.tsx", "src/components/services/v2", "src/components/services/passBooking.ts", "src/data/servicesBuild.ts"],
+  "/services/websites": ["src/pages/ServiceWebsites.tsx", "src/components/services/websites", "src/data/serviceWebsites.ts", "src/data/servicePillars.ts", "src/data/aboutProcess.ts"],
   "/work": ["src/pages/Work.tsx", "src/components/work", "src/data/builtByAverr.ts"],
   "/about": ["src/pages/About.tsx", "src/components/about"],
   "/contact": ["src/pages/Contact.tsx", "src/components/contact"],

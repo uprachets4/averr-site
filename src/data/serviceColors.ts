@@ -30,6 +30,24 @@ export const SERVICE_COLOR: Record<ServiceId, string> = {
   marketing: "#569AFA",
 };
 
+/**
+ * The URL segment per service: `/services#web-apps` today, and the
+ * `/services/<slug>` pages as each one ships.
+ *
+ * It lives here, with `ServiceId`, because two copies of it already
+ * exist — `slugOf()` in `tools/prerender.mjs` and the `DEEP` map in
+ * `pages/Services.tsx` — and a third hand-written one is how a renamed
+ * service leaves a dead anchor behind. New surfaces read this; the two
+ * existing copies are left alone until the remaining three service
+ * pages ship and they can be pointed here in one change.
+ */
+export const SERVICE_SLUG: Record<ServiceId, string> = {
+  websites: "websites",
+  webApps: "web-apps",
+  aiAutomation: "ai-automation",
+  marketing: "marketing",
+};
+
 /** All four together — the studio, never one service. */
 export const STUDIO_GRADIENT =
   "linear-gradient(90deg, #F9AF97 0%, #D5818C 25%, #9874E8 50%, #708DF8 75%, #569AFA 100%)";

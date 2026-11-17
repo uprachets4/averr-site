@@ -1,0 +1,443 @@
+/**
+ * /services/websites — the Websites service page.
+ *
+ * Scoped to `.wsp`, which the page sets alongside `.sv`, so every token,
+ * reset and shared block in `services.css` (`.gut`, `.wrap`, `.eyebrow`,
+ * `.reveal`, `.sec h2`, `.faq`, `.beams`, `.grain`) applies here and the
+ * page sits in the same atmosphere as /services rather than inventing a
+ * second one. Only what is new to this page lives below.
+ *
+ * Type sizes use the scale already approved for `.sv` (the tiered
+ * scale-down in playbook 03): the hero matches `.sv .hero h1`, headings
+ * inherit `.sv .sec h2`. Nothing here is larger than something already
+ * shipped, so the page still fits 1680 × 950.
+ *
+ * Plain CSS, no utilities: invisible text from Tailwind v4 utility
+ * generation has reached production once (playbook 05, pitfall 17).
+ */
+
+/* ── hero ─────────────────────────────────────────────────────────── */
+
+.wsp .whero {
+  position: relative;
+  min-height: 92vh;
+  min-height: 92svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding-block: 128px 64px;
+}
+.wsp .whero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(78% 68% at 42% 44%, transparent 28%, rgba(18, 28, 39, .86) 78%, #121C27 100%);
+}
+.wsp .whero .wrap {
+  position: relative;
+  z-index: 1;
+}
+.wsp .whero h1 {
+  font-size: clamp(36px, 5.25vw, 89px);
+  margin-top: 24px;
+  max-width: 20ch;
+}
+.wsp .whero .sub {
+  margin: 24px 0 0;
+  font-size: clamp(16.7px, 1.4vw, 21px);
+  line-height: 1.5;
+  max-width: 54ch;
+  color: var(--mute);
+}
+
+/* The two calls to action. Primary is filled, secondary is a rule. */
+.wsp .ctas {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.wsp .ctas a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-size: 16px;
+  letter-spacing: -.01em;
+  text-decoration: none;
+  transition: background-color .3s var(--out), border-color .3s var(--out), transform .3s var(--out);
+}
+.wsp .ctas a.pri {
+  background: var(--light);
+  color: var(--ink);
+  border: 1px solid var(--light);
+}
+.wsp .ctas a.pri:hover {
+  transform: translateY(-2px);
+}
+.wsp .ctas a.sec {
+  border: 1px solid var(--line);
+  color: var(--light);
+}
+.wsp .ctas a.sec:hover {
+  border-color: var(--light);
+  transform: translateY(-2px);
+}
+
+/* Three facts under the calls to action, on one rule. */
+.wsp .facts {
+  margin-top: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--faint);
+}
+.wsp .fact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wsp .fact span {
+  font: 500 11px/1 var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.wsp .fact b {
+  font-weight: 500;
+  font-size: clamp(18.6px, 1.58vw, 24px);
+  letter-spacing: -.03em;
+}
+
+/* ── what's included ─────────────────────────────────────────────── */
+
+/* A list on one rule, not a card grid: the first line carries the most
+   weight, the rest step down. Hover shifts the row the way `.svcmap`
+   does on /services, so the two pages behave the same way. */
+.wsp .inc {
+  margin-top: clamp(32px, 5vh, 56px);
+  border-top: 1px solid var(--faint);
+}
+/* The name column is sized in `fr`, not `ch`: at the display sizes these
+   names are set in, a character-based column put "Brand & design
+   direction" on three lines and left the rows ragged. */
+.wsp .incrow {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 0.9fr) minmax(0, 1.3fr);
+  gap: 24px;
+  align-items: baseline;
+  padding: clamp(18px, 2.6vh, 28px) 0;
+  border-bottom: 1px solid var(--faint);
+  transition: padding-left .4s var(--out);
+}
+.wsp .incrow:hover {
+  padding-left: 8px;
+}
+.wsp .incrow i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--wc);
+  align-self: center;
+}
+.wsp .incrow b {
+  font-weight: 500;
+  font-size: clamp(19.4px, 2.11vw, 29px);
+  letter-spacing: -.035em;
+  line-height: 1.15;
+}
+.wsp .incrow p {
+  margin: 0;
+  font-size: clamp(16px, 1.2vw, 18px);
+  line-height: 1.55;
+  color: rgba(245, 244, 249, .82);
+  max-width: 54ch;
+}
+/* The first row is the one people read: larger, and it keeps the accent. */
+.wsp .incrow:first-child b {
+  font-size: clamp(21px, 2.3vw, 32px);
+}
+
+/* ── how the build runs ──────────────────────────────────────────── */
+
+.wsp .wsteps {
+  margin-top: clamp(32px, 5vh, 56px);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 24px;
+  counter-reset: wstep;
+}
+/* A flex column in a stretched grid cell, so the five "you receive" chips
+   sit on one baseline even when one of them wraps to two lines — the
+   longest ("Polish checklist, all passed") otherwise pushed its own chip
+   up and broke the row. */
+.wsp .wstep {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 32px;
+  border-top: 1px solid var(--faint);
+}
+/* The dot sits on the rule, so the five read as one line of work. */
+.wsp .wstep::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--wc);
+}
+.wsp .wstep h3 {
+  font-size: clamp(18.6px, 1.58vw, 24px);
+  letter-spacing: -.03em;
+}
+.wsp .wstep .when {
+  display: block;
+  margin-top: 12px;
+  font: 500 10.5px/1.4 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.wsp .wstep p {
+  margin: 16px 0 24px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(245, 244, 249, .82);
+}
+.wsp .wstep .got {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--faint);
+  font: 500 11px/1 var(--mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--light);
+}
+.wsp .wstep .got i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--wc);
+}
+
+/* ── proof ───────────────────────────────────────────────────────── */
+
+/* Two case files, not equal in weight: the first is the wide one. The
+   whole card is the link, because visitors tap what looks tappable
+   (playbook 05, pitfall 10). */
+.wsp .wproof {
+  margin-top: clamp(32px, 5vh, 56px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 24px;
+}
+.wsp .wcase {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px;
+  border-radius: 20px;
+  border: 1px solid var(--faint);
+  background: linear-gradient(180deg, rgba(24, 38, 51, .72), rgba(18, 28, 39, .72));
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .4s var(--out), transform .4s var(--out);
+}
+.wsp .wcase:hover {
+  border-color: var(--line);
+  transform: translateY(-4px);
+}
+.wsp .wcase .top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  font: 500 11px/1 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.wsp .wcase .top i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--wc);
+}
+.wsp .wcase h3 {
+  font-size: clamp(22.8px, 2.6vw, 33px);
+  letter-spacing: -.035em;
+}
+.wsp .wcase .thesis {
+  margin: 0;
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 1.5;
+  color: rgba(245, 244, 249, .82);
+}
+.wsp .wcase .fig {
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--faint);
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.wsp .wcase .fig b {
+  font-weight: 500;
+  font-size: clamp(28px, 3vw, 44px);
+  letter-spacing: -.045em;
+  line-height: 1;
+}
+.wsp .wcase .fig span {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--mute);
+  max-width: 24ch;
+}
+.wsp .wcase .go {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--light);
+}
+.wsp .wcase .go svg {
+  transition: transform .4s var(--out);
+}
+.wsp .wcase:hover .go svg {
+  transform: translateX(4px);
+}
+
+/* ── the close ───────────────────────────────────────────────────── */
+
+.wsp .wend {
+  padding-block: clamp(88px, 14vh, 150px);
+}
+.wsp .wend .box {
+  padding: clamp(32px, 5vw, 64px);
+  border-radius: 24px;
+  border: 1px solid var(--faint);
+  background:
+    radial-gradient(80% 120% at 12% 0%, rgba(249, 175, 151, .16), rgba(249, 175, 151, 0) 62%),
+    linear-gradient(180deg, rgba(24, 38, 51, .8), rgba(18, 28, 39, .8));
+}
+.wsp .wend h2 {
+  max-width: 24ch;
+}
+.wsp .wend p {
+  margin: 24px 0 0;
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 1.55;
+  color: rgba(245, 244, 249, .82);
+  max-width: 56ch;
+}
+.wsp .other {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--faint);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  align-items: center;
+}
+.wsp .other span {
+  font: 500 11px/1 var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.wsp .other a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding-block: 10px;
+  font-size: 16px;
+  letter-spacing: -.01em;
+  color: var(--light);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .3s;
+}
+.wsp .other a:hover {
+  border-bottom-color: var(--light);
+}
+.wsp .other a i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--oc);
+}
+
+/* ── tablet ──────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .wsp .wsteps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+  }
+  .wsp .wproof {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── phone ───────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .wsp .whero {
+    min-height: 0;
+    padding-block: 112px 48px;
+  }
+  .wsp .whero h1 {
+    max-width: none;
+  }
+  .wsp .facts {
+    margin-top: 32px;
+    gap: 24px;
+  }
+  .wsp .incrow {
+    grid-template-columns: 14px minmax(0, 1fr);
+    gap: 12px 16px;
+  }
+  /* The outcome line drops under the name, past the dot. */
+  .wsp .incrow p {
+    grid-column: 2;
+  }
+  .wsp .wsteps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .wsp .wcase {
+    padding: 24px;
+  }
+  .wsp .ctas a {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+/* The hero beams animate; the shared `.sv` reduced-motion block already
+   settles `.reveal`. Hold the beams too, for the same visitor. */
+@media (prefers-reduced-motion: reduce) {
+  .wsp .ctas a,
+  .wsp .wcase,
+  .wsp .wcase .go svg,
+  .wsp .incrow {
+    transition: none;
+  }
+  .wsp .wcase:hover,
+  .wsp .ctas a:hover {
+    transform: none;
+  }
+}

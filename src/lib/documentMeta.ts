@@ -49,6 +49,16 @@ export const META = {
     description:
       "Websites, web apps, AI automation and marketing for Toronto and GTA businesses. What's included, how long each takes, and a free 30-minute call to start.",
   },
+  /**
+   * /services/websites. One page, one search: "web design Toronto".
+   * The title leads with that search and the description answers it;
+   * neither repeats /services', so the two pages do not compete.
+   */
+  servicesWebsites: {
+    title: "Web Design Toronto — Custom Websites | Averr Studios",
+    description:
+      "Custom websites for Toronto and GTA businesses, hand-built in 2 – 3 weeks. What's included, how the build runs, and a free 30-minute call to start.",
+  },
   about: {
     title: "About Averr Studios — Toronto Web Design and AI Studio",
     description:
