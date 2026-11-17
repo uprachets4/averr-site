@@ -20,7 +20,7 @@ type Props = {
  * mounts and briefly pulses on nav hover — the single delight moment on
  * the mark.
  */
-export default function AverrMark({ variant = "nav", className, tone = "light" }: Props) {
+export default function AverrMark({ variant = "nav", className }: Props) {
   const reduce = useReducedMotion();
   const [hovered, setHovered] = useState(false);
 
@@ -43,28 +43,34 @@ export default function AverrMark({ variant = "nav", className, tone = "light" }
         color: "inherit",
       }}
     >
-      <div
+      {/* The "averr." wordmark: the name in lowercase, the full stop in the
+          brand gradient. Under 380px the word hides (index.css) and the
+          gradient dot stays as the home link's mark. */}
+      <span
         style={{
           display: "inline-flex",
-          alignItems: "center",
-          gap: 10,
+          alignItems: "baseline",
+          fontFamily: "var(--font-display), system-ui, sans-serif",
+          fontSize: isFooter ? 28 : 23,
+          fontWeight: 600,
+          letterSpacing: "-0.045em",
+          lineHeight: 1,
+          color: "inherit",
         }}
       >
-        <AverrGlyph reduce={!!reduce} hovered={hovered} tone={tone} />
-        <span
-          className={isFooter ? undefined : "averr-word"}
-          style={{
-            fontFamily: "var(--font-display), Georgia, serif",
-            fontSize: isFooter ? 28 : 22,
-            fontWeight: 500,
-            letterSpacing: "-0.015em",
-            lineHeight: 1,
-            color: "inherit",
-          }}
-        >
-          Averr
-        </span>
-      </div>
+        <span className={isFooter ? undefined : "averr-word"}>averr</span>
+        <motion.i
+          className="averr-dot"
+          aria-hidden
+          initial={{ scale: reduce ? 1 : 0 }}
+          animate={{ scale: reduce ? 1 : hovered ? [1, 1.35, 1] : 1 }}
+          transition={
+            hovered && !reduce
+              ? { duration: 0.5, ease: ease.outQuart }
+              : { ...spring.snappy, delay: reduce ? 0 : 0.35 }
+          }
+        />
+      </span>
       {isFooter ? (
         <span
           className="type-eyebrow"
@@ -78,63 +84,5 @@ export default function AverrMark({ variant = "nav", className, tone = "light" }
         </span>
       ) : null}
     </div>
-  );
-}
-
-function AverrGlyph({
-  reduce,
-  hovered,
-  tone = "light",
-}: {
-  reduce: boolean;
-  hovered: boolean;
-  tone?: "light" | "dark";
-}) {
-  return (
-    <span
-      aria-hidden
-      style={{
-        position: "relative",
-        display: "inline-block",
-        width: 18,
-        height: 18,
-        flexShrink: 0,
-      }}
-    >
-      {/* Outer filled disc */}
-      <span
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "currentColor",
-          borderRadius: "50%",
-        }}
-      />
-      {/* Inner cream dot — spring-scale entrance, brief hover pulse */}
-      <motion.span
-        initial={{ scale: reduce ? 1 : 0 }}
-        animate={{
-          scale: reduce ? 1 : hovered ? [1, 1.25, 1] : 1,
-        }}
-        transition={
-          hovered && !reduce
-            ? { duration: 0.5, ease: ease.outQuart }
-            : { ...spring.snappy, delay: reduce ? 0 : 0.35 }
-        }
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          width: 6,
-          height: 6,
-          marginTop: -3,
-          marginLeft: -3,
-          background: tone === "dark" ? "var(--color-dark)" : "var(--color-bg)",
-          borderRadius: "50%",
-          transformOrigin: "center center",
-          transition: "background-color 300ms cubic-bezier(0.65, 0, 0.35, 1)",
-        }}
-      />
-    </span>
   );
 }
