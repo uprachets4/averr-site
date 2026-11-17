@@ -1,0 +1,110 @@
+/**
+ * Home's guides band.
+ *
+ * Carries `.sv` so the tokens and the list idiom from services.css
+ * apply, and adds only what is specific to sitting at the end of
+ * home: its own navy ground (the film paints itself, this section
+ * does not inherit that), the row meta, and the link out.
+ *
+ * Reveal classes are deliberately NOT used here. `.sv .reveal` is
+ * hidden until an observer adds `.in`, and home does not run
+ * `useSvReveal` over this subtree — the one on Home covers the pass
+ * only. A reveal without its observer is invisible text in
+ * production, which this codebase has shipped once already
+ * (playbook 05, pitfall 5).
+ */
+
+.sv.gband {
+  background: var(--navy-1, #121c27);
+  padding-block: clamp(72px, 11vh, 120px);
+  position: relative;
+}
+
+/* A hairline where the film ends, so the band reads as a separate
+   beat rather than more film. */
+.sv.gband::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100% - 48px, 1360px);
+  height: 1px;
+  background: var(--faint);
+}
+
+.sv.gband h2 {
+  margin-top: 18px;
+  font-size: clamp(25px, 3.1vw, 50px);
+  max-width: 18ch;
+}
+
+/* The row's read time, pinned right. The grid comes from `.incrow`;
+   this is the fourth cell. */
+.sv.gband .incrow {
+  grid-template-columns: 14px minmax(0, 0.9fr) minmax(0, 1.3fr) auto;
+  color: inherit;
+  text-decoration: none;
+}
+/* `.incrow` centres its dot, which is right on /services where every
+   name is one line. Guide titles are sentences and wrap to two, and a
+   centred dot then sits between the lines rather than beside the
+   first. Pinned to the first line's centre instead, tracking the
+   title's own clamp. */
+.sv.gband .incrow i {
+  align-self: start;
+  margin-top: clamp(6px, 0.56vw, 12px);
+}
+.sv.gband .gbmeta {
+  justify-self: end;
+  white-space: nowrap;
+  font: 500 11px/1 var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.sv.gband .gball {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 32px;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: var(--light);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+.sv.gband .gball:hover {
+  border-bottom-color: var(--light);
+}
+.sv.gband .gball svg {
+  transition: transform 0.4s var(--out);
+}
+.sv.gband .gball:hover svg {
+  transform: translateX(4px);
+}
+
+@media (max-width: 767px) {
+  .sv.gband .incrow {
+    grid-template-columns: 14px minmax(0, 1fr);
+  }
+  .sv.gband .incrow p,
+  .sv.gband .gbmeta {
+    grid-column: 2;
+  }
+  .sv.gband .gbmeta {
+    justify-self: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sv.gband .gball svg {
+    transition: none;
+  }
+  .sv.gband .gball:hover svg {
+    transform: none;
+  }
+}
