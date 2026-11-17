@@ -486,7 +486,10 @@
 
 /* ---------- sections ---------- */
 .sv .sec {padding-block:clamp(88px,14vh,150px)}
-.sv .sec h2 {font-size:clamp(28px,3.44vw,56px);max-width:18ch}
+/* Section headings, stepped down about 10% from 28/3.44/56 at the
+   owner's request after the v3 review. One scale for every section on
+   the page, so the two older sections stay in step with the new ones. */
+.sv .sec h2 {font-size:clamp(25px,3.1vw,50px);max-width:18ch}
 /* what you get — a list on one rule, replacing the struck-through
    refusals. The name column is sized in fr, not ch: at these display
    sizes a character column put "The person on the call builds it" on
@@ -515,7 +518,7 @@
 /* The close is a `.wend`, not a `.sec`, so it does not inherit
    `.sv .sec h2` and shipped at body size until this was caught in the
    render. Same size as every other section heading. */
-.sv .wend h2 {font-size:clamp(28px,3.44vw,56px);max-width:24ch}
+.sv .wend h2 {font-size:clamp(25px,3.1vw,50px);max-width:24ch}
 .sv .wend p {margin:24px 0 0;font-size:clamp(16px,1.2vw,19px);line-height:1.55;color:rgba(245,244,249,.82);max-width:56ch}
 .sv .ctas {margin-top:32px;display:flex;flex-wrap:wrap;gap:12px}
 .sv .ctas a {display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:12px 24px;border-radius:999px;font-size:16px;letter-spacing:-.01em;text-decoration:none;transition:background-color .3s var(--out),border-color .3s var(--out),transform .3s var(--out)}
