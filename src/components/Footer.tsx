@@ -11,7 +11,7 @@ const STUDIO_LINKS = [
 
 const CONTACT_LINKS = [
   { label: "prachets@averrstudios.com", href: "mailto:prachets@averrstudios.com" },
-  { label: "(647) 643-2496", href: "tel:+16476432496" },
+  { label: "+1 647-643-2496", href: "tel:+16476432496" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/prachetsupadhyay" },
   { label: "Instagram", href: "https://www.instagram.com/averrstudios" },
 ];
