@@ -425,62 +425,84 @@ export const ALL_FOUR = {
   cta: "Get your project start pass →",
 };
 
-/* ── what we don't do ──────────────────────────────────────────────── */
+/* ── what you get ──────────────────────────────────────────────────── */
 
-export type Refusal = {
-  text: string;
-  /** The thing being refused — a VERBATIM substring of `text`. A rule is
-   *  drawn across exactly this span. Decorative only: screen readers get
-   *  `text` unchanged. Verified as a substring by `splitRefusal`. */
-  struck: string;
-};
-
-export const NOT_DOING: Refusal[] = [
+/**
+ * What every engagement includes, whichever of the four services it
+ * starts with. This replaced "What we don't do" — three refusals drawn
+ * through with a rule — which told visitors what they would not be
+ * getting at the point in the page where they most want to know what
+ * they would.
+ *
+ * The altitude matters. The pinned stage above already walks through
+ * twelve named deliverables, three per service, with a working mock of
+ * each; listing those again here would be the same page twice. These
+ * five sit a level up: they are true of a website, a web app, an
+ * automation and a marketing engagement alike, which is what makes them
+ * worth stating on a page that sells all four.
+ *
+ * Every line is already live somewhere on the site, rewritten to fit
+ * this list but not re-argued:
+ *
+ *   1 → `aboutProcess.PROCESS` "Direction"
+ *   2 → the studio's own schema description, and the home hero
+ *   3 → `ALL_FOUR.line`, verbatim
+ *   4 → `FAQ` "How much does a project cost?"
+ *   5 → `FAQ` "What happens after launch?"
+ *
+ * Keeping them sourced is the point: a page that sells four services is
+ * the easiest place on the site to start promising a fifth thing nobody
+ * agreed to deliver.
+ */
+export const INCLUDED: { name: string; outcome: string }[] = [
   {
-    text: "We don't do retainers with 12-month minimums.",
-    struck: "retainers with 12-month minimums",
+    name: "Direction before the build",
+    outcome:
+      "What you do, who it's for and how it should feel, settled before a line of code.",
   },
   {
-    text: "We don't white-label for agencies.",
-    struck: "white-label for agencies",
+    name: "The person on the call builds it",
+    outcome:
+      "No account manager, no handoff. You work directly with the person doing the work.",
   },
   {
-    text: "We don't take projects we can't ship in 90 days.",
-    struck: "projects we can't ship in 90 days",
+    name: "Everything talks to everything",
+    outcome: ALL_FOUR.line,
+  },
+  {
+    name: "A fixed scope, timeline and price",
+    outcome:
+      "In writing within 3 business days of the call. If we can't quote it, we'll tell you why.",
+  },
+  {
+    name: "Support after you're live",
+    outcome:
+      "We keep refining once you've launched, and your team gets the documentation to run it without us.",
   },
 ];
 
-/**
- * The verbatim rule, enforced rather than trusted. Moved here from
- * `servicesProcess.ts` unchanged when `NoList` was replaced in step 3.
- *
- * A struck phrase that is not an exact substring of its own sentence is a
- * bug we would otherwise only catch by eye, so it throws in development and
- * degrades to "no strike" in production rather than rendering a lie.
- */
-export function splitRefusal(r: Refusal): {
-  before: string;
-  struck: string;
-  after: string;
-} {
-  const i = r.text.indexOf(r.struck);
-  if (i < 0) {
-    if (import.meta.env.DEV) {
-      throw new Error(
-        `[servicesBuild] struck phrase is not verbatim: "${r.struck}" not found in "${r.text}"`
-      );
-    }
-    return { before: r.text, struck: "", after: "" };
-  }
-  return {
-    before: r.text.slice(0, i),
-    struck: r.struck,
-    after: r.text.slice(i + r.struck.length),
-  };
-}
-
 /* ── questions ─────────────────────────────────────────────────────── */
 
+/**
+ * The questions people ask before the call.
+ *
+ * The first six are the page's originals and are unchanged. The last
+ * five came from the /services/websites draft, which asked a different
+ * set — the concrete build questions a buyer asks once they have
+ * decided they want something made. Both sets were real, so both are
+ * here rather than one replacing the other.
+ *
+ * Order is general to specific: what it costs and how it runs, then
+ * what gets built and how. "What does a website build include?" was
+ * dropped on the merge — "How long does it take?" and the `INCLUDED`
+ * list above already answer it, and a FAQ that answers the same
+ * question twice reads as padding to a visitor and as duplication to a
+ * search engine.
+ *
+ * This array is the page's FAQPage schema: `tools/prerender.mjs` reads
+ * it through `entry-server`, so adding a question here ships it to
+ * Google without a second edit.
+ */
 export const FAQ: { q: string; a: string }[] = [
   {
     q: "How much does a project cost?",
@@ -505,6 +527,26 @@ export const FAQ: { q: string; a: string }[] = [
   {
     q: "What happens after launch?",
     a: "We keep refining after you're live, and you get handoff documentation so your team can run and change things without us.",
+  },
+  {
+    q: "Do you build on WordPress, Wix or Squarespace?",
+    a: "No. Every site is hand-built in code, with real motion and a layout made for every screen. Nothing is dropped in from a theme, so nothing has to be worked around later.",
+  },
+  {
+    q: "How many pages do I get?",
+    a: "Up to 15 pages in a standard site build, and the page count is settled on the discovery call rather than guessed at. Most businesses need fewer pages that each do more.",
+  },
+  {
+    q: "Will it work properly on phones?",
+    a: "Phones come first, not last. Every screen is checked at phone, tablet and desktop sizes, and the polish pass goes through contrast, keyboards and reduced motion one by one before launch.",
+  },
+  {
+    q: "Will Google be able to find it?",
+    a: "Yes. Every page ships its own text, headings, title, description and structured data before any script runs, with a sitemap and a canonical address, so search engines and AI assistants read the real page rather than an empty shell.",
+  },
+  {
+    q: "Can you rebuild something I already have?",
+    a: "Yes, and you keep what works: your domain, your email, your photos and any copy worth keeping. Redirects from your old pages are part of the build, so the rankings you already have move with you.",
   },
 ];
 
