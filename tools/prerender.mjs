@@ -36,7 +36,7 @@ globalThis.document = {
 };
 try { globalThis.navigator = { userAgent: "prerender", maxTouchPoints: 0 }; } catch { /* read-only in some runtimes */ }
 
-const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS, GUIDES, readingMinutes, guideMeta } = await import(
+const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS, GUIDES, readingMinutes, guideMeta, screen } = await import(
   path.join(ROOT, "dist-ssr/entry-server.js")
 );
 
@@ -278,10 +278,78 @@ const lastmod = (url) => {
     return d || null;
   } catch { return null; }
 };
+/**
+ * Images a page shows, as absolute URLs, for the image sitemap.
+ *
+ * Derived from each project's own records rather than scraped out of
+ * the rendered HTML: the HTML of a case file also contains the next
+ * case's thumbnail, and listing another project's screenshot under
+ * this URL tells Google the image belongs to the wrong page.
+ *
+ * The URL is what the page actually serves. `screen()` resolves a
+ * source JPEG to the generated WebP the markup points at, so the
+ * sitemap and the `src` attribute can never name different files.
+ *
+ * Only `image:loc` is emitted. Google removed `image:caption`,
+ * `image:title`, `image:geo_location` and `image:license` from the
+ * spec in 2022 and ignores them; the caption lives on the page, where
+ * it is read, and in the alt text.
+ */
+function imagesFor(url) {
+  const p = BUILT.find((x) => `/work/${x.slug}` === url);
+  if (!p) return [];
+
+  /* The folders this project's own screenshots live in. Derived from
+     its records because the folder name is not the slug — CG Walls &
+     Floors is /work/cgwalls — and because this is what separates its
+     images from the next case's thumbnail further down the page. */
+  const own = new Set(
+    [
+      ...(p.gallery || []).map((g) => g.image),
+      ...(p.sigs || []).map((s) => s.image),
+      ...(p.approach || []).map((a) => a.image),
+    ]
+      .filter(Boolean)
+      .map((src) => src.slice(0, src.lastIndexOf("/") + 1))
+  );
+
+  /* Read back what was actually written, rather than recomputing it.
+     Components do not agree on which variant they render — the gallery
+     grid uses the small one, the signatures use the large — so deriving
+     the URL a second time here listed files that exist but are not the
+     ones on the page. The rendered markup is the only source that
+     cannot disagree with itself. */
+  const html = fs.readFileSync(path.join(DIST, url.slice(1), "index.html"), "utf8");
+  const seen = new Set();
+  const out = [];
+  for (const m of html.matchAll(/<img[^>]*\ssrc="(\/work\/[^"]+)"/g)) {
+    const src = m[1];
+    if (![...own].some((dir) => src.startsWith(dir))) continue;
+    if (seen.has(src)) continue;
+    seen.add(src);
+    out.push(`${SITE}${src}`);
+  }
+  return out;
+}
+
+const sitemapEntries = pages.map(function entry(p) {
+  const loc = `${SITE}${p.url === "/" ? "/" : p.url}`;
+  const d = lastmod(p.url);
+  const images = imagesFor(p.url)
+    .map((src) => `\n    <image:image><image:loc>${src}</image:loc></image:image>`)
+    .join("");
+  return (
+    `  <url><loc>${loc}</loc>${d ? `<lastmod>${d}</lastmod>` : ""}` +
+    `<priority>${p.priority}</priority>${images}${images ? "\n  " : ""}</url>`
+  );
+});
+
 fs.writeFileSync(
   path.join(DIST, "sitemap.xml"),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-    pages.map((p) => `  <url><loc>${SITE}${p.url === "/" ? "/" : p.url}</loc>${(() => { const d = lastmod(p.url); return d ? `<lastmod>${d}</lastmod>` : ""; })()}<priority>${p.priority}</priority></url>`).join("\n") +
+  `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n` +
+    `        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n` +
+    sitemapEntries.join("\n") +
     `\n</urlset>\n`
 );
 fs.writeFileSync(path.join(DIST, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);

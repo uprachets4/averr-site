@@ -23,10 +23,17 @@ export default function Signatures({
   sigs,
   accent,
   number,
+  name,
 }: {
   sigs: BuiltSig[];
   accent: string;
   number: string;
+  /** The project, for alt text. Every other screenshot on the page
+   *  names the project it belongs to — "CG Walls & Floors: Project
+   *  gallery" — and these said only "Realtor intake", which reads as
+   *  nothing in an image search result or to a screen reader arriving
+   *  mid-page. */
+  name: string;
 }) {
   return (
     <section className="bb-sigs" aria-label="Signature moments">
@@ -70,7 +77,12 @@ export default function Signatures({
                       <p>{s.text}</p>
                     </div>
                     <div className="bb-sframe">
-                      <img src={screen(s.image).large} alt={s.title} loading="lazy" decoding="async" />
+                      <img
+                        src={screen(s.image).large}
+                        alt={`${name}: ${s.title}`}
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </div>
                   </div>
                 </div>
