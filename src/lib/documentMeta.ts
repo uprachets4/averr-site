@@ -37,47 +37,80 @@ export function useDocumentMeta(title: string, description: string) {
 /**
  * The pairs, from the spec 34 audit table. Home's also lives in
  * `index.html` as the document default; the two must stay in step.
+ *
+ * ── the keyword map ───────────────────────────────────────────────
+ *
+ * Each entry carries the ONE search it is written to win. The map
+ * lives here, beside the titles, rather than in a document, because a
+ * keyword map in a document is a keyword map nobody opens before
+ * rewriting a title. `tools/keyword-map.test.ts` fails the build if
+ * two pages claim the same search, which is the whole point of having
+ * one: two pages competing for a query win neither.
+ *
+ * `target: null` means the page is not a search target — it is a
+ * utility page (privacy), a 404, or exists for a different job. That
+ * is a decision, not a gap to be filled.
+ *
+ * Case study targets are NOT here; each case file owns its own, in
+ * `builtByAverr.ts`, next to the project it describes.
+ *
+ * Known close pair, deliberately left alone: home and /services both
+ * read on "web design" and "Toronto". They are split by intent — home
+ * is the studio, /services is what you get and how long it takes —
+ * and Google generally resolves that. Indexing for the current titles
+ * was only just requested, so rewriting them now would throw that
+ * away to fix something not yet observed. The honest check is Search
+ * Console once impressions appear: if the two pages trade places on
+ * the same query, that is the signal to split them harder.
  */
 export const META = {
   home: {
     title: "Averr Studios | Web Design, Apps & AI Automation in Toronto",
     description:
       "A Toronto studio building websites, web apps, AI automation and marketing for businesses across the GTA. You work directly with the person who builds it.",
+    target: "toronto web design studio",
   },
   services: {
     title: "Web Design, Web Apps, AI & Marketing Services | Averr Studios",
     description:
       "Websites, web apps, AI automation and marketing for Toronto and GTA businesses. What's included, how long each takes, and a free 30-minute call to start.",
+    target: "web design services toronto",
   },
   about: {
     title: "About Averr Studios — Toronto Web Design and AI Studio",
     description:
       "Averr Studios is a Toronto studio where you work directly with the person who builds it. How we think and work, from the first call to launch.",
+    target: "toronto web designer",
   },
   contact: {
     title: "Contact Averr Studios — Book a Free 30-Minute Call",
     description:
       "Write to Averr Studios or book a free 30-minute call about your website, web app, AI automation or marketing in Toronto and the GTA. Replies within 24 hours.",
+    target: "book a web design call toronto",
   },
   work: {
     title: "Website, Web App and AI Case Studies | Averr Studios",
     description:
       "Real projects built by Averr Studios in Toronto: websites, web apps, AI automation and marketing, each with the problem, the build and the result.",
+    target: "web design case studies toronto",
   },
   privacy: {
     title: "Privacy — Averr Studios",
     description: "How Averr Studios handles the information you send us, including cookies and analytics.",
+    target: null,
   },
   card: {
     title: "Prachets Upadhyay, Founder of Averr Studios, Toronto",
     description:
       "Founder of Averr Studios, Toronto. Save my contact or book a 30-minute discovery call.",
+    target: "prachets upadhyay",
   },
   /** The 404 takes the home description, as the table specifies. */
   notFound: {
     title: "Not found — Averr Studios",
     description:
       "A Toronto studio building websites, web apps, AI automation and marketing for businesses across the GTA. You work directly with the person who builds it.",
+    target: null,
   },
 } as const;
 
