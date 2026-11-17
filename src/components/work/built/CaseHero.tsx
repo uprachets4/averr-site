@@ -1,4 +1,5 @@
 import { useEffect, useRef, type CSSProperties } from "react";
+import { Link } from "react-router-dom";
 import type { BuiltProject } from "../../../data/builtByAverr";
 import { SERVICE_COLOR, SERVICE_NAMES } from "../../../data/serviceColors";
 import { ThesisPill } from "./bits";
@@ -40,6 +41,28 @@ export default function CaseHero({ project, index }: { project: BuiltProject; in
       )}
 
       <div className="bb-wrap">
+        {/* The trail the BreadcrumbList schema has always claimed.
+            Every case file ships Home › Work › <project> to Google,
+            and Search Console is already showing the Breadcrumbs
+            enhancement — but the page itself never drew it, so the
+            markup described a structure a visitor could not see.
+            Drawing it makes the two agree, and gives each case file a
+            link back up to /work that isn't the browser's back
+            button. The separators are decorative; a screen reader
+            gets the list. */}
+        <nav className="bb-crumbs" aria-label="Breadcrumb">
+          <ol>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/work">Work</Link>
+            </li>
+            <li>
+              <span aria-current="page">{project.name}</span>
+            </li>
+          </ol>
+        </nav>
         <span className="bb-eyebrow">
           Case file {String(index + 1).padStart(2, "0")} <b>· {project.sector}</b>
         </span>

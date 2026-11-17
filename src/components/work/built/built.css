@@ -726,6 +726,53 @@
   position: relative;
   z-index: 1;
 }
+
+/* The visible breadcrumb, in the eyebrow's own typeface so it reads as
+   part of the case file's furniture rather than a browser chrome strip
+   bolted on top. 44px tap targets: this is the only way back up to
+   /work from a case file on a phone. */
+.bb-crumbs {
+  margin-bottom: 16px;
+}
+.bb-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bb-mute);
+}
+.bb-crumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+/* The separator is drawn, not typed, so it never reaches a screen
+   reader as a word in the middle of the project's name. */
+.bb-crumbs li + li::before {
+  content: "›";
+  color: var(--bb-mute);
+  opacity: 0.6;
+}
+.bb-crumbs a {
+  color: var(--bb-mute);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.3s, border-color 0.3s;
+}
+.bb-crumbs a:hover {
+  color: var(--bb-light, #f5f4f9);
+  border-bottom-color: currentColor;
+}
+.bb-crumbs [aria-current="page"] {
+  color: var(--bb-light, #f5f4f9);
+}
 .bb-chero h1 {
   font-size: clamp(33px, 4.59vw, 79px);
   letter-spacing: -0.065em;

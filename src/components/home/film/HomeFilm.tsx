@@ -410,12 +410,20 @@ export default function HomeFilm({ name, onName, pass }: FilmProps) {
                       </span>
                     ))}
                   </div>
+                  {/* The name goes to that project's own case file — it
+                      reads as the project, so it has to behave like it;
+                      `p.href` has always carried the study's URL and was
+                      simply not used. It is also the only route by which
+                      home links into a case study at all: before this,
+                      home's ten outgoing links all stopped at the index,
+                      and the case files got no internal links from the
+                      page that earns the most. */}
                   <h3>
-                    <Link to="/work" className="hf-namelink">{p.name}</Link>
+                    <Link to={p.href} className="hf-namelink">{p.name}</Link>
                   </h3>
                   <p>{p.line}</p>
-                  {/* Into the Work index, not the single case study: visitors
-                      land where they can see every project, not just this one. */}
+                  {/* This one stays on the index on purpose: it says "all
+                      our work", so that is where it goes. */}
                   <Link to="/work" style={{ "--c": p.color } as CSSProperties}>
                     See all our work →
                   </Link>

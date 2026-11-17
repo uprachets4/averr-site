@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test:dates": "node --test tools/business-days.test.ts",
-    "test:tokens": "node --test tools/about-tokens.test.ts"
+    "test:tokens": "node --test tools/about-tokens.test.ts",
+    "test:keywords": "node --test tools/keyword-map.test.ts"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",

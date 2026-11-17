@@ -1,4 +1,9 @@
-import { SCREENSHOTS } from "./screenshots";
+/* Extension is explicit so Node can resolve this module directly:
+   `tools/keyword-map.test.ts` imports BUILT, and Node's ESM resolver,
+   unlike Vite's, will not guess the `.ts`. `allowImportingTsExtensions`
+   is already on in both tsconfigs, so this is the same module either
+   way. */
+import { SCREENSHOTS } from "./screenshots.ts";
 import type { ServiceId } from "./serviceColors";
 
 /**
@@ -51,6 +56,24 @@ export type BuiltProject = {
   slug: string;
   name: string;
   sector: string;
+  /**
+   * The ONE search this case file is written to win, part of the
+   * keyword map that starts in `lib/documentMeta.ts`. It lives on the
+   * project rather than in a central table so that adding a project
+   * forces the question "what does this one rank for?" at the moment
+   * the project is added, instead of never.
+   *
+   * `tools/keyword-map.test.ts` fails if two pages claim the same one.
+   *
+   * These are industry-and-service searches, not client names: a buyer
+   * looking for someone who has done their kind of work does not know
+   * the client's name yet. Several of these targets are not fully
+   * carried by the generated title — `caseMeta` builds titles from the
+   * service kind ("Website Case Study"), not the sector — which is a
+   * real gap, logged rather than fixed here because retitling five
+   * indexed pages is its own change.
+   */
+  target: string;
   /** "2025 · ongoing" — the tail doubles as the status chip. */
   year: string;
   svc: ServiceId[];
@@ -86,6 +109,7 @@ export const BUILT: BuiltProject[] = [
     slug: "cg-walls-and-floors",
     name: "CG Walls & Floors",
     sector: "Home renovation, GTA",
+    target: "contractor website design toronto",
     year: "2025 · ongoing",
     svc: ["websites", "aiAutomation", "marketing"],
     c: "#F9AF97",
@@ -159,6 +183,7 @@ export const BUILT: BuiltProject[] = [
     slug: "sift",
     name: "SIFT",
     sector: "SaaS, job search",
+    target: "job search platform ux design",
     year: "2025 · ongoing",
     svc: ["webApps", "aiAutomation"],
     c: "#D5818C",
@@ -270,6 +295,7 @@ export const BUILT: BuiltProject[] = [
     slug: "express-contractors",
     name: "Express Contractors",
     sector: "Appliance installation, GTA",
+    target: "appliance installer website design",
     year: "2026 · live",
     svc: ["websites"],
     c: "#F9AF97",
@@ -378,6 +404,7 @@ export const BUILT: BuiltProject[] = [
     slug: "cadencestack",
     name: "CadenceStack",
     sector: "SaaS, LinkedIn presence",
+    target: "linkedin saas product design",
     year: "2025 · ongoing",
     svc: ["webApps", "aiAutomation", "marketing"],
     c: "#569AFA",
@@ -490,6 +517,7 @@ export const BUILT: BuiltProject[] = [
     slug: "capitalcommand",
     name: "CapitalCommand",
     sector: "Fintech, portfolio intelligence",
+    target: "fintech dashboard design",
     year: "2026 · internal alpha",
     svc: ["webApps", "aiAutomation"],
     c: "#9874E8",
