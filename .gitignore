@@ -15,3 +15,6 @@ assets-src/
 
 # build-time prerender bundle
 dist-ssr
+
+# QA harness output (screenshots + report), never committed
+audit-out/

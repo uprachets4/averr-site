@@ -268,7 +268,7 @@ export default function CaseStudy() {
       <Approach steps={project.approach} name={project.name} number={nApproach} />
       <BuildCards items={project.inventory} number={nBuilt} />
       {project.sigs.length ? (
-        <Signatures sigs={project.sigs} accent={project.c} number={nSigs} />
+        <Signatures sigs={project.sigs} accent={project.c} number={nSigs} name={project.name} />
       ) : null}
       <Gallery items={project.gallery} name={project.name} />
       <Outcome project={project} number={nOutcome} />

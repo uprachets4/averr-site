@@ -51,7 +51,7 @@ async function warm(url: string): Promise<string> {
 
 /* Data the prerender script needs to write each page's head. */
 export { META, caseMeta } from "./lib/documentMeta";
-export { BUILT } from "./data/builtByAverr";
+export { BUILT, screen } from "./data/builtByAverr";
 export { FAQ, SERVICES as SERVICE_CARDS } from "./data/servicesBuild";
 export { GUIDES, readingMinutes } from "./data/guides";
 export { guideMeta, sectionId } from "./pages/Guide";
