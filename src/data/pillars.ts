@@ -68,13 +68,10 @@ export const PILLARS: Record<ServiceId, Pillar> = {
        win. Worth revisiting which page should hold the stronger phrase
        once this one has ranking history of its own. */
     target: "custom website design toronto",
-    /* Ready — 2 case studies, 2 guides — and the only one that is.
-       Flipping this to true is the page's own change, so that the
-       readiness rules guard the flip instead of being checked by hand
-       after the fact. */
-    live: false,
-    waitingOn:
-      "only the page. Proof and cluster are both in place, so this is the pillar to build first and the pattern for the rest.",
+    /* The first pillar to ship. The readiness rules guarded this flip:
+       2 websites-led case files and 2 guides behind it, which is what
+       `a live pillar is a ready pillar` checks on every run. */
+    live: true,
   },
   webApps: {
     slug: "web-apps",

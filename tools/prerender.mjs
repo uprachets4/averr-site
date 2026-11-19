@@ -184,6 +184,18 @@ const pages = [
       crumbs([["Home", "/"], ["Services", "/services"]]),
     ],
   },
+  /* The first pillar page. Its own Service node is the describing one
+     — this is the URL the entity now lives at, so `serviceUrl` points
+     here rather than at the overview's fragment, and the case files and
+     guides that reference it resolve to a real page. */
+  {
+    url: "/services/websites", meta: META.serviceWebsites, og: "service-websites", priority: "0.9",
+    graph: [
+      studio,
+      serviceNode("websites", { full: true }),
+      crumbs([["Home", "/"], ["Services", "/services"], ["Websites", "/services/websites"]]),
+    ],
+  },
   { url: "/work", meta: META.work, og: "work", priority: "0.9", graph: [studio, crumbs([["Home", "/"], ["Work", "/work"]])] },
   ...BUILT.map((p) => ({
     url: `/work/${p.slug}`,
@@ -328,6 +340,12 @@ fs.writeFileSync(
 const SOURCES = {
   "/": ["src/pages/Home.tsx", "src/components/home", "src/data/servicesBuild.ts"],
   "/services": ["src/pages/Services.tsx", "src/components/services", "src/data/servicesBuild.ts"],
+  "/services/websites": [
+    "src/pages/ServiceWebsites.tsx",
+    "src/components/services/websites",
+    "src/data/serviceWebsites.ts",
+    "src/data/pillars.ts",
+  ],
   "/work": ["src/pages/Work.tsx", "src/components/work", "src/data/builtByAverr.ts"],
   "/about": ["src/pages/About.tsx", "src/components/about"],
   "/contact": ["src/pages/Contact.tsx", "src/components/contact"],

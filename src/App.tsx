@@ -15,6 +15,7 @@ import Home from "./pages/Home";
  * page that matters most. Everything else splits.
  */
 const Services = lazy(() => import("./pages/Services"));
+const ServiceWebsites = lazy(() => import("./pages/ServiceWebsites"));
 const Guides = lazy(() => import("./pages/Guides"));
 const Guide = lazy(() => import("./pages/Guide"));
 const Work = lazy(() => import("./pages/Work"));
@@ -72,6 +73,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/services" element={<Services />} />
+                <Route path="/services/websites" element={<ServiceWebsites />} />
                 <Route path="/guides" element={<Guides />} />
                 <Route path="/guides/:slug" element={<Guide />} />
                 <Route path="/work" element={<Work />} />

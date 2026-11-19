@@ -54,6 +54,7 @@ function entries(): { url: string; target: string | null; shipped?: boolean }[] 
   const routes: Record<keyof typeof META, string> = {
     home: "/",
     services: "/services",
+    serviceWebsites: "/services/websites",
     about: "/about",
     contact: "/contact",
     work: "/work",
@@ -77,13 +78,16 @@ function entries(): { url: string; target: string | null; shipped?: boolean }[] 
   for (const g of GUIDES) {
     out.push({ url: `/guides/${g.slug}`, target: g.target });
   }
-  /* Service pillars. A pillar can hold a target before it holds a
-     page: the phrase is decided once, so that a guide written next
-     week cannot quietly claim the search its own pillar is for. */
+  /* Pillars that have reserved a search but have no page yet. The
+     phrase is decided once, so a guide written next week cannot
+     quietly claim the search its own pillar is for.
+     A live pillar is not pushed here: it has a META entry of its own
+     above, which reads its target straight off the registry, so adding
+     it again would be the same decision counted twice. */
   for (const id of Object.keys(PILLARS) as ServiceId[]) {
     const p = PILLARS[id];
-    if (p.target === null) continue;
-    out.push({ url: `/services/${p.slug}`, target: p.target, shipped: p.live });
+    if (p.live || p.target === null) continue;
+    out.push({ url: `/services/${p.slug}`, target: p.target, shipped: false });
   }
   return out;
 }
