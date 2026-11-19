@@ -76,6 +76,23 @@ export type BuiltProject = {
   target: string;
   /** "2025 · ongoing" — the tail doubles as the status chip. */
   year: string;
+  /**
+   * The services this project involved, **lead service first**.
+   *
+   * Ordering carries meaning here, which it did not used to: the first
+   * entry is the job the client actually hired for, and the rest are
+   * what the build also ended up covering. CG Walls & Floors is a
+   * website that grew automation and growth work, so it reads
+   * `["websites", "aiAutomation", "marketing"]` — it is not a
+   * marketing case study.
+   *
+   * `tools/keyword-map.test.ts` counts only lead appearances when it
+   * decides whether a service pillar has enough proof to deserve a
+   * page. That distinction is the whole difference between a service
+   * page backed by work and one backed by a tag: by raw tag counts
+   * Marketing looks ready, and by lead counts it has nothing. Reorder
+   * this array and you change what the site is allowed to claim.
+   */
   svc: ServiceId[];
   /** The case accent. Always one of the four service colours. */
   c: string;

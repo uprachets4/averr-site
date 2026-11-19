@@ -2,6 +2,7 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import type { BuiltProject } from "../../../data/builtByAverr";
 import { SERVICE_COLOR, SERVICE_NAMES } from "../../../data/serviceColors";
+import { pillarHref } from "../../../data/pillars";
 import { ThesisPill } from "./bits";
 import Slideshow from "./Slideshow";
 
@@ -81,13 +82,20 @@ export default function CaseHero({ project, index }: { project: BuiltProject; in
           </div>
           <div>
             <b>Services</b>
+            {/* These were plain text, which left every case file a dead
+                end service-wise: the strongest proof on the site named
+                the service it proved and offered no way to go buy it.
+                `pillarHref` sends each one to its own page where that
+                exists and to its section on the overview where it does
+                not, so this markup does not change again when a pillar
+                ships. */}
             <span className="bb-svcs">
               {project.svc.map(function service(id) {
                 return (
-                  <em key={id}>
+                  <Link key={id} to={pillarHref(id)} className="bb-svclink">
                     <i className="bb-dot" style={{ "--c": SERVICE_COLOR[id] } as CSSProperties} />
                     {SERVICE_NAMES[id]}
-                  </em>
+                  </Link>
                 );
               })}
             </span>

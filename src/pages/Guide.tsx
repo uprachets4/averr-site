@@ -6,6 +6,8 @@ import {
   type Block,
   type Guide as GuideData,
 } from "../data/guides";
+import { pillarHref } from "../data/pillars";
+import { SERVICE_NAMES } from "../data/serviceColors";
 import { useDocumentMeta } from "../lib/documentMeta";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import NotFound from "./NotFound";
@@ -131,6 +133,27 @@ function Article({ g }: { g: GuideData }) {
               </>
             ) : null}
           </div>
+
+          {/* The service this guide belongs to. Every guide used to end
+              at /contact and nowhere else, so a reader who arrived on
+              "why is my website slow" and wanted it fixed had to work
+              out for themselves that we do that. This is the cluster
+              pointing at its pillar — the link a search engine follows
+              to learn the two are about the same thing, and the one a
+              reader follows when the article has convinced them. */}
+          {g.svc.length > 0 ? (
+            <p className="gpart">
+              Part of{" "}
+              {g.svc.map(function svc(id, i) {
+                return (
+                  <span key={id}>
+                    {i > 0 ? (i === g.svc.length - 1 ? " and " : ", ") : null}
+                    <Link to={pillarHref(id)}>{SERVICE_NAMES[id]}</Link>
+                  </span>
+                );
+              })}
+            </p>
+          ) : null}
 
           <nav className="gtoc" aria-labelledby="gtoch">
             <h2 id="gtoch">What's in this guide</h2>
