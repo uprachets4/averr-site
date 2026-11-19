@@ -196,6 +196,14 @@ const pages = [
       crumbs([["Home", "/"], ["Services", "/services"], ["Websites", "/services/websites"]]),
     ],
   },
+  {
+    url: "/services/web-apps", meta: META.serviceWebApps, og: "service-web-apps", priority: "0.9",
+    graph: [
+      studio,
+      serviceNode("webApps", { full: true }),
+      crumbs([["Home", "/"], ["Services", "/services"], ["Web apps", "/services/web-apps"]]),
+    ],
+  },
   { url: "/work", meta: META.work, og: "work", priority: "0.9", graph: [studio, crumbs([["Home", "/"], ["Work", "/work"]])] },
   ...BUILT.map((p) => ({
     url: `/work/${p.slug}`,
@@ -340,10 +348,18 @@ fs.writeFileSync(
 const SOURCES = {
   "/": ["src/pages/Home.tsx", "src/components/home", "src/data/servicesBuild.ts"],
   "/services": ["src/pages/Services.tsx", "src/components/services", "src/data/servicesBuild.ts"],
+  /* Both pillars share the component, the stylesheet and the copy
+     module, so they share most of their lastmod inputs too. */
   "/services/websites": [
     "src/pages/ServiceWebsites.tsx",
-    "src/components/services/websites",
-    "src/data/serviceWebsites.ts",
+    "src/components/services/pillar",
+    "src/data/pillarPages.ts",
+    "src/data/pillars.ts",
+  ],
+  "/services/web-apps": [
+    "src/pages/ServiceWebApps.tsx",
+    "src/components/services/pillar",
+    "src/data/pillarPages.ts",
     "src/data/pillars.ts",
   ],
   "/work": ["src/pages/Work.tsx", "src/components/work", "src/data/builtByAverr.ts"],

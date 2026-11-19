@@ -33,6 +33,24 @@ export type Pillar = {
   /** URL segment under /services. Kebab-case; the ServiceId is camel. */
   slug: string;
   /**
+   * The capability records from `PILLAR_SERVICES` this page lists,
+   * by name, in the order they should read.
+   *
+   * Declared rather than derived, and the first version was derived:
+   * a record was taken to belong here if any case file backing it was
+   * led by this service. That gave the right two records for Websites
+   * and was a coincidence. Applied to Web Apps it pulled in "Marketing
+   * websites", because Sift is cited as proof of that capability while
+   * being a web-app build — `proof` means "work that demonstrates
+   * this", not "work this service leads".
+   *
+   * Which capability belongs on which service page is an editorial
+   * call, so it is written down. `tools/keyword-map.test.ts` asserts
+   * every name here resolves to a real record, so a rename shows up as
+   * a failing test rather than as a page quietly missing a row.
+   */
+  capabilities: string[];
+  /**
    * The one search this pillar owns, or null while it has no page.
    * Unique across the whole site — `tools/keyword-map.test.ts` fails
    * if two pages claim one search.
@@ -62,6 +80,7 @@ export type Pillar = {
 export const PILLARS: Record<ServiceId, Pillar> = {
   websites: {
     slug: "websites",
+    capabilities: ["Brand & design direction", "Marketing websites", "Post-launch refinement"],
     /* /services keeps "web design services toronto": it is indexed
        under that phrase already and it genuinely is the overview. This
        is the narrower buying search, which is what a pillar should
@@ -75,13 +94,17 @@ export const PILLARS: Record<ServiceId, Pillar> = {
   },
   webApps: {
     slug: "web-apps",
-    target: null,
-    live: false,
-    waitingOn:
-      "guides. Sift, CadenceStack and CapitalCommand are real proof, but no guide supports this service, so the page would ship with nothing linking up to it.",
+    capabilities: ["Product & SaaS interfaces", "Design systems", "Human review built in", "Post-launch refinement"],
+    target: "web app development toronto",
+    /* Second pillar to ship. It was waiting on guides, not on build
+       time — "website vs web app" and "when to replace a spreadsheet"
+       were written to unlock it, and the readiness rule flipped to
+       READY on its own once they existed. */
+    live: true,
   },
   aiAutomation: {
     slug: "ai-automation",
+    capabilities: ["Workflow audit", "AI agents", "Tool integration", "Handoff documentation"],
     target: null,
     live: false,
     waitingOn:
@@ -89,6 +112,7 @@ export const PILLARS: Record<ServiceId, Pillar> = {
   },
   marketing: {
     slug: "marketing",
+    capabilities: ["Local search", "Outreach campaigns", "Content", "Reporting"],
     target: null,
     live: false,
     waitingOn:

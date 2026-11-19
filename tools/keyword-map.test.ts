@@ -37,6 +37,7 @@ import { META } from "../src/lib/documentMeta.ts";
 import { BUILT } from "../src/data/builtByAverr.ts";
 import { GUIDES } from "../src/data/guides.ts";
 import { PILLARS } from "../src/data/pillars.ts";
+import { PILLAR_SERVICES } from "../src/data/servicePillars.ts";
 import type { ServiceId } from "../src/data/serviceColors.ts";
 
 /**
@@ -55,6 +56,7 @@ function entries(): { url: string; target: string | null; shipped?: boolean }[] 
     home: "/",
     services: "/services",
     serviceWebsites: "/services/websites",
+    serviceWebApps: "/services/web-apps",
     about: "/about",
     contact: "/contact",
     work: "/work",
@@ -153,6 +155,34 @@ test("a live pillar is a ready pillar", function ready() {
       typeof p.target,
       "string",
       `/services/${p.slug} is live but owns no search. Give it one — that is what the page is for.`
+    );
+  }
+});
+
+test("every capability a pillar lists actually exists", function resolves() {
+  /* The capability rows were derived once — a record belonged to a
+     pillar if any case file backing it was led by that service — and
+     that was right for Websites by luck and wrong for Web Apps, which
+     inherited "Marketing websites" because Sift is cited as proof of
+     it. They are declared by name now, and a name resolves against the
+     records or it does not. Without this, a rename in
+     servicePillars.ts would quietly drop a row from a live page and
+     the build would stay green. */
+  const known = new Set(Object.values(PILLAR_SERVICES).flat().map((c) => c.name));
+  for (const id of Object.keys(PILLARS) as ServiceId[]) {
+    for (const name of PILLARS[id].capabilities) {
+      assert.ok(
+        known.has(name),
+        `PILLARS.${id} lists the capability "${name}", which no record in PILLAR_SERVICES provides. ` +
+          `Either it was renamed there, or it was mistyped here — and the page would just be missing a row.`
+      );
+    }
+  }
+  for (const id of Object.keys(PILLARS) as ServiceId[]) {
+    if (!PILLARS[id].live) continue;
+    assert.ok(
+      PILLARS[id].capabilities.length > 0,
+      `/services/${PILLARS[id].slug} is live and lists no capabilities. The page would open on an empty section.`
     );
   }
 });

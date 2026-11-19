@@ -1,11 +1,16 @@
-/* /services/websites — the Websites pillar.
+/* Service pillar pages — the shared layout.
+ *
+ * Written for /services/websites and generalised when Web Apps
+ * arrived, which is the right moment: one stylesheet means a spacing
+ * or contrast fix lands on every pillar at once rather than three
+ * times, and the third page is data.
  *
  * Layered on services.css rather than replacing it: the pillar and the
  * overview share one vocabulary, and everything here is either an
  * override where one service differs from four, or a pattern /services
  * has no equivalent of (the case cards, the guide list).
  *
- * `--acc` is set on .sv-web by the page, from SERVICE_COLOR.websites.
+ * `--acc` is set on .sv-pillar by the page, from SERVICE_COLOR.websites.
  */
 
 /* ---------- one service, not four ---------- */
@@ -15,10 +20,10 @@
    there is true of all four, so one service's colour would say the
    wrong thing. This page is the inverse — it is about one service, so
    the gradient would be the thing that lies. */
-.sv-web .wgt {
+.sv-pillar .wgt {
   color: var(--acc);
 }
-.sv-web .inc .incrow i {
+.sv-pillar .inc .incrow i {
   background: var(--acc);
 }
 
@@ -26,19 +31,19 @@
    the most interactive thing on the site, and a quieter echo of it
    here would invite the comparison. Shorter, so the first case card is
    close to the fold on a laptop. */
-.sv-web .whero {
+.sv-pillar .whero {
   min-height: 0;
   padding-block: 132px 64px;
 }
 
 /* ---------- breadcrumbs ---------- */
 
-.sv-web .wcrumbs {
+.sv-pillar .wcrumbs {
   padding-top: 96px;
   padding-bottom: 0;
   font-size: 14px;
 }
-.sv-web .wcrumbs ol {
+.sv-pillar .wcrumbs ol {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -47,7 +52,7 @@
   padding: 0;
   list-style: none;
 }
-.sv-web .wcrumbs li {
+.sv-pillar .wcrumbs li {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -56,11 +61,11 @@
   min-height: 44px;
   color: var(--mute);
 }
-.sv-web .wcrumbs li + li::before {
+.sv-pillar .wcrumbs li + li::before {
   content: "›";
   opacity: 0.45;
 }
-.sv-web .wcrumbs a {
+.sv-pillar .wcrumbs a {
   color: inherit;
   text-decoration: none;
   border-bottom: 1px solid transparent;
@@ -72,22 +77,22 @@
   align-items: center;
   padding-block: 4px;
 }
-.sv-web .wcrumbs a:hover {
+.sv-pillar .wcrumbs a:hover {
   border-bottom-color: currentColor;
 }
-.sv-web .wcrumbs [aria-current="page"] {
+.sv-pillar .wcrumbs [aria-current="page"] {
   color: var(--light);
 }
 
 /* ---------- proof ---------- */
 
-.sv-web .wlede {
+.sv-pillar .wlede {
   margin-top: 16px;
   max-width: 54ch;
   color: var(--mute);
 }
 
-.sv-web .wcases {
+.sv-pillar .wcases {
   /* Two case files, so two columns that become one — not a grid built
      for a count the data does not have. If a third websites-led project
      ships, this wraps rather than squeezing. */
@@ -99,10 +104,10 @@
   list-style: none;
 }
 
-.sv-web .wcase {
+.sv-pillar .wcase {
   display: flex;
 }
-.sv-web .wcaselink {
+.sv-pillar .wcaselink {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -118,7 +123,7 @@
     border-color 0.4s,
     box-shadow 0.4s;
 }
-.sv-web .wcaselink:hover {
+.sv-pillar .wcaselink:hover {
   transform: translateY(-4px);
   border-color: color-mix(in srgb, var(--c) 55%, transparent);
   /* Tinted with the project's own colour rather than black, the way
@@ -128,59 +133,59 @@
     0 12px 32px color-mix(in srgb, var(--c) 14%, transparent);
 }
 
-.sv-web .wcasetop {
+.sv-pillar .wcasetop {
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 13px;
   color: var(--mute);
 }
-.sv-web .wcasetop i {
+.sv-pillar .wcasetop i {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--c);
   flex: none;
 }
-.sv-web .wyear {
+.sv-pillar .wyear {
   margin-left: auto;
   font-family: var(--font-mono);
 }
 
-.sv-web .wname {
+.sv-pillar .wname {
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: clamp(22px, 2.1vw, 30px);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.15;
 }
-.sv-web .wthesis {
+.sv-pillar .wthesis {
   /* The same value .incrow p uses, so proof copy and list copy read at
      one weight rather than two. --mute is for labels, not sentences. */
   color: rgba(245, 244, 249, 0.82);
   line-height: 1.55;
 }
-.sv-web .wmore {
+.sv-pillar .wmore {
   margin-top: auto;
   padding-top: 6px;
   font-size: 14px;
   font-weight: 500;
   color: var(--light);
 }
-.sv-web .wcaselink:hover .wmore {
+.sv-pillar .wcaselink:hover .wmore {
   color: var(--c);
 }
 
 /* ---------- the cluster ---------- */
 
-.sv-web .wguides {
+.sv-pillar .wguides {
   display: grid;
   gap: 2px;
   margin: 44px 0 0;
   padding: 0;
   list-style: none;
 }
-.sv-web .wguides a {
+.sv-pillar .wguides a {
   display: grid;
   gap: 6px;
   padding: 24px 0;
@@ -189,23 +194,23 @@
   color: inherit;
   transition: opacity 0.3s;
 }
-.sv-web .wguides li:last-child a {
+.sv-pillar .wguides li:last-child a {
   border-bottom: 1px solid var(--faint);
 }
-.sv-web .wguides strong {
+.sv-pillar .wguides strong {
   font-weight: 500;
   font-size: clamp(18px, 1.5vw, 22px);
   letter-spacing: -0.015em;
 }
-.sv-web .wguides a:hover strong {
+.sv-pillar .wguides a:hover strong {
   color: var(--acc);
 }
-.sv-web .wgdek {
+.sv-pillar .wgdek {
   color: rgba(245, 244, 249, 0.82);
   max-width: 68ch;
   line-height: 1.55;
 }
-.sv-web .wgmeta {
+.sv-pillar .wgmeta {
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.04em;
@@ -217,20 +222,20 @@
 /* ---------- mobile ---------- */
 
 @media (max-width: 900px) {
-  .sv-web .wcrumbs {
+  .sv-pillar .wcrumbs {
     padding-top: 84px;
   }
-  .sv-web .whero {
+  .sv-pillar .whero {
     padding-block: 104px 48px;
   }
-  .sv-web .wcaselink {
+  .sv-pillar .wcaselink {
     padding: 24px;
   }
-  .sv-web .wcases {
+  .sv-pillar .wcases {
     gap: 16px;
     margin-top: 32px;
   }
-  .sv-web .wguides a {
+  .sv-pillar .wguides a {
     padding: 20px 0;
   }
 }
@@ -238,16 +243,16 @@
 /* Hover is the only thing revealing the card lift, so on touch the
    border carries a hint of the project's colour permanently. */
 @media (hover: none) {
-  .sv-web .wcaselink {
+  .sv-pillar .wcaselink {
     border-color: color-mix(in srgb, var(--c) 30%, var(--faint));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sv-web .wcaselink {
+  .sv-pillar .wcaselink {
     transition: none;
   }
-  .sv-web .wcaselink:hover {
+  .sv-pillar .wcaselink:hover {
     transform: none;
   }
 }
