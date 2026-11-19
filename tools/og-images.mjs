@@ -19,6 +19,7 @@ const CARDS = [
   { id: "home", eyebrow: "A full-service studio · Toronto", title: "Websites, Web Apps, AI Automation and Marketing.", sub: "For businesses that want to be Taken Seriously." },
   { id: "services", eyebrow: "Services", title: "Four services. Built around your business.", sub: "Websites · Web Apps · AI Automation · Marketing" },
   { id: "service-websites", eyebrow: "Websites · Toronto & the GTA", title: "A custom website, built by hand.", sub: "Designed and built by the person you brief, in 2 – 3 weeks." },
+  { id: "service-web-apps", eyebrow: "Web apps · Toronto & the GTA", title: "Software for what a spreadsheet stopped holding.", sub: "Dashboards, internal tools and client portals, built by the person you brief." },
   { id: "guide-website-vs-web-app", eyebrow: "Guide", title: "Website or web app?", sub: "Does anyone log in and change something? That is the whole question." },
   { id: "guide-replace-spreadsheet", eyebrow: "Guide", title: "When a spreadsheet stops working.", sub: "Four signs you have outgrown it, and what replacing it actually buys." },
   { id: "guides", eyebrow: "Guides", title: "Guides for Toronto businesses.", sub: "The things we get asked about most, in plain language." },

@@ -92,6 +92,12 @@ export const META = {
        things to keep in step. */
     target: PILLARS.websites.target,
   },
+  serviceWebApps: {
+    title: "Web App Development in Toronto | Averr Studios",
+    description:
+      "Dashboards, internal tools and client portals for Toronto and GTA businesses, built by the person you brief. What a build includes, three tools in daily use, and a free 30-minute call.",
+    target: PILLARS.webApps.target,
+  },
   about: {
     title: "About Averr Studios — Toronto Web Design and AI Studio",
     description:
