@@ -720,7 +720,282 @@ const wixVsCustom: Guide = {
   ],
 };
 
-export const GUIDES: Guide[] = [googleMaps, searchConsole, siteSpeed, wixVsCustom];
+/**
+ * The Web Apps cluster.
+ *
+ * Both of these exist to unlock /services/web-apps: three case files
+ * carry web-app work as the lead service and no guide supported it, so
+ * the readiness rule in `tools/keyword-map.test.ts` would not let that
+ * page ship. Which is the rule working — a pillar with nothing linking
+ * up to it is a leaf.
+ *
+ * They are the two questions that actually precede hiring someone to
+ * build software: whether the thing you need is a site or an app, and
+ * the moment a spreadsheet stops being the right tool. Neither is a
+ * pitch; both tell a reader when to keep what they have.
+ */
+const websiteVsWebApp: Guide = {
+  slug: "website-vs-web-app",
+  title: "Website or web app: which one your business actually needs",
+  target: "website vs web app",
+  svc: ["webApps"],
+  close:
+    "If the question at the end of this points you at an app, that's the kind of thing we build — Sift, CadenceStack and CapitalCommand are all on this site. If it points you at a website and a form, say so on the call and we'll scope that instead.",
+  dek: "The difference that matters is not technical and nobody asks it plainly: does anyone log in and change something? Here is the line, and the expensive mistake people make on both sides of it.",
+  published: "2026-11-19",
+  checked: "2026-11-19",
+  og: "guide-website-vs-web-app",
+  intro: [
+    {
+      t: "p",
+      text: "Most people arrive at this question having been quoted wildly different numbers by different people, which usually means they were quoted for different things. The words are the problem: a website and a web app are built the same way, by the same people, in the same languages. What separates them is what the thing does once it is live.",
+    },
+  ],
+  sections: [
+    {
+      h: "The difference, in one question",
+      blocks: [
+        {
+          t: "p",
+          text: "Does somebody log in and change something that other people then see?",
+        },
+        {
+          t: "p",
+          text: "If no, you need a website. It can be beautiful, it can be long, it can have a booking form and a map and a gallery — it is still a website, because it tells people things and the things it tells them change only when you change them.",
+        },
+        {
+          t: "p",
+          text: "If yes, you need a web app. The moment there are accounts, and what you see depends on who you are, you have crossed into software. Everything expensive about an app follows from that one fact.",
+        },
+      ],
+    },
+    {
+      h: "Signs it is a website",
+      blocks: [
+        {
+          t: "ul",
+          items: [
+            "You want to be found, be credible, and get calls or bookings.",
+            "The content changes weekly at most, and only you change it.",
+            "Nobody needs an account to get value from it.",
+            "The most complex thing it does is take a form and email it to you.",
+            "You can describe everything it should do in one paragraph without using the word 'dashboard'.",
+          ],
+        },
+      ],
+    },
+    {
+      h: "Signs it is a web app",
+      blocks: [
+        {
+          t: "ul",
+          items: [
+            "Different people see different things depending on who they are.",
+            "Something has a status that moves — pending, approved, shipped, paid.",
+            "Two people might need to work on the same record without overwriting each other.",
+            "You care what happened last Tuesday and who did it.",
+            "You are currently doing the job in a spreadsheet and the spreadsheet is losing.",
+          ],
+        },
+      ],
+    },
+    {
+      h: "The expensive mistake, in both directions",
+      blocks: [
+        {
+          t: "p",
+          text: "Building an app when a site and a form would do is the one people warn you about, and it is real: you pay for accounts, permissions and states that nobody uses, and you end up maintaining software instead of running a business.",
+        },
+        {
+          t: "p",
+          text: "The other direction is more common and quieter. A site grows one app-shaped feature, then another, each one added as a plugin or an embed because the site already exists. Two years later the business runs on six tools that do not talk to each other, and the real cost is not the tools — it is the half-hour a day somebody spends copying between them.",
+        },
+        {
+          t: "note",
+          label: "The honest middle case",
+          text: "Plenty of businesses need a website with exactly one app-like feature — a client portal, a quote builder, a booking system with real availability. That is a website with a small app attached, and it should be scoped as such rather than as either extreme. If someone quotes you a full platform for it, get a second opinion.",
+        },
+      ],
+    },
+    {
+      h: "What actually changes when it is an app",
+      blocks: [
+        {
+          t: "p",
+          text: "This is the part that explains the price difference, and it is worth understanding before anyone quotes you:",
+        },
+        {
+          t: "ol",
+          items: [
+            "Accounts. Signing up, signing in, forgetting a password, leaving the company. Each one is a path that has to work.",
+            "Permissions. Who can see what, and who can change what. This is where most of the thinking goes, and it is invisible in a demo.",
+            "State. A thing that can be pending or approved can also be wrongly approved, approved twice, or approved by someone who should not have.",
+            "History. Knowing who changed what and when, which you will want the first time something is wrong.",
+            "What happens when it breaks. A broken website is embarrassing. A broken app stops people working.",
+          ],
+        },
+        {
+          t: "p",
+          text: "None of that is visible on a page. All of it is why an app takes longer than a site, and why the honest answer to 'how long' is that it depends on how many of those five you actually need.",
+        },
+      ],
+    },
+    {
+      h: "How to come to a call ready",
+      blocks: [
+        {
+          t: "p",
+          text: "You do not need a spec. You need the answer to three things, and if you have them the scope writes itself:",
+        },
+        {
+          t: "ol",
+          items: [
+            "Who logs in, and what are they trying to get done in under a minute?",
+            "What is the one record the whole thing revolves around — a job, an order, a client, an application?",
+            "What are you doing by hand today that you would stop doing?",
+          ],
+        },
+        {
+          t: "p",
+          text: "If you can answer those, you know which of the two you need, and so will anyone you ask.",
+        },
+      ],
+    },
+  ],
+};
+
+const spreadsheetToSoftware: Guide = {
+  slug: "when-to-replace-a-spreadsheet",
+  title: "When to stop running your business on a spreadsheet",
+  target: "replace spreadsheet with custom software",
+  svc: ["webApps"],
+  close:
+    "Replacing a spreadsheet that is still working is a waste of money, and we'll tell you if that's what you have. If two of the four signs above are true, that's the conversation worth having — it's most of what we build.",
+  dek: "Spreadsheets are better tools than people admit, right up to a specific breaking point. Here are the four signs you have passed it, and what replacing one actually buys you.",
+  published: "2026-11-19",
+  checked: "2026-11-19",
+  og: "guide-replace-spreadsheet",
+  intro: [
+    {
+      t: "p",
+      text: "Almost every business we build software for was running the job in a spreadsheet first, and that is the correct order. A spreadsheet is the cheapest way to find out what the work actually is. The question is never whether spreadsheets are good — it is whether yours has stopped being a tool and started being a liability.",
+    },
+  ],
+  sections: [
+    {
+      h: "What a spreadsheet is genuinely better at",
+      blocks: [
+        {
+          t: "p",
+          text: "Before the case against, the case for, because it is strong and it is why you should not call anyone yet if these are true:",
+        },
+        {
+          t: "ul",
+          items: [
+            "The process is still changing. A spreadsheet changes in seconds; software changes in days.",
+            "One person uses it, and that person is you.",
+            "You need to see everything at once and do arithmetic on it.",
+            "The job is genuinely a table. Not everything is.",
+            "You are not sure the process will exist in six months.",
+          ],
+        },
+        {
+          t: "p",
+          text: "If that is your situation, keep the spreadsheet and spend the money on something that brings in work.",
+        },
+      ],
+    },
+    {
+      h: "The four signs you have outgrown it",
+      blocks: [
+        {
+          t: "ol",
+          items: [
+            "Two people need it at the same time, and you have started sending versions by email or keeping a 'master' copy.",
+            "You copy and paste between sheets, or between the sheet and something else, as part of the normal week.",
+            "There is a tab nobody will touch because they do not know what it will break.",
+            "You are the only person who understands how it works, and you have caught yourself explaining it for the third time.",
+          ],
+        },
+        {
+          t: "p",
+          text: "One of those is normal. Two is a signal. Three or four and the spreadsheet is now the bottleneck rather than the tool, and the cost is already being paid — in the time it takes, and in the mistakes nobody catches.",
+        },
+        {
+          t: "note",
+          label: "The sign that is actually a risk",
+          text: "The fourth one is different in kind. When one person is the only one who knows how the system works, the business has a single point of failure that no backup covers. That is worth fixing on its own, whether the fix is software or just writing it down.",
+        },
+      ],
+    },
+    {
+      h: "What you are actually buying, and it is not features",
+      blocks: [
+        {
+          t: "p",
+          text: "People expect software to do more than the spreadsheet. The useful version usually does less, and the value is in what it refuses:",
+        },
+        {
+          t: "ul",
+          items: [
+            "You cannot enter a date that is not a date, or a status that is not one of the real statuses.",
+            "Two people can work at once without one of them losing an hour.",
+            "Every change is attributable, so 'who moved this' has an answer.",
+            "The thing you do forty times a week takes one click instead of a copy, a paste and a check.",
+            "Somebody new can be shown how to use it in ten minutes.",
+          ],
+        },
+        {
+          t: "p",
+          text: "A spreadsheet lets you do anything, which is exactly why it lets you do the wrong thing. Constraints are the product.",
+        },
+      ],
+    },
+    {
+      h: "The mistake that wastes the money",
+      blocks: [
+        {
+          t: "p",
+          text: "The most common failure is rebuilding the spreadsheet as software — same columns, same tabs, same workarounds, now in a browser and harder to change. It feels safe because it is familiar, and it buys almost nothing.",
+        },
+        {
+          t: "p",
+          text: "Your spreadsheet is not the process. It is the shape the process took when a grid was the only tool available. Half of its columns exist to work around that grid, and those are the ones that should not survive the move. Anyone who takes your sheet and offers to build exactly that has skipped the part of the job that matters.",
+        },
+      ],
+    },
+    {
+      h: "A cheap first step, before you hire anyone",
+      blocks: [
+        {
+          t: "p",
+          text: "This costs nothing and will save you money whoever you end up working with:",
+        },
+        {
+          t: "ol",
+          items: [
+            "Write down the five things you do with the spreadsheet in a normal week, in the order you do them.",
+            "Next to each, write how long it takes and what goes wrong when it goes wrong.",
+            "Circle anything that is you moving data rather than you making a decision.",
+          ],
+        },
+        {
+          t: "p",
+          text: "What you circled is the scope. Bring that to any conversation and you will get a real quote instead of a guess, because you will have described the work rather than the table.",
+        },
+      ],
+    },
+  ],
+};
+
+export const GUIDES: Guide[] = [
+  googleMaps,
+  searchConsole,
+  siteSpeed,
+  wixVsCustom,
+  websiteVsWebApp,
+  spreadsheetToSoftware,
+];
 
 export const GUIDE_BY_SLUG: Record<string, Guide> = Object.fromEntries(
   GUIDES.map((g) => [g.slug, g])
