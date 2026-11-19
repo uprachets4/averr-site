@@ -181,11 +181,7 @@ function Article({ g }: { g: GuideData }) {
 
           <aside className="gend">
             <h2>Would you rather someone just did this?</h2>
-            <p>
-              Setting up a Google Business Profile is part of what we do for
-              clients in Toronto and the GTA, along with the website it points
-              at. Thirty minutes on a call and you'll know what it takes.
-            </p>
+            <p>{g.close}</p>
             <Link className="gcta" to="/contact">
               Book a free 30-minute call
             </Link>

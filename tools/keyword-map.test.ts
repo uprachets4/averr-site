@@ -173,6 +173,31 @@ test("every guide names a service it supports", function clustered() {
   }
 });
 
+test("every guide closes in its own words", function ownCloser() {
+  /* The closing paragraph was hardcoded in the page for a while, so
+     all four guides offered to set up a Google Business Profile and
+     three of them were closing on a subject the reader had not been
+     reading about. Requiring the copy to be present and to differ
+     from every other guide's is what catches that: identical closing
+     copy across two guides is the signature of exactly this mistake,
+     whether it comes from a shared constant or a paste. */
+  const seen = new Map<string, string>();
+  for (const g of GUIDES) {
+    const close = (g.close ?? "").trim();
+    assert.ok(
+      close.length > 0,
+      `/guides/${g.slug} has no closing copy. That is the paragraph a convinced reader sees last — write it for this guide.`
+    );
+    const first = seen.get(close);
+    assert.equal(
+      first,
+      undefined,
+      `/guides/${g.slug} and /guides/${first} close with identical copy. One of them is talking about the wrong subject.`
+    );
+    seen.set(close, g.slug);
+  }
+});
+
 test("no guide targets its own pillar's search", function noCannibalising() {
   for (const g of GUIDES) {
     for (const id of g.svc) {
