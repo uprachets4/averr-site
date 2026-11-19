@@ -824,11 +824,36 @@
   gap: 10px;
   flex-wrap: wrap;
 }
-.bb-facts .bb-svcs em {
+.bb-facts .bb-svcs em,
+.bb-facts .bb-svcs .bb-svclink {
   font-style: normal;
   display: inline-flex;
   gap: 7px;
   align-items: center;
+}
+/* A link in the facts strip, styled to stay a fact: the facts are
+   scanned, not read, so an underline on every service would turn four
+   quiet rows into a wall of blue. The underline arrives on hover and
+   the focus ring is left to the global style. 44px of touch target
+   via padding rather than a min-height, so the row keeps its rhythm. */
+.bb-facts .bb-svcs .bb-svclink {
+  color: inherit;
+  text-decoration: none;
+  padding-block: 4px;
+  border-radius: 4px;
+  transition: opacity 0.18s ease;
+}
+.bb-facts .bb-svcs .bb-svclink:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (hover: none) {
+  /* No hover to reveal it, so the affordance has to be permanent. */
+  .bb-facts .bb-svcs .bb-svclink {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  }
 }
 
 .bb-sec {

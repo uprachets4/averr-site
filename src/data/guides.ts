@@ -9,8 +9,13 @@
  * Guides are structured data, not JSX, for three reasons: the renderer
  * stays one component instead of one per article, `tools/prerender.mjs`
  * can build Article schema and a reading time from the same source,
- * and a guide can be checked — `tools/guides.test.ts` asserts the
+ * and a guide can be checked — `tools/keyword-map.test.ts` asserts the
  * shape rather than trusting that a new one was written correctly.
+ *
+ * (That line named `tools/guides.test.ts` for a while, which was never
+ * written. The rules live in the keyword-map test because a guide's
+ * target and the pillar it supports are the same decision as the rest
+ * of the map, and one enforced file beats two aspirational ones.)
  *
  * Every factual claim in a guide is either something done on this
  * studio's own profile, or checked against the vendor's own
@@ -19,6 +24,7 @@
  * stale it might be. Section 7 of the SEO checklist asks for a refresh
  * every six months; that date is the thing to refresh.
  */
+import type { ServiceId } from "./serviceColors";
 
 export type Block =
   | { t: "p"; text: string }
@@ -40,6 +46,20 @@ export type Guide = {
   /** The ONE search this guide targets — the keyword map covers guides
    *  too, and `tools/keyword-map.test.ts` fails if two pages claim it. */
   target: string;
+  /**
+   * The service(s) this guide sells. A guide is a cluster page: it
+   * earns traffic on a question and hands the reader up to the pillar
+   * that answers it commercially. Before this field existed every
+   * guide ended at /contact, so the traffic arrived and then had
+   * nowhere service-shaped to go.
+   *
+   * One declaration drives four things: the "part of" link on the
+   * guide, the guide list on the pillar page, the schema `about` edge,
+   * and the readiness rule in the keyword-map test that stops a pillar
+   * shipping without a cluster. Which is why it is a field and not a
+   * link typed into each page.
+   */
+  svc: ServiceId[];
   /** The standfirst under the h1, and the meta description's basis. */
   dek: string;
   /** ISO date the guide first went live. */
@@ -51,6 +71,24 @@ export type Guide = {
   og: string;
   intro: Block[];
   sections: GuideSection[];
+  /**
+   * The closing paragraph, written for this guide.
+   *
+   * This was one hardcoded paragraph in `Guide.tsx` offering to set up
+   * a Google Business Profile, which is right for exactly one of the
+   * four guides. The other three closed by offering a reader who had
+   * just finished an article on site speed, or Search Console, or
+   * builders-versus-custom, something unrelated to what they had just
+   * read — the weakest possible moment to lose them.
+   *
+   * It lives per guide rather than per service because the reader's
+   * position is what the closer has to answer: someone who has just
+   * read why their site is slow is not in the same place as someone
+   * weighing Wix. `tools/keyword-map.test.ts` requires it to be
+   * present and to differ from every other guide's, which is the rule
+   * that would have caught the original.
+   */
+  close: string;
 };
 
 /**
@@ -76,6 +114,12 @@ const googleMaps: Guide = {
   slug: "get-your-toronto-business-on-google-maps",
   title: "How to get your Toronto business on Google Maps",
   target: "get business on google maps toronto",
+  /* Local visibility is the marketing service's own subject. This
+     guide and the Search Console one are why Marketing has the
+     strongest cluster and the weakest proof of the four. */
+  svc: ["marketing"],
+  close:
+    "Setting up a Google Business Profile is part of what we do for clients in Toronto and the GTA, along with the website it points at. Thirty minutes on a call and you'll know what it takes.",
   dek: "A Google Business Profile is the single biggest thing a local business can do for itself, and most of the work is decisions rather than typing. Here is the whole process, in order, including the one choice that gets profiles suspended.",
   published: "2026-11-17",
   checked: "2026-11-17",
@@ -276,6 +320,9 @@ const searchConsole: Guide = {
   slug: "set-up-google-search-console",
   title: "How to set up Google Search Console, and what to actually look at",
   target: "set up google search console",
+  svc: ["marketing"],
+  close:
+    "Search Console will tell you what Google thinks of your site. Acting on it — fixing what's broken, writing what's missing, watching whether it worked — is the part we do for businesses across the GTA. Thirty minutes on a call and you'll know where yours actually stands.",
   dek: "Search Console is the only place Google tells you what it thinks of your site. Setting it up takes twenty minutes; knowing which four screens matter saves you from the other thirty.",
   published: "2026-11-17",
   checked: "2026-11-17",
@@ -419,6 +466,9 @@ const siteSpeed: Guide = {
   slug: "why-your-website-is-slow",
   title: "Why your website is slow, and what actually fixes it",
   target: "why is my website slow",
+  svc: ["websites"],
+  close:
+    "Everything above is ordinary work, and we do it while building rather than coming back to it afterwards — which is why this site scores what it does. If you'd rather not audit your own images and scripts, thirty minutes on a call and you'll know what yours needs.",
   dek: "Most speed advice is a list of fixes with no order. Here are the three numbers Google measures, the handful of things that actually cause a slow site, and the fixes ranked by how much they pay back.",
   published: "2026-11-17",
   checked: "2026-11-17",
@@ -549,6 +599,11 @@ const wixVsCustom: Guide = {
   slug: "wix-vs-custom-website",
   title: "Wix vs a custom website: which one your business actually needs",
   target: "wix vs custom website",
+  /* The clearest cluster page on the site: someone comparing a
+     builder to a custom build is one step from hiring. */
+  svc: ["websites"],
+  close:
+    "If the line in this guide puts you on the custom side, that's what we build. If it puts you on the builder side, we'll say so on the call rather than sell you something you don't need yet. Thirty minutes either way.",
   dek: "Site builders are genuinely good at some things and quietly expensive at others. Here is where the line falls, written by people who sell the custom side and will tell you when you do not need it.",
   published: "2026-11-17",
   checked: "2026-11-17",

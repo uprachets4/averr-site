@@ -36,7 +36,7 @@ globalThis.document = {
 };
 try { globalThis.navigator = { userAgent: "prerender", maxTouchPoints: 0 }; } catch { /* read-only in some runtimes */ }
 
-const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS, GUIDES, readingMinutes, guideMeta, screen } = await import(
+const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS, GUIDES, readingMinutes, guideMeta, screen, PILLARS } = await import(
   path.join(ROOT, "dist-ssr/entry-server.js")
 );
 
@@ -52,6 +52,11 @@ const FOUNDER_ID = `${SITE}/#prachets`;
    and Apple links here once each is verified and live. */
 const STUDIO_PROFILES = ["https://www.instagram.com/averrstudios"];
 const GTA = ["Toronto", "North York", "Scarborough", "Etobicoke", "Mississauga", "Brampton", "Vaughan", "Markham", "Richmond Hill", "Oakville"];
+/* Declared above `studio` because its offer catalogue builds service
+   nodes while this module initialises, and a const is not readable
+   before that point — the build failed outright when this sat further
+   down the file. */
+const SVC_NAME = { websites: "Website design and development", webApps: "Web app development", aiAutomation: "AI automation", marketing: "Digital marketing" };
 const SERVICE_DESC = {
   websites: "Brand and design direction, marketing websites, landing pages and online booking.",
   webApps: "Dashboards, client portals and internal systems built around how your business works.",
@@ -82,9 +87,18 @@ const studio = {
   hasOfferCatalog: {
     "@type": "OfferCatalog",
     name: "Services",
+    /* The compact node, not a bare @id and not a second full copy.
+       This used to restate the whole service inline, so the catalogue
+       and /services described the same four things as eight unrelated
+       nodes. A bare reference was the other extreme and was worse: the
+       catalogue travels with `studio` onto pages that define no Service
+       nodes, so on the home page it pointed at four things that were
+       not there. Carrying @id, name and url makes it stand alone on
+       whatever page it lands, and the @id still ties it to the
+       describing node on /services. */
     itemListElement: SERVICE_CARDS.map((s) => ({
       "@type": "Offer",
-      itemOffered: { "@type": "Service", name: s.name, description: SERVICE_DESC[s.id], url: `${SITE}/services#${slugOf(s.id)}` },
+      itemOffered: serviceNode(s.id),
     })),
   },
 };
@@ -99,13 +113,59 @@ const founder = {
   sameAs: ["https://www.linkedin.com/in/prachetsupadhyay", "https://prachetsupadhyay.com"],
 };
 const website = { "@type": "WebSite", "@id": `${SITE}/#website`, url: SITE + "/", name: "Averr Studios", alternateName: "Averr", inLanguage: "en-CA", publisher: { "@id": ORG_ID } };
-const SVC_NAME = { websites: "Website design and development", webApps: "Web app development", aiAutomation: "AI automation", marketing: "Digital marketing" };
 /* The date a file first entered the repo, for video upload dates. */
 const added = (file) => {
   try { return execSync(`git log --diff-filter=A --format=%cs -- "${file}"`, { encoding: "utf8" }).trim().split("\n").pop() || null; } catch { return null; }
 };
+/* The slug came from a second copy of this map living here, which is
+   the kind of duplication that survives right up until the day the two
+   disagree. The pillar registry owns it now. */
 function slugOf(id) {
-  return { websites: "websites", webApps: "web-apps", aiAutomation: "ai-automation", marketing: "marketing" }[id];
+  return PILLARS[id].slug;
+}
+
+/**
+ * The service as an entity, not as a loose string.
+ *
+ * Every service used to appear twice in the graph as two anonymous
+ * `Service` nodes — once in the offer catalogue, once on /services —
+ * so nothing could state that the two were the same thing, that a
+ * case study was work of that kind, or that a guide was about it. A
+ * stable @id fixes all three: the catalogue references it, case files
+ * and guides point `about` at it, and the four services become one
+ * connected set rather than four repeated names.
+ */
+function serviceId(id) {
+  return `${SITE}/#service-${slugOf(id)}`;
+}
+
+/* Where the service lives. A pillar with its own page gets a real URL;
+   one without gets its section on the overview. The structured data
+   has been claiming four distinct service URLs via fragments, which
+   search engines discard — so until a pillar ships, this says the
+   honest thing and points at the page that actually exists. */
+function serviceUrl(id) {
+  const p = PILLARS[id];
+  return p.live ? `${SITE}/services/${p.slug}` : `${SITE}/services#${p.slug}`;
+}
+
+/**
+ * `full` emits the describing node, for /services, which is where the
+ * service is the subject. Elsewhere a compact node carries the same
+ * @id so the `about` reference resolves on its own page too, without
+ * restating a description that belongs on the service's own page.
+ */
+function serviceNode(id, { full = false } = {}) {
+  const name = SVC_NAME[id];
+  const base = { "@type": "Service", "@id": serviceId(id), name, url: serviceUrl(id) };
+  if (!full) return base;
+  return {
+    ...base,
+    serviceType: name,
+    description: SERVICE_DESC[id],
+    provider: { "@id": ORG_ID },
+    areaServed: "Greater Toronto Area",
+  };
 }
 const crumbs = (items) => ({
   "@type": "BreadcrumbList",
@@ -119,12 +179,21 @@ const pages = [
     url: "/services", meta: META.services, og: "services", priority: "0.9",
     graph: [
       studio,
-      ...SERVICE_CARDS.map((s) => ({
-        "@type": "Service", name: s.name, serviceType: s.name, description: SERVICE_DESC[s.id],
-        provider: { "@id": ORG_ID }, areaServed: "Greater Toronto Area", url: `${SITE}/services#${slugOf(s.id)}`,
-      })),
+      ...SERVICE_CARDS.map((s) => serviceNode(s.id, { full: true })),
       { "@type": "FAQPage", mainEntity: FAQ.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
       crumbs([["Home", "/"], ["Services", "/services"]]),
+    ],
+  },
+  /* The first pillar page. Its own Service node is the describing one
+     — this is the URL the entity now lives at, so `serviceUrl` points
+     here rather than at the overview's fragment, and the case files and
+     guides that reference it resolve to a real page. */
+  {
+    url: "/services/websites", meta: META.serviceWebsites, og: "service-websites", priority: "0.9",
+    graph: [
+      studio,
+      serviceNode("websites", { full: true }),
+      crumbs([["Home", "/"], ["Services", "/services"], ["Websites", "/services/websites"]]),
     ],
   },
   { url: "/work", meta: META.work, og: "work", priority: "0.9", graph: [studio, crumbs([["Home", "/"], ["Work", "/work"]])] },
@@ -135,7 +204,13 @@ const pages = [
     priority: "0.8",
     graph: [
       {
-        "@type": "CreativeWork", name: `${p.name} case study`, headline: `${p.name}: ${p.thesis}`, about: p.sector,
+        /* `about` was the sector as a bare string, so the strongest
+           proof on the site was never tied to the service it proved.
+           It now names the services as entities, lead first, with the
+           sector kept after them — a case file is about a kind of work
+           and an industry, and both are worth saying. */
+        "@type": "CreativeWork", name: `${p.name} case study`, headline: `${p.name}: ${p.thesis}`,
+        about: [...p.svc.map((x) => ({ "@id": serviceId(x) })), p.sector],
         description: clip(`${p.thesis} ${p.problem} ${p.outcome.headline}`, 300),
         genre: p.svc.map((x) => SVC_NAME[x]).join(", "), dateCreated: p.year.slice(0, 4),
         image: `${SITE}/og/work-${p.slug}.png`, creator: { "@id": ORG_ID }, url: `${SITE}/work/${p.slug}`,
@@ -146,6 +221,10 @@ const pages = [
         thumbnailUrl: SITE + p.video.poster, contentUrl: SITE + p.video.src, uploadDate: added(`public${p.video.src}`) || p.year.slice(0, 4),
         publisher: { "@id": ORG_ID },
       }] : []),
+      /* The services this case file points `about` at, so the
+         reference resolves within this page as well as across the
+         site. Compact: the describing node lives on /services. */
+      ...p.svc.map((x) => serviceNode(x)),
       crumbs([["Home", "/"], ["Work", "/work"], [p.name, `/work/${p.slug}`]]),
     ],
   })),
@@ -185,7 +264,12 @@ const pages = [
         image: `${SITE}/og/${g.og}.png`, url: `${SITE}/guides/${g.slug}`,
         mainEntityOfPage: `${SITE}/guides/${g.slug}`, inLanguage: "en-CA",
         wordCount: readingMinutes(g) * 200,
+        /* The service this article sells. A guide with no `about` is a
+           page that ranks for a question and says nothing about who
+           answers it commercially — which is what all four were. */
+        about: g.svc.map((x) => ({ "@id": serviceId(x) })),
       },
+      ...g.svc.map((x) => serviceNode(x)),
       crumbs([["Home", "/"], ["Guides", "/guides"], [g.title, `/guides/${g.slug}`]]),
     ],
   })),
@@ -256,6 +340,12 @@ fs.writeFileSync(
 const SOURCES = {
   "/": ["src/pages/Home.tsx", "src/components/home", "src/data/servicesBuild.ts"],
   "/services": ["src/pages/Services.tsx", "src/components/services", "src/data/servicesBuild.ts"],
+  "/services/websites": [
+    "src/pages/ServiceWebsites.tsx",
+    "src/components/services/websites",
+    "src/data/serviceWebsites.ts",
+    "src/data/pillars.ts",
+  ],
   "/work": ["src/pages/Work.tsx", "src/components/work", "src/data/builtByAverr.ts"],
   "/about": ["src/pages/About.tsx", "src/components/about"],
   "/contact": ["src/pages/Contact.tsx", "src/components/contact"],
@@ -366,7 +456,7 @@ fs.writeFileSync(
     "Averr Studios is a studio in Toronto, Ontario, Canada, founded by Prachets Upadhyay. It designs and builds websites, web apps, AI automation and marketing for businesses across the Greater Toronto Area. Contact: prachets@averrstudios.com, +1 647 643 2496. Free 30-minute discovery calls: https://www.averrstudios.com/contact",
     "",
     "## Services",
-    ...SERVICE_CARDS.map((x) => `- [${x.name}](${SITE}/services#${slugOf(x.id)}): ${SERVICE_DESC[x.id]}`),
+    ...SERVICE_CARDS.map((x) => `- [${x.name}](${serviceUrl(x.id)}): ${SERVICE_DESC[x.id]}`),
     "",
     "## Case studies",
     ...BUILT.map((p) => `- [${p.name}](${SITE}/work/${p.slug}): ${p.sector}. ${p.thesis} ${p.outcome.headline}`),

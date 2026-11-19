@@ -1,4 +1,8 @@
 import { useEffect } from "react";
+/* Explicit .ts because `tools/keyword-map.test.ts` imports this file
+   under plain Node, which cannot resolve an extensionless specifier —
+   the same reason builtByAverr imports ./screenshots.ts. */
+import { PILLARS } from "../data/pillars.ts";
 
 /**
  * One route's title and meta description, set on mount and put back on
@@ -75,6 +79,18 @@ export const META = {
     description:
       "Websites, web apps, AI automation and marketing for Toronto and GTA businesses. What's included, how long each takes, and a free 30-minute call to start.",
     target: "web design services toronto",
+  },
+  serviceWebsites: {
+    title: "Custom Website Design in Toronto | Averr Studios",
+    description:
+      "Custom websites for Toronto and GTA businesses, hand-built in code rather than assembled from a theme. What a build includes, who we've built for, and a free 30-minute call.",
+    /* Narrower than /services, which keeps "web design services
+       toronto": this is the phrase someone types when they have already
+       decided against a builder.
+       Read from the registry rather than typed again — the pillar owns
+       the search it competes for, and two copies of a keyword are two
+       things to keep in step. */
+    target: PILLARS.websites.target,
   },
   about: {
     title: "About Averr Studios — Toronto Web Design and AI Studio",

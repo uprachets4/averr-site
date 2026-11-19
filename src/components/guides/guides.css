@@ -168,6 +168,27 @@
   font-size: 15px;
   color: var(--g-mute);
 }
+/* The service this guide sits under. Sits directly beneath the byline
+   and shares its register — the same muted size, so it reads as part
+   of the article's credentials rather than as a call to action. The
+   pull toward the service belongs at the end of the guide, where the
+   reader has been convinced; this one is for the reader who already
+   knows what they want, and for the crawler. */
+.gd .gpart {
+  margin-top: 12px;
+  font-size: 15px;
+  color: var(--g-mute);
+}
+.gd .gpart a {
+  color: var(--g-ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--g-hair-strong);
+  transition: border-color 0.3s;
+}
+.gd .gpart a:hover {
+  border-color: var(--g-ink);
+}
+
 .gd .gby a {
   color: var(--g-ink);
   text-decoration: none;
