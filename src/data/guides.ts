@@ -988,6 +988,209 @@ const spreadsheetToSoftware: Guide = {
   ],
 };
 
+/**
+ * Guide 7 — what belongs on a contractor's home page.
+ *
+ * Written from the two contractor sites this studio has actually
+ * shipped — Express Contractors and CG Walls & Floors — which is the
+ * only reason it is worth publishing. There is no shortage of
+ * "10 things every contractor website needs" content; what almost none
+ * of it has is a page someone built, in this market, and can point at.
+ *
+ * So every section here is a decision made on one of those two builds,
+ * and the guide says which. Where a claim is general rather than
+ * observed, it is written as reasoning the reader can check against
+ * their own business, not as a result.
+ *
+ * The only figures are Express Contractors' own: the 5.0 from 203
+ * Google reviews shown on their site, the eleven services, and Anas's
+ * licence and years in the trade. No invented conversion numbers,
+ * because the honest answer is that two sites is not a sample.
+ *
+ * Target is informational — someone planning a page, one or two steps
+ * further out than the Wix comparison. "contractor website design
+ * toronto" belongs to the CG case file and
+ * "appliance installer website design" to Express, so this takes
+ * neither; `tools/keyword-map.test.ts` would fail if it did.
+ */
+const contractorHomePage: Guide = {
+  slug: "what-to-put-on-a-contractor-website",
+  title: "What to put on a contractor's home page, section by section",
+  target: "what to put on a contractor website",
+  svc: ["websites"],
+  close:
+    "If you want this structure applied to your own trade rather than read in the abstract, send us the photos you already have on your phone and the five jobs you most want more of. That is genuinely enough to lay out a first version, and the call to walk through it is thirty minutes.",
+  dek: "Eight sections, in the order a homeowner reads them, drawn from two contractor sites we built for the GTA — plus the four things worth leaving off.",
+  published: "2026-11-21",
+  checked: "2026-11-21",
+  og: "guide-contractor-home-page",
+  intro: [
+    {
+      t: "p",
+      text: "A homeowner landing on a contractor's site is answering one question: can this person be trusted inside my house, with my money, on a job I cannot inspect myself. Almost everything that belongs on the page is evidence for that question, and almost everything that does not belong is a company talking about itself.",
+    },
+    {
+      t: "p",
+      text: "This is the order we have used on two builds for GTA trades. Take the order more seriously than the wording — the sections earn their place by answering the homeowner's next doubt, one after another.",
+    },
+  ],
+  sections: [
+    {
+      h: "Open with the work, not the company",
+      blocks: [
+        {
+          t: "p",
+          text: "The first screen should show the job being done well. Not a stock kitchen, not a van with your logo, and not a sentence about your commitment to quality — the work.",
+        },
+        {
+          t: "p",
+          text: "This matters more for trades than for almost any other business, because the homeowner cannot judge your competence from your words. They can judge it from a photograph of a finished edge.",
+        },
+        {
+          t: "note",
+          label: "What we did",
+          text: "For Express Contractors, the hero draws a gas install as you scroll — from the meter, through the line, to a correct blue flame at the end. A visitor sees a properly executed install before reading a single word. CG Walls & Floors opens on the finished rooms rather than on the company, and the whole page is styled closer to an interior design firm than to a trades site.",
+        },
+      ],
+    },
+    {
+      h: "Say what you are licensed to do, early",
+      blocks: [
+        {
+          t: "p",
+          text: "Licences, registrations and years in the trade are the strongest trust signal a contractor has, and they are usually buried in an About page nobody opens. Put them where the homeowner is already looking.",
+        },
+        {
+          t: "p",
+          text: "Be specific and verifiable. A registration number a homeowner can check beats a badge graphic, and naming the body that issued it beats the word \"certified\" on its own.",
+        },
+        {
+          t: "note",
+          label: "What we did",
+          text: "Express Contractors leads with Anas being a licensed gas fitter, TSSA registered, with more than twenty years in the trade. For gas work that is not a credential, it is the whole permission to be in the room.",
+        },
+      ],
+    },
+    {
+      h: "One block per service, each with the detail that matters",
+      blocks: [
+        {
+          t: "p",
+          text: "A list of service names tells a homeowner nothing. \"Plumbing · Electrical · Renovation\" could describe any of four hundred businesses in the GTA. What converts is a short block per service that says what is included and names the one thing that goes wrong when it is done badly.",
+        },
+        {
+          t: "p",
+          text: "That one detail does two jobs at once: it answers a practical question, and it demonstrates you know the job well enough to know where it fails.",
+        },
+        {
+          t: "note",
+          label: "What we did",
+          text: "Express Contractors lists eleven services — ranges, gas runs, laundry, water heaters and the rest — and each one states what is supplied plus the detail that matters for that specific install. It is the longest part of the page and the part that does the most work.",
+        },
+      ],
+    },
+    {
+      h: "Show the parts nobody sees",
+      blocks: [
+        {
+          t: "p",
+          text: "Every competitor shows the finished result. Almost none show the work behind it, which is exactly where a good contractor is separated from a cheap one — and exactly what the homeowner is most afraid of getting wrong.",
+        },
+        {
+          t: "p",
+          text: "Use real job photographs from your own phone, and label where the work is. Unlabelled photos of pipework read as clutter; the same photo with a line of text explaining what you are looking at reads as expertise.",
+        },
+        {
+          t: "note",
+          label: "What we did",
+          text: "A whole section of the Express Contractors site is given to this, under the heading \"the parts you never see\" — real job photos, labelled at the point where the work actually is. There is also a plainly written standard: vented outside, fed to code, supported every run. Three short phrases that tell a homeowner what they are buying.",
+        },
+      ],
+    },
+    {
+      h: "Reviews, with the number and where they came from",
+      blocks: [
+        {
+          t: "p",
+          text: "Ratings only persuade when they are checkable. A row of stars drawn in the design persuades nobody, because anyone can draw stars. A rating, the count behind it, and the platform it came from is a different claim entirely.",
+        },
+        {
+          t: "ul",
+          items: [
+            "Give the rating and the number of reviews, not just the rating. \"5.0\" alone is weaker than \"5.0 from 203\".",
+            "Name the platform, and make it the place a visitor can go and check.",
+            "Quote two or three reviews in full rather than cropping them to the flattering clause.",
+            "Use real names and the town the job was in, with permission. \"Sarah M., Oakville\" outperforms \"Happy Customer\".",
+          ],
+        },
+        {
+          t: "note",
+          label: "What we did",
+          text: "Express Contractors has 5.0 from 203 Google reviews, and the site shows the figure, the count and the source, with featured quotes carried in full. CG Walls & Floors had no review history at the time, so we started one properly rather than inventing social proof: a Google Business Profile, seeded with a real review from a real homeowner.",
+        },
+      ],
+    },
+    {
+      h: "Make the next step one tap, and say what happens after it",
+      blocks: [
+        {
+          t: "p",
+          text: "Most of your traffic is a phone. The number should be tappable, visible without scrolling, and repeated at the end of the page — a homeowner who has just finished reading should not have to go hunting.",
+        },
+        {
+          t: "p",
+          text: "Then answer the question that actually stops people calling, which is not price. It is not knowing what the call will be like. Lay out the steps from first contact to finished job, so the homeowner knows what they are agreeing to.",
+        },
+        {
+          t: "note",
+          label: "What we did",
+          text: "Express Contractors has tap-to-call throughout, a short booking form that asks only for the appliance, the town and the timing, and a four-step sequence stated plainly: call, quote, install, and test it together at the end. The last step is there because a homeowner wants to know the job gets checked in front of them.",
+        },
+      ],
+    },
+    {
+      h: "Name the area you actually cover",
+      blocks: [
+        {
+          t: "p",
+          text: "Vagueness here costs real calls in both directions. \"Serving the Greater Toronto Area and surrounding regions\" makes someone in Niagara guess, and guessing usually means closing the tab. It also brings in enquiries from outside your range that you then have to turn down.",
+        },
+        {
+          t: "p",
+          text: "Name the towns. This is also the single most useful thing you can do for local search, because the places you serve are the words people are typing.",
+        },
+        {
+          t: "note",
+          label: "What we did",
+          text: "Express Contractors has a coverage map showing the GTA, the Hamilton base and Niagara — so the answer to \"do you come out to me\" is visible rather than inferred.",
+        },
+      ],
+    },
+    {
+      h: "What to leave off",
+      blocks: [
+        {
+          t: "p",
+          text: "Four things take up room on most contractor sites and earn none of it.",
+        },
+        {
+          t: "ul",
+          items: [
+            "Stock photography. A homeowner can tell, and the moment they can tell they start wondering why you have no photos of your own work.",
+            "A mission statement. Nobody chose a contractor because of one. The licence, the photos and the reviews are doing this job already.",
+            "A blog you will not write. Three posts from two years ago reads as a business that stopped paying attention. If you want to publish, publish finished jobs.",
+            "A hero slider. Three messages rotating past is three messages nobody reads, and the images usually arrive slowly on mobile data. Pick the strongest one and let it sit still.",
+          ],
+        },
+        {
+          t: "p",
+          text: "The test for anything you are unsure about: does it help a homeowner decide you can be trusted in their house? If it does, keep it and give it room. If it is there because websites usually have one, it goes.",
+        },
+      ],
+    },
+  ],
+};
+
 export const GUIDES: Guide[] = [
   googleMaps,
   searchConsole,
@@ -995,6 +1198,7 @@ export const GUIDES: Guide[] = [
   wixVsCustom,
   websiteVsWebApp,
   spreadsheetToSoftware,
+  contractorHomePage,
 ];
 
 export const GUIDE_BY_SLUG: Record<string, Guide> = Object.fromEntries(
