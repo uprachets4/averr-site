@@ -35,10 +35,10 @@ export const SPACING_SCALE = [4, 8, 12, 16, 24, 32, 48, 64, 96, 128] as const;
  * is simply the value.
  */
 export const TYPE_SCALE: { label: string; token: string; max: number }[] = [
-  { label: "Display", token: "--type-display-2xl-size", max: 208 },
-  { label: "H1", token: "--type-h1-size", max: 72 },
-  { label: "H2", token: "--type-h2-size", max: 56 },
-  { label: "H3", token: "--type-h3-size", max: 28 },
+  { label: "Display", token: "--type-display-2xl-size", max: 171 },
+  { label: "H1", token: "--type-h1-size", max: 59 },
+  { label: "H2", token: "--type-h2-size", max: 48 },
+  { label: "H3", token: "--type-h3-size", max: 25 },
   { label: "Body", token: "--type-body-size", max: 17 },
   { label: "Eyebrow", token: "--type-eyebrow-size", max: 13 },
 ];
