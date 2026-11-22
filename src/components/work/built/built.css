@@ -765,6 +765,12 @@
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: color 0.3s, border-color 0.3s;
+  /* Same fix as the guides' crumbs: the row is 44px but the link box was
+     only the 13px of text, under the 24px WCAG 2.5.8 minimum.
+     Verified by tools/tap-targets.mjs. */
+  display: inline-flex;
+  align-items: center;
+  padding-block: 7px;
 }
 .bb-crumbs a:hover {
   color: var(--bb-light, #f5f4f9);

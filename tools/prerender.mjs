@@ -36,7 +36,7 @@ globalThis.document = {
 };
 try { globalThis.navigator = { userAgent: "prerender", maxTouchPoints: 0 }; } catch { /* read-only in some runtimes */ }
 
-const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS, GUIDES, readingMinutes, guideMeta, screen, PILLARS } = await import(
+const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS, GUIDES, readingMinutes, guideMeta, PILLARS } = await import(
   path.join(ROOT, "dist-ssr/entry-server.js")
 );
 

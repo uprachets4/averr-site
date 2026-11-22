@@ -399,6 +399,15 @@
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: color 0.3s, border-color 0.3s;
+  /* The li row is already 44px, but the link itself measured 12px — the
+     font shorthand above pins line-height to 1, so the box is just the
+     text. WCAG 2.5.8 wants 24px, and a row that is tall enough does
+     nothing if the thing you actually tap is not. Padding the link is
+     what makes the target match what you can see.
+     Verified by tools/tap-targets.mjs. */
+  display: inline-flex;
+  align-items: center;
+  padding-block: 7px;
 }
 .gd .gcrumbs a:hover {
   color: var(--g-ink);

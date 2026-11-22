@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test:dates": "node --test tools/business-days.test.ts",
     "test:tokens": "node --test tools/about-tokens.test.ts",
-    "test:keywords": "node --test tools/keyword-map.test.ts"
+    "test:keywords": "node --test tools/keyword-map.test.ts",
+    "test:targets": "node tools/tap-targets.mjs"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",
