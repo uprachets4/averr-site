@@ -36,6 +36,7 @@ import { fileURLToPath } from "node:url";
 import { META } from "../src/lib/documentMeta.ts";
 import { BUILT } from "../src/data/builtByAverr.ts";
 import { GUIDES } from "../src/data/guides.ts";
+import { INDUSTRIES } from "../src/data/industries.ts";
 import { PILLARS } from "../src/data/pillars.ts";
 import { PILLAR_SERVICES } from "../src/data/servicePillars.ts";
 import type { ServiceId } from "../src/data/serviceColors.ts";
@@ -57,6 +58,7 @@ function entries(): { url: string; target: string | null; shipped?: boolean }[] 
     services: "/services",
     serviceWebsites: "/services/websites",
     serviceWebApps: "/services/web-apps",
+    industryContractors: "/industries/contractors",
     about: "/about",
     contact: "/contact",
     work: "/work",
@@ -263,6 +265,128 @@ test("only live pillars ship a page", function noGhosts() {
       !shipped.has(`/services/${p.slug}`),
       `/services/${p.slug} is in the sitemap but PILLARS.${id}.live is false. ` +
         `Either the page is real and the flag is stale, or a page shipped that nobody decided to ship.`
+    );
+  }
+});
+
+/* Industry pages are the doorway-page shape by default: one template,
+   the vertical swapped, twenty pages, nothing behind any of them.
+   Google filters exactly that, so the bar here is higher than a
+   pillar's — two case files rather than one, because the claim an
+   industry page makes is "we build for this trade", and one project
+   does not establish a trade. */
+const MIN_INDUSTRY_PROOF = 2;
+const industryKeys = Object.keys(INDUSTRIES);
+
+test("a live industry page has a vertical behind it", function industryReady() {
+  for (const key of industryKeys) {
+    const i = INDUSTRIES[key];
+    if (!i.live) continue;
+    assert.ok(
+      i.proof.length >= MIN_INDUSTRY_PROOF,
+      `/industries/${i.slug} is live with ${i.proof.length} case file(s), needs ${MIN_INDUSTRY_PROOF}. ` +
+        `One project in a vertical is an anecdote — this page exists to show a pattern.`
+    );
+    assert.equal(
+      typeof i.target,
+      "string",
+      `/industries/${i.slug} is live but owns no search. That is the entire reason to have a vertical page.`
+    );
+    assert.ok(
+      PILLARS[i.pillar].live,
+      `/industries/${i.slug} is live but its pillar (${i.pillar}) is not. ` +
+        `The crumb trail and the "what a build includes" link both point at /services/${PILLARS[i.pillar].slug}, which does not exist.`
+    );
+  }
+});
+
+test("every case file an industry claims actually exists", function industryProofResolves() {
+  const slugs = new Set(BUILT.map((p) => p.slug));
+  for (const key of industryKeys) {
+    for (const s of INDUSTRIES[key].proof) {
+      assert.ok(
+        slugs.has(s),
+        `INDUSTRIES.${key} claims case file "${s}", which is not in BUILT. ` +
+          `Renamed or removed — either way the proof section on that page is now shorter than it reads here.`
+      );
+    }
+  }
+});
+
+test("every guide an industry claims actually exists", function industryGuidesResolve() {
+  const slugs = new Set(GUIDES.map((g) => g.slug));
+  for (const key of industryKeys) {
+    for (const s of INDUSTRIES[key].guides) {
+      assert.ok(
+        slugs.has(s),
+        `INDUSTRIES.${key} claims guide "${s}", which is not in GUIDES.`
+      );
+    }
+  }
+});
+
+test("an industry that is not live says what it is waiting on", function industryHonest() {
+  for (const key of industryKeys) {
+    const i = INDUSTRIES[key];
+    if (i.live) continue;
+    assert.ok(
+      i.waitingOn && i.waitingOn.length > 20,
+      `INDUSTRIES.${key} is not live and does not say why. The next person here is deciding whether to flip the flag and deserves the reason.`
+    );
+  }
+});
+
+test("only live industries ship a page", function noIndustryGhosts() {
+  const sitemap = join(dirname(fileURLToPath(import.meta.url)), "..", "dist", "sitemap.xml");
+  if (!existsSync(sitemap)) {
+    console.log("  (no dist/sitemap.xml — run npm run build to include this check)");
+    return;
+  }
+  const shipped = new Set(
+    [...readFileSync(sitemap, "utf8").matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname)
+  );
+  for (const key of industryKeys) {
+    const i = INDUSTRIES[key];
+    if (i.live) continue;
+    assert.ok(
+      !shipped.has(`/industries/${i.slug}`),
+      `/industries/${i.slug} is in the sitemap but INDUSTRIES.${key}.live is false.`
+    );
+  }
+});
+
+test("a live industry page is linked from somewhere", function noOrphans() {
+  const dist = join(dirname(fileURLToPath(import.meta.url)), "..", "dist");
+  if (!existsSync(join(dist, "sitemap.xml"))) {
+    console.log("  (no dist — run npm run build to include this check)");
+    return;
+  }
+  /* /industries/contractors shipped with zero inbound links the first
+     time. An orphan page is barely crawled and inherits no authority,
+     which defeats the entire reason for moving a keyword onto it: the
+     argument was that a vertical page collects links from the pillar
+     and passes them down to the case files. With nothing pointing in,
+     it collects nothing. Hence a rule rather than a note. */
+  const pages = [...readFileSync(join(dist, "sitemap.xml"), "utf8").matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map((m) => new URL(m[1]).pathname)
+    .map((p) => (p === "/" ? "index.html" : join(p.slice(1), "index.html")));
+
+  for (const key of industryKeys) {
+    const i = INDUSTRIES[key];
+    if (!i.live) continue;
+    const href = `href="/industries/${i.slug}"`;
+    const linkedFrom = pages.filter(function links(rel) {
+      const f = join(dist, rel);
+      if (!existsSync(f)) return false;
+      /* Its own page links to itself via the breadcrumb's current item
+         in some markups, so exclude it from its own count. */
+      if (rel.startsWith(join("industries", i.slug))) return false;
+      return readFileSync(f, "utf8").includes(href);
+    });
+    assert.ok(
+      linkedFrom.length > 0,
+      `/industries/${i.slug} is live and nothing links to it. ` +
+        `An orphan vertical page collects no authority to pass down, which is the only reason it owns a keyword instead of a case file.`
     );
   }
 });

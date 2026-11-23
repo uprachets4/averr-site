@@ -7,6 +7,7 @@ import {
   type Guide as GuideData,
 } from "../data/guides";
 import { pillarHref } from "../data/pillars";
+import { industriesForGuide } from "../data/industries";
 import { SERVICE_NAMES } from "../data/serviceColors";
 import { useDocumentMeta } from "../lib/documentMeta";
 import { useDeclarePageEndTone } from "../lib/pageTone";
@@ -149,6 +150,20 @@ function Article({ g }: { g: GuideData }) {
                   <span key={id}>
                     {i > 0 ? (i === g.svc.length - 1 ? " and " : ", ") : null}
                     <Link to={pillarHref(id)}>{SERVICE_NAMES[id]}</Link>
+                  </span>
+                );
+              })}
+              {/* And down to the vertical, where one claims this guide.
+                  The guide is usually the most specific page in the
+                  cluster, so a reader who got here from a search for
+                  their trade is one click from the page written for it —
+                  and the vertical page gets an inbound link it would
+                  otherwise have to wait on someone adding by hand. */}
+              {industriesForGuide(g.slug).map(function ind(i) {
+                return (
+                  <span key={i.slug}>
+                    {" · "}
+                    <Link to={`/industries/${i.slug}`}>{i.name}</Link>
                   </span>
                 );
               })}
