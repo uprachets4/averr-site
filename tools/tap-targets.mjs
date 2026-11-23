@@ -25,6 +25,7 @@ const PAGES = [
   ["guide",     "/guides/wix-vs-custom-website", ".gcrumbs a"],
   ["case file", "/work/express-contractors",     ".bb-crumbs a"],
   ["pillar",    "/services/websites",            ".wcrumbs a"],
+  ["industry",  "/industries/contractors",        ".wcrumbs a"],
 ];
 const WIDTHS = [375, 768, 1024, 1440];
 const MIN = 24;

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 /* Explicit .ts because `tools/keyword-map.test.ts` imports this file
    under plain Node, which cannot resolve an extensionless specifier —
    the same reason builtByAverr imports ./screenshots.ts. */
+import { INDUSTRIES } from "../data/industries.ts";
 import { PILLARS } from "../data/pillars.ts";
 
 /**
@@ -97,6 +98,14 @@ export const META = {
     description:
       "Dashboards, internal tools and client portals for Toronto and GTA businesses, built by the person you brief. What a build includes, three tools in daily use, and a free 30-minute call.",
     target: PILLARS.webApps.target,
+  },
+  industryContractors: {
+    title: "Contractor Website Design in Toronto | Averr Studios",
+    description:
+      "Websites for GTA contractors and home services: the work first, the licence early, the phone one tap away. Two trade builds — one found by homeowners, one grown through referrals — and a free 30-minute call.",
+    /* From the industry registry for the same reason the pillars read
+       from theirs — one copy of the keyword, in the file that owns it. */
+    target: INDUSTRIES.contractors.target,
   },
   about: {
     title: "About Averr Studios — Toronto Web Design and AI Studio",
