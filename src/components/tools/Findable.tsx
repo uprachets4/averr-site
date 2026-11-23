@@ -135,9 +135,10 @@ export default function Findable() {
 
           {/* Stated before the result, not after it. */}
           <p className="fnd-limits">
-            This reads your page the way a crawler does. It does{" "}
+            This reads the HTML your server sends, the way a crawler does on its first pass, so
+            anything your site draws with JavaScript afterwards is invisible to it. It also does{" "}
             <strong>not</strong> measure real page speed or look at your Google Business Profile —
-            both need paid Google APIs, and a made-up grade would be worse than none. Those two gaps
+            both need paid Google APIs, and a made-up grade would be worse than none. All three gaps
             are named again with your results.
           </p>
         </div>

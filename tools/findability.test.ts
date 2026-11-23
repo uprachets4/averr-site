@@ -173,6 +173,16 @@ test("the report always names what it did not check", function honest() {
      score imply a completeness it does not have. */
   assert.ok(r.notChecked.some((s) => /speed/i.test(s)), "page speed is not named");
   assert.ok(r.notChecked.some((s) => /Business Profile/i.test(s)), "the Google profile is not named");
+  /* Added after the live tool reported "no tappable phone link" on a
+     Framer-built client site whose case file says it has one. Whether
+     that site really has the link is still unknown, which is exactly
+     the point: a checker that reads server HTML and does not say so
+     will keep producing confident false negatives on every JS-rendered
+     site, and those are most small-business sites now. */
+  assert.ok(
+    r.notChecked.some((s) => /JavaScript/i.test(s)),
+    "the JS-rendering limit is not named, so false negatives read as findings"
+  );
 });
 
 test("it survives the studio's own home page", function dogfood() {
