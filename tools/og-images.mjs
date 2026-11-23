@@ -29,6 +29,7 @@ const CARDS = [
   { id: "guide-wix-vs-custom", eyebrow: "Guide · Choosing", title: "Wix or custom?", sub: "Where the line falls, from people who sell one side." },
   { id: "guide-contractor-home-page", eyebrow: "Guide · Trades", title: "A contractor's home page.", sub: "Eight sections, in the order a homeowner reads them." },
   { id: "guide-build-vs-buy", eyebrow: "Guide · Choosing", title: "Build or buy?", sub: "Buying wins most of the time. One reason to build holds up." },
+  { id: "guide-agency-vs-freelancer", eyebrow: "Guide · Choosing", title: "Agency, freelancer or you?", sub: "Three structures, three failures. Which one you are signing up for." },
   { id: "tool-findable", eyebrow: "Free tool", title: "Can customers find you?", sub: "Check what Google can and cannot work out about your business." },
   { id: "industry-contractors", eyebrow: "Contractors · GTA", title: "A website that gets you called.", sub: "Two builds for GTA trades: an installer and a renovation company." },
   { id: "work", eyebrow: "Work", title: "Built by Averr.", sub: "Real products for businesses across the GTA." },

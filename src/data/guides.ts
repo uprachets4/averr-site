@@ -1380,6 +1380,199 @@ const buildVsBuy: Guide = {
   ],
 };
 
+/**
+ * Guide 9 — who builds it.
+ *
+ * The companion to `wixVsCustom`, deliberately on a different axis:
+ * that guide is about what you build, this one is about who builds
+ * it. The two are easy to blur, so the intro here says which question
+ * it is answering and points at the other one rather than quietly
+ * overlapping with it. The keyword map keeps them apart; the writing
+ * has to as well.
+ *
+ * Averr is the middle option — one person — and the guide says so in
+ * the section where that is a weakness, not in the summary where it
+ * would read as a disclaimer after the sale. The ownership checklist
+ * it gives (your domain, your hosting account, your repository) is
+ * the convention this studio actually follows, written into the
+ * playbook on 23 Nov 2026 after a client site was found living in one
+ * folder on one laptop. A guide recommending a practice its author
+ * does not keep is the kind a reader can smell.
+ *
+ * No price bands. The site states no prices, and the ranges a guide
+ * like this usually quotes are invented; worse, they overlap so much
+ * that sorting by them is the mistake the guide is arguing against.
+ * The argument runs on structure, accountability and continuity
+ * instead, which is both honest and more useful.
+ */
+const agencyVsFreelancer: Guide = {
+  slug: "agency-vs-freelancer-vs-diy",
+  title: "Agency, freelancer or yourself: who should build your website",
+  target: "web design agency vs freelancer",
+  svc: ["websites"],
+  dek: "Three ways to get a website made, and the specific thing that goes wrong with each. Written by a one-person studio, which is the middle option and the one you should push hardest on.",
+  published: "2026-11-23",
+  checked: "2026-11-23",
+  og: "guide-agency-vs-freelancer",
+  intro: [
+    {
+      t: "p",
+      text: "Most people ask this question in the wrong order. The first half — a site builder or a custom build — has its own guide. This is the second half: who makes it. That is the decision that determines whether you still have a working site in two years, and it gets about a tenth of the thought.",
+    },
+    {
+      t: "p",
+      text: "We are one of the three answers here, so read us accordingly. The paragraph on what goes wrong with a one-person studio is the one worth reading twice.",
+    },
+  ],
+  sections: [
+    {
+      h: "The three options, described plainly",
+      blocks: [
+        {
+          t: "p",
+          text: "Sort them by structure rather than by what they charge, because the ranges overlap so heavily that price tells you almost nothing about which one you are dealing with.",
+        },
+        {
+          t: "ul",
+          items: [
+            "An agency is a team. Someone sells, someone designs, someone builds, and someone manages the account. You are buying capacity, cover when one person is away, and a process that runs whether or not you ask for it.",
+            "A freelancer or solo studio is one person who sells, designs and builds. You talk to whoever is doing the work. There is no account layer, which is simultaneously the appeal and the risk.",
+            "Doing it yourself is you and a template. No brief, no scheduling, no invoice. You pay in your own hours and in the ceiling you will eventually hit.",
+          ],
+        },
+        {
+          t: "p",
+          text: "These are structures, not quality tiers. There are careless agencies and there are freelancers who will out-build them. What the structure reliably predicts is not how good the work is but how the project behaves when something goes wrong.",
+        },
+      ],
+    },
+    {
+      h: "What each one is actually good at",
+      blocks: [
+        {
+          t: "ul",
+          items: [
+            "Agency: projects with several stakeholders, a deadline that cannot move, or a scope nobody has fully worked out yet. Figuring out what the project should be is a job, and agencies staff for it.",
+            "Freelancer or solo studio: projects you can already describe. Nothing is lost in a handoff between a salesperson and a builder, because there is no handoff. Decisions take hours instead of a week.",
+            "Yourself: proving the business exists. If you do not yet know whether people want the thing, spending on a built site is the wrong order of operations.",
+          ],
+        },
+      ],
+    },
+    {
+      h: "What goes wrong, in each case",
+      blocks: [
+        {
+          t: "p",
+          text: "Every option has one characteristic failure. Knowing which one you are signing up for is most of the decision.",
+        },
+        {
+          t: "p",
+          text: "With an agency, the person who sold you the project is usually not the person who builds it, and the work goes to whoever has capacity. That is fine when the brief is airtight and expensive when it is not, because every clarification travels through someone whose job is to relay it. The common symptom is that small changes take a strange amount of time and nobody can tell you why.",
+        },
+        {
+          t: "p",
+          text: "With a freelancer or a one-person studio, there is one calendar. If that person gets busy, sick, or takes a contract elsewhere, your project waits, and there is nobody to escalate to. The failure people under-weigh is the slower one: if they stop answering in a year, can you still run your site without them? For a lot of businesses the honest answer is no, and they only find out at the moment it matters.",
+        },
+        {
+          t: "p",
+          text: "Doing it yourself costs you the fortnight you spend on it rather than on the business, which is the part everyone discounts and nobody gets back. Then you hit the ceiling of what the template anticipated. Then you discover you are the only person who knows how any of it is wired, which makes handing it to somebody later more expensive than starting clean.",
+        },
+      ],
+    },
+    {
+      h: "The question that actually separates them",
+      blocks: [
+        {
+          t: "note",
+          label: "The sorting question",
+          text: "Not what can you afford. It is: how much of this project can you already specify? If you can describe what you need in a page, an agency is largely overhead and a freelancer is the efficient answer. If you cannot — if the real work is deciding what the thing should be — that is the part an agency is structured to do and the part doing it yourself cannot do at all, because you will build whatever the template suggests.",
+        },
+      ],
+    },
+    {
+      h: "Who answers the phone in month seven",
+      blocks: [
+        {
+          t: "p",
+          text: "All three options look fine on launch day. Almost all of a website's life happens afterwards, and that is where the choice actually plays out. Before you hire anyone, get plain answers to these:",
+        },
+        {
+          t: "ul",
+          items: [
+            "Where does the code live, and whose account is it in?",
+            "Who renews the domain, and what happens if that invoice goes unpaid?",
+            "When the platform or a dependency updates and something breaks, whose problem is it?",
+            "What does a small change cost, and how long does it take?",
+            "If you and I stop working together, what exactly do I walk away with?",
+          ],
+        },
+        {
+          t: "p",
+          text: "You are not testing their technical ability with these. You are testing whether they have thought about the version of this relationship where they are not involved.",
+        },
+      ],
+    },
+    {
+      h: "Reducing the risk, whichever you pick",
+      blocks: [
+        {
+          t: "p",
+          text: "Most of the damage from a bad choice here is preventable, and the prevention is the same in all three cases.",
+        },
+        {
+          t: "ol",
+          items: [
+            "Register the domain yourself, in an account in your own name. This is the single thing that strands people, and it is the easiest to get right.",
+            "Put the hosting account in your name too, and invite whoever builds the site into it rather than the other way round.",
+            "The code lives in a private repository you own, and you have access from the first week. Ask at the start of the project, not the end — an awkward question in week one is a stranded site in month twenty.",
+            "If you are replacing an existing site, get the redirect plan in writing before anyone starts. Old pages that point nowhere hand back rankings you spent years earning.",
+            "Agree what a small change costs and how quickly it happens, while you still have leverage.",
+          ],
+        },
+        {
+          t: "p",
+          text: "Anyone who hesitates at the first three is telling you something useful, and it costs you nothing to have asked.",
+        },
+      ],
+    },
+    {
+      h: "The questions that actually decide it",
+      blocks: [
+        {
+          t: "ul",
+          items: [
+            "Can you describe what you need, or do you need help working out what it should be?",
+            "What happens to this project if one person is unavailable for three weeks?",
+            "Is there a second phase, or is this the whole thing?",
+            "How many people on your side have to agree before anything gets signed off?",
+            "Do you want to talk to the person typing, or do you want somebody whose job is to manage them for you?",
+          ],
+        },
+        {
+          t: "p",
+          text: "The last one is a real preference and not a trick question. Some owners want a single point of contact who handles it; others find the relay maddening. Neither is wrong, but choosing against your own temperament is how projects turn sour.",
+        },
+      ],
+    },
+    {
+      h: "The honest summary",
+      blocks: [
+        {
+          t: "ul",
+          items: [
+            "Simple site, a clear idea, some time, and you are still proving the business works: build it yourself, and spend the difference on photography and on getting your Google Business Profile right.",
+            "You know what you need, it has to be good, and you would rather talk to whoever is building it: a freelancer or a one-person studio, with the ownership checklist above done properly rather than assumed.",
+            "Several stakeholders, a fixed deadline, or a scope that nobody has pinned down yet: an agency, and treat the coordination as part of what you are buying instead of as a surprise on the invoice.",
+          ],
+        },
+      ],
+    },
+  ],
+  close:
+    "If the middle option is where you landed, that is us, and the call is with the person who would do the work rather than someone who would pass it on. Ask about the handover before you ask about the design — it is the answer that tells you the most.",
+};
+
 export const GUIDES: Guide[] = [
   googleMaps,
   searchConsole,
@@ -1389,6 +1582,7 @@ export const GUIDES: Guide[] = [
   spreadsheetToSoftware,
   contractorHomePage,
   buildVsBuy,
+  agencyVsFreelancer,
 ];
 
 export const GUIDE_BY_SLUG: Record<string, Guide> = Object.fromEntries(
