@@ -516,6 +516,7 @@ export function analyze(input: AnalyzeInput): Report {
     headline,
     groups,
     notChecked: [
+      "Anything your site draws with JavaScript after the page loads. This reads the HTML your server sends, the way a crawler does on its first pass — so on a site built with Framer, Webflow or React, a phone link or heading added in the browser will show here as missing when it is really there. If a check below looks wrong, that is the likely reason.",
       "Actual page speed. A real measurement needs Google's PageSpeed API; the page weight above is a rough proxy, not a verdict.",
       "Your Google Business Profile. Checking it needs the Places API, and it is the single biggest factor in whether you show up on the map.",
       "Whether your pages are actually indexed. Only Search Console, signed in as you, can say that.",
