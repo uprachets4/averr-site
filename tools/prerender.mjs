@@ -36,7 +36,7 @@ globalThis.document = {
 };
 try { globalThis.navigator = { userAgent: "prerender", maxTouchPoints: 0 }; } catch { /* read-only in some runtimes */ }
 
-const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS, GUIDES, readingMinutes, guideMeta, PILLARS } = await import(
+const { render, META, caseMeta, BUILT, FAQ, SERVICE_CARDS, GUIDES, readingMinutes, guideMeta, PILLARS, INDUSTRIES } = await import(
   path.join(ROOT, "dist-ssr/entry-server.js")
 );
 
@@ -204,6 +204,40 @@ const pages = [
       crumbs([["Home", "/"], ["Services", "/services"], ["Web apps", "/services/web-apps"]]),
     ],
   },
+  {
+    /* The industry page sits under its pillar in the crumb trail even
+       though the URL is flat — see IndustryPage.tsx for why. The Service
+       node it emits is the pillar's, not a service of its own: this page
+       sells website design to one audience, and minting a second Service
+       entity for the same offering would split the signal between two
+       @ids describing one thing.
+
+       `about` names the two case files, which is the machine-readable
+       half of the argument for moving the keyword here — the page
+       points at its proof, and the proof points back by sector. */
+    url: "/industries/contractors", meta: META.industryContractors, og: "industry-contractors", priority: "0.9",
+    graph: [
+      studio,
+      serviceNode("websites", { full: true }),
+      {
+        "@type": "WebPage",
+        "@id": `${SITE}/industries/contractors`,
+        url: `${SITE}/industries/contractors`,
+        name: META.industryContractors.title,
+        description: META.industryContractors.description,
+        isPartOf: { "@id": `${SITE}/#website` },
+        about: { "@id": serviceId("websites") },
+        mainEntity: { "@id": serviceId("websites") },
+        significantLink: INDUSTRIES.contractors.proof.map((s) => `${SITE}/work/${s}`),
+      },
+      crumbs([
+        ["Home", "/"],
+        ["Services", "/services"],
+        ["Websites", "/services/websites"],
+        ["Contractors", "/industries/contractors"],
+      ]),
+    ],
+  },
   { url: "/work", meta: META.work, og: "work", priority: "0.9", graph: [studio, crumbs([["Home", "/"], ["Work", "/work"]])] },
   ...BUILT.map((p) => ({
     url: `/work/${p.slug}`,
@@ -361,6 +395,12 @@ const SOURCES = {
     "src/components/services/pillar",
     "src/data/pillarPages.ts",
     "src/data/pillars.ts",
+  ],
+  "/industries/contractors": [
+    "src/pages/IndustryContractors.tsx",
+    "src/components/industries",
+    "src/data/industryPages.ts",
+    "src/data/industries.ts",
   ],
   "/work": ["src/pages/Work.tsx", "src/components/work", "src/data/builtByAverr.ts"],
   "/about": ["src/pages/About.tsx", "src/components/about"],

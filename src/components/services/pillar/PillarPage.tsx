@@ -8,6 +8,7 @@ import { useDocumentMeta, META } from "../../../lib/documentMeta";
 import { track } from "../../../lib/analytics";
 import { readingMinutes } from "../../../data/guides";
 import { PILLARS } from "../../../data/pillars";
+import { industriesForPillar } from "../../../data/industries";
 import {
   PILLAR_COPY,
   pillarAccent,
@@ -77,6 +78,11 @@ export default function PillarPage({ id, metaKey }: { id: ServiceId; metaKey: ke
   const proof = pillarProof(id);
   const guides = pillarGuides(id);
   const name = SERVICE_NAMES[id];
+  /* Derived, not written into the copy: a vertical page needs its
+     inbound link from the moment it goes live, and anything that waits
+     on someone editing prose will eventually ship orphaned — which is
+     exactly how /industries/contractors first shipped. */
+  const verticals = industriesForPillar(id);
 
   return (
     <div
@@ -147,6 +153,20 @@ export default function PillarPage({ id, metaKey }: { id: ServiceId; metaKey: ke
             {copy.proofHead}
           </h2>
           <p className="wlede reveal">{copy.proofLede}</p>
+          {verticals.length > 0 ? (
+            <p className="wvert reveal">
+              Built for a particular trade?{" "}
+              {verticals.map(function v(ind, n) {
+                return (
+                  <span key={ind.slug}>
+                    {n > 0 ? ", " : null}
+                    <Link to={`/industries/${ind.slug}`}>{ind.name.toLowerCase()}</Link>
+                  </span>
+                );
+              })}
+              .
+            </p>
+          ) : null}
           <ul className="wcases">
             {proof.map(function card(p) {
               return (

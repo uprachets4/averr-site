@@ -126,7 +126,14 @@ export const BUILT: BuiltProject[] = [
     slug: "cg-walls-and-floors",
     name: "CG Walls & Floors",
     sector: "Home renovation, GTA",
-    target: "contractor website design toronto",
+    /* Was "contractor website design toronto" until /industries/contractors
+       shipped. This was the only one of the five case files carrying a
+       category-plus-city commercial term; the other four are
+       project-shaped, and a case file can only ever show one project
+       against a query that asks whether you serve the trade. Moved to
+       the industry page, which shows both contractor builds and passes
+       authority down to them. Retargeted here in line with the rest. */
+    target: "renovation company website design",
     year: "2025 · ongoing",
     svc: ["websites", "aiAutomation", "marketing"],
     c: "#F9AF97",

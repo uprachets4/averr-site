@@ -53,6 +53,7 @@ async function warm(url: string): Promise<string> {
 export { META, caseMeta } from "./lib/documentMeta";
 export { BUILT, screen } from "./data/builtByAverr";
 export { PILLARS } from "./data/pillars";
+export { INDUSTRIES } from "./data/industries";
 export { FAQ, SERVICES as SERVICE_CARDS } from "./data/servicesBuild";
 export { GUIDES, readingMinutes } from "./data/guides";
 export { guideMeta, sectionId } from "./pages/Guide";

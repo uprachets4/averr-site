@@ -92,6 +92,32 @@
   color: var(--mute);
 }
 
+/* The link down to the vertical pages. Sits between the proof lede and
+   the case cards because that is where someone who has just read "two
+   case files" is deciding whether the work resembles theirs. Quieter
+   than the lede: it is a route onward, not part of the argument. */
+.sv-pillar .wvert {
+  margin-top: 14px;
+  max-width: 54ch;
+  color: var(--faint);
+  font-size: 15px;
+}
+
+.sv-pillar .wvert a {
+  color: var(--mute);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--acc) 45%, transparent);
+  /* Inline in a sentence, so WCAG 2.5.8 exempts it from the 24px target
+     minimum — padding it would break the line box. tools/tap-targets.mjs
+     measures the breadcrumbs, which are not exempt. */
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.sv-pillar .wvert a:hover {
+  color: var(--light-2, #e8e8e8);
+  border-bottom-color: var(--acc);
+}
+
 .sv-pillar .wcases {
   /* Two case files, so two columns that become one — not a grid built
      for a count the data does not have. If a third websites-led project
