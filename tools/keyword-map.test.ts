@@ -59,6 +59,7 @@ function entries(): { url: string; target: string | null; shipped?: boolean }[] 
     serviceWebsites: "/services/websites",
     serviceWebApps: "/services/web-apps",
     industryContractors: "/industries/contractors",
+    toolFindable: "/tools/findable",
     about: "/about",
     contact: "/contact",
     work: "/work",
@@ -355,40 +356,55 @@ test("only live industries ship a page", function noIndustryGhosts() {
   }
 });
 
-test("a live industry page is linked from somewhere", function noOrphans() {
+/* Pages nobody links to. Declared, not guessed: an orphan is almost
+   always an accident, so the list of deliberate ones is short and has
+   to be argued for.
+
+   /prachets is the digital business card. It is handed out as a link
+   and scanned from a QR code rather than browsed to, so having no
+   inbound link is the design rather than a miss. It stays in the
+   sitemap because it should be indexable when someone searches the
+   name. */
+const ORPHANS_BY_DESIGN = new Set(["/prachets"]);
+
+test("no page is orphaned", function noOrphans() {
   const dist = join(dirname(fileURLToPath(import.meta.url)), "..", "dist");
   if (!existsSync(join(dist, "sitemap.xml"))) {
     console.log("  (no dist — run npm run build to include this check)");
     return;
   }
-  /* /industries/contractors shipped with zero inbound links the first
-     time. An orphan page is barely crawled and inherits no authority,
-     which defeats the entire reason for moving a keyword onto it: the
-     argument was that a vertical page collects links from the pillar
-     and passes them down to the case files. With nothing pointing in,
-     it collects nothing. Hence a rule rather than a note. */
-  const pages = [...readFileSync(join(dist, "sitemap.xml"), "utf8").matchAll(/<loc>([^<]+)<\/loc>/g)]
-    .map((m) => new URL(m[1]).pathname)
-    .map((p) => (p === "/" ? "index.html" : join(p.slice(1), "index.html")));
+  /* This rule exists because it was learned twice in one week.
+     /industries/contractors shipped with nothing pointing at it, and
+     /tools/findable did the same three days later. An orphan page is
+     barely crawled and inherits no authority, which quietly defeats
+     whatever argument justified building it. */
+  const urls = [...readFileSync(join(dist, "sitemap.xml"), "utf8").matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map((m) => new URL(m[1]).pathname);
 
-  for (const key of industryKeys) {
-    const i = INDUSTRIES[key];
-    if (!i.live) continue;
-    const href = `href="/industries/${i.slug}"`;
-    const linkedFrom = pages.filter(function links(rel) {
-      const f = join(dist, rel);
-      if (!existsSync(f)) return false;
-      /* Its own page links to itself via the breadcrumb's current item
-         in some markups, so exclude it from its own count. */
-      if (rel.startsWith(join("industries", i.slug))) return false;
-      return readFileSync(f, "utf8").includes(href);
-    });
-    assert.ok(
-      linkedFrom.length > 0,
-      `/industries/${i.slug} is live and nothing links to it. ` +
-        `An orphan vertical page collects no authority to pass down, which is the only reason it owns a keyword instead of a case file.`
-    );
+  const pageFile = (u: string) => (u === "/" ? join(dist, "index.html") : join(dist, u.slice(1), "index.html"));
+  const bodies = new Map<string, string>();
+  for (const u of urls) {
+    const f = pageFile(u);
+    if (existsSync(f)) bodies.set(u, readFileSync(f, "utf8"));
   }
+
+  const orphaned: string[] = [];
+  for (const u of urls) {
+    if (ORPHANS_BY_DESIGN.has(u)) continue;
+    let inbound = 0;
+    for (const [other, html] of bodies) {
+      if (other === u) continue;
+      if (html.includes(`href="${u}"`)) inbound++;
+    }
+    if (inbound === 0) orphaned.push(u);
+  }
+
+  assert.deepEqual(
+    orphaned,
+    [],
+    `in the sitemap but nothing links to them: ${orphaned.join(", ")}. ` +
+      `Link each one from a page that belongs above it, or add it to ORPHANS_BY_DESIGN with the reason.`
+  );
 });
 
 test("the pillars that are ready but not built", function todo() {

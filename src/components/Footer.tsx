@@ -13,6 +13,10 @@ const STUDIO_LINKS = [
   { label: "Work", href: "/work" },
   { label: "Services", href: "/services" },
   { label: "Guides", href: "/guides" },
+  /* The free tool goes in the footer rather than the nav: it belongs to
+     the same family as the guides, and a site-wide link is what stops it
+     shipping orphaned the way /industries/contractors did. */
+  { label: "Findability check", href: "/tools/findable" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
