@@ -33,7 +33,7 @@
    for /var/task/src/lib/findability. Shared code for a function has to
    sit under api/, and a leading underscore keeps it from being served
    as a route of its own. */
-import { analyze, isPrivateHost, normaliseTarget } from "./_findability";
+import { analyze, isPrivateHost, normaliseTarget } from "./_findability.js";
 
 const TIMEOUT_MS = 8000;
 const MAX_BYTES = 2_000_000;
