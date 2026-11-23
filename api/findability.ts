@@ -26,7 +26,15 @@
  * damage low, but if this gets abused the fix is a rate limit keyed on
  * IP, not more validation.
  */
-import { analyze, isPrivateHost, normaliseTarget } from "../src/lib/findability.ts";
+/* Extensionless on purpose. With "../src/lib/findability.ts" Vercel
+   compiled this route to api/findability.js, left the specifier
+   untouched, and never traced or copied the module — the deployed
+   function died with ERR_MODULE_NOT_FOUND for
+   /var/task/src/lib/findability.ts on its first request. The extension
+   made it read as a runtime path rather than something to compile.
+   api/ is outside tsconfig's include so tsc never objects either way;
+   this form is what the deployed function needs. */
+import { analyze, isPrivateHost, normaliseTarget } from "../src/lib/findability";
 
 const TIMEOUT_MS = 8000;
 const MAX_BYTES = 2_000_000;
