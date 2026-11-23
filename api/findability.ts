@@ -1,7 +1,7 @@
 /**
  * GET /api/findability?url=… → a findability report as JSON.
  *
- * Deliberately thin. Every judgement lives in src/lib/findability.ts,
+ * Deliberately thin. Every judgement lives in api/_findability.ts,
  * which is unit-tested against fixtures, because this file cannot be
  * run in the development workspace — no `vercel dev`, and the sandbox
  * cannot reach arbitrary hosts. What is left here is fetch, call,
@@ -14,7 +14,7 @@
  *
  *   - http and https only. No file:, no gopher:, no data:.
  *   - No hostname that resolves to somewhere private. `isPrivateHost`
- *     and `normaliseTarget` live in src/lib/findability.ts, where the
+ *     and `normaliseTarget` live in api/_findability.ts, where the
  *     tests can reach them, and their limits are documented there.
  *   - No redirects followed across hosts without re-checking.
  *   - A hard timeout and a capped read, so a slow or enormous target
@@ -26,15 +26,14 @@
  * damage low, but if this gets abused the fix is a rate limit keyed on
  * IP, not more validation.
  */
-/* Extensionless on purpose. With "../src/lib/findability.ts" Vercel
-   compiled this route to api/findability.js, left the specifier
-   untouched, and never traced or copied the module — the deployed
-   function died with ERR_MODULE_NOT_FOUND for
-   /var/task/src/lib/findability.ts on its first request. The extension
-   made it read as a runtime path rather than something to compile.
-   api/ is outside tsconfig's include so tsc never objects either way;
-   this form is what the deployed function needs. */
-import { analyze, isPrivateHost, normaliseTarget } from "../src/lib/findability";
+/* The analyser lives beside this file rather than in src/lib, which is
+   where it started. Vercel does not include src/ in a function bundle:
+   both "../src/lib/findability.ts" and the extensionless form deployed
+   clean and then died on the first request with ERR_MODULE_NOT_FOUND
+   for /var/task/src/lib/findability. Shared code for a function has to
+   sit under api/, and a leading underscore keeps it from being served
+   as a route of its own. */
+import { analyze, isPrivateHost, normaliseTarget } from "./_findability";
 
 const TIMEOUT_MS = 8000;
 const MAX_BYTES = 2_000_000;

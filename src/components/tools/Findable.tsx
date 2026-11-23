@@ -4,7 +4,7 @@ import { useSetNavDarkOverride } from "../../lib/navTone";
 import { useDeclarePageEndTone } from "../../lib/pageTone";
 import { useDocumentMeta, META } from "../../lib/documentMeta";
 import { track } from "../../lib/analytics";
-import type { Report } from "../../lib/findability";
+import type { Report } from "../../../api/_findability";
 import "./findable.css";
 
 /**

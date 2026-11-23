@@ -421,7 +421,7 @@ const SOURCES = {
   "/tools/findable": [
     "src/pages/ToolFindable.tsx",
     "src/components/tools",
-    "src/lib/findability.ts",
+    "api/_findability.ts",
     "api/findability.ts",
   ],
   "/industries/contractors": [

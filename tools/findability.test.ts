@@ -24,7 +24,7 @@ import {
   normaliseTarget,
   type AnalyzeInput,
   type Report,
-} from "../src/lib/findability.ts";
+} from "../api/_findability.ts";
 
 function input(html: string, over: Partial<AnalyzeInput> = {}): AnalyzeInput {
   return {

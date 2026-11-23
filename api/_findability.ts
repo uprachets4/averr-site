@@ -5,6 +5,12 @@
  * here does IO, which is deliberate and is most of the reason the file
  * exists separately from `api/findability.ts`.
  *
+ * It sits under api/ rather than src/lib because Vercel does not
+ * include src/ in a function bundle — the route deployed clean twice
+ * and died on the first request with ERR_MODULE_NOT_FOUND. The leading
+ * underscore keeps it from being served as a route. src/ imports only
+ * the `Report` type from here, which is erased at build time.
+ *
  * Two constraints shaped it:
  *
  * 1. A Vercel function cannot be run in this workspace, and the
