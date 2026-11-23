@@ -28,6 +28,7 @@ const CARDS = [
   { id: "guide-site-speed", eyebrow: "Guide · Performance", title: "Why your site is slow.", sub: "The three numbers Google measures, and the fixes that pay." },
   { id: "guide-wix-vs-custom", eyebrow: "Guide · Choosing", title: "Wix or custom?", sub: "Where the line falls, from people who sell one side." },
   { id: "guide-contractor-home-page", eyebrow: "Guide · Trades", title: "A contractor's home page.", sub: "Eight sections, in the order a homeowner reads them." },
+  { id: "guide-build-vs-buy", eyebrow: "Guide · Choosing", title: "Build or buy?", sub: "Buying wins most of the time. One reason to build holds up." },
   { id: "work", eyebrow: "Work", title: "Built by Averr.", sub: "Real products for businesses across the GTA." },
   { id: "about", eyebrow: "About", title: "You work directly with the person who builds it.", sub: "Averr Studios · Toronto" },
   { id: "contact", eyebrow: "Contact", title: "Write to the person who builds it.", sub: "Or book a 30-minute discovery call." },

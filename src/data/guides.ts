@@ -1191,6 +1191,195 @@ const contractorHomePage: Guide = {
   ],
 };
 
+/**
+ * Guide 8 — build or buy.
+ *
+ * The Web Apps counterpart to the Wix comparison, and written on the
+ * same terms: this studio sells the build side, so the guide has to
+ * say plainly where buying wins, and the summary has to be capable of
+ * sending a reader away. A comparison nobody could lose is not a
+ * comparison.
+ *
+ * The argument came out of the case files rather than being imposed on
+ * them. All three webApps-led projects — Sift, CadenceStack and
+ * CapitalCommand — had mature off-the-shelf tools available in their
+ * category and were built anyway, and the stated problem in each is
+ * the same shape: the existing tools optimise for something adjacent
+ * to what the client needed. Volume rather than precision; typing
+ * rather than positioning; one loop where research and execution
+ * should be two.
+ *
+ * That is a real test a reader can apply to their own situation, and
+ * it is the only reason to build in here that is given any weight.
+ * The commoner reasons — we are unique, it will be cheaper, we want to
+ * own it — are argued against, because they are the ones that produce
+ * projects nobody should have started.
+ *
+ * No figures. The case files carry one (Sift's ATS improvement) but it
+ * measures an outcome of that product, not anything about the
+ * build-or-buy decision, so quoting it here would be borrowing
+ * authority from an unrelated number.
+ */
+const buildVsBuy: Guide = {
+  slug: "build-vs-buy-software",
+  title: "Build or buy: when custom software is worth it, and when it is not",
+  target: "build vs buy software",
+  svc: ["webApps"],
+  close:
+    "If you have run the test in the last section and the answer came out on the build side, the next step is a scoping call rather than a quote — thirty minutes to work out whether the thin layer is really thin. If it came out on the buy side, you have saved yourself a project, and we would rather you spent the money on the tool.",
+  dek: "Buying wins most of the time. There is one reason to build that holds up, and three projects we have shipped that met it — plus the common reasons that do not.",
+  published: "2026-11-22",
+  checked: "2026-11-22",
+  og: "guide-build-vs-buy",
+  intro: [
+    {
+      t: "p",
+      text: "We build custom software, so read this accordingly. The useful version of this question is not which is better — it is what you have to be able to say about your own situation before building is the rational choice, and most businesses cannot say it.",
+    },
+  ],
+  sections: [
+    {
+      h: "Buy, almost always",
+      blocks: [
+        {
+          t: "p",
+          text: "An established tool in a mature category has had years of other people's problems found and fixed in it. You are not paying for the features you can see on the pricing page; you are paying for the edge cases somebody already hit.",
+        },
+        {
+          t: "ul",
+          items: [
+            "It works on the day you pay for it, rather than in some number of weeks.",
+            "Someone else carries the maintenance, the security patching and the compliance work.",
+            "If it turns out to be wrong, you have lost a subscription rather than a project.",
+            "Your team may already know it, which is a real cost you only notice when it is absent.",
+          ],
+        },
+        {
+          t: "p",
+          text: "If a tool does roughly what you need and the gap is irritating rather than structural, buy it and live with the irritation. The irritation is cheaper than it looks and the project is more expensive than it looks.",
+        },
+      ],
+    },
+    {
+      h: "The reasons to build that do not hold up",
+      blocks: [
+        {
+          t: "p",
+          text: "Four arguments come up constantly. None of them is sufficient on its own, and together they are how a business ends up two-thirds of the way through something it did not need.",
+        },
+        {
+          t: "ul",
+          items: [
+            "\"Our business is unique.\" Almost every business believes this and most are unique in their market rather than in their software. Being unusual in how you sell is not the same as being unusual in how you track what you sold.",
+            "\"It will be cheaper than subscriptions eventually.\" Only if nothing changes and nobody maintains it, and both of those are false. Software you own is a thing you keep paying for in attention.",
+            "\"We want to own it.\" Ownership is real, but it is a benefit you feel in year three and a cost you feel immediately. It is a tiebreaker, not a reason.",
+            "\"The tool is missing one feature we need.\" One missing feature is an argument for asking the vendor, or for a small integration. It is not an argument for rebuilding the other forty features you are currently getting for free.",
+          ],
+        },
+      ],
+    },
+    {
+      h: "The one reason that does hold up",
+      blocks: [
+        {
+          t: "p",
+          text: "Building makes sense when every tool in the category is optimising for something adjacent to what you actually need — not missing a feature, but pointed at a slightly different problem. When that is true, buying does not get you most of the way there. It gets you somewhere else, efficiently.",
+        },
+        {
+          t: "p",
+          text: "This is narrower than it sounds, and it is the test worth applying honestly, because it is the only one of these arguments that does not dissolve when you look at it closely.",
+        },
+        {
+          t: "note",
+          label: "What we did",
+          text: "All three of the software products in our work met this test, and each one for the same reason in a different market. For Sift, every job-search tool in reach was built around auto-apply — optimising for volume, where the problem was precision. For CadenceStack, LinkedIn tools solve the typing, where the client's problem was positioning: knowing what to say next. For CapitalCommand, investing apps collapse research and execution into one loop, and the whole point was to put those steps back in order. In each case a tool existed, worked well, and was aimed a few degrees off.",
+        },
+      ],
+    },
+    {
+      h: "How to tell which situation you are in",
+      blocks: [
+        {
+          t: "p",
+          text: "Two questions separate the real version of this from the flattering version.",
+        },
+        {
+          t: "ol",
+          items: [
+            "Can you name, in one sentence, the thing every tool in the category is optimising for? If you cannot, you have not looked at enough of them to know whether yours is different.",
+            "Have you run at least two of them properly — not a trial, actual work — until you hit the wall? The wall is the evidence. Without it you are comparing your idea of a tool against your idea of a build, and your idea of a build is always better behaved than the real one.",
+          ],
+        },
+        {
+          t: "p",
+          text: "If you have hit the wall in two tools and can describe it in the same sentence both times, that is the signal. If you have not, the next step is to go and hit it, not to start building.",
+        },
+      ],
+    },
+    {
+      h: "What building actually costs",
+      blocks: [
+        {
+          t: "p",
+          text: "The build is the visible part and usually not the expensive part. What you are taking on alongside it:",
+        },
+        {
+          t: "ul",
+          items: [
+            "Every decision the tool was making for you. Permissions, exports, what happens on a failed payment, what an admin can undo. Each is small and there are hundreds.",
+            "Maintenance, which does not stop. Dependencies age, browsers change, and a thing nobody is tending quietly stops working.",
+            "The gap before it is useful. A tool is useful the day you buy it. A build is useful at the end, and you are running the business in between.",
+            "Being the person who fixes it. Whoever builds it is now the support line, including the version of that where they are on holiday.",
+          ],
+        },
+        {
+          t: "p",
+          text: "None of this is an argument against building. It is the argument for building the smallest possible thing, which is the next section.",
+        },
+      ],
+    },
+    {
+      h: "The middle path, which is usually the right one",
+      blocks: [
+        {
+          t: "p",
+          text: "Build or buy is rarely the actual choice. The useful version is: buy the commodity, build only the part that is genuinely yours, and connect them.",
+        },
+        {
+          t: "p",
+          text: "Payments, email, authentication, storage, calendars, accounting — buy all of it. The thing worth building is the layer where your business does something nobody has a product for, and that layer is usually much thinner than it feels at the start.",
+        },
+        {
+          t: "p",
+          text: "A thin custom layer over bought infrastructure gets you the thing you actually need while leaving the hundreds of small decisions with the vendors who already made them. It is also much easier to abandon if you were wrong, which is worth more than it sounds.",
+        },
+      ],
+    },
+    {
+      h: "What to work out before you talk to anyone",
+      blocks: [
+        {
+          t: "p",
+          text: "Whether you end up buying or building, this is the preparation that makes the conversation useful rather than speculative.",
+        },
+        {
+          t: "ol",
+          items: [
+            "Write down the two tools you have actually used for this and the exact point each one stopped working for you.",
+            "Write the sentence describing what every tool in the category optimises for, and the sentence describing what you need optimised instead. If those two sentences are the same, stop here — you are buying.",
+            "List the parts of the job that are pure commodity. That is the part nobody should build.",
+            "What is left is the scope, and it is usually a quarter of what you expected.",
+          ],
+        },
+        {
+          t: "p",
+          text: "Bring that to any developer and you will get a real answer instead of an estimate shaped like one, because you will have described the problem rather than the software you imagined solving it.",
+        },
+      ],
+    },
+  ],
+};
+
 export const GUIDES: Guide[] = [
   googleMaps,
   searchConsole,
@@ -1199,6 +1388,7 @@ export const GUIDES: Guide[] = [
   websiteVsWebApp,
   spreadsheetToSoftware,
   contractorHomePage,
+  buildVsBuy,
 ];
 
 export const GUIDE_BY_SLUG: Record<string, Guide> = Object.fromEntries(
