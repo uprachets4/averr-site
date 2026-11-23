@@ -11,7 +11,8 @@
     "test:dates": "node --test tools/business-days.test.ts",
     "test:tokens": "node --test tools/about-tokens.test.ts",
     "test:keywords": "node --test tools/keyword-map.test.ts",
-    "test:targets": "node tools/tap-targets.mjs"
+    "test:targets": "node tools/tap-targets.mjs",
+    "test:findable": "node --test tools/findability.test.ts"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",

@@ -107,6 +107,16 @@ export const META = {
        from theirs — one copy of the keyword, in the file that owns it. */
     target: INDUSTRIES.contractors.target,
   },
+  toolFindable: {
+    title: "Free Website Findability Check | Averr Studios",
+    description:
+      "Put in your website address and see what a search engine can and cannot work out about your business — structured data, crawlability, mobile and trust signals, with the reason each one matters. No email required.",
+    /* A tool's first job is earning links rather than ranking, but a
+       page with no search of its own is a page nobody decided about.
+       This is the long-tail phrasing a GTA owner actually types, and it
+       collides with nothing. */
+    target: "free website seo check toronto",
+  },
   about: {
     title: "About Averr Studios — Toronto Web Design and AI Studio",
     description:

@@ -18,6 +18,7 @@ const Services = lazy(() => import("./pages/Services"));
 const ServiceWebsites = lazy(() => import("./pages/ServiceWebsites"));
 const ServiceWebApps = lazy(() => import("./pages/ServiceWebApps"));
 const IndustryContractors = lazy(() => import("./pages/IndustryContractors"));
+const ToolFindable = lazy(() => import("./pages/ToolFindable"));
 const Guides = lazy(() => import("./pages/Guides"));
 const Guide = lazy(() => import("./pages/Guide"));
 const Work = lazy(() => import("./pages/Work"));
@@ -78,6 +79,7 @@ function App() {
                 <Route path="/services/websites" element={<ServiceWebsites />} />
                 <Route path="/services/web-apps" element={<ServiceWebApps />} />
                 <Route path="/industries/contractors" element={<IndustryContractors />} />
+                <Route path="/tools/findable" element={<ToolFindable />} />
                 <Route path="/guides" element={<Guides />} />
                 <Route path="/guides/:slug" element={<Guide />} />
                 <Route path="/work" element={<Work />} />

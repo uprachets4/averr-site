@@ -238,6 +238,28 @@ const pages = [
       ]),
     ],
   },
+  {
+    /* The tool is a SoftwareApplication so it can be understood as a
+       thing you use rather than an article about one. No FAQPage: the
+       pillar pages deliberately carry none, and a third FAQ on this
+       site would put two of them in the running for one rich result. */
+    url: "/tools/findable", meta: META.toolFindable, og: "tool-findable", priority: "0.8",
+    graph: [
+      studio,
+      {
+        "@type": "SoftwareApplication",
+        "@id": `${SITE}/tools/findable#tool`,
+        name: "Findability check",
+        url: `${SITE}/tools/findable`,
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Any",
+        description: META.toolFindable.description,
+        publisher: { "@id": ORG_ID },
+        offers: { "@type": "Offer", price: "0", priceCurrency: "CAD" },
+      },
+      crumbs([["Home", "/"], ["Findability check", "/tools/findable"]]),
+    ],
+  },
   { url: "/work", meta: META.work, og: "work", priority: "0.9", graph: [studio, crumbs([["Home", "/"], ["Work", "/work"]])] },
   ...BUILT.map((p) => ({
     url: `/work/${p.slug}`,
@@ -395,6 +417,12 @@ const SOURCES = {
     "src/components/services/pillar",
     "src/data/pillarPages.ts",
     "src/data/pillars.ts",
+  ],
+  "/tools/findable": [
+    "src/pages/ToolFindable.tsx",
+    "src/components/tools",
+    "src/lib/findability.ts",
+    "api/findability.ts",
   ],
   "/industries/contractors": [
     "src/pages/IndustryContractors.tsx",

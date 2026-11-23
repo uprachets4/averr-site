@@ -1,0 +1,374 @@
+/**
+ * The findability checker.
+ *
+ * Reuses the `.sv` navy ground so the tool reads as part of the site
+ * rather than a bolt-on, but takes its own layout: everything here is a
+ * single centred column, because the page is a form and a list of
+ * results and any other arrangement is decoration.
+ *
+ * Colour comes from the dark-ground vocabulary (--mute for text,
+ * --line and --faint for borders only) rather than the pale-card set
+ * (--ink, --light-2) — getting that backwards is what put thirteen
+ * contrast violations on the first pillar page.
+ */
+
+.fnd {
+  --fnd-ok: #7fd1a8;
+  --fnd-warn: #f3c969;
+  --fnd-bad: #f0907f;
+  /* --faint is a BORDER token (rgba(245,244,249,.14)) and reads at
+     about 1.3:1 against this ground — unusable for text, which is what
+     six rules in the first version of this file used it for. axe caught
+     two of them; the rest only escaped because they sat on larger type.
+     This is the secondary-text token: 62% white, 7.3:1 on the navy,
+     clear of AA at any size. --faint stays for borders only. */
+  --fnd-dim: rgba(245, 244, 249, 0.62);
+  padding-bottom: 96px;
+}
+
+.fnd .wrap {
+  max-width: 760px;
+}
+
+.fnd-hero {
+  padding-block: 48px 32px;
+}
+
+.fnd-hero h1 {
+  margin-top: 18px;
+  max-width: 18ch;
+}
+
+.fnd-acc {
+  color: var(--acc, #f9af97);
+}
+
+.fnd-sub {
+  margin-top: 20px;
+  max-width: 58ch;
+  color: var(--mute);
+}
+
+/* --- the form --- */
+
+.fnd-form {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.fnd-form input {
+  flex: 1 1 260px;
+  min-width: 0;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.16));
+  background: rgba(255, 255, 255, 0.04);
+  color: #f5f5f5;
+  font-size: 16px; /* 16px or iOS zooms the page on focus */
+  font-family: inherit;
+  transition: border-color 0.25s, background-color 0.25s;
+}
+
+.fnd-form input::placeholder {
+  color: var(--fnd-dim);
+}
+
+.fnd-form input:focus-visible {
+  outline: 2px solid var(--acc, #f9af97);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+.fnd-form button {
+  padding: 14px 24px;
+  border-radius: 999px;
+  border: 1px solid #ede9e2;
+  background: #ede9e2;
+  color: #121c27;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.25s, transform 0.25s;
+}
+
+.fnd-form button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.fnd-form button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.fnd-form button:focus-visible {
+  outline: 2px solid var(--acc, #f9af97);
+  outline-offset: 3px;
+}
+
+/* The limits, stated before the result rather than after it. */
+.fnd-limits {
+  margin-top: 20px;
+  max-width: 62ch;
+  color: var(--fnd-dim);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.fnd-limits strong {
+  color: var(--mute);
+  font-weight: 600;
+}
+
+/* --- waiting and failure --- */
+
+.fnd-wait,
+.fnd-err {
+  margin-top: 8px;
+  padding: 18px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.16));
+  color: var(--mute);
+}
+
+.fnd-err {
+  border-color: color-mix(in oklab, var(--fnd-bad) 45%, transparent);
+}
+
+/* --- the result --- */
+
+.fnd-out {
+  margin-top: 16px;
+}
+
+.fnd-out:focus-visible {
+  outline: 2px solid var(--acc, #f9af97);
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
+.fnd-score {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.fnd-score strong {
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.fnd-score span {
+  color: var(--fnd-dim);
+  font-size: 14px;
+}
+
+.fnd-good strong {
+  color: var(--fnd-ok);
+}
+.fnd-mid strong {
+  color: var(--fnd-warn);
+}
+.fnd-poor strong {
+  color: var(--fnd-bad);
+}
+
+.fnd-head {
+  margin-top: 14px;
+  max-width: 52ch;
+  color: #f5f5f5;
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.fnd-for {
+  margin-top: 8px;
+  color: var(--fnd-dim);
+  font-size: 13px;
+  word-break: break-all;
+}
+
+.fnd-group {
+  margin-top: 40px;
+  border-top: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+  padding-top: 24px;
+}
+
+.fnd-group h2 {
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+.fnd-group ul {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.fnd-group li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+/* The status marker is a shape as well as a colour: colour alone fails
+   WCAG 1.4.1, and a fifth of the people reading a contractor's audit
+   will not reliably separate the green from the amber. */
+.fnd-mark {
+  width: 14px;
+  height: 14px;
+  margin-top: 5px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.fnd-pass .fnd-mark {
+  background: var(--fnd-ok);
+}
+.fnd-warn .fnd-mark {
+  background: var(--fnd-warn);
+  border-radius: 2px;
+}
+.fnd-fail .fnd-mark {
+  background: var(--fnd-bad);
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+.fnd-none .fnd-mark {
+  background: transparent;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.22));
+}
+
+.fnd-group b {
+  display: block;
+  font-weight: 600;
+  color: #f5f5f5;
+  font-size: 16px;
+}
+
+.fnd-tag {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 2px;
+  color: var(--fnd-dim);
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.16));
+}
+
+.fnd-pass .fnd-tag {
+  color: var(--fnd-ok);
+  border-color: color-mix(in oklab, var(--fnd-ok) 40%, transparent);
+}
+.fnd-warn .fnd-tag {
+  color: var(--fnd-warn);
+  border-color: color-mix(in oklab, var(--fnd-warn) 40%, transparent);
+}
+.fnd-fail .fnd-tag {
+  color: var(--fnd-bad);
+  border-color: color-mix(in oklab, var(--fnd-bad) 40%, transparent);
+}
+
+.fnd-group p {
+  margin-top: 6px;
+  color: var(--mute);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.fnd-why {
+  color: var(--fnd-dim) !important;
+  font-size: 14px !important;
+}
+
+.fnd-not li p {
+  margin-top: 0;
+}
+
+/* --- the close --- */
+
+.fnd-end {
+  margin-top: 48px;
+  padding: 32px;
+  border-radius: 16px;
+  background: var(--navy-2, #16202c);
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.1));
+}
+
+.fnd-end h2 {
+  font-size: 22px;
+}
+
+.fnd-end p {
+  margin-top: 14px;
+  max-width: 56ch;
+  color: var(--mute);
+}
+
+.fnd-ctas {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.fnd-ctas a {
+  padding: 12px 24px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  transition: transform 0.25s, background-color 0.25s;
+}
+
+.fnd-ctas .pri {
+  background: #ede9e2;
+  color: #121c27;
+  border: 1px solid #ede9e2;
+}
+
+.fnd-ctas .sec {
+  color: #f5f5f5;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.22));
+}
+
+.fnd-ctas a:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 520px) {
+  .fnd-hero h1 {
+    max-width: none;
+  }
+  .fnd-score strong {
+    font-size: 48px;
+  }
+  .fnd-end {
+    padding: 24px 20px;
+  }
+  .fnd-form button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fnd-form button,
+  .fnd-ctas a {
+    transition: none;
+  }
+  .fnd-form button:hover:not(:disabled),
+  .fnd-ctas a:hover {
+    transform: none;
+  }
+}
