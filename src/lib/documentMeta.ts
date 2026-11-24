@@ -76,7 +76,7 @@ export const META = {
     target: "toronto web design studio",
   },
   services: {
-    title: "Web Design, Web Apps, AI & Marketing Services | Averr Studios",
+    title: "Web Design, Web Apps, AI & Marketing | Averr Studios",
     description:
       "Websites, web apps, AI automation and marketing for Toronto and GTA businesses. What's included, how long each takes, and a free 30-minute call to start.",
     target: "web design services toronto",
@@ -84,7 +84,7 @@ export const META = {
   serviceWebsites: {
     title: "Custom Website Design in Toronto | Averr Studios",
     description:
-      "Custom websites for Toronto and GTA businesses, hand-built in code rather than assembled from a theme. What a build includes, who we've built for, and a free 30-minute call.",
+      "Custom websites for Toronto and GTA businesses, hand-built in code rather than assembled from a theme. What a build includes, and a free 30-minute call.",
     /* Narrower than /services, which keeps "web design services
        toronto": this is the phrase someone types when they have already
        decided against a builder.
@@ -96,13 +96,13 @@ export const META = {
   serviceWebApps: {
     title: "Web App Development in Toronto | Averr Studios",
     description:
-      "Dashboards, internal tools and client portals for Toronto and GTA businesses, built by the person you brief. What a build includes, three tools in daily use, and a free 30-minute call.",
+      "Dashboards, internal tools and client portals for Toronto and GTA businesses, built by the person you brief. Three tools in daily use, and a free call.",
     target: PILLARS.webApps.target,
   },
   industryContractors: {
     title: "Contractor Website Design in Toronto | Averr Studios",
     description:
-      "Websites for GTA contractors and home services: the work first, the licence early, the phone one tap away. Two trade builds — one found by homeowners, one grown through referrals — and a free 30-minute call.",
+      "Websites for GTA contractors and home services: the work first, the licence early, the phone one tap away. Two trade builds, and a free 30-minute call.",
     /* From the industry registry for the same reason the pillars read
        from theirs — one copy of the keyword, in the file that owns it. */
     target: INDUSTRIES.contractors.target,
@@ -110,7 +110,7 @@ export const META = {
   toolFindable: {
     title: "Free Website Findability Check | Averr Studios",
     description:
-      "Put in your website address and see what a search engine can and cannot work out about your business — structured data, crawlability, mobile and trust signals, with the reason each one matters. No email required.",
+      "Put in your website address and see what a search engine can and cannot work out about your business: structure, crawlability, mobile, trust. No email.",
     /* A tool's first job is earning links rather than ranking, but a
        page with no search of its own is a page nobody decided about.
        This is the long-tail phrasing a GTA owner actually types, and it
@@ -142,7 +142,7 @@ export const META = {
   guides: {
     title: "Guides for Toronto Small Businesses | Averr Studios",
     description:
-      "Plain-language guides to the things Toronto and GTA business owners ask us about most: Google Maps, Search Console, analytics and site speed. Free, no sign-up.",
+      "Plain-language guides to what Toronto and GTA owners ask us about most: Google Maps, Search Console, site speed, and what to build. Free, no sign-up.",
     target: "small business guides toronto",
   },
   privacy: {
@@ -159,8 +159,10 @@ export const META = {
   /** The 404 takes the home description, as the table specifies. */
   notFound: {
     title: "Not found — Averr Studios",
+    /* Was a copy of the home page's, which is harmless for ranking —
+       this page is noindex — and wrong for anyone who lands here. */
     description:
-      "A Toronto studio building websites, web apps, AI automation and marketing for businesses across the GTA. You work directly with the person who builds it.",
+      "That page is not here. Try the work, the services or the guides, or book a free 30-minute call and ask us directly.",
     target: null,
   },
 } as const;
@@ -173,11 +175,46 @@ const CASE_KIND: Record<string, string> = {
   marketing: "Marketing",
 };
 
+/**
+ * The lengths a search result actually shows. Titles past roughly 60
+ * characters are trimmed with an ellipsis; descriptions past roughly
+ * 158 are cut. `tools/meta-lengths.test.ts` holds every page to these,
+ * which is the only reason they stay true — ten titles and eighteen
+ * descriptions had drifted over before the test existed.
+ */
+export const TITLE_MAX = 60;
+export const DESCRIPTION_MAX = 158;
+
+/** One guide's title and description, shared by the page and the prerender. */
+export function guideMeta(g: { title: string; dek: string }): { title: string; description: string } {
+  const title = `${g.title} | Averr Studios`;
+  const description =
+    g.dek.length <= DESCRIPTION_MAX
+      ? g.dek
+      : g.dek.slice(0, g.dek.lastIndexOf(" ", DESCRIPTION_MAX - 1)) + "…";
+  return { title, description };
+}
+
 /** One case study's title and description, shared by the page and the prerender. */
 export function caseMeta(p: { name: string; svc: readonly string[]; thesis: string; problem: string; sector: string }) {
   const kind = CASE_KIND[p.svc[0]] ?? "Project";
   const title = `${p.name}: ${kind} Case Study | Averr Studios`;
-  const raw = `${p.name} (${p.sector}): ${p.thesis} ${p.problem} Built by Averr Studios, Toronto.`;
-  const description = raw.length <= 158 ? raw : raw.slice(0, raw.lastIndexOf(" ", 157)) + "…";
+
+  /* This used to build the whole sentence and clip whatever ran past
+     the limit, which cut the credit off the end of all five case
+     studies — the one clause that says whose work it is. Build the
+     longest version that fits instead: drop the problem sentence
+     before the credit, and clip only if even the short form is long. */
+  const credit = " Built by Averr Studios, Toronto.";
+  const lead = `${p.name} (${p.sector}): ${p.thesis}`;
+  const full = `${lead} ${p.problem}${credit}`;
+  const short = `${lead}${credit}`;
+  const description =
+    full.length <= DESCRIPTION_MAX
+      ? full
+      : short.length <= DESCRIPTION_MAX
+        ? short
+        : lead.slice(0, lead.lastIndexOf(" ", DESCRIPTION_MAX - credit.length - 1)) + "…" + credit;
+
   return { title, description };
 }
