@@ -14,7 +14,8 @@
     "test:targets": "node tools/tap-targets.mjs",
     "test:findable": "node --test tools/findability.test.ts",
     "test:function": "node tools/function-loads.mjs",
-    "test:meta": "node --test tools/meta-lengths.test.ts"
+    "test:meta": "node --test tools/meta-lengths.test.ts",
+    "test:schema": "node --test tools/schema.test.ts"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",
