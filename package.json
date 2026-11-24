@@ -15,7 +15,8 @@
     "test:findable": "node --test tools/findability.test.ts",
     "test:function": "node tools/function-loads.mjs",
     "test:meta": "node --test tools/meta-lengths.test.ts",
-    "test:schema": "node --test tools/schema.test.ts"
+    "test:schema": "node --test tools/schema.test.ts",
+    "test:contact": "node --test tools/contact.test.ts"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",
