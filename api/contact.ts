@@ -15,6 +15,25 @@ function bad(status: number, body: object) {
   });
 }
 
+/**
+ * Say so, out loud, when a message does not get through.
+ *
+ * On 24 Nov 2026 this form had been failing for an unknown length of
+ * time with RESEND_API_KEY missing from the Vercel project. Every
+ * enquiry through /contact was lost. Nothing recorded it: the route
+ * returned its errors as HTTP responses and wrote nothing to the
+ * console, so Vercel's runtime logs were empty, there was no alert,
+ * and the only evidence was a visitor seeing "it didn't send".
+ *
+ * One line per failure, prefixed so it can be filtered, and carrying
+ * the reason rather than a status code on its own. Never the key, and
+ * never the sender's address or their message — a log is not the place
+ * for either, and the useful part is why the send failed.
+ */
+function logFailure(reason: string, detail?: Record<string, unknown>) {
+  console.error(`[contact] send failed: ${reason}`, detail ? JSON.stringify(detail) : "");
+}
+
 function escapeHtml(s: string) {
   return s
     .replace(/&/g, "&amp;")
@@ -51,6 +70,7 @@ export async function POST(req: Request): Promise<Response> {
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
+    logFailure("RESEND_API_KEY is not set on this deployment");
     return bad(500, {
       error:
         "Email backend is not configured. Please set RESEND_API_KEY in Vercel.",
@@ -85,6 +105,9 @@ export async function POST(req: Request): Promise<Response> {
       }),
     });
   } catch (e) {
+    logFailure("could not reach the email service", {
+      cause: e instanceof Error ? e.message : String(e),
+    });
     return bad(502, { error: "Could not reach email service" });
   }
 
@@ -97,10 +120,18 @@ export async function POST(req: Request): Promise<Response> {
     } catch {
       /* ignore */
     }
+    logFailure("the email service rejected the send", {
+      status: resendRes.status,
+      providerMessage: providerMessage || "(none given)",
+    });
     return bad(resendRes.status >= 500 ? 502 : 500, {
       error: providerMessage || `Email service returned ${resendRes.status}`,
     });
   }
+
+  /* Logged too, so an empty log means no one wrote in rather than
+     the form being broken again. No address and no message body. */
+  console.log("[contact] send ok");
 
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,
