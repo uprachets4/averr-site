@@ -1989,6 +1989,214 @@ const notOnGoogle: Guide = {
     "If you have run the ten minutes and want someone to tell you which of the three you have and what it would actually take, that is a reasonable first call. We will give you the honest answer, including the one where the website is not the problem and you should go and fill in your Google profile instead.",
 };
 
+/**
+ * Guide 12 — app or web app.
+ *
+ * The fifth Web Apps guide, which takes that pillar to the five that
+ * count as depth and finishes both pillars.
+ *
+ * Distinct from `websiteVsWebApp`, which is site versus app. This is
+ * native versus web, the conversation that starts when an owner says
+ * "we need an app" — and the honest answer is usually that they do
+ * not, which is a good thing for the studio that builds web apps to
+ * be the one saying.
+ *
+ * Facts checked on 23 Nov 2026 rather than written from memory, and
+ * the check changed the guide. The draft was going to argue that the
+ * capability gap is what decides it; it is not, because the gap has
+ * largely closed. Web Push reached iOS in Safari 16.4 and works
+ * across Chrome, Firefox, Edge and Safari on both desktop and
+ * mobile. What remains is installation: Safari shows no install
+ * prompt, a user has to find Add to Home Screen in the share menu,
+ * and on iPhone push does not work at all until they have. That is
+ * a distribution problem rather than a technical one, and it is the
+ * spine of the guide.
+ *
+ * The EU's separate treatment of home-screen web apps is left out.
+ * It has changed more than once, the sources disagree, and no GTA
+ * client has European users. A guide should not carry a fact its
+ * reader cannot use and its author cannot stand behind.
+ *
+ * No prices and no build durations.
+ */
+const appOrWebApp: Guide = {
+  slug: "mobile-app-or-web-app",
+  title: "Do you need a mobile app, or a web app?",
+  target: "mobile app vs web app for business",
+  svc: ["webApps"],
+  dek: "The capability gap has mostly closed. What is left is getting it installed, which is a distribution problem and what decides this for most businesses.",
+  published: "2026-11-23",
+  checked: "2026-11-23",
+  og: "guide-app-or-web-app",
+  intro: [
+    {
+      t: "p",
+      text: "Most people who say they need an app have not decided between two quite different products. One lives in the App Store and Google Play and has to be installed. The other opens in a browser, can be saved to a phone's home screen, and looks identical to the person using it.",
+    },
+    {
+      t: "p",
+      text: "We build the second kind, so weigh that. The useful version of this comparison is not which is better; it is what a browser genuinely cannot do any more, which is a shorter list than it was.",
+    },
+  ],
+  sections: [
+    {
+      h: "Three things people mean by an app",
+      blocks: [
+        {
+          t: "ul",
+          items: [
+            "A native app: built for iPhone and Android, distributed through the stores, installed and updated like any other app.",
+            "A web app: a real application that runs in the browser. It can be saved to the home screen, open without browser chrome, work offline and send notifications. No store, no download.",
+            "A mobile-friendly website: your existing site, readable on a phone. Not an app at all, and often what someone actually needs.",
+          ],
+        },
+        {
+          t: "p",
+          text: "The third is worth ruling out before anything else. If what you want is for customers to find you, read something and get in touch, that is a website, and an app is a way of spending considerably more to reach fewer people.",
+        },
+      ],
+    },
+    {
+      h: "What a browser can do now",
+      blocks: [
+        {
+          t: "p",
+          text: "This is the part most comparisons get wrong, because they were written when it was true. A web app today can:",
+        },
+        {
+          t: "ul",
+          items: [
+            "Be saved to the home screen with its own icon, and open full screen with no browser bar.",
+            "Work offline, and keep working with no signal once it has been loaded.",
+            "Send push notifications. Android and desktop have had this for years; Safari added it for iPhone and iPad in 16.4, and it now works across the major browsers.",
+            "Use the camera, the microphone and location.",
+            "Open the phone's own share sheet.",
+          ],
+        },
+        {
+          t: "p",
+          text: "For a booking tool, a customer portal, a dashboard, an internal system, a quoting app or an ordering flow, the browser does everything required. The capability argument for going native has quietly stopped applying to most business software.",
+        },
+      ],
+    },
+    {
+      h: "The gap that actually remains",
+      blocks: [
+        {
+          t: "note",
+          label: "It is distribution, not technology",
+          text: "On an iPhone there is no install prompt. Safari will not offer to add your web app to the home screen; the user has to open the share menu and find Add to Home Screen themselves. And push notifications do not work at all until they have done it — somebody reading your web app in a Safari tab cannot be sent anything. Android handles this better, with a real install prompt. So the question is not whether your web app can behave like an app. It is whether the people you need it installed by will follow two steps to install it.",
+        },
+        {
+          t: "p",
+          text: "That reframes the decision usefully. For twenty staff, two steps is nothing: you show them once. For customers who have never heard of you, two steps on a phone is most of them gone, and a store listing with a one-tap install is worth real money.",
+        },
+      ],
+    },
+    {
+      h: "What a native app costs after it is built",
+      blocks: [
+        {
+          t: "p",
+          text: "The build is the part people budget for. These are the parts they do not:",
+        },
+        {
+          t: "ul",
+          items: [
+            "Two platforms. Either two codebases, or a cross-platform framework and the compromises it brings.",
+            "Review. Every release waits for Apple. A bug on a Friday is not fixed on a Friday.",
+            "Versions in the wild. Some of your users will be on an old build for months, and your back end has to keep working for them.",
+            "Store accounts and fees, renewed annually and forever.",
+            "Getting it installed, which is the real cost and the one nobody estimates.",
+          ],
+        },
+        {
+          t: "p",
+          text: "A web app has none of these. You deploy and everyone has the new version on their next load.",
+        },
+      ],
+    },
+    {
+      h: "When a native app is genuinely the answer",
+      blocks: [
+        {
+          t: "p",
+          text: "It is a real list, and it is specific:",
+        },
+        {
+          t: "ul",
+          items: [
+            "It needs to do things while closed — track location in the background, sync continuously, respond to something while nobody is holding the phone.",
+            "It leans on the hardware: sustained camera work, Bluetooth devices, sensors, anything that has to be fast and local.",
+            "It is used all day by people in the field, offline-first, where installation is a non-issue because it is the job.",
+            "It is a game, or anything where the frame rate is the product.",
+            "The store is your distribution channel. If people are going to find you by searching the App Store, you need to be in the App Store, and no amount of web capability substitutes for that.",
+          ],
+        },
+        {
+          t: "p",
+          text: "If none of those describe the thing you are imagining, a native app is a more expensive way to deliver the same product to fewer people.",
+        },
+      ],
+    },
+    {
+      h: "Five real asks, and where each one lands",
+      blocks: [
+        {
+          t: "p",
+          text: "Put against actual requests rather than principles, the decision is usually quick:",
+        },
+        {
+          t: "ul",
+          items: [
+            "Customers book appointments and get a reminder the day before. Web app. Nothing here needs a store, and asking a customer to install something before they can book you will cost you bookings.",
+            "Our installers log each job on site, and half the basements have no signal. Web app, almost certainly. It works offline once loaded, and staff will follow two steps to install it because it is the job. Native only if it has to sync in the background while nobody is holding the phone.",
+            "Clients want to see their project status without emailing us. Web app, and it should be a link in your email signature. A portal nobody installs is a portal nobody opens.",
+            "We want people to find us in the App Store. Native, and that is a complete answer. Store presence is the one thing a web app cannot substitute for, and if it is genuinely how you expect to be discovered, nothing else in this guide matters.",
+            "Staff check stock from the shop floor on their own phones. Web app. Personal devices make installation harder, and a link that works in any browser sidesteps the whole problem.",
+          ],
+        },
+        {
+          t: "p",
+          text: "Four of those five are web apps, which is roughly the real ratio. The one that is not is the one where the App Store is the point, and it is usually obvious which one you are.",
+        },
+      ],
+    },
+    {
+      h: "The order that usually works",
+      blocks: [
+        {
+          t: "ol",
+          items: [
+            "Build the web app. It is one build, it works on every phone and every desktop, and it is live the day it is finished.",
+            "Watch what people actually do with it. Most of what you imagined for version two turns out not to matter, and something you did not think of turns out to.",
+            "If the usage justifies a store presence, go then — with a year of real behaviour telling you what to build, rather than guesses.",
+          ],
+        },
+        {
+          t: "p",
+          text: "The reverse order is the expensive one. A native app built first commits you to two platforms and a release cycle before you know whether anyone wants the thing.",
+        },
+      ],
+    },
+    {
+      h: "The tell, when someone quotes you",
+      blocks: [
+        {
+          t: "p",
+          text: "Ask what it needs to do that a browser cannot. A good answer names something concrete from the list above, or says plainly that nothing does and recommends the web app.",
+        },
+        {
+          t: "p",
+          text: "A quote for a native build that arrives without that question having been asked is a quote for the more expensive option by default. That is not necessarily dishonest — native is what a lot of shops build, and people quote what they build — but you are the one paying for the assumption, so it is worth making them say it out loud.",
+        },
+      ],
+    },
+  ],
+  close:
+    "If you are weighing this, the quickest way through is a call where we ask what it has to do and tell you which one that points at. If it points at a native app we will say so, and we do not build those.",
+};
+
 export const GUIDES: Guide[] = [
   googleMaps,
   searchConsole,
@@ -2001,6 +2209,7 @@ export const GUIDES: Guide[] = [
   agencyVsFreelancer,
   softwareBrief,
   notOnGoogle,
+  appOrWebApp,
 ];
 
 export const GUIDE_BY_SLUG: Record<string, Guide> = Object.fromEntries(
