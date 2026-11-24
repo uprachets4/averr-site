@@ -36,6 +36,7 @@ const CARDS = [
   { id: "tool-findable", eyebrow: "Free tool", title: "Can customers find you?", sub: "Check what Google can and cannot work out about your business." },
   { id: "industry-contractors", eyebrow: "Contractors · GTA", title: "A website that gets you called.", sub: "Two builds for GTA trades: an installer and a renovation company." },
   { id: "work", eyebrow: "Work", title: "Built by Averr.", sub: "Real products for businesses across the GTA." },
+  { id: "how-we-work", eyebrow: "How we work", title: "What you are actually buying.", sub: "Four stages, five promises, and what you own at the end." },
   { id: "about", eyebrow: "About", title: "You work directly with the person who builds it.", sub: "Averr Studios · Toronto" },
   { id: "contact", eyebrow: "Contact", title: "Write to the person who builds it.", sub: "Or book a 30-minute discovery call." },
   { id: "prachets", eyebrow: "Founder, Averr Studios", title: "Prachets Upadhyay", sub: "Save my contact or book a discovery call." },

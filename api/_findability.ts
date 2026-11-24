@@ -443,6 +443,10 @@ export function analyze(input: AnalyzeInput): Report {
   /* --- Group 3: will it work on a phone --- */
   const viewport = metaContent(html, "viewport");
   const https = finalUrl.startsWith("https://");
+  /* Whether the page says it is written content rather than a business
+     page, read off its own structured data. Used only to decide whether
+     having no images is worth mentioning. */
+  const written = types.some((t) => /^(Article|BlogPosting|NewsArticle|TechArticle|WebPage)$/i.test(t));
   const imgs = [...html.matchAll(/<img\b[^>]*>/gi)].map((m) => m[0]);
   const withAlt = imgs.filter((t) => /\salt=/i.test(t)).length;
   const altPct = imgs.length === 0 ? 100 : Math.round((withAlt / imgs.length) * 100);
@@ -458,7 +462,15 @@ export function analyze(input: AnalyzeInput): Report {
         ? check("https", "Secure connection", "pass", "Served over HTTPS.", "Browsers mark anything else as not secure, in front of your customer.")
         : check("https", "Secure connection", "fail", "Not served over HTTPS.", "Browsers mark this as not secure, in front of your customer."),
       imgs.length === 0
-        ? check("alt", "Image descriptions", "warn", "No images found on the page.", "For a trade, photographs of finished work are the most persuasive thing you have.")
+        ? written
+          /* A guide, a blog post or a policy page with no photographs is
+             not a fault, and warning about it was the tool being wrong
+             on its own site: seventeen of twenty-nine pages were told
+             they had no images, with advice about photographs of
+             finished work. If the page declares itself as written
+             content, there is nothing here to fix. */
+          ? check("alt", "Image descriptions", "pass", "No images, which is normal for a written page.", "Alt text matters once there are images. A page of text does not need any.")
+          : check("alt", "Image descriptions", "warn", "No images found on the page.", "Photographs of real work are usually the most persuasive thing on a small business page.")
         : altPct >= 90
           ? check("alt", "Image descriptions", "pass", `${withAlt} of ${imgs.length} images have alt text.`, "Alt text is how a search engine and a screen reader know what a photo shows.")
           : check("alt", "Image descriptions", altPct >= 50 ? "warn" : "fail", `Only ${withAlt} of ${imgs.length} images have alt text.`, "Alt text is how a search engine and a screen reader know what a photo shows."),
