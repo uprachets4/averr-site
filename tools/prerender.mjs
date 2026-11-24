@@ -356,6 +356,7 @@ const pages = [
   })),
   { url: "/about", meta: META.about, og: "about", priority: "0.7", graph: [studio, founder, crumbs([["Home", "/"], ["About", "/about"]])] },
   { url: "/contact", meta: META.contact, og: "contact", priority: "0.8", graph: [studio, crumbs([["Home", "/"], ["Contact", "/contact"]])] },
+  { url: "/tools/automation-roi", meta: META.toolAutomationRoi, og: "tool-automation-roi", priority: "0.6", graph: [crumbs([["Home", "/"], ["Automation calculator", "/tools/automation-roi"]])] },
   { url: "/how-we-work", meta: META.howWeWork, og: "how-we-work", priority: "0.6", graph: [crumbs([["Home", "/"], ["How we work", "/how-we-work"]])] },
   { url: "/privacy", meta: META.privacy, og: "home", priority: "0.3", graph: [] },
   { url: "/prachets", meta: META.card, og: "prachets", priority: "0.5", graph: [founder] },

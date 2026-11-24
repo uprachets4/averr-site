@@ -117,6 +117,15 @@ export const META = {
        collides with nothing. */
     target: "free website seo check toronto",
   },
+  toolAutomationRoi: {
+    title: "Free Automation Time Calculator | Averr Studios",
+    description:
+      "Work out what a repeated task costs your business in a year, in hours and in money. Four numbers, no email, nothing stored.",
+    /* Sits beside the findability checker: a tool earns links first and
+       ranks second, but a page with no search of its own is a page
+       nobody decided about. Collides with nothing. */
+    target: "automation roi calculator",
+  },
   about: {
     title: "About Averr Studios — Toronto Web Design and AI Studio",
     description:
