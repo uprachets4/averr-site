@@ -18,6 +18,7 @@ const STUDIO_LINKS = [
      shipping orphaned the way /industries/contractors did. */
   { label: "Findability check", href: "/tools/findable" },
   { label: "About", href: "/about" },
+  { label: "How we work", href: "/how-we-work" },
   { label: "Contact", href: "/contact" },
 ];
 

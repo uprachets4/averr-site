@@ -63,6 +63,7 @@ function entries(): { url: string; target: string | null; shipped?: boolean }[] 
     about: "/about",
     contact: "/contact",
     work: "/work",
+    howWeWork: "/how-we-work",
     privacy: "/privacy",
     /* The key is `card`; the route it ships at is /prachets. The
        sitemap check below is what caught that mismatch. */

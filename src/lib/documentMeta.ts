@@ -145,6 +145,16 @@ export const META = {
       "Plain-language guides to what Toronto and GTA owners ask us about most: Google Maps, Search Console, site speed, and what to build. Free, no sign-up.",
     target: "small business guides toronto",
   },
+  /** The trust page. Deliberately `target: null` — it exists to answer
+   *  a question a buyer already on the site has, not to win a search.
+   *  Giving it a phrase it will not rank for would take that phrase out
+   *  of circulation for a page that could. */
+  howWeWork: {
+    title: "How We Work \u2014 Averr Studios, Toronto",
+    description:
+      "What a project with Averr Studios actually involves: the four stages, what we commit to, what we need from you, and what you own at the end.",
+    target: null,
+  },
   privacy: {
     title: "Privacy — Averr Studios",
     description: "How Averr Studios handles the information you send us, including cookies and analytics.",

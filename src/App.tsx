@@ -26,6 +26,7 @@ const CaseStudy = lazy(() => import("./pages/CaseStudy"));
 const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const HowWeWork = lazy(() => import("./pages/HowWeWork"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Prachets = lazy(() => import("./pages/Prachets"));
 
@@ -86,6 +87,7 @@ function App() {
                 <Route path="/work/:slug" element={<CaseStudy />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/how-we-work" element={<HowWeWork />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/prachets" element={<Prachets />} />
                 <Route path="*" element={<NotFound />} />
