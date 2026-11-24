@@ -1,0 +1,181 @@
+/**
+ * The automation time calculator.
+ *
+ * Same navy ground and same single centred column as the findability
+ * checker, for the same reason: the page is a short form and a result,
+ * and any other arrangement is decoration. Shares that file's colour
+ * discipline too — `--roi-dim` for secondary text, never `--faint`,
+ * which is a 14% border token and reads at about 1.3:1 here.
+ */
+
+.roi {
+  --roi-dim: rgba(245, 244, 249, 0.62);
+  --roi-ok: #7fd1a8;
+  padding-bottom: 96px;
+}
+
+.roi .wrap {
+  max-width: 760px;
+}
+
+.roi-hero {
+  padding-block: 48px 32px;
+}
+
+.roi-hero h1 {
+  margin-top: 18px;
+  max-width: 20ch;
+}
+
+.roi-acc {
+  color: var(--roi-ok);
+}
+
+.roi-sub {
+  margin-top: 20px;
+  max-width: 62ch;
+  color: var(--mute);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+.roi-form {
+  margin-top: 32px;
+  display: grid;
+  gap: 20px;
+}
+
+.roi-row {
+  display: grid;
+  gap: 8px;
+}
+
+.roi-row label {
+  font-size: 0.9375rem;
+  color: rgba(245, 244, 249, 0.92);
+}
+
+.roi-hint {
+  font-size: 0.8125rem;
+  color: var(--roi-dim);
+  line-height: 1.5;
+}
+
+.roi-row input[type="text"],
+.roi-row input[type="number"] {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f5f4f9;
+  font: inherit;
+  font-size: 1rem;
+}
+
+.roi-row input:focus-visible {
+  outline: 2px solid var(--roi-ok);
+  outline-offset: 2px;
+}
+
+.roi-pair {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 560px) {
+  .roi-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+.roi-out {
+  margin-top: 40px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 28px 24px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.roi-big {
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: #fff;
+  margin: 0;
+}
+
+.roi-big span {
+  color: var(--roi-ok);
+}
+
+.roi-line {
+  margin-top: 14px;
+  color: var(--mute);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.roi-grid {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 560px) {
+  .roi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.roi-stat b {
+  display: block;
+  font-size: 1.375rem;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.roi-stat span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8125rem;
+  color: var(--roi-dim);
+}
+
+.roi-share {
+  margin-top: 28px;
+}
+
+.roi-share input[type="range"] {
+  width: 100%;
+  accent-color: var(--roi-ok);
+}
+
+.roi-note {
+  margin-top: 32px;
+  border-left: 2px solid var(--line);
+  padding-left: 16px;
+  color: var(--roi-dim);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.roi-note strong {
+  color: rgba(245, 244, 249, 0.92);
+}
+
+.roi-end {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+
+.roi-end p {
+  color: var(--mute);
+  line-height: 1.65;
+  max-width: 60ch;
+}

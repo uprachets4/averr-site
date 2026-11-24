@@ -17,6 +17,7 @@ const STUDIO_LINKS = [
      the same family as the guides, and a site-wide link is what stops it
      shipping orphaned the way /industries/contractors did. */
   { label: "Findability check", href: "/tools/findable" },
+  { label: "Automation calculator", href: "/tools/automation-roi" },
   { label: "About", href: "/about" },
   { label: "How we work", href: "/how-we-work" },
   { label: "Contact", href: "/contact" },

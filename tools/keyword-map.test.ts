@@ -60,6 +60,7 @@ function entries(): { url: string; target: string | null; shipped?: boolean }[] 
     serviceWebApps: "/services/web-apps",
     industryContractors: "/industries/contractors",
     toolFindable: "/tools/findable",
+    toolAutomationRoi: "/tools/automation-roi",
     about: "/about",
     contact: "/contact",
     work: "/work",
