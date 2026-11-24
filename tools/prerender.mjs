@@ -48,9 +48,19 @@ const ld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj).re
 /* ── the studio, as structured data (owner-stated facts only) ──────── */
 const ORG_ID = `${SITE}/#studio`;
 const FOUNDER_ID = `${SITE}/#prachets`;
-/* The studio's own public profiles. Add the Google Business Profile, Clutch
-   and Apple links here once each is verified and live. */
-const STUDIO_PROFILES = ["https://www.instagram.com/averrstudios"];
+/* The studio's own public profiles. Add the Clutch and Apple links here once
+   each is verified and live.
+
+   The Google Business Profile went on 23 Nov 2026, the day after the profile
+   was verified. It is the share link from the listing rather than a
+   google.com/maps/place/... URL with a CID in it: Google blocks automated
+   reads of both g.page and maps.app.goo.gl, so the canonical form could not
+   be resolved from here. The short link is Google's own and permanent, and
+   swapping it for the canonical URL later changes nothing else. */
+const STUDIO_PROFILES = [
+  "https://www.instagram.com/averrstudios",
+  "https://maps.app.goo.gl/wsJaom8Gdpftd91n8",
+];
 const GTA = ["Toronto", "North York", "Scarborough", "Etobicoke", "Mississauga", "Brampton", "Vaughan", "Markham", "Richmond Hill", "Oakville"];
 /* Declared above `studio` because its offer catalogue builds service
    nodes while this module initialises, and a const is not readable
