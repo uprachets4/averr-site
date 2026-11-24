@@ -1784,6 +1784,211 @@ const softwareBrief: Guide = {
     "If you have written the page and want someone to read it back to you, that is a good use of a first call — we will tell you which parts are doing work and which are a wish, whether or not we end up building it. Thirty minutes, and you keep the brief either way.",
 };
 
+/**
+ * Guide 11 — the diagnostic.
+ *
+ * The fifth Websites guide, which takes that pillar to the five that
+ * count as depth. It is also the highest-intent search on the list:
+ * someone typing this has just discovered they cannot find themselves
+ * and is about to pay somebody.
+ *
+ * It opens by refusing the question as asked. Almost nobody who says
+ * "my site is not on Google" is invisible; they are invisible for the
+ * search that would bring them work, which is a different problem
+ * with a different fix. Three problems get conflated into one
+ * complaint, and most advice answers whichever one the writer felt
+ * like answering. Separating them is the whole value of the page, and
+ * it is also what stops this guide colliding with the Search Console
+ * and Google Maps guides — those are how-tos, this is the triage that
+ * tells a reader which of them they need.
+ *
+ * Prose blocks render as plain text, so nothing here can be a link.
+ * The free checker and the other guides are named rather than linked;
+ * the closer is where a reader gets sent.
+ *
+ * No timelines in weeks and no traffic figures. "A new domain takes
+ * three to six months" is the kind of number that gets repeated
+ * because it sounds specific, and nobody can tell you what it will be
+ * for yours.
+ */
+const notOnGoogle: Guide = {
+  slug: "why-your-website-isnt-on-google",
+  title: "Why your website isn't showing up on Google",
+  target: "why is my website not showing up on google",
+  svc: ["websites"],
+  dek: "Three different problems get called this, and the fix for one makes no difference to the others. Here is how to tell which one you actually have.",
+  published: "2026-11-23",
+  checked: "2026-11-23",
+  og: "guide-not-on-google",
+  intro: [
+    {
+      t: "p",
+      text: "Almost nobody who says this is actually invisible. Search your business name and you will usually find yourself immediately. What people mean is that they are invisible for the search that would bring them work, and that is a different problem with a different fix.",
+    },
+    {
+      t: "p",
+      text: "There are three problems hiding inside this one complaint. Most advice answers whichever the writer felt like answering, which is why so much of it does nothing. Work out which one you have first.",
+    },
+  ],
+  sections: [
+    {
+      h: "The ten-second test",
+      blocks: [
+        {
+          t: "p",
+          text: "Type this into Google, with your own domain and no space after the colon:",
+        },
+        {
+          t: "p",
+          text: "site:yourbusiness.ca",
+        },
+        {
+          t: "p",
+          text: "That asks Google to list only pages it holds from your site. What comes back tells you which problem you have, and it is the first thing anyone competent will check.",
+        },
+        {
+          t: "ul",
+          items: [
+            "Nothing at all: Google does not have your site. Problem one.",
+            "Some pages but not the ones that matter: Google has part of it. Also problem one, narrower.",
+            "Everything, but you still cannot find yourself in a normal search: Google has you and is not showing you. Problem two or three.",
+          ],
+        },
+      ],
+    },
+    {
+      h: "Problem one: Google does not have your pages",
+      blocks: [
+        {
+          t: "p",
+          text: "Rarer than people assume, and almost always one of five things:",
+        },
+        {
+          t: "ul",
+          items: [
+            "The site is new. Google has not got to it yet. Nothing is broken; it has been days, not months.",
+            "Nothing points at it. Google finds pages by following links, and a brand new site with no links anywhere is a house with no road to it.",
+            "A noindex tag was left on. This is the common one. Sites are built with indexing switched off so the half-finished version does not get found, and switching it back on is the step everyone forgets. It is invisible from the front of the site.",
+            "robots.txt is blocking crawlers, usually the same story: a staging setting that shipped.",
+            "The pages have no text in them. If the site is built so that the content only appears once JavaScript has run, there are builders and frameworks where what Google first receives is an empty shell. The page looks perfect to you and reads as blank to a crawler.",
+          ],
+        },
+        {
+          t: "p",
+          text: "Search Console tells you which of these it is, and it is free. There is a separate guide on this site for setting it up; the Pages report names every URL it knows about and says in plain language why each one is not indexed.",
+        },
+      ],
+    },
+    {
+      h: "Problem two: Google has you and nobody sees you",
+      blocks: [
+        {
+          t: "p",
+          text: "This is most people. You are in the index, you are on page four, and page four does not exist as far as customers are concerned.",
+        },
+        {
+          t: "p",
+          text: "Three honest reasons, in the order they usually apply:",
+        },
+        {
+          t: "ol",
+          items: [
+            "Nobody links to you. Links from other real websites are still the strongest signal there is, and a new site has none. This is the slow one and there is no trick for it.",
+            "Your pages do not contain the words people search. Sites describe what the business calls itself rather than what a customer types. A page headed Our Services competes for nothing.",
+            "Everyone above you has been there for years. Age is not a ranking factor on its own, but the things that come with age are.",
+          ],
+        },
+        {
+          t: "p",
+          text: "Anyone who promises you page one on a competitive search by a particular date is either guessing or lying, and the honest version of this answer is that it depends on who is above you and how long they have been there.",
+        },
+      ],
+    },
+    {
+      h: "Problem three: you rank, but only for your own name",
+      blocks: [
+        {
+          t: "p",
+          text: "Ranking first for your business name is not visibility. The people searching it already know you exist; you did not win them, you were handed them.",
+        },
+        {
+          t: "p",
+          text: "The question worth asking is what somebody types when they do not know you exist. For most local businesses that is a service and a place, and it is a phrase the website often does not contain anywhere. If the words a customer would use appear nowhere on the site, no amount of technical work will produce them.",
+        },
+        {
+          t: "p",
+          text: "This is the problem most worth having, because it is the one you can fix by writing.",
+        },
+      ],
+    },
+    {
+      h: "The local wrinkle, which catches everyone",
+      blocks: [
+        {
+          t: "note",
+          label: "Two results, two systems",
+          text: "The map results at the top of a local search and the ordinary blue links below them are not the same system. You can be prominent in the map and invisible in the links, or the reverse. The map is driven by your Google Business Profile, not your website, which means a business can be perfectly findable without the website doing anything at all. For most local trades the profile is the bigger lever of the two, and it is free.",
+        },
+        {
+          t: "p",
+          text: "If you serve customers in a particular area and you are not in the map results, the website is not what to fix first. There is a guide on this site for getting on the map, and it is the better use of an afternoon.",
+        },
+      ],
+    },
+    {
+      h: "What actually moves it, in order",
+      blocks: [
+        {
+          t: "ol",
+          items: [
+            "A verified Google Business Profile, filled in properly. Biggest effect, lowest effort, free.",
+            "Reviews on it. They affect the map results directly and they affect whether anyone clicks you once they see you.",
+            "Pages that answer the thing people search, in the words they search it in. One page per question, not everything on the home page.",
+            "Links from real, relevant sites. Slow, unglamorous, and still the thing that separates page one from page four.",
+            "Time. Unsatisfying, and true.",
+          ],
+        },
+      ],
+    },
+    {
+      h: "What does not move it",
+      blocks: [
+        {
+          t: "ul",
+          items: [
+            "Meta keywords. Google stopped using them before most small businesses had a website.",
+            "Submitting to hundreds of directories. A handful of real ones help; bulk submission services get you listed on sites nobody visits and Google discounts.",
+            "Repeating a phrase until the page reads badly. That stopped working a long time ago and now reads as a signal of its own.",
+            "A monthly fee with no list of what is being done for it. If nobody can tell you what shipped last month, nothing shipped last month.",
+            "Buying links. It works until it is caught, and being caught is worse than where you started.",
+          ],
+        },
+      ],
+    },
+    {
+      h: "Ten minutes, in order",
+      blocks: [
+        {
+          t: "ol",
+          items: [
+            "Run the site: search above. Write down which of the three problems you have.",
+            "Search your own business name. If you are not first for that, something is badly wrong and it is worth paying someone to look.",
+            "Search what a customer would type — the service and the place. Note who is above you.",
+            "Check whether you appear in the map results for that search, separately from the links.",
+            "Look at your own home page and ask whether the phrase you just searched appears anywhere on it.",
+          ],
+        },
+        {
+          t: "p",
+          text: "That is enough to know which problem is yours and roughly what it will take. The free findability checker on this site does the technical half of it automatically, including whether a crawler can read your pages at all, which is the one most people cannot check by looking.",
+        },
+      ],
+    },
+  ],
+  close:
+    "If you have run the ten minutes and want someone to tell you which of the three you have and what it would actually take, that is a reasonable first call. We will give you the honest answer, including the one where the website is not the problem and you should go and fill in your Google profile instead.",
+};
+
 export const GUIDES: Guide[] = [
   googleMaps,
   searchConsole,
@@ -1795,6 +2000,7 @@ export const GUIDES: Guide[] = [
   buildVsBuy,
   agencyVsFreelancer,
   softwareBrief,
+  notOnGoogle,
 ];
 
 export const GUIDE_BY_SLUG: Record<string, Guide> = Object.fromEntries(
