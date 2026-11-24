@@ -9,7 +9,7 @@ import {
 import { pillarHref } from "../data/pillars";
 import { industriesForGuide } from "../data/industries";
 import { SERVICE_NAMES } from "../data/serviceColors";
-import { useDocumentMeta } from "../lib/documentMeta";
+import { useDocumentMeta, guideMeta } from "../lib/documentMeta";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import NotFound from "./NotFound";
 import "../components/guides/guides.css";
@@ -74,13 +74,12 @@ function Blocks({ blocks }: { blocks: Block[] }) {
   );
 }
 
-/** Title and description for a guide, shared by the page and prerender. */
-export function guideMeta(g: GuideData): { title: string; description: string } {
-  const title = `${g.title} | Averr Studios`;
-  const description =
-    g.dek.length <= 158 ? g.dek : g.dek.slice(0, g.dek.lastIndexOf(" ", 157)) + "…";
-  return { title, description };
-}
+/* `guideMeta` moved to lib/documentMeta beside `caseMeta`: both answer
+   the same question, both are held to the same limits by
+   tools/meta-lengths.test.ts, and that test cannot import a .tsx —
+   node's type stripping does not do JSX. Re-exported here so the
+   existing callers keep their import path. */
+export { guideMeta };
 
 function Article({ g }: { g: GuideData }) {
   const meta = guideMeta(g);

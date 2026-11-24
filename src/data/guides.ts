@@ -112,7 +112,7 @@ export type Guide = {
  */
 const googleMaps: Guide = {
   slug: "get-your-toronto-business-on-google-maps",
-  title: "How to get your Toronto business on Google Maps",
+  title: "Get your Toronto business on Google Maps",
   target: "get business on google maps toronto",
   /* Local visibility is the marketing service's own subject. This
      guide and the Search Console one are why Marketing has the
@@ -120,7 +120,7 @@ const googleMaps: Guide = {
   svc: ["marketing"],
   close:
     "Setting up a Google Business Profile is part of what we do for clients in Toronto and the GTA, along with the website it points at. Thirty minutes on a call and you'll know what it takes.",
-  dek: "A Google Business Profile is the single biggest thing a local business can do for itself, and most of the work is decisions rather than typing. Here is the whole process, in order, including the one choice that gets profiles suspended.",
+  dek: "A Google Business Profile is the biggest free lever a local business has. The whole process, in order, including the one choice that gets profiles suspended.",
   published: "2026-11-17",
   checked: "2026-11-17",
   og: "guide-google-maps",
@@ -318,12 +318,12 @@ const googleMaps: Guide = {
  */
 const searchConsole: Guide = {
   slug: "set-up-google-search-console",
-  title: "How to set up Google Search Console, and what to actually look at",
+  title: "Set up Google Search Console in 20 minutes",
   target: "set up google search console",
   svc: ["marketing"],
   close:
     "Search Console will tell you what Google thinks of your site. Acting on it — fixing what's broken, writing what's missing, watching whether it worked — is the part we do for businesses across the GTA. Thirty minutes on a call and you'll know where yours actually stands.",
-  dek: "Search Console is the only place Google tells you what it thinks of your site. Setting it up takes twenty minutes; knowing which four screens matter saves you from the other thirty.",
+  dek: "Search Console is the only place Google tells you what it makes of your site. Setup takes twenty minutes, and four screens matter. The rest can wait.",
   published: "2026-11-17",
   checked: "2026-11-17",
   og: "guide-search-console",
@@ -464,12 +464,12 @@ const searchConsole: Guide = {
  */
 const siteSpeed: Guide = {
   slug: "why-your-website-is-slow",
-  title: "Why your website is slow, and what actually fixes it",
+  title: "Why your website is slow, and what fixes it",
   target: "why is my website slow",
   svc: ["websites"],
   close:
     "Everything above is ordinary work, and we do it while building rather than coming back to it afterwards — which is why this site scores what it does. If you'd rather not audit your own images and scripts, thirty minutes on a call and you'll know what yours needs.",
-  dek: "Most speed advice is a list of fixes with no order. Here are the three numbers Google measures, the handful of things that actually cause a slow site, and the fixes ranked by how much they pay back.",
+  dek: "Most speed advice is a list of fixes in no order. The three numbers Google measures, what actually causes a slow site, and the fixes ranked by payback.",
   published: "2026-11-17",
   checked: "2026-11-17",
   og: "guide-site-speed",
@@ -597,14 +597,14 @@ const siteSpeed: Guide = {
  */
 const wixVsCustom: Guide = {
   slug: "wix-vs-custom-website",
-  title: "Wix vs a custom website: which one your business actually needs",
+  title: "Wix vs a custom website: which you need",
   target: "wix vs custom website",
   /* The clearest cluster page on the site: someone comparing a
      builder to a custom build is one step from hiring. */
   svc: ["websites"],
   close:
     "If the line in this guide puts you on the custom side, that's what we build. If it puts you on the builder side, we'll say so on the call rather than sell you something you don't need yet. Thirty minutes either way.",
-  dek: "Site builders are genuinely good at some things and quietly expensive at others. Here is where the line falls, written by people who sell the custom side and will tell you when you do not need it.",
+  dek: "Site builders are good at some things and quietly expensive at others. We sell the custom side, so here is where the line honestly falls, both ways.",
   published: "2026-11-17",
   checked: "2026-11-17",
   og: "guide-wix-vs-custom",
@@ -736,12 +736,12 @@ const wixVsCustom: Guide = {
  */
 const websiteVsWebApp: Guide = {
   slug: "website-vs-web-app",
-  title: "Website or web app: which one your business actually needs",
+  title: "Website or web app: which one you need",
   target: "website vs web app",
   svc: ["webApps"],
   close:
     "If the question at the end of this points you at an app, that's the kind of thing we build — Sift, CadenceStack and CapitalCommand are all on this site. If it points you at a website and a form, say so on the call and we'll scope that instead.",
-  dek: "The difference that matters is not technical and nobody asks it plainly: does anyone log in and change something? Here is the line, and the expensive mistake people make on both sides of it.",
+  dek: "Nobody asks it plainly: does anyone log in and change something? That is the whole line, plus the expensive mistake people make on each side of it.",
   published: "2026-11-19",
   checked: "2026-11-19",
   og: "guide-website-vs-web-app",
@@ -866,12 +866,12 @@ const websiteVsWebApp: Guide = {
 
 const spreadsheetToSoftware: Guide = {
   slug: "when-to-replace-a-spreadsheet",
-  title: "When to stop running your business on a spreadsheet",
+  title: "When a spreadsheet stops being enough",
   target: "replace spreadsheet with custom software",
   svc: ["webApps"],
   close:
     "Replacing a spreadsheet that is still working is a waste of money, and we'll tell you if that's what you have. If two of the four signs above are true, that's the conversation worth having — it's most of what we build.",
-  dek: "Spreadsheets are better tools than people admit, right up to a specific breaking point. Here are the four signs you have passed it, and what replacing one actually buys you.",
+  dek: "Spreadsheets are better tools than people admit, right up to one specific breaking point. The four signs you have passed it, and what replacing one buys.",
   published: "2026-11-19",
   checked: "2026-11-19",
   og: "guide-replace-spreadsheet",
@@ -1015,7 +1015,7 @@ const spreadsheetToSoftware: Guide = {
  */
 const contractorHomePage: Guide = {
   slug: "what-to-put-on-a-contractor-website",
-  title: "What to put on a contractor's home page, section by section",
+  title: "What to put on a contractor's home page",
   target: "what to put on a contractor website",
   svc: ["websites"],
   close:
@@ -1222,12 +1222,12 @@ const contractorHomePage: Guide = {
  */
 const buildVsBuy: Guide = {
   slug: "build-vs-buy-software",
-  title: "Build or buy: when custom software is worth it, and when it is not",
+  title: "Build or buy: when custom software pays",
   target: "build vs buy software",
   svc: ["webApps"],
   close:
     "If you have run the test in the last section and the answer came out on the build side, the next step is a scoping call rather than a quote — thirty minutes to work out whether the thin layer is really thin. If it came out on the buy side, you have saved yourself a project, and we would rather you spent the money on the tool.",
-  dek: "Buying wins most of the time. There is one reason to build that holds up, and three projects we have shipped that met it — plus the common reasons that do not.",
+  dek: "Buying wins most of the time. One reason to build holds up, and three projects we shipped met it — plus the common reasons that do not.",
   published: "2026-11-22",
   checked: "2026-11-22",
   og: "guide-build-vs-buy",
@@ -1407,10 +1407,10 @@ const buildVsBuy: Guide = {
  */
 const agencyVsFreelancer: Guide = {
   slug: "agency-vs-freelancer-vs-diy",
-  title: "Agency, freelancer or yourself: who should build your website",
+  title: "Agency, freelancer or you: who builds it",
   target: "web design agency vs freelancer",
   svc: ["websites"],
-  dek: "Three ways to get a website made, and the specific thing that goes wrong with each. Written by a one-person studio, which is the middle option and the one you should push hardest on.",
+  dek: "Three ways to get a website made, and the thing that goes wrong with each. Written by a one-person studio: the middle option, and the one to push on.",
   published: "2026-11-23",
   checked: "2026-11-23",
   og: "guide-agency-vs-freelancer",

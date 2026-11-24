@@ -13,7 +13,8 @@
     "test:keywords": "node --test tools/keyword-map.test.ts",
     "test:targets": "node tools/tap-targets.mjs",
     "test:findable": "node --test tools/findability.test.ts",
-    "test:function": "node tools/function-loads.mjs"
+    "test:function": "node tools/function-loads.mjs",
+    "test:meta": "node --test tools/meta-lengths.test.ts"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",
