@@ -1573,6 +1573,217 @@ const agencyVsFreelancer: Guide = {
     "If the middle option is where you landed, that is us, and the call is with the person who would do the work rather than someone who would pass it on. Ask about the handover before you ask about the design — it is the answer that tells you the most.",
 };
 
+/**
+ * Guide 10 — the brief.
+ *
+ * `buildVsBuy` ends by telling the reader to bring a scoped problem to
+ * a developer and get a real answer instead of an estimate shaped like
+ * one. It never says how to scope it. This is that guide, and the Web
+ * Apps pillar needed the depth anyway: three guides behind it against
+ * the five to eight that make Google read a pillar as covering its
+ * subject.
+ *
+ * The argument is that most briefs describe an imagined solution
+ * rather than the problem, which is why quotes for the same project
+ * vary so wildly — every developer is pricing a different thing. It
+ * is written for someone who has never commissioned software and is
+ * about to, which is most of this studio's web-app enquiries.
+ *
+ * No prices, and no durations attached to phases: the site states no
+ * prices, and "phase one takes six weeks" would be a figure invented
+ * for somebody else's project. What the guide gives instead is the
+ * shape of a brief and the test for whether a quote came back honest,
+ * both of which hold whatever the numbers turn out to be.
+ */
+const softwareBrief: Guide = {
+  slug: "how-to-write-a-software-brief",
+  title: "A software brief that gets you real quotes",
+  target: "how to write a software brief",
+  svc: ["webApps"],
+  dek: "Quotes for the same project come back wildly apart because the brief described an imagined solution instead of the problem. Here is the page that fixes that.",
+  published: "2026-11-23",
+  checked: "2026-11-23",
+  og: "guide-software-brief",
+  intro: [
+    {
+      t: "p",
+      text: "If you have asked three developers to price the same project and got three answers that barely resemble each other, the brief is usually why. Not because anyone was dishonest — because each of them was pricing a different piece of software, having been handed a description vague enough to imagine their own.",
+    },
+    {
+      t: "p",
+      text: "This is the page that fixes it. It takes an afternoon, it costs nothing, and it is the single highest-leverage hour in the whole project.",
+    },
+  ],
+  sections: [
+    {
+      h: "Why most briefs produce bad quotes",
+      blocks: [
+        {
+          t: "p",
+          text: "Almost every first brief describes a solution. A dashboard with a calendar view, a client login, a reports tab. It reads like a specification and it behaves like a wish, because nobody reading it can tell which parts matter, which were guesses, and what the thing is actually for.",
+        },
+        {
+          t: "p",
+          text: "A developer handed that has three options: price the maximum reading of it and look expensive, price the minimum and look cheap until the change requests start, or come back with a list of questions. Only the third is honest, and it is the one that loses jobs to the people who guessed low.",
+        },
+        {
+          t: "p",
+          text: "Describe the problem instead and the three quotes converge, because everyone is finally pricing the same thing.",
+        },
+      ],
+    },
+    {
+      h: "Start with the day, not the software",
+      blocks: [
+        {
+          t: "p",
+          text: "Before writing a single feature, write down what actually happens now. Not the tidy version — the real one, with the spreadsheet somebody maintains by hand, the message sent to confirm the thing the system already knows, the folder named final-v3.",
+        },
+        {
+          t: "p",
+          text: "That workaround is the specification. People build workarounds around the exact shape of the problem, and they stop building them the moment the problem goes away. A brief that describes the workaround in detail tells a developer more than one that describes a feature list, because it says which parts are load-bearing.",
+        },
+      ],
+    },
+    {
+      h: "The five things every brief needs",
+      blocks: [
+        {
+          t: "ol",
+          items: [
+            "Who uses it, and how many of them. Five staff is a different piece of software from five hundred customers, and the difference is most of the cost.",
+            "What happens today, in order. The whole sequence, manual steps included, from the thing that starts it to the thing that ends it.",
+            "What has to come out of it. The invoice, the weekly report, the list someone prints on a Friday. Outputs are concrete in a way that features are not.",
+            "What it has to talk to. Accounting software, the calendar, the booking system, the till. Each connection is real work, and each one left unmentioned is a surprise later.",
+            "What done means for the first version. One sentence. If you cannot write it, the project has no edge and will not have one later either.",
+          ],
+        },
+      ],
+    },
+    {
+      h: "Rank, don't list",
+      blocks: [
+        {
+          t: "note",
+          label: "The thing that halves the scope",
+          text: "A brief with twenty features gets priced as twenty features. The same brief with those twenty sorted into must-have, useful, and later gets priced as a first phase — usually a third of the list, and the two-thirds you deferred were mostly things you would have discovered you did not need after paying for them. Sorting costs you an hour. It is the highest-return hour in the project.",
+        },
+        {
+          t: "p",
+          text: "Be ruthless with the top tier. The test is not whether a feature would be good. It is whether you would still commission the project if that feature were the only thing it did.",
+        },
+      ],
+    },
+    {
+      h: "What to leave out",
+      blocks: [
+        {
+          t: "p",
+          text: "Three things that make a brief worse:",
+        },
+        {
+          t: "ul",
+          items: [
+            "The technology. Naming a framework or a database narrows the field to people who use it and tells you nothing about whether it was the right call. Say what it has to do; let the quote argue for how.",
+            "The screens. Sketching layouts freezes decisions before anyone has thought about the flow, and a developer who follows your sketch exactly has stopped thinking.",
+            "Invented numbers. A made-up user count or deadline gets priced as though it were real. Say you do not know; a good quote handles that better than a wrong figure.",
+          ],
+        },
+      ],
+    },
+    {
+      h: "The things nobody writes down and everybody needs",
+      blocks: [
+        {
+          t: "p",
+          text: "These never appear in a first brief and all of them turn into arguments later. Decide them while you still have leverage.",
+        },
+        {
+          t: "ul",
+          items: [
+            "Who owns the code and the data, and whose accounts they sit in.",
+            "Who can see what. If one staff member should not see everyone's figures, say so now — permissions are cheap to design in and expensive to retrofit.",
+            "What happens when someone leaves, on either side. Access, handover, documentation.",
+            "Where it is hosted and who pays for that monthly, forever.",
+            "What support looks like after launch, and what counts as a bug rather than a new request.",
+          ],
+        },
+      ],
+    },
+    {
+      h: "The same lines, before and after",
+      blocks: [
+        {
+          t: "p",
+          text: "What that looks like in practice. Four lines from a real first brief, and the version that gets a quote you can trust. None of the rewrites are longer by much; they are just about the business instead of about software.",
+        },
+        {
+          t: "ul",
+          items: [
+            "Instead of \"a dashboard where staff can see jobs\": three installers need to know, on their phone, which job is next and what the address is. Today the office texts them each morning and re-texts when anything moves.",
+            "Instead of \"reporting functionality\": on Friday I need one number, hours billed per installer this week. I add it up from the paper sheets and it takes about an hour.",
+            "Instead of \"integrate with the accounting software\": every completed job should become an invoice. Today someone retypes it, and roughly one in twenty never gets invoiced at all.",
+            "Instead of \"user management\": two office staff see everything, installers see only their own jobs, nobody outside the company sees anything.",
+          ],
+        },
+        {
+          t: "p",
+          text: "Every rewrite does the same thing: it names who, says what happens now, and admits what it costs. A developer reading the second column can price it. A developer reading the first can only guess, and the guess is what you were going to be charged for.",
+        },
+      ],
+    },
+    {
+      h: "The one page",
+      blocks: [
+        {
+          t: "p",
+          text: "Put together, that is a single page with seven headings. Write a few lines under each and stop.",
+        },
+        {
+          t: "ol",
+          items: [
+            "The problem, in two sentences, with no software in them.",
+            "What happens today, in order.",
+            "Who uses it and how many.",
+            "Must-have, useful, later.",
+            "What has to come out of it.",
+            "What it has to connect to.",
+            "What done looks like for version one.",
+          ],
+        },
+        {
+          t: "p",
+          text: "Longer than a page usually means the first version is too big, which is worth knowing before anyone quotes rather than after.",
+        },
+      ],
+    },
+    {
+      h: "How to tell a real quote from a guess",
+      blocks: [
+        {
+          t: "p",
+          text: "Once the brief goes out, the replies tell you as much as the numbers do. A real one does four things:",
+        },
+        {
+          t: "ul",
+          items: [
+            "It asks questions, and the questions are about your business rather than about your preferences.",
+            "It phases the work, and the first phase is smaller than you proposed.",
+            "It writes down what it assumed, so you can correct the assumption rather than discover it.",
+            "It prices the parts nobody can know separately, or says plainly that they will be estimated once the first phase is built.",
+          ],
+        },
+        {
+          t: "p",
+          text: "A quote that comes back the same day with one number and no questions is not confidence. Nobody can price software they have not thought about, and the number is either padded enough to be safe or low enough to win, with the difference arriving later as change requests.",
+        },
+      ],
+    },
+  ],
+  close:
+    "If you have written the page and want someone to read it back to you, that is a good use of a first call — we will tell you which parts are doing work and which are a wish, whether or not we end up building it. Thirty minutes, and you keep the brief either way.",
+};
+
 export const GUIDES: Guide[] = [
   googleMaps,
   searchConsole,
@@ -1583,6 +1794,7 @@ export const GUIDES: Guide[] = [
   contractorHomePage,
   buildVsBuy,
   agencyVsFreelancer,
+  softwareBrief,
 ];
 
 export const GUIDE_BY_SLUG: Record<string, Guide> = Object.fromEntries(
