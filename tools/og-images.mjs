@@ -32,6 +32,7 @@ const CARDS = [
   { id: "guide-agency-vs-freelancer", eyebrow: "Guide · Choosing", title: "Agency, freelancer or you?", sub: "Three structures, three failures. Which one you are signing up for." },
   { id: "guide-software-brief", eyebrow: "Guide · Scoping", title: "Write the brief first.", sub: "Seven headings, one page, and the hour that halves the scope." },
   { id: "guide-not-on-google", eyebrow: "Guide · Search", title: "Why you're not on Google.", sub: "Three different problems. Most advice answers the wrong one." },
+  { id: "guide-app-or-web-app", eyebrow: "Guide · Choosing", title: "App, or web app?", sub: "The gap closed. What is left is getting it installed." },
   { id: "tool-findable", eyebrow: "Free tool", title: "Can customers find you?", sub: "Check what Google can and cannot work out about your business." },
   { id: "industry-contractors", eyebrow: "Contractors · GTA", title: "A website that gets you called.", sub: "Two builds for GTA trades: an installer and a renovation company." },
   { id: "work", eyebrow: "Work", title: "Built by Averr.", sub: "Real products for businesses across the GTA." },
