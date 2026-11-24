@@ -61,6 +61,8 @@ const STUDIO_PROFILES = [
   "https://www.instagram.com/averrstudios",
   "https://maps.app.goo.gl/wsJaom8Gdpftd91n8",
 ];
+/* studio, founder and website are defined below; IDENTITY is assembled
+   after them, just above the page table. */
 const GTA = ["Toronto", "North York", "Scarborough", "Etobicoke", "Mississauga", "Brampton", "Vaughan", "Markham", "Richmond Hill", "Oakville"];
 /* Declared above `studio` because its offer catalogue builds service
    nodes while this module initialises, and a const is not readable
@@ -183,6 +185,11 @@ const crumbs = (items) => ({
 });
 
 /* ── the routes ───────────────────────────────────────────────────── */
+/* The three nodes that identify this business, put on every indexable
+   page by `head` below. Kept as one list so there is a single place to
+   add the fourth if one ever exists. */
+const IDENTITY = [studio, founder, website];
+
 const pages = [
   { url: "/", meta: META.home, og: "home", priority: "1.0", graph: [studio, founder, website] },
   {
@@ -372,6 +379,23 @@ function head(html, page, { noindex = false } = {}) {
   set(/<meta property="og:url" content="[^"]*" \/>/, `<meta property="og:url" content="${canonical}" />`);
   set(/<meta name="twitter:title" content="[^"]*" \/>/, `<meta name="twitter:title" content="${esc(title)}" />`);
   set(/<meta name="twitter:description" content="[^"]*" \/>/, `<meta name="twitter:description" content="${esc(description)}" />`);
+  /* The three nodes that say who this is go on every indexable page,
+     not only the routes whose definition happened to list them. Google
+     reads each page's graph on its own, so an `@id` pointing at a node
+     defined on another page does not resolve — a quiet failure, because
+     the markup is well-formed and the node it names is simply absent.
+     On 23 Nov 2026 the five case studies carried
+     `creator: {"@id": …#studio}` with no studio node on the page,
+     /prachets had the founder alone, /privacy had no graph at all, and
+     fifteen pages pointed at a founder that was not there. The checker
+     scored those 91 and 79 against 97 for the pages that did carry it.
+     Done here rather than in a dozen route definitions, so the next
+     page added cannot forget. `tools/schema.test.ts` holds it, and also
+     checks the general case: no reference without its node.
+     Noindex pages are left alone — nothing to tell Google about a page
+     it will not index. */
+  const graph = noindex ? page.graph : [...IDENTITY.filter((n) => !page.graph.includes(n)), ...page.graph];
+
   const extra = [
     noindex ? `<meta name="robots" content="noindex" />` : `<link rel="canonical" href="${canonical}" />`,
     `<meta property="og:site_name" content="Averr Studios" />`,
@@ -381,7 +405,7 @@ function head(html, page, { noindex = false } = {}) {
     `<meta property="og:image:height" content="630" />`,
     `<meta property="og:image:alt" content="${esc(title)}" />`,
     `<meta name="twitter:image" content="${ogImage}" />`,
-    page.graph.length ? ld({ "@context": "https://schema.org", "@graph": page.graph }) : "",
+    graph.length ? ld({ "@context": "https://schema.org", "@graph": graph }) : "",
   ].filter(Boolean).join("\n    ");
   return html.replace("</head>", `    ${extra}\n  </head>`);
 }
