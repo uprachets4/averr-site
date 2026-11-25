@@ -160,7 +160,14 @@ export default function ProjectRows({
                           state={{ from: "work" }}
                           data-no-wipe
                         >
-                          Open the case file →
+                          {/* The project's name is in the link rather than
+                              only in the row above it. Five case files
+                              shared the anchor text "Open the case file",
+                              which tells a crawler nothing about which of
+                              the five it leads to and reads identically
+                              five times in a screen reader's link list.
+                              Visually hidden, so the card is unchanged. */}
+                          Open the <span className="sr-only">{p.name} </span>case file →
                         </Link>
                       </div>
                     </div>

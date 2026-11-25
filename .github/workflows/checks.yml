@@ -1,0 +1,59 @@
+# The checks that already existed, actually running.
+#
+# The repository had ten test scripts — meta lengths, the keyword map,
+# schema, findability, tap targets, contact logging and the rest — and
+# one workflow, which pinged IndexNow after a deploy. Nothing ran the
+# tests. They are the thing holding the SEO work in place: titles under
+# sixty characters, one page per search, a business node on every
+# indexable page. A rule nobody runs is a rule that drifts, which is
+# how ten of twenty-six titles went over the limit before anyone
+# measured.
+#
+# Two jobs rather than one. `data` needs no build and finishes in
+# seconds, so a title typed too long fails almost immediately.
+# `built` runs the checks that read `dist/`, which need the real
+# prerendered HTML — `schema` and `findability` both skip themselves
+# when there is no build, and skipping silently on CI would be worse
+# than not running them.
+name: Checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  data:
+    name: Data checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:meta
+      - run: npm run test:links
+      - run: npm run test:keywords
+      - run: npm run test:dates
+      - run: npm run test:tokens
+      - run: npm run test:contact
+
+  built:
+    name: Build and check the output
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Playwright is only needed by the checks that drive a page.
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run test:schema
+      - run: npm run test:findable
+      - run: npm run test:targets
+      - run: npm run test:function

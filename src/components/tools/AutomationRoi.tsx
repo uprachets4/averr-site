@@ -266,8 +266,11 @@ export default function AutomationRoi() {
           <p>
             If the number surprised you, that is usually the sign the task is worth looking at. The
             next question is which parts of it a person still has to do, which is a conversation
-            rather than a calculator. There is a guide on this site about writing the brief for
-            that, and a thirty-minute call costs nothing.
+            rather than a calculator. There is{" "}
+            <Link to="/guides/how-to-write-a-software-brief">
+              a guide on this site about writing the brief
+            </Link>{" "}
+            for that, and <Link to="/contact">a thirty-minute call</Link> costs nothing.
           </p>
         </div>
       </div>

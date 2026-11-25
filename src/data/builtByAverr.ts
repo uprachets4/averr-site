@@ -98,7 +98,19 @@ export type BuiltProject = {
   c: string;
   /** A real recording, or `slides` for the projects without one. */
   video?: { src: string; poster: string };
-  slides?: string[];
+  /**
+   * Each slide carries its caption, the same shape `gallery` uses, so
+   * the image can describe itself.
+   *
+   * These were bare paths and rendered `alt=""`. That was defensible
+   * inside the component — the crossfade is one `role="img"` group
+   * with a label, and empty alt on the children is correct for a
+   * composite. It stopped being defensible at the sitemap: prerender
+   * declares all five to Google as images worth indexing, and an
+   * image sitemap entry whose page gives it no text is a screenshot
+   * of a client's product that nothing describes.
+   */
+  slides?: { image: string; caption: string }[];
   thesis: string;
   /** A verbatim phrase from `thesis`, set in the studio gradient. */
   pill: string;
@@ -546,11 +558,11 @@ export const BUILT: BuiltProject[] = [
     svc: ["webApps", "aiAutomation"],
     c: "#9874E8",
     slides: [
-      `${CAP}/01-overview.jpg`,
-      `${CAP}/02-portfolio.jpg`,
-      `${CAP}/04-ipo-intelligence.jpg`,
-      `${CAP}/08-system-health.jpg`,
-      `${CAP}/05-signal-desk.jpg`,
+      { image: `${CAP}/01-overview.jpg`, caption: "Overview" },
+      { image: `${CAP}/02-portfolio.jpg`, caption: "Portfolio" },
+      { image: `${CAP}/04-ipo-intelligence.jpg`, caption: "IPO intelligence" },
+      { image: `${CAP}/08-system-health.jpg`, caption: "System health" },
+      { image: `${CAP}/05-signal-desk.jpg`, caption: "Signal desk" },
     ],
     thesis: "A research-first investment console.",
     pill: "research-first",
