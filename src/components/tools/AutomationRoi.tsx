@@ -325,19 +325,19 @@ export default function AutomationRoi() {
             usually spread thin, and the value of that depends entirely on what they do instead.
           </p>
           <p>
-            <strong>Almost nothing automates to zero.</strong> The slider above starts at 100% on
-            purpose, because that is the honest starting point — the full cost of the task as you
-            described it. Most real automation removes somewhere between half and most of a job
-            and leaves a person checking the output. Moving the slider is you making an
-            assumption, and the page would rather you made it deliberately than inherited a
-            flattering default.
+            <strong>Almost nothing automates to zero.</strong> The slider above asks how much of
+            the job automation would actually remove, and it starts at the top. At 100% the figure
+            on screen is simply the whole task costed out, which is a fact about the numbers you
+            typed. Most real automation removes somewhere between half and most of a job and
+            leaves a person checking the output — so dragging the slider down is where your own
+            judgement enters, and the page would rather you made that call deliberately than
+            inherited it from a default.
           </p>
           <p>
             <strong>An hourly rate is not the full cost of the person.</strong> If you entered a
             wage, the real figure is higher once you account for everything employing someone
-            actually costs. The calculation here stays with the number you typed rather than
-            marking it up, because a multiplier invented on this page would be the part you could
-            fairly argue with.
+            actually costs. The calculation stays with the number you typed rather than marking it
+            up, so the total is yours to defend rather than ours to justify.
           </p>
         </section>
       </div>

@@ -248,8 +248,8 @@ export default function Findable() {
             <h2>What the check actually looks at</h2>
             <p>
               Four questions, in the order that decides whether a search engine can do anything
-              useful with your site. Each one is answered from the HTML your server sends, so you
-              are seeing roughly what Google sees on its first visit.
+              useful with your site. Most of the answers come from the page itself; the rest from
+              your robots.txt, your sitemap, and the response your server gives.
             </p>
 
             <h3>Can Google tell who you are?</h3>
@@ -299,11 +299,11 @@ export default function Findable() {
 
             <h2>What a low score means, and what it does not</h2>
             <p>
-              The number is pass, warn or fail across every check, as a percentage. It is not a
-              Google ranking and nothing here is a penalty — a site can score badly and still rank,
-              and a perfect score guarantees nothing on its own. What the score tells you is how
-              much a search engine is having to guess about your business, and guessing is where
-              you lose to a competitor who made it obvious.
+              You get a score out of 100, which is every check counted as a pass, a half for a
+              warning, or nothing. It is not a Google ranking and nothing here is a penalty — a
+              site can score badly and still rank, and a perfect score guarantees nothing on its
+              own. What it measures is how much a search engine is having to guess about your
+              business, and guessing is where you lose to a competitor who made it obvious.
             </p>
             <p>
               Most failures here are one line of code. The exceptions are structured data, which is
