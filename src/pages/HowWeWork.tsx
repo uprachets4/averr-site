@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useDocumentMeta, META } from "../lib/documentMeta";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import { useSetNavDarkOverride } from "../lib/navTone";
@@ -241,7 +242,21 @@ export default function HowWeWork() {
             </p>
             <p>
               What happens to anything you send us is set out separately on the{" "}
-              <a href="/privacy">privacy page</a>.
+              <Link to="/privacy">privacy page</Link>.
+            </p>
+            {/* This page had exactly one outbound link — the privacy
+                one above — which left the page that answers "what am I
+                actually buying" with nowhere to send a reader who has
+                just been answered. Three destinations, in the order
+                someone reads this page and then wants them. */}
+            <p>
+              If that is the way you would want a project run, the next useful pages are{" "}
+              <Link to="/services">the four services and what each takes</Link>, or{" "}
+              <Link to="/work/express-contractors">
+                a finished build with the decisions behind it
+              </Link>{" "}
+              if you would rather see the process in its result than read about it. When you are
+              ready, <Link to="/contact">the first call is thirty minutes and free</Link>.
             </p>
           </section>
         </div>

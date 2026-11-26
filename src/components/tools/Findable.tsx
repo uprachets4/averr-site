@@ -234,6 +234,90 @@ export default function Findable() {
             </div>
           </div>
         ) : null}
+
+        {/* The page before anyone runs a check.
+            The tool was 150 words of indexable text wrapped around a
+            form, which is the shape of a page that earns links and
+            ranks for nothing. This is what a crawler and a first-time
+            visitor read: the four questions the check asks, in the
+            order it asks them, and what to do about each answer.
+            Hidden once there is a report, because by then the reader
+            has the specific version of all of it. */}
+        {!report ? (
+          <section className="fnd-explain">
+            <h2>What the check actually looks at</h2>
+            <p>
+              Four questions, in the order that decides whether a search engine can do anything
+              useful with your site. Each one is answered from the HTML your server sends, so you
+              are seeing roughly what Google sees on its first visit.
+            </p>
+
+            <h3>Can Google tell who you are?</h3>
+            <p>
+              Structured data is a block of machine-readable detail in the page — your business
+              name, your phone number, where you work. Without it a search engine has to infer all
+              of that from your paragraphs, and it often infers wrong or not at all. This is the
+              single most common gap on a small business site, and for a local trade it is the one
+              that costs the most: it is how Google connects a website to a business it can place
+              on a map. If this group fails, start with{" "}
+              <Link to="/guides/get-your-toronto-business-on-google-maps">
+                getting your business on Google Maps
+              </Link>
+              , which matters more than anything on your website.
+            </p>
+
+            <h3>Can Google find your pages?</h3>
+            <p>
+              A title and a description on every page, one main heading, a canonical address so two
+              URLs showing the same page do not compete with each other, and a sitemap and
+              robots.txt a crawler can read. These are mechanical and cheap, and they are the
+              difference between a site Google has catalogued and one it has merely visited. If
+              you have never looked at what Google thinks of your site, the twenty-minute version
+              is{" "}
+              <Link to="/guides/set-up-google-search-console">setting up Search Console</Link>.
+            </p>
+
+            <h3>Does it work on a phone?</h3>
+            <p>
+              A declared mobile viewport, HTTPS, descriptions on your images, and a page that is
+              not so heavy it stalls on a phone signal. Most people looking for a trade are
+              standing somewhere holding a phone. A site that loads slowly there is not a ranking
+              problem first, it is a lost enquiry first — the ranking follows.{" "}
+              <Link to="/guides/why-your-website-is-slow">
+                What actually makes a site slow
+              </Link>{" "}
+              goes through the causes in the order worth fixing them.
+            </p>
+
+            <h3>Will a customer trust it?</h3>
+            <p>
+              A phone number that is tappable rather than typed out as text, and the signals a
+              person scans for before they call a stranger to come to their house. This group is
+              the one that is about the visitor rather than the crawler, and on a trades site it is
+              usually the one worth fixing first.
+            </p>
+
+            <h2>What a low score means, and what it does not</h2>
+            <p>
+              The number is pass, warn or fail across every check, as a percentage. It is not a
+              Google ranking and nothing here is a penalty — a site can score badly and still rank,
+              and a perfect score guarantees nothing on its own. What the score tells you is how
+              much a search engine is having to guess about your business, and guessing is where
+              you lose to a competitor who made it obvious.
+            </p>
+            <p>
+              Most failures here are one line of code. The exceptions are structured data, which is
+              a short block someone has to write for your business specifically, and page weight,
+              which usually means images nobody resized. If several of these fail at once and you
+              are wondering why you cannot find yourself at all, that question has three different
+              answers and{" "}
+              <Link to="/guides/why-your-website-isnt-on-google">
+                this is how to tell which one is yours
+              </Link>
+              .
+            </p>
+          </section>
+        ) : null}
       </div>
     </div>
   );

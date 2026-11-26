@@ -372,3 +372,59 @@
     transform: none;
   }
 }
+
+/* --- the explainer, shown before a check has been run ---
+   The page was a form and about 150 words, which earns links and
+   ranks for nothing. This is the indexable half: the four questions
+   the check asks, and what to do about each answer. It gives way to
+   the report, because by then the reader has the specific version. */
+
+.fnd-explain {
+  margin-top: 48px;
+  max-width: 68ch;
+}
+
+.fnd-explain h2 {
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+.fnd-explain h2:first-child {
+  margin-top: 0;
+}
+
+.fnd-explain h3 {
+  font-size: 17px;
+  margin-top: 28px;
+  letter-spacing: -0.01em;
+}
+
+.fnd-explain p {
+  margin-top: 12px;
+  max-width: 62ch;
+  color: var(--mute);
+  line-height: 1.65;
+}
+
+.fnd-explain a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--line, rgba(255, 255, 255, 0.35));
+  transition: text-decoration-color 0.25s, color 0.25s;
+}
+
+.fnd-explain a:hover {
+  color: #ede9e2;
+  text-decoration-color: currentColor;
+}
+
+@media (max-width: 640px) {
+  .fnd-explain {
+    margin-top: 32px;
+  }
+
+  .fnd-explain h2 {
+    margin-top: 32px;
+  }
+}
