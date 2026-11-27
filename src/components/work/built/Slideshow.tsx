@@ -14,7 +14,7 @@ export default function Slideshow({
   name,
   className,
 }: {
-  slides: string[];
+  slides: { image: string; caption: string }[];
   name: string;
   className?: string;
 }) {
@@ -24,12 +24,18 @@ export default function Slideshow({
       role="img"
       aria-label={`Screens from ${name}`}
     >
-      {slides.map(function slide(src, i) {
+      {slides.map(function slide(s, i) {
         return (
           <img
-            key={src}
-            src={screen(src).small}
-            alt=""
+            key={s.image}
+            src={screen(s.image).small}
+            /* The group above is one `role="img"` with its own label,
+               so a screen reader announces that and never reaches
+               these. The alt is here for everything that does read
+               it — image search above all, since prerender lists all
+               five in the image sitemap. Same `name: caption` form
+               the gallery and the signatures use. */
+            alt={`${name}: ${s.caption}`}
             decoding="async"
             style={{
               animationDelay: `${i * 4 - 1}s`,

@@ -10,6 +10,7 @@ import { pillarHref } from "../data/pillars";
 import { industriesForGuide } from "../data/industries";
 import { SERVICE_NAMES } from "../data/serviceColors";
 import { useDocumentMeta, guideMeta } from "../lib/documentMeta";
+import { parseInline } from "../lib/inlineLinks";
 import { useDeclarePageEndTone } from "../lib/pageTone";
 import NotFound from "./NotFound";
 import "../components/guides/guides.css";
@@ -42,16 +43,52 @@ export function sectionId(h: string): string {
     .replace(/^-|-$/g, "");
 }
 
+/**
+ * Prose, with `[label](/path)` rendered as a real link.
+ *
+ * Every string in a guide goes through here rather than straight into
+ * JSX, so a reference written in one guide's copy reaches the page it
+ * names. Parsing lives in `lib/inlineLinks` — pure, no JSX — because
+ * `tools/guide-links.test.ts` imports it under plain Node, and because
+ * `readingMinutes` needs the same rules to count words.
+ */
+function Prose({ text }: { text: string }) {
+  const parts = parseInline(text);
+  /* The overwhelmingly common case: no link, no wrapper, no keys. */
+  if (parts.length === 1 && !parts[0].to) return <>{text}</>;
+
+  return (
+    <>
+      {parts.map((p, i) =>
+        p.to ? (
+          <Link key={i} to={p.to}>
+            {p.text}
+          </Link>
+        ) : (
+          <span key={i}>{p.text}</span>
+        )
+      )}
+    </>
+  );
+}
+
 function Blocks({ blocks }: { blocks: Block[] }) {
   return (
     <>
       {blocks.map(function block(b, i) {
-        if (b.t === "p") return <p key={i}>{b.text}</p>;
+        if (b.t === "p")
+          return (
+            <p key={i}>
+              <Prose text={b.text} />
+            </p>
+          );
         if (b.t === "ul")
           return (
             <ul key={i}>
               {b.items.map((x) => (
-                <li key={x}>{x}</li>
+                <li key={x}>
+                  <Prose text={x} />
+                </li>
               ))}
             </ul>
           );
@@ -59,14 +96,18 @@ function Blocks({ blocks }: { blocks: Block[] }) {
           return (
             <ol key={i}>
               {b.items.map((x) => (
-                <li key={x}>{x}</li>
+                <li key={x}>
+                  <Prose text={x} />
+                </li>
               ))}
             </ol>
           );
         return (
           <aside className="gnote" key={i}>
             <b>{b.label}</b>
-            <p>{b.text}</p>
+            <p>
+              <Prose text={b.text} />
+            </p>
           </aside>
         );
       })}
@@ -195,7 +236,9 @@ function Article({ g }: { g: GuideData }) {
 
           <aside className="gend">
             <h2>Would you rather someone just did this?</h2>
-            <p>{g.close}</p>
+            <p>
+              <Prose text={g.close} />
+            </p>
             <Link className="gcta" to="/contact">
               Book a free 30-minute call
             </Link>

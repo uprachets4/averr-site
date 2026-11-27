@@ -25,7 +25,16 @@
  * every six months; that date is the thing to refresh.
  */
 import type { ServiceId } from "./serviceColors";
+import { plainText } from "../lib/inlineLinks.ts";
 
+/**
+ * Prose in any `text` or `items` entry below may carry inline links,
+ * written `[label](/path)` and internal only. See `lib/inlineLinks.ts`
+ * for why the links live inside the string rather than in the type,
+ * and `tools/guide-links.test.ts` for what is enforced. `title` and
+ * `dek` are plain text — they become the `<title>` and the meta
+ * description, and a token there would ship into a search result.
+ */
 export type Block =
   | { t: "p"; text: string }
   | { t: "ul"; items: string[] }
@@ -740,7 +749,7 @@ const websiteVsWebApp: Guide = {
   target: "website vs web app",
   svc: ["webApps"],
   close:
-    "If the question at the end of this points you at an app, that's the kind of thing we build — Sift, CadenceStack and CapitalCommand are all on this site. If it points you at a website and a form, say so on the call and we'll scope that instead.",
+    "If the question at the end of this points you at an app, that's the kind of thing we build — [Sift](/work/sift), [CadenceStack](/work/cadencestack) and [CapitalCommand](/work/capitalcommand) are all on this site. If it points you at a website and a form, say so on the call and we'll scope that instead.",
   dek: "Nobody asks it plainly: does anyone log in and change something? That is the whole line, plus the expensive mistake people make on each side of it.",
   published: "2026-11-19",
   checked: "2026-11-19",
@@ -1031,7 +1040,7 @@ const contractorHomePage: Guide = {
     },
     {
       t: "p",
-      text: "This is the order we have used on two builds for GTA trades. Take the order more seriously than the wording — the sections earn their place by answering the homeowner's next doubt, one after another.",
+      text: "This is the order we have used on [two builds for GTA trades](/industries/contractors). Take the order more seriously than the wording — the sections earn their place by answering the homeowner's next doubt, one after another.",
     },
   ],
   sections: [
@@ -1049,7 +1058,7 @@ const contractorHomePage: Guide = {
         {
           t: "note",
           label: "What we did",
-          text: "For Express Contractors, the hero draws a gas install as you scroll — from the meter, through the line, to a correct blue flame at the end. A visitor sees a properly executed install before reading a single word. CG Walls & Floors opens on the finished rooms rather than on the company, and the whole page is styled closer to an interior design firm than to a trades site.",
+          text: "For [Express Contractors](/work/express-contractors), the hero draws a gas install as you scroll — from the meter, through the line, to a correct blue flame at the end. A visitor sees a properly executed install before reading a single word. [CG Walls & Floors](/work/cg-walls-and-floors) opens on the finished rooms rather than on the company, and the whole page is styled closer to an interior design firm than to a trades site.",
         },
       ],
     },
@@ -1292,7 +1301,7 @@ const buildVsBuy: Guide = {
         {
           t: "note",
           label: "What we did",
-          text: "All three of the software products in our work met this test, and each one for the same reason in a different market. For Sift, every job-search tool in reach was built around auto-apply — optimising for volume, where the problem was precision. For CadenceStack, LinkedIn tools solve the typing, where the client's problem was positioning: knowing what to say next. For CapitalCommand, investing apps collapse research and execution into one loop, and the whole point was to put those steps back in order. In each case a tool existed, worked well, and was aimed a few degrees off.",
+          text: "All three of the software products in our work met this test, and each one for the same reason in a different market. For [Sift](/work/sift), every job-search tool in reach was built around auto-apply — optimising for volume, where the problem was precision. For [CadenceStack](/work/cadencestack), LinkedIn tools solve the typing, where the client's problem was positioning: knowing what to say next. For [CapitalCommand](/work/capitalcommand), investing apps collapse research and execution into one loop, and the whole point was to put those steps back in order. In each case a tool existed, worked well, and was aimed a few degrees off.",
         },
       ],
     },
@@ -1875,7 +1884,7 @@ const notOnGoogle: Guide = {
         },
         {
           t: "p",
-          text: "Search Console tells you which of these it is, and it is free. There is a separate guide on this site for setting it up; the Pages report names every URL it knows about and says in plain language why each one is not indexed.",
+          text: "Search Console tells you which of these it is, and it is free. There is [a separate guide on this site](/guides/set-up-google-search-console) for setting it up; the Pages report names every URL it knows about and says in plain language why each one is not indexed.",
         },
       ],
     },
@@ -1931,7 +1940,7 @@ const notOnGoogle: Guide = {
         },
         {
           t: "p",
-          text: "If you serve customers in a particular area and you are not in the map results, the website is not what to fix first. There is a guide on this site for getting on the map, and it is the better use of an afternoon.",
+          text: "If you serve customers in a particular area and you are not in the map results, the website is not what to fix first. There is [a guide on this site for getting on the map](/guides/get-your-toronto-business-on-google-maps), and it is the better use of an afternoon.",
         },
       ],
     },
@@ -1980,7 +1989,7 @@ const notOnGoogle: Guide = {
         },
         {
           t: "p",
-          text: "That is enough to know which problem is yours and roughly what it will take. The free findability checker on this site does the technical half of it automatically, including whether a crawler can read your pages at all, which is the one most people cannot check by looking.",
+          text: "That is enough to know which problem is yours and roughly what it will take. The [free findability checker on this site](/tools/findable) does the technical half of it automatically, including whether a crawler can read your pages at all, which is the one most people cannot check by looking.",
         },
       ],
     },
@@ -2222,11 +2231,18 @@ export const GUIDE_BY_SLUG: Record<string, Guide> = Object.fromEntries(
  * is the slow end of adult reading and therefore the honest end.
  */
 export function readingMinutes(g: Guide): number {
+  /* Through `plainText`, so a link's path is not counted as words.
+     This number is published — prerender writes `wordCount:
+     readingMinutes(g) * 200` into the Article schema — and
+     `](/guides/what-to-put-on-a-contractor-website)` is markup, not
+     something anybody reads. */
+  const words_ = (s: string) => plainText(s).split(/\s+/).filter(Boolean).length;
+
   const fromBlocks = (bs: Block[]): number =>
     bs.reduce(function count(n, b) {
-      if (b.t === "p") return n + b.text.split(/\s+/).length;
-      if (b.t === "note") return n + b.text.split(/\s+/).length;
-      return n + b.items.join(" ").split(/\s+/).length;
+      if (b.t === "p") return n + words_(b.text);
+      if (b.t === "note") return n + words_(b.text);
+      return n + words_(b.items.join(" "));
     }, 0);
 
   const words =
