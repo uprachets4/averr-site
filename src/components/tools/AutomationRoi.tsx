@@ -273,6 +273,73 @@ export default function AutomationRoi() {
             for that, and <Link to="/contact">a thirty-minute call</Link> costs nothing.
           </p>
         </div>
+
+        {/* The page was a calculator and about 150 words, which earns
+            links and ranks for nothing. This is the readable half:
+            what to do with the figure, and the three honest limits on
+            reading too much into it. */}
+        <section className="roi-explain">
+          <h2>What to do with the number</h2>
+          <p>
+            A figure on its own decides nothing. What makes it useful is comparing it against the
+            three things you could do with that task, in rough order of how often they are the
+            right answer.
+          </p>
+
+          <h3>Change the process</h3>
+          <p>
+            The cheapest fix is almost always removing a step rather than automating it. A weekly
+            report nobody reads, a form that asks for information already in another system, an
+            approval that has never once been refused. If the task exists because of a decision
+            made years ago that nobody has revisited, the annual cost above is the argument for
+            revisiting it, and the fix costs nothing.
+          </p>
+
+          <h3>Buy something</h3>
+          <p>
+            Most repeated office work has a tool built for it, and buying beats building the great
+            majority of the time. Build only wins when the thing you do is genuinely not what
+            everyone else does — which is rarer than it feels from the inside.{" "}
+            <Link to="/guides/build-vs-buy-software">
+              Build or buy: when custom software pays
+            </Link>{" "}
+            sets out the one test that holds up, with three projects that met it.
+          </p>
+
+          <h3>Build something</h3>
+          <p>
+            Worth it when the task is specific to how your business works, when the cost above is
+            recurring rather than seasonal, and when the people doing it are the people you can
+            least afford to have doing it. If the task is currently held together by a spreadsheet
+            that several people edit,{" "}
+            <Link to="/guides/when-to-replace-a-spreadsheet">
+              there is a point where that stops being enough
+            </Link>{" "}
+            and four fairly clear signs you have passed it.
+          </p>
+
+          <h2>Three reasons to read the figure carefully</h2>
+          <p>
+            <strong>Hours saved are not hours recovered.</strong> Removing four hours a week from
+            someone's job does not hand you four hours of new output. It hands you back attention,
+            usually spread thin, and the value of that depends entirely on what they do instead.
+          </p>
+          <p>
+            <strong>Almost nothing automates to zero.</strong> The slider above asks how much of
+            the job automation would actually remove, and it starts at the top. At 100% the figure
+            on screen is simply the whole task costed out, which is a fact about the numbers you
+            typed. Most real automation removes somewhere between half and most of a job and
+            leaves a person checking the output — so dragging the slider down is where your own
+            judgement enters, and the page would rather you made that call deliberately than
+            inherited it from a default.
+          </p>
+          <p>
+            <strong>An hourly rate is not the full cost of the person.</strong> If you entered a
+            wage, the real figure is higher once you account for everything employing someone
+            actually costs. The calculation stays with the number you typed rather than marking it
+            up, so the total is yours to defend rather than ours to justify.
+          </p>
+        </section>
       </div>
     </div>
   );

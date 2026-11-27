@@ -179,3 +179,60 @@
   line-height: 1.65;
   max-width: 60ch;
 }
+
+/* --- the explainer ---
+   The calculator was about 150 words of indexable text around a form.
+   This is the readable half: what to do with the figure, and the
+   limits on reading too much into it. */
+
+.roi-explain {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  max-width: 68ch;
+}
+
+.roi-explain h2 {
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+.roi-explain h2:first-child {
+  margin-top: 0;
+}
+
+.roi-explain h3 {
+  font-size: 17px;
+  margin-top: 28px;
+  letter-spacing: -0.01em;
+}
+
+.roi-explain p {
+  margin-top: 12px;
+  max-width: 62ch;
+  color: var(--mute);
+  line-height: 1.65;
+}
+
+.roi-explain a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--line);
+  transition: text-decoration-color 0.25s, color 0.25s;
+}
+
+.roi-explain a:hover {
+  color: #ede9e2;
+  text-decoration-color: currentColor;
+}
+
+@media (max-width: 640px) {
+  .roi-explain {
+    margin-top: 32px;
+  }
+
+  .roi-explain h2 {
+    margin-top: 32px;
+  }
+}
